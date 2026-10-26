@@ -72,11 +72,11 @@ internal static class ApiPipeline
         guarded.MapSetups();
         guarded.MapEventGrants();
         guarded.MapConsoleOperators();
-        app.MapAccountSearch();
-        app.MapRegistrySearch();
-        app.MapParticipationHistory();
-        app.MapParticipantLinks();
-        app.MapReference();
+        guarded.MapAccountSearch();
+        guarded.MapRegistrySearch();
+        guarded.MapParticipationHistory();
+        guarded.MapParticipantLinks();
+        guarded.MapReference();
         guarded.MapEventData();
         guarded.MapTimeEventActors();
         guarded.MapSnapshots();

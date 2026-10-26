@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Text.Json;
-using Microsoft.AspNetCore.Identity;
 using MongoDB.Driver.Linq;
 using Not.Domain.Abstractions;
 using Not.Exceptions;
@@ -93,28 +92,19 @@ internal sealed class ReferenceFamily<TModel, TEntity>
 
 /// <summary>
 /// What the routes of every family of reference data need, in one place: the collection a caller sees (the Tenant's they
-/// act in, or the platform's), and the policy's answer to whether the caller may write it.
+/// act in, or the platform's), and whether a Participation refers to a row. Whether the caller may write is not asked here:
+/// the endpoint filter decides it from what the family says it needs (#671).
 /// </summary>
 internal sealed class ReferenceAccess
 {
     readonly TenantCollections _tenants;
     readonly GlobalCollections _globals;
-    readonly TenantStore _tenantStore;
-    readonly StandingReader _standing;
     readonly CrossTenantReads _reads;
 
-    public ReferenceAccess(
-        TenantCollections tenants,
-        GlobalCollections globals,
-        TenantStore tenantStore,
-        StandingReader standing,
-        CrossTenantReads reads
-    )
+    public ReferenceAccess(TenantCollections tenants, GlobalCollections globals, CrossTenantReads reads)
     {
         _tenants = tenants;
         _globals = globals;
-        _tenantStore = tenantStore;
-        _standing = standing;
         _reads = reads;
     }
 
@@ -135,41 +125,6 @@ internal sealed class ReferenceAccess
     {
         return _reads.IsReferencedByParticipationAsync(use.Member, rowId, cancellationToken);
     }
-
-    /// <summary>Null when the caller may write the family, and the answer that refuses it when not.</summary>
-    public async Task<IResult?> RefuseWriteAsync<TModel, TEntity>(
-        ReferenceFamily<TModel, TEntity> family,
-        NIdentityUser user,
-        CancellationToken cancellationToken
-    )
-        where TModel : class, IDocument, IKrudModel<TEntity>, new()
-        where TEntity : class, IEntity
-    {
-        if (family.Writes == ReferenceWrites.Developer)
-        {
-            var verdict = await _standing.DecideAtPlatformAsync(Capability.EditCountries, user, cancellationToken);
-            return verdict.IsAllowed ? null : AccessResults.Refused(verdict);
-        }
-
-        var tenantId = AccountRoles.CurrentTenantOf(user);
-        if (tenantId == null || await _tenantStore.FindAsync(tenantId, cancellationToken) is null)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status409Conflict,
-                "no-current-tenant",
-                "Choose a country on your profile: what you write belongs to the Tenant of one."
-            );
-        }
-
-        var allowed = await _standing.DecideAtTenantAsync(
-            Capability.EditRegistry,
-            user,
-            tenantId,
-            await _tenantStore.IsOperationalAsync(tenantId, cancellationToken),
-            cancellationToken
-        );
-        return allowed.IsAllowed ? null : AccessResults.Refused(allowed);
-    }
 }
 
 /// <summary>
@@ -177,8 +132,9 @@ internal sealed class ReferenceAccess
 /// <c>filter</c>, <c>sort</c> and <c>page[...]</c>, <c>GET /api/{type}/{id}</c> reads, <c>POST</c> makes (201 and the
 /// <c>Location</c>, with the id the document names, which is how a client that makes its ids does it), <c>PATCH</c>
 /// changes the members it names (200 and the resource) and <c>DELETE</c> removes (204). Only a signed-in caller reads; who
-/// writes is the policy's, and what a document may name is the family's, so a row can not be given a Tenant. A row is
-/// found among the Tenant's and in no other's, and one that is somebody else's answers as a row that is not there.
+/// writes is the policy's, decided by the endpoint filter from what the family says it needs (#671), and what a document may
+/// name is the family's, so a row can not be given a Tenant. A row is found among the Tenant's and in no other's, and one that
+/// is somebody else's answers as a row that is not there.
 /// </summary>
 internal static class ReferenceEndpoints
 {
@@ -187,38 +143,48 @@ internal static class ReferenceEndpoints
         where TEntity : class, IEntity
     {
         var path = $"/api/{family.Route}";
+        var writes = WritesOf(family.Writes);
         app.MapGet(
-                path,
-                (HttpContext context, UserManager<NIdentityUser> users, ReferenceAccess access) =>
-                    ListAsync(family, context, users, access)
-            )
-            .RequireAuthorization();
+            path,
+            [Requires(Capability.SignedIn, PlaceIn.Platform)]
+            (HttpContext context, AccessContext access, ReferenceAccess data) =>
+                ListAsync(family, context, access, data)
+        );
         app.MapGet(
-                path + "/{id}",
-                (string id, HttpContext context, UserManager<NIdentityUser> users, ReferenceAccess access) =>
-                    ReadAsync(family, id, context, users, access)
-            )
-            .RequireAuthorization();
+            path + "/{id}",
+            [Requires(Capability.SignedIn, PlaceIn.Platform)]
+            (string id, AccessContext access, ReferenceAccess data, CancellationToken cancellationToken) =>
+                ReadAsync(family, id, access, data, cancellationToken)
+        );
         app.MapPost(
                 path,
-                (HttpContext context, UserManager<NIdentityUser> users, ReferenceAccess access) =>
-                    CreateAsync(family, context, users, access)
+                (
+                    JsonApiBody<NewMembers> body,
+                    AccessContext access,
+                    ReferenceAccess data,
+                    CancellationToken cancellationToken
+                ) => CreateAsync(family, body, access, data, cancellationToken)
             )
-            .RequireAuthorization();
+            .WithMetadata(writes, new ResourceAttribute(family.Route));
         app.MapPatch(
                 path + "/{id}",
-                (string id, HttpContext context, UserManager<NIdentityUser> users, ReferenceAccess access) =>
-                    ChangeAsync(family, id, context, users, access)
+                (
+                    string id,
+                    JsonApiBody<MemberChange> body,
+                    AccessContext access,
+                    ReferenceAccess data,
+                    CancellationToken cancellationToken
+                ) => ChangeAsync(family, id, body, access, data, cancellationToken)
             )
-            .RequireAuthorization();
+            .WithMetadata(writes, new ResourceAttribute(family.Route));
         if (family.CanDelete)
         {
             app.MapDelete(
                     path + "/{id}",
-                    (string id, HttpContext context, UserManager<NIdentityUser> users, ReferenceAccess access) =>
-                        RemoveAsync(family, id, context, users, access)
+                    (string id, AccessContext access, ReferenceAccess data, CancellationToken cancellationToken) =>
+                        RemoveAsync(family, id, access, data, cancellationToken)
                 )
-                .RequireAuthorization();
+                .WithMetadata(writes);
         }
     }
 
@@ -339,21 +305,23 @@ internal static class ReferenceEndpoints
         typeof(TModel).GetProperty("Id")!.SetValue(row, id);
     }
 
+    /// <summary>What a family needs to be written: the registry of the Tenant the account acts in, or the platform's own data.</summary>
+    static RequiresAttribute WritesOf(ReferenceWrites writes)
+    {
+        return writes == ReferenceWrites.Developer
+            ? new RequiresAttribute(Capability.EditCountries, PlaceIn.Platform)
+            : new RequiresAttribute(Capability.EditRegistry, PlaceIn.CurrentTenant);
+    }
+
     static async Task<IResult> ListAsync<TModel, TEntity>(
         ReferenceFamily<TModel, TEntity> family,
         HttpContext context,
-        UserManager<NIdentityUser> users,
-        ReferenceAccess access
+        AccessContext access,
+        ReferenceAccess data
     )
         where TModel : class, IDocument, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
         var query = ReferenceQuery<TModel>.Read(context.Request, family.Members.Hidden);
         if (query.Refusal != null)
         {
@@ -361,7 +329,8 @@ internal static class ReferenceEndpoints
         }
 
         var (rows, unsupported) = await ReadPageAsync(
-            () => access.Open(family, user).ReadAsync(query.Options, query.Skip, query.Take, context.RequestAborted)
+            () =>
+                data.Open(family, access.User).ReadAsync(query.Options, query.Skip, query.Take, context.RequestAborted)
         );
         if (unsupported != null)
         {
@@ -380,59 +349,32 @@ internal static class ReferenceEndpoints
     static async Task<IResult> ReadAsync<TModel, TEntity>(
         ReferenceFamily<TModel, TEntity> family,
         string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        ReferenceAccess access
+        AccessContext access,
+        ReferenceAccess data,
+        CancellationToken cancellationToken
     )
         where TModel : class, IDocument, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
         var row = Guid.TryParse(id, out var rowId)
-            ? await access.Open(family, user).FindAsync(rowId, context.RequestAborted)
+            ? await data.Open(family, access.User).FindAsync(rowId, cancellationToken)
             : null;
         return row is null ? JsonApiResults.NotFound() : Resource(family, row, StatusCodes.Status200OK);
     }
 
     static async Task<IResult> CreateAsync<TModel, TEntity>(
         ReferenceFamily<TModel, TEntity> family,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        ReferenceAccess access
+        JsonApiBody<NewMembers> body,
+        AccessContext access,
+        ReferenceAccess data,
+        CancellationToken cancellationToken
     )
         where TModel : class, IDocument, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, family.Route);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        if (await access.RefuseWriteAsync(family, user, context.RequestAborted) is { } refusal)
-        {
-            return refusal;
-        }
-
-        var id = Guid.NewGuid();
-        if (read.Id != null && !Guid.TryParse(read.Id, out id))
-        {
-            return JsonApiResults.InvalidId();
-        }
-
+        var id = body.Id is null ? Guid.NewGuid() : Guid.Parse(body.Id);
         var row = new TModel();
-        if (family.Members.Apply(row, read.Attributes!.Members ?? [], []) is { } malformed)
+        if (family.Members.Apply(row, body.Attributes.Members ?? [], []) is { } malformed)
         {
             return malformed;
         }
@@ -443,57 +385,31 @@ internal static class ReferenceEndpoints
             return invalid;
         }
 
-        var collection = access.Open(family, user);
-        if (await collection.InsertAsync(row, context.RequestAborted))
+        var collection = data.Open(family, access.User);
+        if (await collection.InsertAsync(row, cancellationToken))
         {
             return Resource(family, row, StatusCodes.Status201Created, $"/api/{family.Route}/{id}");
         }
 
         // The same id again is the row that was made, as it is for anything a client makes the id of; another Tenant's
         // row with it is not told about.
-        var existing = await collection.FindAsync(id, context.RequestAborted);
+        var existing = await collection.FindAsync(id, cancellationToken);
         return existing is null ? JsonApiResults.IdTaken() : Resource(family, existing, StatusCodes.Status200OK);
     }
 
     static async Task<IResult> ChangeAsync<TModel, TEntity>(
         ReferenceFamily<TModel, TEntity> family,
         string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        ReferenceAccess access
+        JsonApiBody<MemberChange> body,
+        AccessContext access,
+        ReferenceAccess data,
+        CancellationToken cancellationToken
     )
         where TModel : class, IDocument, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, family.Route);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        if (await access.RefuseWriteAsync(family, user, context.RequestAborted) is { } refusal)
-        {
-            return refusal;
-        }
-
-        if (!Guid.TryParse(id, out var rowId))
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        if (read.Id != null && read.Id != id)
-        {
-            return JsonApiResults.IdMismatch();
-        }
-
-        var collection = access.Open(family, user);
-        var row = await collection.FindAsync(rowId, context.RequestAborted);
+        var collection = data.Open(family, access.User);
+        var row = Guid.TryParse(id, out var rowId) ? await collection.FindAsync(rowId, cancellationToken) : null;
         if (row is null)
         {
             return JsonApiResults.NotFound();
@@ -503,8 +419,8 @@ internal static class ReferenceEndpoints
             family.Members,
             collection,
             row,
-            read.Attributes!.Members ?? [],
-            context.RequestAborted
+            body.Attributes.Members ?? [],
+            cancellationToken
         );
         return failed ?? Resource(family, row, StatusCodes.Status200OK);
     }
@@ -512,47 +428,34 @@ internal static class ReferenceEndpoints
     static async Task<IResult> RemoveAsync<TModel, TEntity>(
         ReferenceFamily<TModel, TEntity> family,
         string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        ReferenceAccess access
+        AccessContext access,
+        ReferenceAccess data,
+        CancellationToken cancellationToken
     )
         where TModel : class, IDocument, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        if (await access.RefuseWriteAsync(family, user, context.RequestAborted) is { } refusal)
-        {
-            return refusal;
-        }
-
         if (!Guid.TryParse(id, out var rowId))
         {
             return JsonApiResults.NotFound();
         }
 
-        var collection = access.Open(family, user);
+        var collection = data.Open(family, access.User);
         if (family.InUse is { } use)
         {
             // a row that is not the Tenant's is not told about, so it is found before it is asked whether it is in use
-            if (await collection.FindAsync(rowId, context.RequestAborted) is null)
+            if (await collection.FindAsync(rowId, cancellationToken) is null)
             {
                 return JsonApiResults.NotFound();
             }
 
-            if (await access.IsReferencedAsync(use, rowId, context.RequestAborted))
+            if (await data.IsReferencedAsync(use, rowId, cancellationToken))
             {
                 return JsonApiResults.Error(StatusCodes.Status409Conflict, use.Code, use.Title, use.Detail);
             }
         }
 
-        return await collection.DeleteAsync(rowId, context.RequestAborted)
-            ? Results.NoContent()
-            : JsonApiResults.NotFound();
+        return await collection.DeleteAsync(rowId, cancellationToken) ? Results.NoContent() : JsonApiResults.NotFound();
     }
 
     static IResult Resource<TModel, TEntity>(

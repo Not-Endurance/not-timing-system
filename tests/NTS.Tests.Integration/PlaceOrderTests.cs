@@ -380,6 +380,139 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.NotFound, notAnId.StatusCode);
     }
 
+    [Fact]
+    public async Task A_row_of_the_registry_is_written_in_the_Tenant_the_account_acts_in_which_is_looked_for_before_what_it_holds_and_the_content_last()
+    {
+        await using var scene = await SceneAsync();
+        var homeless = await SignedInAsync(scene.Api, scene.Client, _mongo.ConnectionString, home: null);
+        var club = Guid.NewGuid();
+
+        var noTenant = await WriteClubAsync(homeless, HttpMethod.Post, "/api/clubs", new { name = "Sofia Riders" });
+        var tooLittle = await WriteClubAsync(
+            scene.Member,
+            HttpMethod.Post,
+            "/api/clubs",
+            new { nothing = "else" },
+            "not-a-guid"
+        );
+        var notAnId = await WriteClubAsync(
+            scene.ConsoleOperator,
+            HttpMethod.Post,
+            "/api/clubs",
+            new { name = "Sofia Riders" },
+            "not-a-guid"
+        );
+        var content = await WriteClubAsync(
+            scene.ConsoleOperator,
+            HttpMethod.Post,
+            "/api/clubs",
+            new { nothing = "else" },
+            club.ToString()
+        );
+        var made = await WriteClubAsync(
+            scene.ConsoleOperator,
+            HttpMethod.Post,
+            "/api/clubs",
+            new { name = "Sofia Riders" },
+            club.ToString()
+        );
+        var unknown = await WriteClubAsync(
+            scene.ConsoleOperator,
+            HttpMethod.Patch,
+            $"/api/clubs/{Guid.NewGuid()}",
+            new { name = "x" }
+        );
+        var changedWithoutTheLevel = await WriteClubAsync(
+            scene.Member,
+            HttpMethod.Patch,
+            $"/api/clubs/{Guid.NewGuid()}",
+            new { name = "x" },
+            Guid.NewGuid().ToString()
+        );
+        var mismatched = await WriteClubAsync(
+            scene.ConsoleOperator,
+            HttpMethod.Patch,
+            $"/api/clubs/{club}",
+            new { name = "x" },
+            Guid.NewGuid().ToString()
+        );
+        var removedWithoutTheLevel = await scene.Member.Page.DeleteAsync($"/api/clubs/{club}");
+        var removed = await scene.ConsoleOperator.Page.DeleteAsync($"/api/clubs/{club}");
+        var country = await WriteClubAsync(
+            scene.Root,
+            HttpMethod.Post,
+            "/api/countries",
+            new { nothing = "else" },
+            "not-a-guid"
+        );
+
+        Assert.Equal(HttpStatusCode.Conflict, noTenant.StatusCode);
+        Assert.Equal("no-current-tenant", await ErrorCodeAsync(noTenant));
+        Assert.Equal(HttpStatusCode.Forbidden, tooLittle.StatusCode); // the Level comes before the id that is none and the member that is not one
+        Assert.Equal("not-console-operator", await ErrorCodeAsync(tooLittle));
+        Assert.Equal(HttpStatusCode.BadRequest, notAnId.StatusCode);
+        Assert.Equal("invalid-id", await ErrorCodeAsync(notAnId));
+        Assert.Equal(HttpStatusCode.BadRequest, content.StatusCode);
+        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(content));
+        Assert.Equal(HttpStatusCode.Created, made.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, changedWithoutTheLevel.StatusCode); // before the row is looked for
+        Assert.Equal(HttpStatusCode.Conflict, mismatched.StatusCode);
+        Assert.Equal("id-mismatch", await ErrorCodeAsync(mismatched));
+        Assert.Equal(HttpStatusCode.Forbidden, removedWithoutTheLevel.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, removed.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, country.StatusCode); // the countries are the Developer's, whoever is Root of a Tenant
+        Assert.Equal("not-developer", await ErrorCodeAsync(country));
+    }
+
+    [Fact]
+    public async Task A_search_of_accounts_is_answered_by_the_query_then_who_asks_then_the_length_of_the_words()
+    {
+        await using var scene = await SceneAsync();
+        var homeless = await SignedInAsync(scene.Api, scene.Client, _mongo.ConnectionString, home: null);
+        var developer = await SignedInAsync(
+            scene.Api,
+            scene.Client,
+            _mongo.ConnectionString,
+            home: null,
+            isDeveloper: true
+        );
+
+        var notAFilter = await scene.Member.Page.GetAsync("/api/accounts");
+        var tooLittle = await SearchAccountsAsync(scene.Member, "a");
+        var tooShort = await SearchAccountsAsync(scene.ConsoleOperator, "a");
+        var everywhere = await SearchAccountsAsync(scene.Member, "ab", acrossTenants: true);
+        var nowhere = await SearchAccountsAsync(homeless, "ab");
+        var nowhereButDeveloper = await SearchAccountsAsync(developer, "ab");
+
+        Assert.Equal(HttpStatusCode.BadRequest, notAFilter.StatusCode); // the query is whole before anybody is asked
+        Assert.Equal("invalid-filter", await ErrorCodeAsync(notAFilter));
+        Assert.Equal(HttpStatusCode.Forbidden, tooLittle.StatusCode); // and who asks before the length of the words
+        Assert.Equal("not-console-operator", await ErrorCodeAsync(tooLittle));
+        Assert.Equal(HttpStatusCode.BadRequest, tooShort.StatusCode);
+        Assert.Equal("search-too-short", await ErrorCodeAsync(tooShort));
+        Assert.Equal(HttpStatusCode.Forbidden, everywhere.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, nowhere.StatusCode); // an account that acts in no Tenant is asked what the platform asks
+        Assert.Equal(HttpStatusCode.OK, nowhereButDeveloper.StatusCode);
+    }
+
+    static Task<HttpResponseMessage> WriteClubAsync(
+        Person person,
+        HttpMethod method,
+        string path,
+        object attributes,
+        string? id = null
+    )
+    {
+        return person.Page.WriteAsync(method, path, path.Split('/')[2], attributes, id: id);
+    }
+
+    static Task<HttpResponseMessage> SearchAccountsAsync(Person person, string text, bool acrossTenants = false)
+    {
+        var filter = Uri.EscapeDataString($"contains(name,'{text}')");
+        return person.Page.GetAsync($"/api/accounts{(acrossTenants ? "/all-tenants" : string.Empty)}?filter={filter}");
+    }
+
     static Dictionary<string, object?> SnapshotOf(Guid? eventId, string kind = "Arrive")
     {
         var attributes = new Dictionary<string, object?>

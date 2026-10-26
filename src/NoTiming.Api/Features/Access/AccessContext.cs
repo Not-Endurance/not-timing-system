@@ -34,6 +34,9 @@ internal sealed class AccessContext
     /// <summary>The Tenant the request is about, found once; a handler of an endpoint that is about none does not ask for it.</summary>
     public Tenant Tenant => _tenant ?? throw new InvalidOperationException("The request is not about a Tenant.");
 
+    /// <summary>Whether the request is about a Tenant: an account that acts in none is let through by a route that says what then decides.</summary>
+    public bool HasTenant => _tenant != null;
+
     /// <summary>Whether the Tenant the request is about can hold Events, which it can once it has a Tenant Root.</summary>
     public bool IsOperational => _tenant != null && _isOperational;
 
@@ -82,6 +85,12 @@ internal sealed class FoundPlace
         return new FoundPlace { Tenant = tenant, IsOperational = isOperational };
     }
 
+    /// <summary>The place of an account that acts in no Tenant, where the route lets it ask about the platform instead.</summary>
+    public static FoundPlace WithoutATenant()
+    {
+        return new FoundPlace { IsWithoutTenant = true };
+    }
+
     FoundPlace() { }
 
     public static FoundPlace Platform { get; } = new();
@@ -92,4 +101,7 @@ internal sealed class FoundPlace
     public IEventScoped? Row { get; private init; }
     public Tenant? Tenant { get; private init; }
     public bool IsOperational { get; private init; }
+
+    /// <summary>The account acts in no Tenant, and what the route asks instead is asked at the platform.</summary>
+    public bool IsWithoutTenant { get; private init; }
 }

@@ -1,7 +1,6 @@
 using System.Globalization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Net.Http.Headers;
-using Not.Identity;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
@@ -24,34 +23,18 @@ internal static class ParticipationHistoryEndpoints
 
     public static IEndpointRouteBuilder MapParticipationHistory(this IEndpointRouteBuilder app)
     {
-        app.MapGet(
-                "/api/participations/history",
-                (
-                    HttpContext context,
-                    UserManager<NIdentityUser> users,
-                    ParticipationHistoryReader reader,
-                    AccountText text,
-                    TimeProvider time
-                ) => ListAsync(context, users, reader, text, time)
-            )
-            .RequireAuthorization();
+        app.MapGet("/api/participations/history", ListAsync);
         return app;
     }
 
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
     static async Task<IResult> ListAsync(
         HttpContext context,
-        UserManager<NIdentityUser> users,
         ParticipationHistoryReader reader,
         AccountText text,
         TimeProvider time
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
         // The Participant says whose rides to read, before anything else is looked at.
         if (HistoryFilter.SubjectOf(context.Request.Query["filter"].ToString()) is not { } subject)
         {

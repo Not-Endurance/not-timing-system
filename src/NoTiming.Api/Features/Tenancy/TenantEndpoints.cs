@@ -179,6 +179,18 @@ internal class MemberAttributes : IResourceAttributes
     }
 }
 
+/// <summary>The document of a row that is made of the members it names: the id of it is the one the client made for the row, a Guid, and may be left out.</summary>
+internal class NewMembers : MemberAttributes, IResourceAttributes
+{
+    public static DocumentIds Ids => DocumentIds.OptionalGuid;
+}
+
+/// <summary>The document of a change of a row: the members it names, and the id of the row, which it may give.</summary>
+internal sealed class MemberChange : MemberAttributes, IResourceAttributes
+{
+    public static DocumentIds Ids => DocumentIds.MatchesRoute;
+}
+
 /// <summary>
 /// The change of the rules of a Tenant: the members of the document are the rules and nothing else. A member that is not
 /// named stays as it is, and a ranker that is null is cleared. Its id, when the document gives one, is the one of the route.

@@ -63,6 +63,12 @@ internal sealed class RequiresAttribute : Attribute
     /// and one that does is told what it is missing. None when the thing is there for everybody who may ask (the default).
     /// </summary>
     public Capability SeenWith { get; init; }
+
+    /// <summary>
+    /// Where the place is <see cref="PlaceIn.CurrentTenant"/>: what is asked instead, at the platform, of an account that acts in
+    /// no Tenant, which is then let ask and finds nobody. None (the default) refuses such an account: it has to choose a Tenant.
+    /// </summary>
+    public Capability WithoutTenant { get; init; }
 }
 
 /// <summary>

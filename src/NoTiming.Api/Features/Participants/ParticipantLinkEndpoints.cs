@@ -1,7 +1,6 @@
 using System.Globalization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Net.Http.Headers;
-using Not.Identity;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
@@ -35,62 +34,56 @@ internal static class ParticipantLinkEndpoints
     {
         var path = $"/api/{RouteOf(kind)}/{{id}}/link";
         app.MapGet(
-                path,
-                (
-                    string id,
-                    HttpContext context,
-                    UserManager<NIdentityUser> users,
-                    ParticipantLinkStore store,
-                    CrossTenantReads reads,
-                    AccountText text
-                ) => ReadAsync(kind, id, context, users, store, reads, text)
-            )
-            .RequireAuthorization();
+            path,
+            [Requires(Capability.SignedIn, PlaceIn.Platform)]
+            (
+                string id,
+                HttpContext context,
+                AccessContext access,
+                ParticipantLinkStore store,
+                CrossTenantReads reads,
+                AccountText text
+            ) => ReadAsync(kind, id, context, access, store, reads, text)
+        );
         app.MapPost(
-                path,
-                (
-                    string id,
-                    HttpContext context,
-                    UserManager<NIdentityUser> users,
-                    ParticipantLinkStore store,
-                    CrossTenantReads reads,
-                    AccountText text
-                ) => LinkAsync(kind, id, context, users, store, reads, text)
-            )
-            .RequireAuthorization();
+            path,
+            [Requires(Capability.SignedIn, PlaceIn.Platform)]
+            (
+                string id,
+                HttpContext context,
+                AccessContext access,
+                ParticipantLinkStore store,
+                CrossTenantReads reads,
+                AccountText text
+            ) => LinkAsync(kind, id, context, access, store, reads, text)
+        );
         app.MapDelete(
-                path,
-                (string id, HttpContext context, UserManager<NIdentityUser> users, ParticipantLinkStore store) =>
-                    UnlinkAsync(kind, id, context, users, store)
-            )
-            .RequireAuthorization();
+            path,
+            [Requires(Capability.SignedIn, PlaceIn.Platform)]
+            (string id, AccessContext access, ParticipantLinkStore store, CancellationToken cancellationToken) =>
+                UnlinkAsync(kind, id, access, store, cancellationToken)
+        );
     }
 
     static async Task<IResult> ReadAsync(
         ParticipantKind kind,
         string id,
         HttpContext context,
-        UserManager<NIdentityUser> users,
+        AccessContext access,
         ParticipantLinkStore store,
         CrossTenantReads reads,
         AccountText text
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
         if (!Guid.TryParse(id, out var participantId))
         {
             return JsonApiResults.NotFound();
         }
 
-        var links = await store.FindAsync(user.Id, context.RequestAborted);
+        var links = await store.FindAsync(access.User.Id, context.RequestAborted);
         var isLinked =
             kind == ParticipantKind.Athlete ? links.AthleteId == participantId : links.HorseIds.Contains(participantId);
-        var participant = isLinked ? await FindAsync(kind, participantId, user, reads, context.RequestAborted) : null;
+        var participant = isLinked ? await FindAsync(kind, participantId, reads, context.RequestAborted) : null;
         return participant is null
             ? JsonApiResults.NotFound()
             : Resource(context, text, participant, StatusCodes.Status200OK);
@@ -100,20 +93,14 @@ internal static class ParticipantLinkEndpoints
         ParticipantKind kind,
         string id,
         HttpContext context,
-        UserManager<NIdentityUser> users,
+        AccessContext access,
         ParticipantLinkStore store,
         CrossTenantReads reads,
         AccountText text
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
         var participant = Guid.TryParse(id, out var participantId)
-            ? await FindAsync(kind, participantId, user, reads, context.RequestAborted)
+            ? await FindAsync(kind, participantId, reads, context.RequestAborted)
             : null;
         if (participant is null)
         {
@@ -123,11 +110,11 @@ internal static class ParticipantLinkEndpoints
         bool created;
         if (kind == ParticipantKind.Athlete)
         {
-            created = await store.LinkAthleteAsync(user.Id, participantId, context.RequestAborted);
+            created = await store.LinkAthleteAsync(access.User.Id, participantId, context.RequestAborted);
         }
         else
         {
-            var linking = await store.LinkHorseAsync(user.Id, participantId, MAX_HORSES, context.RequestAborted);
+            var linking = await store.LinkHorseAsync(access.User.Id, participantId, MAX_HORSES, context.RequestAborted);
             if (linking == HorseLinking.LimitReached)
             {
                 return JsonApiResults.Error(
@@ -152,17 +139,11 @@ internal static class ParticipantLinkEndpoints
     static async Task<IResult> UnlinkAsync(
         ParticipantKind kind,
         string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        ParticipantLinkStore store
+        AccessContext access,
+        ParticipantLinkStore store,
+        CancellationToken cancellationToken
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
         if (!Guid.TryParse(id, out var participantId))
         {
             return JsonApiResults.NotFound();
@@ -170,8 +151,8 @@ internal static class ParticipantLinkEndpoints
 
         var removed =
             kind == ParticipantKind.Athlete
-                ? await store.UnlinkAthleteAsync(user.Id, participantId, context.RequestAborted)
-                : await store.UnlinkHorseAsync(user.Id, participantId, context.RequestAborted);
+                ? await store.UnlinkAthleteAsync(access.User.Id, participantId, cancellationToken)
+                : await store.UnlinkHorseAsync(access.User.Id, participantId, cancellationToken);
         return removed ? Results.NoContent() : JsonApiResults.NotFound();
     }
 
@@ -184,7 +165,6 @@ internal static class ParticipantLinkEndpoints
     static async Task<Participant?> FindAsync(
         ParticipantKind kind,
         Guid participantId,
-        NIdentityUser user,
         CrossTenantReads reads,
         CancellationToken cancellationToken
     )

@@ -70,7 +70,7 @@ internal static class EventDataEndpoints
                 path + "/{id}",
                 [Requires(Capability.RunEvent, PlaceIn.EventOfRow)]
                 (
-                    JsonApiBody<RowChange> body,
+                    JsonApiBody<MemberChange> body,
                     AccessContext access,
                     EventDataAccess data,
                     CancellationToken cancellationToken
@@ -239,7 +239,7 @@ internal static class EventDataEndpoints
 
     static async Task<IResult> ChangeAsync<TModel, TEntity>(
         EventDataFamily<TModel, TEntity> family,
-        JsonApiBody<RowChange> body,
+        JsonApiBody<MemberChange> body,
         AccessContext access,
         EventDataAccess data,
         CancellationToken cancellationToken
@@ -431,7 +431,7 @@ internal static class EventDataEndpoints
 /// The document of a row that is made: the members of the row as they were sent, and the Event it names, which is where the
 /// row is made. The id of it is the one the client made for the row, a Guid, and may be left out.
 /// </summary>
-internal sealed class NewRow : MemberAttributes, INamesEvent, IResourceAttributes
+internal sealed class NewRow : NewMembers, INamesEvent
 {
     const string EVENT_ID = "eventId";
 
@@ -450,8 +450,6 @@ internal sealed class NewRow : MemberAttributes, INamesEvent, IResourceAttribute
             }
             : null;
 
-    public static DocumentIds Ids => DocumentIds.OptionalGuid;
-
     /// <summary>The Event is named once: the caller is let in to one, and the row is made in the one that was named.</summary>
     public override JsonApiFailure? Invalid()
     {
@@ -464,10 +462,4 @@ internal sealed class NewRow : MemberAttributes, INamesEvent, IResourceAttribute
             )
             : null;
     }
-}
-
-/// <summary>The document of a change of a row: the members it names, and the id of the row, which it may give.</summary>
-internal sealed class RowChange : MemberAttributes, IResourceAttributes
-{
-    public static DocumentIds Ids => DocumentIds.MatchesRoute;
 }

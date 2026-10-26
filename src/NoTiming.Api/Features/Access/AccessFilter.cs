@@ -84,19 +84,20 @@ internal sealed class AccessFilter : IEndpointFilter
         }
 
         var user = await _users.GetUserAsync(http.User);
-        var place = await PlaceOfAsync(requires.Place, user, http, inputs);
+        var place = await PlaceOfAsync(requires, user, http, inputs);
         if (place.Refusal != null)
         {
             return place.Refusal;
         }
 
-        var (standing, state) = await StandingAsync(user, place, requires.Capability, http.RequestAborted);
+        var capability = place.IsWithoutTenant ? requires.WithoutTenant : requires.Capability;
+        var (standing, state) = await StandingAsync(user, place, capability, http.RequestAborted);
         if (requires.SeenWith != 0 && !AccessPolicy.Decide(requires.SeenWith, standing, state).IsAllowed)
         {
             return JsonApiResults.NotFound(); // what a caller may not see is not there for it
         }
 
-        var verdict = AccessPolicy.Decide(requires.Capability, standing, state);
+        var verdict = AccessPolicy.Decide(capability, standing, state);
         if (!verdict.IsAllowed)
         {
             return AccessResults.Refused(verdict);
@@ -176,13 +177,14 @@ internal sealed class AccessFilter : IEndpointFilter
     }
 
     async Task<FoundPlace> PlaceOfAsync(
-        PlaceIn place,
+        RequiresAttribute requires,
         NIdentityUser? user,
         HttpContext http,
         IReadOnlyList<IJsonApiInput> inputs
     )
     {
         var cancellationToken = http.RequestAborted;
+        var place = requires.Place;
         switch (place)
         {
             case PlaceIn.Platform:
@@ -221,7 +223,7 @@ internal sealed class AccessFilter : IEndpointFilter
             case PlaceIn.TenantRoute:
                 return await TenantOfRouteAsync(http, cancellationToken);
             case PlaceIn.CurrentTenant:
-                return await CurrentTenantAsync(user, cancellationToken);
+                return await CurrentTenantAsync(user, requires.WithoutTenant != 0, cancellationToken);
             default:
                 throw new ArgumentOutOfRangeException(
                     nameof(place),
@@ -317,19 +319,28 @@ internal sealed class AccessFilter : IEndpointFilter
     }
 
     /// <summary>What the account does in is its current Tenant: nothing that is sent names another.</summary>
-    async Task<FoundPlace> CurrentTenantAsync(NIdentityUser? user, CancellationToken cancellationToken)
+    async Task<FoundPlace> CurrentTenantAsync(
+        NIdentityUser? user,
+        bool orAskAtThePlatform,
+        CancellationToken cancellationToken
+    )
     {
         var id = user is null ? null : AccountRoles.CurrentTenantOf(user);
         var tenant = id is null ? null : await _tenants.FindAsync(id, cancellationToken);
-        return tenant is null
-            ? FoundPlace.Refused(
-                JsonApiResults.Error(
-                    StatusCodes.Status409Conflict,
-                    "no-current-tenant",
-                    "Choose a country on your profile before you do this: it is done in the Tenant of one."
-                )
-            )
-            : FoundPlace.OfTenant(tenant, await _tenants.IsOperationalAsync(tenant.Id, cancellationToken));
+        if (tenant is null)
+        {
+            return orAskAtThePlatform
+                ? FoundPlace.WithoutATenant()
+                : FoundPlace.Refused(
+                    JsonApiResults.Error(
+                        StatusCodes.Status409Conflict,
+                        "no-current-tenant",
+                        "Choose a country on your profile before you do this: it is done in the Tenant of one."
+                    )
+                );
+        }
+
+        return FoundPlace.OfTenant(tenant, await _tenants.IsOperationalAsync(tenant.Id, cancellationToken));
     }
 
     static IResult NotInTheDocument(bool missing)
