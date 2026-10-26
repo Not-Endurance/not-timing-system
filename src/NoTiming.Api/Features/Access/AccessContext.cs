@@ -23,8 +23,6 @@ internal sealed class AccessContext
     public NIdentityUser User =>
         _user ?? throw new InvalidOperationException("The request is not from a signed-in account.");
 
-    public bool IsSignedIn => _user != null;
-
     /// <summary>Where the caller stands at the place the request names.</summary>
     public Standing Standing { get; private set; } = Standing.Anonymous;
 

@@ -453,12 +453,17 @@ internal sealed class NewRow : NewMembers, INamesEvent
     /// <summary>The Event is named once: the caller is let in to one, and the row is made in the one that was named.</summary>
     public override JsonApiFailure? Invalid()
     {
-        return (Members ?? []).Keys.Count(x => string.Equals(x, EVENT_ID, StringComparison.OrdinalIgnoreCase)) > 1
+        // The Event is read twice, by the filter (any spelling of a Guid) and into the row (the one the Api writes), so it has to
+        // be spelled the one way for both to mean the same Event.
+        var named = ((INamesEvent)this).EventId;
+        return
+            (Members ?? []).Keys.Count(x => string.Equals(x, EVENT_ID, StringComparison.OrdinalIgnoreCase)) > 1
+            || (named != null && !Guid.TryParseExact(named, "D", out _))
             ? new JsonApiFailure(
                 StatusCodes.Status400BadRequest,
                 "malformed-request",
                 "The request is malformed.",
-                "The Event is named once."
+                "The Event is named once, as an id."
             )
             : null;
     }

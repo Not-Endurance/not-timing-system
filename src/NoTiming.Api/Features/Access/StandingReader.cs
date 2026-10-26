@@ -64,32 +64,6 @@ internal sealed class StandingReader
         return AccessPolicy.Decide(capability, standing, PlaceState.OfEvent(facts.Stage));
     }
 
-    /// <summary>The policy's answer for an action of a Tenant, for the account.</summary>
-    public async Task<Verdict> DecideAtTenantAsync(
-        Capability capability,
-        NIdentityUser user,
-        string tenantId,
-        bool isOperational,
-        CancellationToken cancellationToken
-    )
-    {
-        var standing = await AtTenantAsync(user, tenantId, cancellationToken);
-
-        return AccessPolicy.Decide(capability, standing, PlaceState.OfTenant(isOperational));
-    }
-
-    /// <summary>The policy's answer for an action of the platform, for the account.</summary>
-    public async Task<Verdict> DecideAtPlatformAsync(
-        Capability capability,
-        NIdentityUser user,
-        CancellationToken cancellationToken
-    )
-    {
-        var standing = await AtPlatformAsync(user, cancellationToken);
-
-        return AccessPolicy.Decide(capability, standing, PlaceState.Platform);
-    }
-
     Task<IReadOnlyList<string>> OpenEventTenantsAsync(NIdentityUser user, CancellationToken cancellationToken)
     {
         return _reads.OpenEventTenantsOfAsync(user.Id, _time.GetUtcNow(), cancellationToken);

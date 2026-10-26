@@ -157,6 +157,15 @@ public sealed class StandingTests
     }
 
     [Fact]
+    public void A_Tenant_is_told_by_its_key_as_it_is_written_and_not_by_another_spelling_of_it()
+    {
+        var root = Roles.Of(tenantRootIn: [TENANT]);
+
+        Assert.True(root.IsRootAt(TENANT));
+        Assert.False(root.IsRootAt(TENANT.ToUpperInvariant()));
+    }
+
+    [Fact]
     public void Root_outweighs_the_grants_it_holds()
     {
         var standing = Standing.AtEvent(Roles.Of(tenantRootIn: [TENANT]), TENANT, [AnOperator()]);

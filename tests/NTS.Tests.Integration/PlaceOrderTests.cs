@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 
@@ -213,6 +214,20 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task A_row_whose_Event_is_gone_is_not_there_to_change_or_to_remove_whoever_asks()
+    {
+        await using var scene = await SceneAsync();
+        var orphan = IntegrationPayloadFactory.Official(Guid.NewGuid(), null, Guid.NewGuid());
+        await EventSeed.OfficialAsync(_mongo.ConnectionString, scene.Tenant, orphan);
+
+        var changed = await ChangeRowAsync(scene.Root, orphan.Id.ToString(), new { nameEnglish = "x" });
+        var removed = await scene.Root.Page.DeleteAsync($"/api/officials/{orphan.Id}");
+
+        Assert.Equal(HttpStatusCode.NotFound, changed.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, removed.StatusCode);
+    }
+
+    [Fact]
     public async Task A_row_is_made_in_the_Event_the_document_names_which_is_looked_for_before_what_the_caller_holds_and_the_content_last()
     {
         await using var scene = await SceneAsync();
@@ -223,6 +238,7 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
             JsonApiAttributes.Without(EventDataRow.Of("officials", scene.Live).Attributes, "eventId")
         );
         var empty = await MakeRowAsync(scene.ConsoleOperator, NamingEvent(scene.Live, Guid.Empty.ToString()));
+        var blank = await MakeRowAsync(scene.ConsoleOperator, NamingEvent(scene.Live, "  "));
         var notAnId = await MakeRowAsync(scene.ConsoleOperator, NamingEvent(scene.Live, "not-a-guid"));
         var unknown = await MakeRowAsync(scene.ConsoleOperator, NamingEvent(scene.Live, Guid.NewGuid().ToString()));
         var tooLittle = await MakeRowAsync(
@@ -257,6 +273,8 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         Assert.Equal("event-required", await ErrorCodeAsync(unnamed));
         Assert.Equal(HttpStatusCode.BadRequest, empty.StatusCode); // the empty id names no Event
         Assert.Equal("event-required", await ErrorCodeAsync(empty));
+        Assert.Equal(HttpStatusCode.BadRequest, blank.StatusCode); // a name of nothing but spaces names none
+        Assert.Equal("event-required", await ErrorCodeAsync(blank));
         Assert.Equal(HttpStatusCode.BadRequest, notAnId.StatusCode);
         Assert.Equal("invalid-event", await ErrorCodeAsync(notAnId));
         Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
@@ -350,6 +368,7 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         var unknown = await SendGroupAsync(scene.ConsoleOperator, EntryOf(Guid.NewGuid()));
         var tooLittleAndTooMany = await SendGroupAsync(scene.Member, many);
         var tooMany = await SendGroupAsync(scene.ConsoleOperator, many);
+        var full = await SendGroupAsync(scene.ConsoleOperator, [.. many.Take(100)]);
         var mixed = await SendGroupAsync(scene.ConsoleOperator, EntryOf(scene.Live), EntryOf(scene.Historic));
 
         Assert.Equal(HttpStatusCode.BadRequest, notAList.StatusCode);
@@ -361,6 +380,7 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         Assert.Equal("not-allowed", await ErrorCodeAsync(tooLittleAndTooMany));
         Assert.Equal(HttpStatusCode.BadRequest, tooMany.StatusCode);
         Assert.Equal("too-many-snapshots", await ErrorCodeAsync(tooMany));
+        Assert.Equal(HttpStatusCode.OK, full.StatusCode); // a hundred is as many as a group may hold
         Assert.Equal(HttpStatusCode.OK, mixed.StatusCode);
         var results = (await ApiSessions.ReadJsonAsync(mixed)).GetProperty("meta").GetProperty("results");
         Assert.Equal(404, results[0].GetProperty("status").GetInt32()); // the first names the Event of the group, which has no such start number

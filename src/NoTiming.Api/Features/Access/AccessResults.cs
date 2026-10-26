@@ -13,17 +13,14 @@ internal static class AccessResults
 {
     public static IResult Refused(Verdict verdict)
     {
-        return Of(
-            verdict.Reason ?? throw new ArgumentException("An action that is allowed has no refusal.", nameof(verdict))
-        );
+        return FailureOf(
+                verdict.Reason
+                    ?? throw new ArgumentException("An action that is allowed has no refusal.", nameof(verdict))
+            )
+            .AsResult();
     }
 
-    public static IResult Of(Refusal reason)
-    {
-        return FailureOf(reason).AsResult();
-    }
-
-    /// <summary>The refusal as an error that is not yet an answer, for where a request holds several, such as a group.</summary>
+    /// <summary>The refusal as an error.</summary>
     public static JsonApiFailure FailureOf(Refusal reason)
     {
         return reason switch
@@ -41,12 +38,12 @@ internal static class AccessResults
             Refusal.NotRoot => new JsonApiFailure(
                 StatusCodes.Status403Forbidden,
                 "not-root",
-                "Only a Tenant Root of the Tenant may do this."
+                "Only Root may do this: a Tenant Root of the Tenant, or the Developer."
             ),
             Refusal.NotConsoleOperator => new JsonApiFailure(
                 StatusCodes.Status403Forbidden,
                 "not-console-operator",
-                "Only a Console Operator of the Event may do this."
+                "Only a Console Operator of the Event, or Root, may do this."
             ),
             Refusal.NotDeveloper => new JsonApiFailure(
                 StatusCodes.Status403Forbidden,
