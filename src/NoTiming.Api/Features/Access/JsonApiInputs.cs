@@ -34,6 +34,9 @@ internal enum DocumentIds
 
     /// <summary>A change: it may be left out, and a document that gives one gives the id of the route.</summary>
     MatchesRoute,
+
+    /// <summary>It has to be given, and to be a Guid that is not the empty one (ADR-0009): the id a device makes for what is recorded once.</summary>
+    RequiredGuid,
 }
 
 /// <summary>The attributes of a resource a body carries: the type of resource it is, and whether what it says is valid.</summary>
@@ -50,6 +53,9 @@ internal interface IResourceAttributes
 
     /// <summary>What is said when the id of a change is not the one of the route.</summary>
     static virtual JsonApiFailure IdMismatch => JsonApiFailures.IdMismatch;
+
+    /// <summary>What is said when a document that has to give an id gives none.</summary>
+    static virtual JsonApiFailure IdRequired => JsonApiFailures.IdRequired;
 
     /// <summary>What is wrong with the attributes, said once and in the same words wherever they are sent; none when they are valid.</summary>
     JsonApiFailure? Invalid();
@@ -119,6 +125,9 @@ internal sealed class JsonApiBody<TAttributes> : IJsonApiInput
         {
             DocumentIds.OptionalGuid when Id != null && !Guid.TryParse(Id, out _) => JsonApiFailures.InvalidId,
             DocumentIds.MatchesRoute when Id != null && Id != _routeId => TAttributes.IdMismatch,
+            DocumentIds.RequiredGuid when Id is null => TAttributes.IdRequired,
+            DocumentIds.RequiredGuid when !Guid.TryParse(Id, out var given) || given == Guid.Empty =>
+                JsonApiFailures.InvalidId,
             _ => null,
         };
     }
@@ -189,4 +198,12 @@ internal static class JsonApiFailures
 
     public static JsonApiFailure IdMismatch { get; } =
         new(StatusCodes.Status409Conflict, "id-mismatch", "The id of the resource is not the one of the route.");
+
+    public static JsonApiFailure IdRequired { get; } =
+        new(
+            StatusCodes.Status400BadRequest,
+            "id-required",
+            "The resource needs the id a client makes for it.",
+            "Send a Guid as the id of the resource."
+        );
 }

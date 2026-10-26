@@ -298,6 +298,140 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.OK, allowed.StatusCode);
     }
 
+    [Fact]
+    public async Task A_Snapshot_is_sent_to_the_Event_the_document_names_which_is_looked_for_before_what_the_caller_holds_and_the_content_last()
+    {
+        await using var scene = await SceneAsync();
+
+        var notJsonApi = await SendRawAsync(scene.Member, HttpMethod.Post, "/api/snapshots", "text/plain", "{}");
+        var unnamed = await SendSnapshotAsync(scene.ConsoleOperator, SnapshotOf(null), Guid.NewGuid());
+        var named = SnapshotOf(scene.Live);
+        named["eventId"] = "not-a-guid";
+        var notAnId = await SendSnapshotAsync(scene.ConsoleOperator, named, Guid.NewGuid());
+        var unknown = await SendSnapshotAsync(scene.ConsoleOperator, SnapshotOf(Guid.NewGuid()), Guid.NewGuid());
+        var tooLittle = await SendSnapshotAsync(scene.Member, SnapshotOf(scene.Live, "Bogus"), null);
+        var tooLate = await SendSnapshotAsync(scene.ConsoleOperator, SnapshotOf(scene.Historic, "Bogus"), null);
+        var noId = await SendSnapshotAsync(scene.ConsoleOperator, SnapshotOf(scene.Live), null);
+        var emptyId = await SendSnapshotAsync(scene.ConsoleOperator, SnapshotOf(scene.Live), Guid.Empty);
+        var badKind = await SendSnapshotAsync(scene.ConsoleOperator, SnapshotOf(scene.Live, "Bogus"), Guid.NewGuid());
+        var noParticipation = await SendSnapshotAsync(scene.ConsoleOperator, SnapshotOf(scene.Live), Guid.NewGuid());
+
+        Assert.Equal(HttpStatusCode.UnsupportedMediaType, notJsonApi.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, unnamed.StatusCode);
+        Assert.Equal("event-required", await ErrorCodeAsync(unnamed));
+        Assert.Equal(HttpStatusCode.BadRequest, notAnId.StatusCode);
+        Assert.Equal("invalid-event", await ErrorCodeAsync(notAnId));
+        Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, tooLittle.StatusCode); // the Level comes before the kind that is none and the id that is missing
+        Assert.Equal("not-allowed", await ErrorCodeAsync(tooLittle));
+        Assert.Equal(HttpStatusCode.Conflict, tooLate.StatusCode); // and the stage
+        Assert.Equal("event-ended", await ErrorCodeAsync(tooLate));
+        Assert.Equal("id-required", await ErrorCodeAsync(noId));
+        Assert.Equal("invalid-id", await ErrorCodeAsync(emptyId));
+        Assert.Equal("invalid-snapshot", await ErrorCodeAsync(badKind));
+        Assert.Equal(HttpStatusCode.NotFound, noParticipation.StatusCode); // the work is done last
+        Assert.Equal("participation-not-found", await ErrorCodeAsync(noParticipation));
+    }
+
+    [Fact]
+    public async Task A_group_of_Snapshots_is_sent_to_one_Event_found_once_and_an_entry_of_another_is_refused_on_its_own()
+    {
+        await using var scene = await SceneAsync();
+        var many = Enumerable.Range(0, 101).Select(_ => EntryOf(scene.Live)).ToArray();
+
+        var notAList = await SendRawAsync(
+            scene.Member,
+            HttpMethod.Post,
+            "/api/snapshots/actions/send-group",
+            ApiSessions.MEDIA_TYPE,
+            """{ "data": {} }"""
+        );
+        var unnamed = await SendGroupAsync(scene.ConsoleOperator, EntryOf(null));
+        var unknown = await SendGroupAsync(scene.ConsoleOperator, EntryOf(Guid.NewGuid()));
+        var tooLittleAndTooMany = await SendGroupAsync(scene.Member, many);
+        var tooMany = await SendGroupAsync(scene.ConsoleOperator, many);
+        var mixed = await SendGroupAsync(scene.ConsoleOperator, EntryOf(scene.Live), EntryOf(scene.Historic));
+
+        Assert.Equal(HttpStatusCode.BadRequest, notAList.StatusCode);
+        Assert.Equal("malformed-request", await ErrorCodeAsync(notAList));
+        Assert.Equal(HttpStatusCode.BadRequest, unnamed.StatusCode);
+        Assert.Equal("event-required", await ErrorCodeAsync(unnamed));
+        Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, tooLittleAndTooMany.StatusCode); // the Level comes before the size
+        Assert.Equal("not-allowed", await ErrorCodeAsync(tooLittleAndTooMany));
+        Assert.Equal(HttpStatusCode.BadRequest, tooMany.StatusCode);
+        Assert.Equal("too-many-snapshots", await ErrorCodeAsync(tooMany));
+        Assert.Equal(HttpStatusCode.OK, mixed.StatusCode);
+        var results = (await ApiSessions.ReadJsonAsync(mixed)).GetProperty("meta").GetProperty("results");
+        Assert.Equal(404, results[0].GetProperty("status").GetInt32()); // the first names the Event of the group, which has no such start number
+        Assert.Equal(409, results[1].GetProperty("status").GetInt32());
+        Assert.Equal("event-mismatch", results[1].GetProperty("errors")[0].GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task An_Update_of_a_Snapshot_is_about_the_Event_of_the_Participation_that_holds_it_which_is_looked_for_before_what_the_caller_holds()
+    {
+        await using var scene = await SceneAsync();
+
+        var unknown = await UpdateSnapshotAsync(scene.ConsoleOperator, Guid.NewGuid().ToString());
+        var notAnId = await UpdateSnapshotAsync(scene.ConsoleOperator, "not-a-guid");
+
+        Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, notAnId.StatusCode);
+    }
+
+    static Dictionary<string, object?> SnapshotOf(Guid? eventId, string kind = "Arrive")
+    {
+        var attributes = new Dictionary<string, object?>
+        {
+            ["number"] = 1,
+            ["kind"] = kind,
+            ["time"] = DateTimeOffset.UtcNow,
+        };
+        if (eventId != null)
+        {
+            attributes["eventId"] = eventId;
+        }
+
+        return attributes;
+    }
+
+    static object EntryOf(Guid? eventId)
+    {
+        return new
+        {
+            type = "snapshots",
+            id = Guid.NewGuid(),
+            attributes = SnapshotOf(eventId),
+        };
+    }
+
+    static Task<HttpResponseMessage> SendSnapshotAsync(Person person, object attributes, Guid? id)
+    {
+        return person.Page.WriteAsync(HttpMethod.Post, "/api/snapshots", "snapshots", attributes, id: id?.ToString());
+    }
+
+    static Task<HttpResponseMessage> SendGroupAsync(Person person, params object[] entries)
+    {
+        return SendRawAsync(
+            person,
+            HttpMethod.Post,
+            "/api/snapshots/actions/send-group",
+            ApiSessions.MEDIA_TYPE,
+            JsonSerializer.Serialize(new { data = entries })
+        );
+    }
+
+    static Task<HttpResponseMessage> UpdateSnapshotAsync(Person person, string snapshot)
+    {
+        return person.Page.WriteAsync(
+            HttpMethod.Patch,
+            $"/api/snapshots/{snapshot}",
+            "snapshots",
+            new { time = DateTimeOffset.UtcNow }
+        );
+    }
+
     static Dictionary<string, JsonElement> NamingEvent(Guid eventId, string named)
     {
         var attributes = EventDataRow.Of("officials", eventId).Attributes;

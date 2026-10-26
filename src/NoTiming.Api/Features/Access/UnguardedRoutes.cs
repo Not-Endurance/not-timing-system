@@ -44,7 +44,6 @@ internal static class UnguardedRoutes
         "PATCH api/horses/{id}",
         "PATCH api/me/profile",
         "PATCH api/passkeys/{id}",
-        "PATCH api/snapshots/{id}",
         "PATCH api/user-sessions/{id}",
         "POST api/athletes",
         "POST api/athletes/{id}/link",
@@ -54,8 +53,6 @@ internal static class UnguardedRoutes
         "POST api/horses/{id}/link",
         "POST api/passkeys",
         "POST api/passkeys/actions/creation-options",
-        "POST api/snapshots",
-        "POST api/snapshots/actions/send-group",
         "POST api/user-sessions",
     };
 }
