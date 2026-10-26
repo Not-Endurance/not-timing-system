@@ -68,8 +68,9 @@ internal static class ApiPipeline
         app.MapEventResources();
         app.MapHistoricEventRedirects();
         app.MapSetups();
-        app.MapEventGrants();
-        app.MapConsoleOperators();
+        var guarded = app.MapGroup(string.Empty).AddEndpointFilter<AccessFilter>();
+        guarded.MapEventGrants();
+        guarded.MapConsoleOperators();
         app.MapAccountSearch();
         app.MapRegistrySearch();
         app.MapParticipationHistory();
@@ -105,6 +106,12 @@ internal static class ApiPipeline
 
         // Deep links into the Ui. A path that looks like a file (it has an extension) that is missing stays a 404.
         app.MapFallbackToFile("{**path:nonfile}", "index.html");
+
+        // Fail closed: a route of the Api that is neither public nor declares what it needs does not let the host start.
+        EndpointGuard.ThrowWhenUnguarded(
+            ((IEndpointRouteBuilder)app).DataSources.SelectMany(x => x.Endpoints),
+            UnguardedRoutes.NotYet
+        );
 
         return app;
     }

@@ -1,0 +1,48 @@
+using NTS.Domain.Access;
+
+namespace NoTiming.Api.Features.Access;
+
+/// <summary>Where a request names the place its requirement is about (ADR-0012, #671).</summary>
+internal enum PlaceIn
+{
+    /// <summary>No place: the platform.</summary>
+    Platform = 1,
+
+    /// <summary>The Event named as the attribute <c>eventId</c> of the document in the body.</summary>
+    EventInBody,
+
+    /// <summary>The Event named at the head of the filter of a list: <c>filter=eventId eq {id}</c>.</summary>
+    EventInFilter,
+
+    /// <summary>The Event of the Operator or Official grant whose id is the route value <c>id</c>.</summary>
+    EventOfGrant,
+
+    /// <summary>The Event of the Console Operator grant whose id is the route value <c>id</c>.</summary>
+    EventOfConsoleOperator,
+}
+
+/// <summary>
+/// What an endpoint needs, and where the place of it is named (ADR-0012, #671): the one thing an endpoint says about who may
+/// call it. The endpoint filter does the rest, in the order of the answers: it finds the caller, the place and the caller's
+/// Level there, asks the policy, and only then runs the validation of the request and the handler. A handler that is
+/// reached has a caller that holds the Level and a request that is valid. An endpoint that declares none is either public,
+/// by the one list, or does not let the host start.
+/// </summary>
+[AttributeUsage(AttributeTargets.Method)]
+internal sealed class RequiresAttribute : Attribute
+{
+    public RequiresAttribute(Capability capability, PlaceIn place)
+    {
+        Capability = capability;
+        Place = place;
+    }
+
+    public Capability Capability { get; }
+    public PlaceIn Place { get; }
+
+    /// <summary>
+    /// What a caller has to hold to see that the thing is there at all, such as a grant: one that does not is told it is not found,
+    /// and one that does is told what it is missing. None when the thing is there for everybody who may ask (the default).
+    /// </summary>
+    public Capability SeenWith { get; init; }
+}

@@ -61,6 +61,7 @@ internal static class ApiServices
         services.AddSingleton<GrantInvitations>();
         services.AddHostedService<TenancyIndexes>();
         services.AddSingleton<StandingReader>();
+        services.AddScoped<AccessContext>();
         services.AddSingleton<GlobalCollections>();
         services.AddSingleton<ReferenceAccess>();
         services.AddSingleton<EventDataAccess>();

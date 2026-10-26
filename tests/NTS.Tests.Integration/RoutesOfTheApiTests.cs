@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using NoTiming.Api.Features.Access;
 using NTS.Tests.Integration.Infrastructure;
 using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 
@@ -39,6 +40,16 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             route =>
                 Assert.DoesNotContain(NeverInARoute(), word => route.Contains(word, StringComparison.OrdinalIgnoreCase))
         );
+    }
+
+    [Fact]
+    public async Task Every_route_of_the_Api_is_public_or_declares_what_it_needs_or_is_named_as_not_yet_guarded()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+
+        var endpoints = api.Services.GetServices<EndpointDataSource>().SelectMany(x => x.Endpoints);
+
+        Assert.Empty(EndpointGuard.Mistakes(endpoints, UnguardedRoutes.NotYet));
     }
 
     [Fact]
