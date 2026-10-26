@@ -68,6 +68,24 @@ public sealed class RepositoryArchitectureTests
         Holds(ArchitectureRules.OnlyTestsTakePlaywright(GRAPH));
     }
 
+    [Fact]
+    public void Only_the_endpoint_filter_and_the_places_that_tell_ask_the_policy()
+    {
+        Holds(ArchitectureRules.OnlyTheFilterAndThePlacesThatTellAskThePolicy(SourcesOfTheApi()));
+    }
+
+    static List<(string Path, string Text)> SourcesOfTheApi()
+    {
+        var root = RepositoryPaths.Discover().Root;
+        return
+        [
+            .. Directory
+                .EnumerateFiles(Path.Combine(root, "src", "NoTiming.Api"), "*.cs", SearchOption.AllDirectories)
+                .Select(x => (Path.GetRelativePath(root, x).Replace('\\', '/'), File.ReadAllText(x)))
+                .Where(x => !x.Item1.Contains("/obj/") && !x.Item1.Contains("/bin/")),
+        ];
+    }
+
     static void Holds(IReadOnlyList<string> violations)
     {
         Assert.True(violations.Count == 0, string.Join(Environment.NewLine, violations));

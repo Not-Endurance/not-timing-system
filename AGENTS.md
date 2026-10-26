@@ -179,6 +179,10 @@ Overall average: **60-90% token reduction** on common development operations.
 ## WSL
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker
 
+## Endpoints
+1. Authorization and validation are never written in a handler. A route declares what it needs with `[Requires(Capability, PlaceIn)]`; the one endpoint filter (`AccessFilter`) finds the caller and the place, asks `AccessPolicy` and validates the request (`JsonApiBody<T>`, `ListQuery`, `SearchQuery`), and the handler takes the `AccessContext` and a request that is valid. A route that is neither in `PublicEndpoints` nor declares a requirement stops the host (`EndpointGuard`), and an architecture test fails a handler that asks the policy or reads the session itself.
+2. The shape of a route, the order of its answers and its codes are in `.claude/skills/rest-api/SKILL.md` and ADR-0012.
+
 ## Agent skills
 
 ### Issue tracker

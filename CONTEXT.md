@@ -114,7 +114,7 @@ _Avoid_: Judge, Judge app
 One Combination's ride at an Event — its category, phases, and outcome: the act of Participants competing, recorded. A record of competing, not a competitor and not a person. The same ride can count in the Rankings of more than one Competition.
 _Avoid_: entry, run
 
-> **A Participant is an Athlete or a Horse, not the pair and not the ride.** The competing pair is a **Combination**; its ride is a **Participation**. A thing named `Participant` that means the pair, the ride or a signed-in account is a misnomer to be corrected: `WitnessAccessLevel.Participant` was one such misnomer and is now `Registered` — "signed in without a write role" (see #592).
+> **A Participant is an Athlete or a Horse, not the pair and not the ride.** The competing pair is a **Combination**; its ride is a **Participation**. A thing named `Participant` that means the pair, the ride or a signed-in account is a misnomer to be corrected: `WitnessAccessLevel.Participant` was one such misnomer and became `Registered` — "signed in without a write role" (see #592); the Ui has no such level any more (#671), and is told by the Api whether the person may send a Snapshot.
 
 **Ranking**:
 The Participations that compete for placement in one Competition and Category, each marked ranked or not ranked. While its Event is Live it holds no placings and Results derive them; once the Event is Historic it keeps its final placings.
