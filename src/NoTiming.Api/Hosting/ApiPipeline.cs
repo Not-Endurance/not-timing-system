@@ -57,6 +57,8 @@ internal static class ApiPipeline
                     }
                 )
         );
+        // The routes that declare what they need are mapped through the group the endpoint filter is on (ADR-0012, #671).
+        var guarded = app.MapGroup(string.Empty).AddEndpointFilter<AccessFilter>();
         app.MapAccount();
 #if DEBUG
         app.MapLocalSignIn();
@@ -64,11 +66,10 @@ internal static class ApiPipeline
         app.MapProfile();
         app.MapTenancy();
         app.MapBranding();
-        app.MapEvents();
-        app.MapEventResources();
+        guarded.MapEvents();
+        guarded.MapEventResources();
         app.MapHistoricEventRedirects();
-        app.MapSetups();
-        var guarded = app.MapGroup(string.Empty).AddEndpointFilter<AccessFilter>();
+        guarded.MapSetups();
         guarded.MapEventGrants();
         guarded.MapConsoleOperators();
         app.MapAccountSearch();

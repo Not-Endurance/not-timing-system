@@ -19,6 +19,11 @@ internal static class ApiFailures
                 "grant-limit-reached",
                 $"An Event has at most {EventGrantStore.MAX_GRANTS_PER_EVENT} grants: remove one that is not needed."
             ),
+            TenantCountryMissingException => new JsonApiFailure(
+                StatusCodes.Status409Conflict,
+                "tenant-country-missing",
+                "The country of the Tenant is not among the countries, so no Event can be made in it."
+            ),
             _ => null,
         };
     }

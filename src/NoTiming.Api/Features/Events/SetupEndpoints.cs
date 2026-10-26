@@ -25,29 +25,25 @@ internal static class SetupEndpoints
 
     public static IEndpointRouteBuilder MapSetups(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/configure-events", ListAsync).RequireAuthorization();
-        app.MapGet("/api/configure-events/{id}", ReadAsync).RequireAuthorization();
-        app.MapPatch("/api/configure-events/{id}", ChangeAsync).RequireAuthorization();
-        app.MapDelete("/api/configure-events/{id}", RemoveAsync).RequireAuthorization();
+        app.MapGet("/api/configure-events", ListAsync);
+        app.MapGet("/api/configure-events/{id}", ReadAsync);
+        app.MapPatch("/api/configure-events/{id}", ChangeAsync);
+        app.MapDelete("/api/configure-events/{id}", RemoveAsync);
         return app;
     }
 
     /// <summary>The members the Setup is shown with: its own, and the Tenant, which only the server sets.</summary>
     public static ReferenceMembers<ConfigureEventModel> Members { get; } = new([], []);
 
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
     static async Task<IResult> ListAsync(
         HttpContext context,
-        UserManager<NIdentityUser> users,
+        AccessContext access,
         TenantCollections tenants,
         EventGrantStore grants
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
+        var user = access.User;
         var query = ReferenceQuery<ConfigureEventModel>.Read(context.Request, Members.Hidden);
         if (query.Refusal != null)
         {
@@ -87,82 +83,29 @@ internal static class SetupEndpoints
         );
     }
 
+    [Requires(Capability.ReadConfiguration, PlaceIn.EventRoute)]
     static async Task<IResult> ReadAsync(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        StandingReader standing,
-        EventStore events,
-        TenantCollections tenants
+        AccessContext access,
+        TenantCollections tenants,
+        CancellationToken cancellationToken
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var facts = Guid.TryParse(id, out var eventId) ? await events.FindAsync(eventId, context.RequestAborted) : null;
-        if (facts is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var verdict = await standing.DecideAtEventAsync(
-            Capability.ReadConfiguration,
-            user,
-            facts,
-            context.RequestAborted
-        );
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
-        var setup = await Open(tenants, facts).FindAsync(eventId, context.RequestAborted);
+        var facts = access.Event;
+        var setup = await Open(tenants, facts).FindAsync(facts.Id, cancellationToken);
         return setup is null ? JsonApiResults.NotFound() : Resource(setup, facts, StatusCodes.Status200OK);
     }
 
+    [Requires(Capability.EditSetup, PlaceIn.EventRoute)]
     static async Task<IResult> ChangeAsync(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        StandingReader standing,
-        EventStore events,
-        TenantCollections tenants
+        JsonApiBody<SetupChange> body,
+        AccessContext access,
+        TenantCollections tenants,
+        CancellationToken cancellationToken
     )
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, CONFIGURE_EVENTS);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var facts = Guid.TryParse(id, out var eventId) ? await events.FindAsync(eventId, context.RequestAborted) : null;
-        if (facts is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var verdict = await standing.DecideAtEventAsync(Capability.EditSetup, user, facts, context.RequestAborted);
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
-        if (read.Id != null && read.Id != id)
-        {
-            return JsonApiResults.IdMismatch();
-        }
-
+        var facts = access.Event;
         var collection = Open(tenants, facts);
-        var setup = await collection.FindAsync(eventId, context.RequestAborted);
+        var setup = await collection.FindAsync(facts.Id, cancellationToken);
         if (setup is null)
         {
             return JsonApiResults.NotFound();
@@ -172,51 +115,32 @@ internal static class SetupEndpoints
             Members,
             collection,
             setup,
-            read.Attributes!.Members ?? [],
-            context.RequestAborted
+            body.Attributes.Members ?? [],
+            cancellationToken
         );
         return failed ?? Resource(setup, facts, StatusCodes.Status200OK);
     }
 
+    [Requires(Capability.DeleteEvent, PlaceIn.EventRoute)]
     static async Task<IResult> RemoveAsync(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        StandingReader standing,
-        EventStore events,
+        AccessContext access,
         TenantCollections tenants,
         EventGrantStore grants,
         BrandingStore branding,
-        TenancyLog log
+        TenancyLog log,
+        CancellationToken cancellationToken
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var facts = Guid.TryParse(id, out var eventId) ? await events.FindAsync(eventId, context.RequestAborted) : null;
-        if (facts is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var verdict = await standing.DecideAtEventAsync(Capability.DeleteEvent, user, facts, context.RequestAborted);
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
-        if (!await Open(tenants, facts).DeleteAsync(eventId, context.RequestAborted))
+        var facts = access.Event;
+        if (!await Open(tenants, facts).DeleteAsync(facts.Id, cancellationToken))
         {
             return JsonApiResults.NotFound();
         }
 
         // What was given on the Event goes with it, so that no grant is left waiting for an Event that is not there.
-        await grants.RemoveAllOfAsync(facts.Record, context.RequestAborted);
-        await branding.RemoveOfEventAsync(facts.TenantId, eventId, context.RequestAborted); // and the logos it put in place of the Tenant's
-        log.EventDeleted(user.Id, eventId, facts.TenantId);
+        await grants.RemoveAllOfAsync(facts.Record, cancellationToken);
+        await branding.RemoveOfEventAsync(facts.TenantId, facts.Id, cancellationToken); // and the logos it put in place of the Tenant's
+        log.EventDeleted(access.User.Id, facts.Id, facts.TenantId);
         return Results.NoContent();
     }
 
@@ -229,4 +153,12 @@ internal static class SetupEndpoints
     {
         return JsonApiResults.Resource(status, CONFIGURE_EVENTS, setup.Id.ToString(), Members.AttributesOf(setup));
     }
+}
+
+/// <summary>The members a change of a Setup names. Its id, when the document gives one, is the one of the route.</summary>
+internal sealed class SetupChange : MemberAttributes, IResourceAttributes
+{
+    public static string? ResourceType => "configure-events";
+
+    public static DocumentIds Ids => DocumentIds.MatchesRoute;
 }

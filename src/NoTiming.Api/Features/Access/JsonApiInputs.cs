@@ -16,15 +16,37 @@ internal interface IJsonApiInput
     /// <summary>The Event the part names, as the text it gave; none when it names none.</summary>
     string? NamedEvent { get; }
 
-    /// <summary>What is wrong with the content of the part (400, 422); none when it is valid.</summary>
+    /// <summary>The id the document gave its resource, as the text it gave; none when it gave none or the part is not a document.</summary>
+    string? DocumentId { get; }
+
+    /// <summary>What is wrong with the content of the part (400, 409, 422); none when it is valid.</summary>
     JsonApiFailure? Content();
+}
+
+/// <summary>What a document says of the id of its resource.</summary>
+internal enum DocumentIds
+{
+    /// <summary>It is no business of the Api's: a document that gives one is not refused for it.</summary>
+    Ignored = 0,
+
+    /// <summary>It may be left out, and a document that gives one gives a Guid (ADR-0009): the id a client makes.</summary>
+    OptionalGuid,
+
+    /// <summary>A change: it may be left out, and a document that gives one gives the id of the route.</summary>
+    MatchesRoute,
 }
 
 /// <summary>The attributes of a resource a body carries: the type of resource it is, and whether what it says is valid.</summary>
 internal interface IResourceAttributes
 {
-    /// <summary>The type of the resource, as the document names it.</summary>
-    static abstract string ResourceType { get; }
+    /// <summary>
+    /// The type of the resource, as the document names it, when the attributes are of one resource only; a route that is made
+    /// for each of several (the families) says it with <see cref="ResourceAttribute"/>.
+    /// </summary>
+    static virtual string? ResourceType => null;
+
+    /// <summary>What the document says of the id of its resource.</summary>
+    static virtual DocumentIds Ids => DocumentIds.Ignored;
 
     /// <summary>What is wrong with the attributes, said once and in the same words wherever they are sent; none when they are valid.</summary>
     JsonApiFailure? Invalid();
@@ -46,31 +68,56 @@ internal sealed class JsonApiBody<TAttributes> : IJsonApiInput
 {
     public static async ValueTask<JsonApiBody<TAttributes>?> BindAsync(HttpContext context)
     {
+        var type =
+            context.GetEndpoint()?.Metadata.GetMetadata<ResourceAttribute>()?.Type
+            ?? TAttributes.ResourceType
+            ?? throw new InvalidOperationException(
+                $"The route does not say what resource {typeof(TAttributes).Name} is."
+            );
+
         return new JsonApiBody<TAttributes>(
-            await JsonApiRequests.ReadAsync<TAttributes>(context.Request, TAttributes.ResourceType)
+            await JsonApiRequests.ReadAsync<TAttributes>(context.Request, type),
+            context.GetRouteValue("id")?.ToString()
         );
     }
 
     readonly JsonApiRead<TAttributes> _read;
+    readonly string? _routeId;
 
-    JsonApiBody(JsonApiRead<TAttributes> read)
+    JsonApiBody(JsonApiRead<TAttributes> read, string? routeId)
     {
         _read = read;
+        _routeId = routeId;
     }
 
     /// <summary>The attributes; they are valid in the handler, which the filter does not reach before it knows.</summary>
     public TAttributes Attributes => _read.Attributes!;
 
-    /// <summary>The id the document gave its resource, when it gave one.</summary>
+    /// <summary>The id the document gave its resource, when it gave one; a Guid, when the attributes say it has to be.</summary>
     public string? Id => _read.Id;
+
+    /// <summary>The <c>meta</c> the document gave its resource, when it gave one.</summary>
+    public System.Text.Json.JsonElement? Meta => _read.Meta;
 
     public IResult? Transport => _read.Error;
 
     public string? NamedEvent => (_read.Attributes as INamesEvent)?.EventId;
 
+    public string? DocumentId => _read.Id;
+
     public JsonApiFailure? Content()
     {
-        return _read.Attributes?.Invalid();
+        if (_read.Attributes?.Invalid() is { } invalid)
+        {
+            return invalid;
+        }
+
+        return TAttributes.Ids switch
+        {
+            DocumentIds.OptionalGuid when Id != null && !Guid.TryParse(Id, out _) => JsonApiFailures.InvalidId,
+            DocumentIds.MatchesRoute when Id != null && Id != _routeId => JsonApiFailures.IdMismatch,
+            _ => null,
+        };
     }
 }
 
@@ -123,8 +170,20 @@ internal sealed class ListQuery : IJsonApiInput
 
     public string? NamedEvent => _list.EqualTo.GetValueOrDefault(EVENT_ID);
 
+    public string? DocumentId => null;
+
     public JsonApiFailure? Content()
     {
         return null;
     }
+}
+
+/// <summary>The failures of a request that more than one resource has, said once.</summary>
+internal static class JsonApiFailures
+{
+    public static JsonApiFailure InvalidId { get; } =
+        new(StatusCodes.Status400BadRequest, "invalid-id", "The id of a resource is a Guid.");
+
+    public static JsonApiFailure IdMismatch { get; } =
+        new(StatusCodes.Status409Conflict, "id-mismatch", "The id of the resource is not the one of the route.");
 }

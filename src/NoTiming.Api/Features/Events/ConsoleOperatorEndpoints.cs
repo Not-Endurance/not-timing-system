@@ -159,7 +159,7 @@ internal static class ConsoleOperatorEndpoints
 /// <summary>What a Console Operator is sent as: an Event, and a person by an email or an account. A member that is not one of these is kept, to be refused.</summary>
 internal sealed class ConsoleOperatorAttributes : IResourceAttributes, INamesEvent
 {
-    public static string ResourceType => "console-operators";
+    public static string? ResourceType => "console-operators";
 
     public string? EventId { get; set; }
     public string? Email { get; set; }

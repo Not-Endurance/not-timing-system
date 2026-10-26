@@ -49,9 +49,9 @@ internal static class EventResourceEndpoints
                 ListAsync(EventStage.Historic, context, reads, time)
         );
         app.MapGet("/api/events/{id}", ReadAsync);
-        app.MapPost("/api/events", StartAsync).RequireAuthorization();
-        app.MapPatch("/api/events/{id}", ChangeAsync).RequireAuthorization();
-        app.MapDelete("/api/events/{id}", ResetAsync).RequireAuthorization();
+        app.MapPost("/api/events", StartAsync);
+        app.MapPatch("/api/events/{id}", ChangeAsync);
+        app.MapDelete("/api/events/{id}", ResetAsync);
         return app;
     }
 
@@ -109,76 +109,29 @@ internal static class EventResourceEndpoints
         return model is null ? JsonApiResults.NotFound() : Resource(model, time.GetUtcNow(), StatusCodes.Status200OK);
     }
 
+    // The Event is its Setup, so the document names the Setup and nothing else.
+    [Requires(Capability.ConfigureEvent, PlaceIn.EventInDocument)]
     static async Task<IResult> StartAsync(
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        StandingReader standing,
-        EventStore events,
+        JsonApiBody<EventStart> body,
+        AccessContext access,
         EventStarter starter,
         TenantStore tenantStore,
         TenantCollections tenants,
         CrossTenantReads reads,
         TenancyLog log,
-        TimeProvider time
+        TimeProvider time,
+        CancellationToken cancellationToken
     )
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, EVENTS);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        // The Event is its Setup, so the document names the Setup and nothing else.
-        if (read.Id == null)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "id-required",
-                "Name the Setup the Event starts from.",
-                "The id of the resource is the id of its Setup."
-            );
-        }
-
-        if (!Guid.TryParse(read.Id, out var id))
-        {
-            return JsonApiResults.InvalidId();
-        }
-
-        if (read.Attributes!.Members is { Count: > 0 } named)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "unsupported-attribute",
-                "An Event is started from its Setup and takes nothing else.",
-                string.Join(", ", named.Keys)
-            );
-        }
-
-        var facts = await events.FindAsync(id, context.RequestAborted);
-        if (facts is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var verdict = await standing.DecideAtEventAsync(Capability.ConfigureEvent, user, facts, context.RequestAborted);
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
+        var facts = access.Event;
+        var id = facts.Id;
         var now = time.GetUtcNow();
         if (facts.Record.IsStarted)
         {
-            return await ThatEventAsync(id, reads, now, context.RequestAborted);
+            return await ThatEventAsync(id, reads, now, cancellationToken);
         }
 
-        var tenant = await tenantStore.FindAsync(facts.TenantId, context.RequestAborted);
+        var tenant = await tenantStore.FindAsync(facts.TenantId, cancellationToken);
         if (tenant is null)
         {
             return JsonApiResults.Error(
@@ -190,7 +143,7 @@ internal static class EventResourceEndpoints
 
         var setup = await tenants
             .Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, facts.TenantId)
-            .FindAsync(id, context.RequestAborted);
+            .FindAsync(id, cancellationToken);
         if (setup is null)
         {
             return JsonApiResults.NotFound();
@@ -207,64 +160,35 @@ internal static class EventResourceEndpoints
             return refusal;
         }
 
-        if (!await starter.StartAsync(plan!, facts.TenantId, context.RequestAborted))
+        if (!await starter.StartAsync(plan!, facts.TenantId, cancellationToken))
         {
-            return await ThatEventAsync(id, reads, now, context.RequestAborted);
+            return await ThatEventAsync(id, reads, now, cancellationToken);
         }
 
-        log.EventStarted(user.Id, id, facts.TenantId);
+        log.EventStarted(access.User.Id, id, facts.TenantId);
         return Resource(plan!.EventInformation, now, StatusCodes.Status201Created, $"/api/{EVENTS}/{id}");
     }
 
+    [Requires(Capability.ConfigureEvent, PlaceIn.StartedEventRoute)]
     static async Task<IResult> ChangeAsync(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        StandingReader standing,
-        EventStore events,
+        JsonApiBody<EventChange> body,
+        AccessContext access,
         TenantCollections tenants,
-        TimeProvider time
+        TimeProvider time,
+        CancellationToken cancellationToken
     )
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, EVENTS);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        // An Event that has not started is a Setup, which is not an Event, whoever asks.
-        var facts = Guid.TryParse(id, out var eventId) ? await events.FindAsync(eventId, context.RequestAborted) : null;
-        if (facts is not { Record.IsStarted: true })
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var verdict = await standing.DecideAtEventAsync(Capability.ConfigureEvent, user, facts, context.RequestAborted);
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
-        if (read.Id != null && read.Id != id)
-        {
-            return JsonApiResults.IdMismatch();
-        }
-
+        var facts = access.Event;
+        var eventId = facts.Id;
         var collection = tenants.Of<EventInformationModel>(TenantOwned.EVENT_INFORMATIONS, facts.TenantId);
-        var row = await collection.FindAsync(eventId, context.RequestAborted);
+        var row = await collection.FindAsync(eventId, cancellationToken);
         if (row is null)
         {
             return JsonApiResults.NotFound();
         }
 
         var named = new List<PropertyInfo>();
-        if (Members.Apply(row, read.Attributes!.Members ?? [], named) is { } malformed)
+        if (Members.Apply(row, body.Attributes.Members ?? [], named) is { } malformed)
         {
             return malformed;
         }
@@ -312,7 +236,7 @@ internal static class EventResourceEndpoints
         }
 
         var update = Members.UpdateOf(row, named);
-        if (update.ElementCount > 0 && !await collection.UpdateAsync(eventId, update, context.RequestAborted))
+        if (update.ElementCount > 0 && !await collection.UpdateAsync(eventId, update, cancellationToken))
         {
             return JsonApiResults.NotFound();
         }
@@ -320,36 +244,17 @@ internal static class EventResourceEndpoints
         return Resource(row, now, StatusCodes.Status200OK);
     }
 
+    [Requires(Capability.RunEvent, PlaceIn.EventRoute)]
     static async Task<IResult> ResetAsync(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        StandingReader standing,
-        EventStore events,
+        AccessContext access,
         EventStarter starter,
-        TenancyLog log
+        TenancyLog log,
+        CancellationToken cancellationToken
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var facts = Guid.TryParse(id, out var eventId) ? await events.FindAsync(eventId, context.RequestAborted) : null;
-        if (facts is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var verdict = await standing.DecideAtEventAsync(Capability.RunEvent, user, facts, context.RequestAborted);
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
-        await starter.ResetAsync(eventId, facts.TenantId, context.RequestAborted);
-        log.EventReset(user.Id, eventId, facts.TenantId);
+        var facts = access.Event;
+        await starter.ResetAsync(facts.Id, facts.TenantId, cancellationToken);
+        log.EventReset(access.User.Id, facts.Id, facts.TenantId);
         return Results.NoContent();
     }
 
@@ -369,4 +274,30 @@ internal static class EventResourceEndpoints
     {
         return JsonApiResults.Resource(status, EVENTS, model.Id.ToString(), AttributesOf(model, now), location);
     }
+}
+
+/// <summary>An Event is started from its Setup and takes nothing else: the document names the Setup by its id and carries no member.</summary>
+internal sealed class EventStart : MemberAttributes, IResourceAttributes
+{
+    public static string? ResourceType => "events";
+
+    public override JsonApiFailure? Invalid()
+    {
+        return Members is { Count: > 0 } named
+            ? new JsonApiFailure(
+                StatusCodes.Status400BadRequest,
+                "unsupported-attribute",
+                "An Event is started from its Setup and takes nothing else.",
+                string.Join(", ", named.Keys)
+            )
+            : null;
+    }
+}
+
+/// <summary>The members a change of an Event names. Its id, when the document gives one, is the one of the route.</summary>
+internal sealed class EventChange : MemberAttributes, IResourceAttributes
+{
+    public static string? ResourceType => "events";
+
+    public static DocumentIds Ids => DocumentIds.MatchesRoute;
 }

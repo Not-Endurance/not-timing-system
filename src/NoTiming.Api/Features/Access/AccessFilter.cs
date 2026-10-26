@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Not.Identity;
 using NoTiming.Api.Features.Events;
+using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
 using NTS.Domain.Access;
 
@@ -11,9 +12,9 @@ namespace NoTiming.Api.Features.Access;
 /// needs with <see cref="RequiresAttribute"/>. It answers in the order the rest-api skill gives: the transport of the request
 /// (415, 413, 400), the place the request names, found once (400 when it is named wrongly, 404 when it is not there), the
 /// Level the caller holds against the row, then the stage of the place (403, 409), then the content of the request (400,
-/// 422). Only then is the handler reached, with a caller who holds the Level and a valid request, and what the handler throws
-/// that the Api has an answer for is answered once, here. The caller is signed in by then: that is the baseline's, which
-/// runs before any endpoint.
+/// 409, 422). Only then is the handler reached, with a caller who holds the Level and a valid request, and what the handler
+/// throws that the Api has an answer for is answered once, here. The caller is signed in by then: that is the baseline's,
+/// which runs before any endpoint.
 /// </summary>
 internal sealed class AccessFilter : IEndpointFilter
 {
@@ -21,6 +22,7 @@ internal sealed class AccessFilter : IEndpointFilter
     readonly StandingReader _standings;
     readonly EventStore _events;
     readonly EventGrantStore _grants;
+    readonly TenantStore _tenants;
     readonly AccessContext _access;
 
     public AccessFilter(
@@ -28,6 +30,7 @@ internal sealed class AccessFilter : IEndpointFilter
         StandingReader standings,
         EventStore events,
         EventGrantStore grants,
+        TenantStore tenants,
         AccessContext access
     )
     {
@@ -35,8 +38,25 @@ internal sealed class AccessFilter : IEndpointFilter
         _standings = standings;
         _events = events;
         _grants = grants;
+        _tenants = tenants;
         _access = access;
     }
+
+    static IResult NotInTheFilter { get; } =
+        JsonApiResults.Error(
+            StatusCodes.Status400BadRequest,
+            "invalid-filter",
+            "The filter is not valid.",
+            "Name the Event: filter=eventId eq <id>."
+        );
+
+    static IResult NotInTheBody { get; } =
+        JsonApiResults.Error(
+            StatusCodes.Status400BadRequest,
+            "invalid-event",
+            "The Event is not named.",
+            "Name the Event by its id as eventId."
+        );
 
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext invocation, EndpointFilterDelegate next)
     {
@@ -53,14 +73,13 @@ internal sealed class AccessFilter : IEndpointFilter
         }
 
         var user = await _users.GetUserAsync(http.User);
-        var (refusal, facts, grant) = await PlaceOfAsync(requires.Place, http, inputs);
-        if (refusal != null)
+        var place = await PlaceOfAsync(requires.Place, user, http, inputs);
+        if (place.Refusal != null)
         {
-            return refusal;
+            return place.Refusal;
         }
 
-        var standing = await StandingAsync(user, facts, http.RequestAborted);
-        var state = facts?.State ?? PlaceState.Platform;
+        var (standing, state) = await StandingAsync(user, place, requires.Capability, http.RequestAborted);
         if (requires.SeenWith != 0 && !AccessPolicy.Decide(requires.SeenWith, standing, state).IsAllowed)
         {
             return JsonApiResults.NotFound(); // what a caller may not see is not there for it
@@ -77,7 +96,7 @@ internal sealed class AccessFilter : IEndpointFilter
             return invalid.AsResult();
         }
 
-        _access.Fill(user, standing, facts, grant);
+        _access.Fill(user, standing, place);
         try
         {
             return await next(invocation);
@@ -108,34 +127,76 @@ internal sealed class AccessFilter : IEndpointFilter
         );
     }
 
-    async Task<Standing> StandingAsync(NIdentityUser? user, EventFacts? facts, CancellationToken cancellationToken)
+    /// <summary>Where the caller stands at the place the capability belongs to, in the state that place is in: the Event, the Tenant or the platform.</summary>
+    async Task<(Standing Standing, PlaceState State)> StandingAsync(
+        NIdentityUser? user,
+        FoundPlace place,
+        Capability capability,
+        CancellationToken cancellationToken
+    )
     {
-        if (user is null)
+        switch (AccessPolicy.RequirementOf(capability).Place)
         {
-            return Standing.Anonymous;
+            case Place.Event:
+                var facts = place.Event ?? throw NoSuchPlace(capability, "an Event");
+                return (
+                    user is null ? Standing.Anonymous : await _standings.AtEventAsync(user, facts, cancellationToken),
+                    facts.State
+                );
+            case Place.Tenant:
+                var tenant = place.Tenant ?? throw NoSuchPlace(capability, "a Tenant");
+                return (
+                    user is null
+                        ? Standing.Anonymous
+                        : await _standings.AtTenantAsync(user, tenant.Id, cancellationToken),
+                    PlaceState.OfTenant(place.IsOperational)
+                );
+            default:
+                return (
+                    user is null ? Standing.Anonymous : await _standings.AtPlatformAsync(user, cancellationToken),
+                    PlaceState.Platform
+                );
         }
-
-        return facts is null
-            ? await _standings.AtPlatformAsync(user, cancellationToken)
-            : await _standings.AtEventAsync(user, facts, cancellationToken);
     }
 
-    async Task<(IResult? Refusal, EventFacts? Event, EventGrant? Grant)> PlaceOfAsync(
+    static InvalidOperationException NoSuchPlace(Capability capability, string place)
+    {
+        return new InvalidOperationException($"{capability} is an action of {place}, and the route names none.");
+    }
+
+    async Task<FoundPlace> PlaceOfAsync(
         PlaceIn place,
+        NIdentityUser? user,
         HttpContext http,
         IReadOnlyList<IJsonApiInput> inputs
     )
     {
+        var cancellationToken = http.RequestAborted;
         switch (place)
         {
             case PlaceIn.Platform:
-                return (null, null, null);
+                return FoundPlace.Platform;
             case PlaceIn.EventInBody:
             case PlaceIn.EventInFilter:
-                return await NamedEventAsync(place, inputs, http.RequestAborted);
+                return await EventNamedAsync(
+                    inputs.Select(x => x.NamedEvent).FirstOrDefault(x => x != null),
+                    place == PlaceIn.EventInFilter ? NotInTheFilter : NotInTheBody,
+                    cancellationToken
+                );
+            case PlaceIn.EventInDocument:
+                return inputs.Select(x => x.DocumentId).FirstOrDefault(x => x != null) is { } documentId
+                    ? await EventNamedAsync(documentId, NotInTheDocument(missing: false), cancellationToken)
+                    : FoundPlace.Refused(NotInTheDocument(missing: true));
+            case PlaceIn.EventRoute:
+            case PlaceIn.StartedEventRoute:
+                return await EventOfRouteAsync(place == PlaceIn.StartedEventRoute, http, cancellationToken);
             case PlaceIn.EventOfGrant:
             case PlaceIn.EventOfConsoleOperator:
-                return await EventOfGrantAsync(place, http);
+                return await EventOfGrantAsync(place == PlaceIn.EventOfConsoleOperator, http, cancellationToken);
+            case PlaceIn.TenantRoute:
+                return await TenantOfRouteAsync(http, cancellationToken);
+            case PlaceIn.CurrentTenant:
+                return await CurrentTenantAsync(user, cancellationToken);
             default:
                 throw new ArgumentOutOfRangeException(
                     nameof(place),
@@ -145,51 +206,90 @@ internal sealed class AccessFilter : IEndpointFilter
         }
     }
 
-    async Task<(IResult?, EventFacts?, EventGrant?)> NamedEventAsync(
-        PlaceIn place,
-        IReadOnlyList<IJsonApiInput> inputs,
-        CancellationToken cancellationToken
-    )
+    async Task<FoundPlace> EventNamedAsync(string? text, IResult notNamed, CancellationToken cancellationToken)
     {
-        var text = inputs.Select(x => x.NamedEvent).FirstOrDefault(x => x != null);
         if (!Guid.TryParse(text, out var id))
         {
-            return (NotNamed(place), null, null);
+            return FoundPlace.Refused(notNamed);
         }
 
         var facts = await _events.FindAsync(id, cancellationToken);
-        return facts is null ? (JsonApiResults.NotFound(), null, null) : (null, facts, null);
+        return facts is null ? FoundPlace.Refused(JsonApiResults.NotFound()) : FoundPlace.OfEvent(facts);
     }
 
-    async Task<(IResult?, EventFacts?, EventGrant?)> EventOfGrantAsync(PlaceIn place, HttpContext http)
+    async Task<FoundPlace> EventOfRouteAsync(
+        bool mustHaveStarted,
+        HttpContext http,
+        CancellationToken cancellationToken
+    )
     {
-        var wantsConsoleOperator = place == PlaceIn.EventOfConsoleOperator;
+        var facts = Guid.TryParse(http.GetRouteValue("id")?.ToString(), out var id)
+            ? await _events.FindAsync(id, cancellationToken)
+            : null;
+
+        // An Event that has not started is a Setup, which is not an Event, whoever asks.
+        return facts is null || (mustHaveStarted && !facts.Record.IsStarted)
+            ? FoundPlace.Refused(JsonApiResults.NotFound())
+            : FoundPlace.OfEvent(facts);
+    }
+
+    async Task<FoundPlace> EventOfGrantAsync(
+        bool wantsConsoleOperator,
+        HttpContext http,
+        CancellationToken cancellationToken
+    )
+    {
         var grant = Guid.TryParse(http.GetRouteValue("id")?.ToString(), out var id)
-            ? await _grants.FindAsync(id, http.RequestAborted)
+            ? await _grants.FindAsync(id, cancellationToken)
             : null;
         if (grant is null || (grant.Kind == GrantKind.ConsoleOperator) != wantsConsoleOperator)
         {
-            return (JsonApiResults.NotFound(), null, null); // the other kind is the other resource's
+            return FoundPlace.Refused(JsonApiResults.NotFound()); // the other kind is the other resource's
         }
 
-        var facts = await _events.FindAsync(grant.EventId, http.RequestAborted);
-        return facts is null ? (JsonApiResults.NotFound(), null, null) : (null, facts, grant);
+        var facts = await _events.FindAsync(grant.EventId, cancellationToken);
+        return facts is null ? FoundPlace.Refused(JsonApiResults.NotFound()) : FoundPlace.OfEvent(facts, grant);
     }
 
-    static IResult NotNamed(PlaceIn place)
+    async Task<FoundPlace> TenantOfRouteAsync(HttpContext http, CancellationToken cancellationToken)
     {
-        return place == PlaceIn.EventInFilter
+        var id = http.GetRouteValue("id")?.ToString();
+        var tenant = id is null ? null : await _tenants.FindAsync(id, cancellationToken);
+        return tenant is null
+            ? FoundPlace.Refused(JsonApiResults.NotFound())
+            : FoundPlace.OfTenant(tenant, await _tenants.IsOperationalAsync(tenant.Id, cancellationToken));
+    }
+
+    /// <summary>What the account does in is its current Tenant: nothing that is sent names another.</summary>
+    async Task<FoundPlace> CurrentTenantAsync(NIdentityUser? user, CancellationToken cancellationToken)
+    {
+        var id = user is null ? null : AccountRoles.CurrentTenantOf(user);
+        var tenant = id is null ? null : await _tenants.FindAsync(id, cancellationToken);
+        return tenant is null
+            ? FoundPlace.Refused(
+                JsonApiResults.Error(
+                    StatusCodes.Status409Conflict,
+                    "no-current-tenant",
+                    "Choose a country on your profile before you do this: it is done in the Tenant of one."
+                )
+            )
+            : FoundPlace.OfTenant(tenant, await _tenants.IsOperationalAsync(tenant.Id, cancellationToken));
+    }
+
+    static IResult NotInTheDocument(bool missing)
+    {
+        return missing
             ? JsonApiResults.Error(
                 StatusCodes.Status400BadRequest,
-                "invalid-filter",
-                "The filter is not valid.",
-                "Name the Event: filter=eventId eq <id>."
+                "id-required",
+                "Name the Setup the Event starts from.",
+                "The id of the resource is the id of its Setup."
             )
             : JsonApiResults.Error(
                 StatusCodes.Status400BadRequest,
-                "invalid-event",
+                "invalid-id",
                 "The Event is not named.",
-                "Name the Event by its id as eventId."
+                "The id of the resource is the id of the Event, and it is a Guid."
             );
     }
 }

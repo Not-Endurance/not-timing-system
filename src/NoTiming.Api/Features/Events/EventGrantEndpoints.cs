@@ -163,7 +163,7 @@ internal static class EventGrantEndpoints
 /// </summary>
 internal sealed class GrantAttributes : IResourceAttributes, INamesEvent
 {
-    public static string ResourceType => "event-grants";
+    public static string? ResourceType => "event-grants";
 
     public string? EventId { get; set; }
     public string? Kind { get; set; }
