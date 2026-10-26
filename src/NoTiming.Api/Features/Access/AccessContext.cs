@@ -15,6 +15,7 @@ internal sealed class AccessContext
     NIdentityUser? _user;
     EventFacts? _event;
     Tenant? _tenant;
+    bool _isOperational;
 
     /// <summary>The signed-in account that asks. A handler is reached by a caller who is not signed in only when the endpoint is public.</summary>
     public NIdentityUser User =>
@@ -31,6 +32,9 @@ internal sealed class AccessContext
     /// <summary>The Tenant the request is about, found once; a handler of an endpoint that is about none does not ask for it.</summary>
     public Tenant Tenant => _tenant ?? throw new InvalidOperationException("The request is not about a Tenant.");
 
+    /// <summary>Whether the Tenant the request is about can hold Events, which it can once it has a Tenant Root.</summary>
+    public bool IsOperational => _tenant != null && _isOperational;
+
     /// <summary>The grant the route names, when the place of the request is the Event of one.</summary>
     public EventGrant? Grant { get; private set; }
 
@@ -40,6 +44,7 @@ internal sealed class AccessContext
         Standing = standing;
         _event = place.Event;
         _tenant = place.Tenant;
+        _isOperational = place.IsOperational;
         Grant = place.Grant;
     }
 }

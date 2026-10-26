@@ -24,37 +24,29 @@ internal static class TenantEndpoints
     const string TENANTS = "tenants";
     const string CAPABILITIES = "capabilities";
     const string SELECTED_TENANT_ID = "selectedTenantId";
-    const string REGIONAL_RULES = "regionalRules";
 
     public static IEndpointRouteBuilder MapTenancy(this IEndpointRouteBuilder app)
     {
-        app.MapPatch("/api/me", SelectTenant).RequireAuthorization();
-        app.MapGet("/api/tenants/{id}", ReadTenant).RequireAuthorization();
-        app.MapPatch("/api/tenants/{id}", EditRules).RequireAuthorization();
-        app.MapGet("/api/tenants/{id}/capabilities", ReadCapabilities).RequireAuthorization();
+        app.MapPatch("/api/me", SelectTenant);
+        app.MapGet("/api/tenants/{id}", ReadTenant);
+        app.MapPatch("/api/tenants/{id}", EditRules);
+        app.MapGet("/api/tenants/{id}/capabilities", ReadCapabilities);
         return app;
     }
 
+    // What an account does for itself is any signed-in account's.
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
     static async Task<IResult> SelectTenant(
-        HttpContext context,
+        JsonApiBody<SelectionChange> body,
+        AccessContext access,
         UserManager<NIdentityUser> users,
         ProfileStore store,
-        TenantStore tenants
+        TenantStore tenants,
+        CancellationToken cancellationToken
     )
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, ACCOUNTS);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        if (read.Id != null && read.Id != user.Id.ToString())
+        var user = access.User;
+        if (body.Id != null && body.Id != user.Id.ToString())
         {
             return JsonApiResults.Error(
                 StatusCodes.Status409Conflict,
@@ -63,34 +55,10 @@ internal static class TenantEndpoints
             );
         }
 
-        var members = read.Attributes!.Members ?? [];
-        if (members.Keys.Any(x => !string.Equals(x, SELECTED_TENANT_ID, StringComparison.OrdinalIgnoreCase)))
+        if (body.Attributes.Choice is { } choice)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "unsupported-attribute",
-                "Only the selected Tenant of an account can be changed.",
-                SELECTED_TENANT_ID
-            );
-        }
-
-        var named = members.FirstOrDefault(x =>
-            string.Equals(x.Key, SELECTED_TENANT_ID, StringComparison.OrdinalIgnoreCase)
-        );
-        if (named.Key != null)
-        {
-            var choice = named.Value;
-            if (choice.ValueKind is not (JsonValueKind.Null or JsonValueKind.String))
-            {
-                return JsonApiResults.Error(
-                    StatusCodes.Status400BadRequest,
-                    "malformed-request",
-                    "The selected Tenant is the id of a Tenant, or null to go back to the home Tenant."
-                );
-            }
-
             var tenantId = choice.ValueKind == JsonValueKind.String ? choice.GetString() : null;
-            if (tenantId != null && !await MayActIn(user, tenantId, tenants, context.RequestAborted))
+            if (tenantId != null && !await MayActIn(user, tenantId, tenants, cancellationToken))
             {
                 return JsonApiResults.Error(
                     StatusCodes.Status422UnprocessableEntity,
@@ -102,7 +70,7 @@ internal static class TenantEndpoints
             await store.SaveAsync(
                 user.Id,
                 new Dictionary<string, string?> { [AccountRoles.SELECTED_TENANT] = tenantId },
-                context.RequestAborted
+                cancellationToken
             );
         }
 
@@ -124,120 +92,42 @@ internal static class TenantEndpoints
             || (AccountRoles.IsDeveloper(user) && await tenants.FindAsync(tenantId, cancellationToken) is not null);
     }
 
-    static async Task<IResult> ReadTenant(string id, HttpContext context, TenantStore tenants)
+    [Requires(Capability.SignedIn, PlaceIn.TenantRoute)]
+    static IResult ReadTenant(AccessContext access)
     {
-        var tenant = await tenants.FindAsync(id, context.RequestAborted);
-        return tenant is null
-            ? JsonApiResults.NotFound()
-            : TenantResource(
-                tenant,
-                await tenants.IsOperationalAsync(id, context.RequestAborted),
-                StatusCodes.Status200OK
-            );
+        return TenantResource(access.Tenant, access.IsOperational, StatusCodes.Status200OK);
     }
 
+    [Requires(Capability.EditTenant, PlaceIn.TenantRoute)]
     static async Task<IResult> EditRules(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        StandingReader standing,
+        JsonApiBody<TenantChange> body,
+        AccessContext access,
         TenantStore tenants,
-        TenancyLog log
+        TenancyLog log,
+        CancellationToken cancellationToken
     )
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, TENANTS);
-        if (read.Error != null)
+        var tenant = access.Tenant;
+        var named = body.Attributes.Rules;
+        var rules = named is null ? tenant.RegionalRules : TenantChange.Merge(tenant.RegionalRules, named.Value)!;
+        if (await tenants.SetRulesAsync(tenant.Id, tenant.RegionalRules, rules, cancellationToken))
         {
-            return read.Error;
+            log.TenantRulesEdited(access.User.Id, tenant.Id, rules);
         }
 
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var tenant = await tenants.FindAsync(id, context.RequestAborted);
-        if (tenant is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        if (read.Id != null && read.Id != id)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status409Conflict,
-                "tenant-id-mismatch",
-                "The id of the resource is not the one of the route."
-            );
-        }
-
-        var operational = await tenants.IsOperationalAsync(id, context.RequestAborted);
-        var verdict = await standing.DecideAtTenantAsync(
-            Capability.EditTenant,
-            user,
-            id,
-            operational,
-            context.RequestAborted
-        );
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
-        var members = read.Attributes!.Members ?? [];
-        if (members.Keys.Any(x => !string.Equals(x, REGIONAL_RULES, StringComparison.OrdinalIgnoreCase)))
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "unsupported-attribute",
-                "Only the rules of the Regional competitions of a Tenant can be changed.",
-                REGIONAL_RULES
-            );
-        }
-
-        var named = members.FirstOrDefault(x =>
-            string.Equals(x.Key, REGIONAL_RULES, StringComparison.OrdinalIgnoreCase)
-        );
-        var rules = named.Key == null ? tenant.RegionalRules : Merge(tenant.RegionalRules, named.Value);
-        if (rules is null)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-rules",
-                "The rules are onlyAverageLoopSpeed (true or false) and rankerCode (a short text, or null for none)."
-            );
-        }
-
-        if (await tenants.SetRulesAsync(id, tenant.RegionalRules, rules, context.RequestAborted))
-        {
-            log.TenantRulesEdited(user.Id, id, rules);
-        }
-
-        return TenantResource(tenant.WithRules(rules), operational, StatusCodes.Status200OK);
+        return TenantResource(tenant.WithRules(rules), access.IsOperational, StatusCodes.Status200OK);
     }
 
+    [Requires(Capability.SignedIn, PlaceIn.TenantRoute)]
     static async Task<IResult> ReadCapabilities(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        TenantStore tenants,
-        StandingReader standings
+        AccessContext access,
+        StandingReader standings,
+        CancellationToken cancellationToken
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        if (await tenants.FindAsync(id, context.RequestAborted) is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var standing = await standings.AtTenantAsync(user, id, context.RequestAborted);
-        var state = PlaceState.OfTenant(await tenants.IsOperationalAsync(id, context.RequestAborted));
+        var id = access.Tenant.Id;
+        var standing = await standings.AtTenantAsync(access.User, id, cancellationToken);
+        var state = PlaceState.OfTenant(access.IsOperational);
         return JsonApiResults.Resource(
             StatusCodes.Status200OK,
             CAPABILITIES,
@@ -271,12 +161,37 @@ internal static class TenantEndpoints
             }
         );
     }
+}
+
+/// <summary>
+/// The members of a document that a PATCH names, as they were sent: "not named" and "null" mean different things, the
+/// first leaves a member alone and the second clears it.
+/// </summary>
+internal class MemberAttributes : IResourceAttributes
+{
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? Members { get; set; }
+
+    /// <summary>The members are checked against the row they are applied to, which only the handler has.</summary>
+    public virtual JsonApiFailure? Invalid()
+    {
+        return null;
+    }
+}
+
+/// <summary>
+/// The change of the rules of a Tenant: the members of the document are the rules and nothing else. A member that is not
+/// named stays as it is, and a ranker that is null is cleared. Its id, when the document gives one, is the one of the route.
+/// </summary>
+internal sealed class TenantChange : MemberAttributes, IResourceAttributes
+{
+    const string REGIONAL_RULES = "regionalRules";
 
     /// <summary>
-    /// The rules once the members of the document are applied: a member that is not named stays as it is, and a ranker
-    /// that is null is cleared. Null when anything is not valid, and then nothing is saved.
+    /// The rules once the members of the document are applied to the current ones. Null when anything is not valid, and then
+    /// nothing is saved.
     /// </summary>
-    static RegionalRules? Merge(RegionalRules current, JsonElement document)
+    public static RegionalRules? Merge(RegionalRules current, JsonElement document)
     {
         if (document.ValueKind != JsonValueKind.Object)
         {
@@ -320,20 +235,79 @@ internal static class TenantEndpoints
             return null;
         }
     }
+
+    public static string? ResourceType => "tenants";
+
+    public static DocumentIds Ids => DocumentIds.MatchesRoute;
+
+    public static JsonApiFailure IdMismatch { get; } =
+        new(StatusCodes.Status409Conflict, "tenant-id-mismatch", "The id of the resource is not the one of the route.");
+
+    /// <summary>The document of the rules, when it names them.</summary>
+    public JsonElement? Rules =>
+        (Members ?? []).FirstOrDefault(x => string.Equals(x.Key, REGIONAL_RULES, StringComparison.OrdinalIgnoreCase))
+            is { Key: not null } named
+            ? named.Value
+            : null;
+
+    public override JsonApiFailure? Invalid()
+    {
+        var members = Members ?? [];
+        if (members.Keys.Any(x => !string.Equals(x, REGIONAL_RULES, StringComparison.OrdinalIgnoreCase)))
+        {
+            return new JsonApiFailure(
+                StatusCodes.Status400BadRequest,
+                "unsupported-attribute",
+                "Only the rules of the Regional competitions of a Tenant can be changed.",
+                REGIONAL_RULES
+            );
+        }
+
+        // What is named is valid whatever the Tenant has now: only the members that are not named come from it.
+        return Rules is { } named && Merge(new RegionalRules(false, null), named) is null
+            ? new JsonApiFailure(
+                StatusCodes.Status400BadRequest,
+                "invalid-rules",
+                "The rules are onlyAverageLoopSpeed (true or false) and rankerCode (a short text, or null for none)."
+            )
+            : null;
+    }
 }
 
-/// <summary>
-/// The members of a document that a PATCH names, as they were sent: "not named" and "null" mean different things, the
-/// first leaves a member alone and the second clears it.
-/// </summary>
-internal class MemberAttributes : IResourceAttributes
+/// <summary>The change of the Tenant an account acts in: the only member of the account that this resource takes.</summary>
+internal sealed class SelectionChange : MemberAttributes, IResourceAttributes
 {
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Members { get; set; }
+    const string SELECTED_TENANT_ID = "selectedTenantId";
 
-    /// <summary>The members are checked against the row they are applied to, which only the handler has.</summary>
-    public virtual JsonApiFailure? Invalid()
+    public static string? ResourceType => "accounts";
+
+    /// <summary>The Tenant the document chooses, or null to go back to the home Tenant; none when the document does not name it.</summary>
+    public JsonElement? Choice =>
+        (Members ?? []).FirstOrDefault(x =>
+            string.Equals(x.Key, SELECTED_TENANT_ID, StringComparison.OrdinalIgnoreCase)
+        )
+            is { Key: not null } named
+            ? named.Value
+            : null;
+
+    public override JsonApiFailure? Invalid()
     {
-        return null;
+        if ((Members ?? []).Keys.Any(x => !string.Equals(x, SELECTED_TENANT_ID, StringComparison.OrdinalIgnoreCase)))
+        {
+            return new JsonApiFailure(
+                StatusCodes.Status400BadRequest,
+                "unsupported-attribute",
+                "Only the selected Tenant of an account can be changed.",
+                SELECTED_TENANT_ID
+            );
+        }
+
+        return Choice is { ValueKind: not (JsonValueKind.Null or JsonValueKind.String) }
+            ? new JsonApiFailure(
+                StatusCodes.Status400BadRequest,
+                "malformed-request",
+                "The selected Tenant is the id of a Tenant, or null to go back to the home Tenant."
+            )
+            : null;
     }
 }

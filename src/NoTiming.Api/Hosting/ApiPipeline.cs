@@ -64,8 +64,8 @@ internal static class ApiPipeline
         app.MapLocalSignIn();
 #endif
         app.MapProfile();
-        app.MapTenancy();
-        app.MapBranding();
+        guarded.MapTenancy();
+        guarded.MapBranding();
         guarded.MapEvents();
         guarded.MapEventResources();
         app.MapHistoricEventRedirects();

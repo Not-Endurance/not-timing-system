@@ -113,6 +113,55 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.Created, made.StatusCode);
     }
 
+    [Fact]
+    public async Task The_rules_of_a_Tenant_are_changed_in_the_Tenant_the_route_names_by_Root_and_the_content_is_answered_last()
+    {
+        await using var scene = await SceneAsync();
+        var tenant = scene.Tenant;
+
+        var unknown = await ChangeRulesAsync(
+            scene.Member,
+            "country-nowhere",
+            new { regionalRules = new { rankerCode = "a" } }
+        );
+        var tooLittle = await ChangeRulesAsync(scene.Member, tenant, new { nothing = "else" });
+        var mismatched = await ChangeRulesAsync(
+            scene.Root,
+            tenant,
+            new { regionalRules = new { rankerCode = "a" } },
+            "country-xx"
+        );
+        var content = await ChangeRulesAsync(
+            scene.Root,
+            tenant,
+            new { regionalRules = new { onlyAverageLoopSpeed = "yes" } }
+        );
+        var changed = await ChangeRulesAsync(
+            scene.Root,
+            tenant,
+            new { regionalRules = new { onlyAverageLoopSpeed = true } }
+        );
+
+        Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, tooLittle.StatusCode); // who asks before what is asked
+        Assert.Equal("not-root", await ErrorCodeAsync(tooLittle));
+        Assert.Equal(HttpStatusCode.Conflict, mismatched.StatusCode);
+        Assert.Equal("tenant-id-mismatch", await ErrorCodeAsync(mismatched));
+        Assert.Equal(HttpStatusCode.BadRequest, content.StatusCode);
+        Assert.Equal("invalid-rules", await ErrorCodeAsync(content));
+        Assert.Equal(HttpStatusCode.OK, changed.StatusCode);
+    }
+
+    static Task<HttpResponseMessage> ChangeRulesAsync(
+        Person person,
+        string tenant,
+        object attributes,
+        string? id = null
+    )
+    {
+        return person.Page.WriteAsync(HttpMethod.Patch, $"/api/tenants/{tenant}", "tenants", attributes, id: id);
+    }
+
     static Task<HttpResponseMessage> ChangeSetupAsync(Person person, string route, object attributes, string? id = null)
     {
         return person.Page.WriteAsync(
@@ -159,6 +208,7 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         return new Scene(
             api,
             client,
+            tenant,
             root,
             consoleOperator,
             member,
@@ -179,6 +229,7 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         public Scene(
             ApiFactory api,
             HttpClient client,
+            string tenant,
             Person root,
             Person consoleOperator,
             Person member,
@@ -189,6 +240,7 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         {
             Api = api;
             Client = client;
+            Tenant = tenant;
             Root = root;
             ConsoleOperator = consoleOperator;
             Member = member;
@@ -199,6 +251,7 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
 
         public ApiFactory Api { get; }
         public HttpClient Client { get; }
+        public string Tenant { get; }
         public Person Root { get; }
         public Person ConsoleOperator { get; }
         public Person Member { get; }

@@ -48,6 +48,9 @@ internal interface IResourceAttributes
     /// <summary>What the document says of the id of its resource.</summary>
     static virtual DocumentIds Ids => DocumentIds.Ignored;
 
+    /// <summary>What is said when the id of a change is not the one of the route.</summary>
+    static virtual JsonApiFailure IdMismatch => JsonApiFailures.IdMismatch;
+
     /// <summary>What is wrong with the attributes, said once and in the same words wherever they are sent; none when they are valid.</summary>
     JsonApiFailure? Invalid();
 }
@@ -115,7 +118,7 @@ internal sealed class JsonApiBody<TAttributes> : IJsonApiInput
         return TAttributes.Ids switch
         {
             DocumentIds.OptionalGuid when Id != null && !Guid.TryParse(Id, out _) => JsonApiFailures.InvalidId,
-            DocumentIds.MatchesRoute when Id != null && Id != _routeId => JsonApiFailures.IdMismatch,
+            DocumentIds.MatchesRoute when Id != null && Id != _routeId => TAttributes.IdMismatch,
             _ => null,
         };
     }
