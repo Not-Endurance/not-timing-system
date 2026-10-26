@@ -18,7 +18,7 @@ namespace NoTiming.Ui.Features.Console;
 
 /// <summary>
 /// The dashboard of a Live Event in the Console (#646). The Participations are a view over the store (ADR-0006), and what is
-/// kept here is the selection of the Main Operator and the numbers it recorded a time for. A change is made on the
+/// kept here is the selection of the Console Operator and the numbers it recorded a time for. A change is made on the
 /// Participation of the store and written to the Api against the version the Participation was read at (ADR-0013): when the Api
 /// refuses it, because the Participation changed meanwhile or for another reason, the Participation is read again, so that
 /// what is shown is what is stored and not the change that was not taken, and what the Api said is thrown, so that the form

@@ -175,7 +175,7 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Tenant_Root_the_Main_Operator_of_an_Event_that_is_not_Historic_and_the_Developer_read_the_whole_row_and_no_other_account_does()
+    public async Task The_Tenant_Root_the_Console_Operator_of_an_Event_that_is_not_Historic_and_the_Developer_read_the_whole_row_and_no_other_account_does()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
@@ -183,12 +183,12 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
         var other = await TenantAsync(_mongo.ConnectionString);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
         var rootElsewhere = await SignedInAsync(api, client, _mongo.ConnectionString, other, TenantRootOf(other));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var formerMainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var formerConsoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, formerMainOperator.Id, DateTimeOffset.UtcNow);
+        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, formerConsoleOperator.Id, DateTimeOffset.UtcNow);
         var marker = Guid.NewGuid().ToString("N")[..8];
         await AddAsync("athletes", tenant, $"Rider{marker} Name", feiId: $"FEI{marker}");
 
@@ -202,9 +202,9 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
 
         Assert.True(await SeesTheFeiIdAsync(root));
         Assert.True(await SeesTheFeiIdAsync(rootElsewhere)); // of any Tenant: the rows are those of every Tenant
-        Assert.True(await SeesTheFeiIdAsync(mainOperator));
+        Assert.True(await SeesTheFeiIdAsync(consoleOperator));
         Assert.True(await SeesTheFeiIdAsync(developer));
-        Assert.False(await SeesTheFeiIdAsync(formerMainOperator)); // the Event it ran is Historic
+        Assert.False(await SeesTheFeiIdAsync(formerConsoleOperator)); // the Event it ran is Historic
         Assert.False(await SeesTheFeiIdAsync(member));
     }
 

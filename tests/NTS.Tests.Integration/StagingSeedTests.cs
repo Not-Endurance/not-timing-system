@@ -10,7 +10,7 @@ using NTS.Tools.Staging;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// #607, <c>seed-staging</c>: a Tenant Root, a Main Operator, Officials, Operators and a Live Event with Participations,
+/// #607, <c>seed-staging</c>: a Tenant Root, a Console Operator, Officials, Operators and a Live Event with Participations,
 /// in the Tenant of Bulgaria, on a database that is not production. It is a dry run unless it is told to apply, it refuses a
 /// database that is marked Production and one that is not marked at all unless it is told which environment it is, it makes
 /// everything once, and what it makes is what the Api makes when it starts an Event. Over a MongoDB in a container.
@@ -48,7 +48,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         Assert.Equal(2, report.EventDocuments["event_rankings"]);
         Assert.Equal(2, report.EventDocuments["event_officials"]);
         Assert.Equal(1, report.EventDocuments["event_operators"]);
-        Assert.Equal(3, report.GrantsMade);
+        Assert.Equal(4, report.GrantsMade);
         var text = new StringWriter();
         report.WriteTo(text);
         Assert.Contains("Dry-run staging seed.", text.ToString());
@@ -73,7 +73,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         var accounts = (await data.ManyAsync("users")).ToDictionary(x => x["Email"].AsString);
         Assert.Equal(
             [
-                "main@example.test",
+                "console@example.test",
                 "official.one@example.test",
                 "official.two@example.test",
                 "operator@example.test",
@@ -94,14 +94,13 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
             }
         );
         Assert.Equal(["tenant-root"], RolesOf(accounts["root@example.test"]));
-        Assert.Empty(RolesOf(accounts["main@example.test"]));
+        Assert.Empty(RolesOf(accounts["console@example.test"]));
 
         var eventId = report.EventId;
         var setup = await data.OneAsync("configure_events", eventId);
         var core = await data.OneAsync("event_informations", eventId);
-        var main = accounts["main@example.test"]["_id"].AsGuid;
-        Assert.Equal(main, setup["MainOperatorId"].AsGuid);
-        Assert.Equal(main, core["MainOperatorId"].AsGuid);
+        Assert.False(setup.Contains("MainOperatorId")); // the Main Operator is retired (#671): the Console Operators are grants
+        Assert.False(core.Contains("MainOperatorId"));
         Assert.Equal("country-bg", setup["TenantId"].AsString);
         Assert.Equal("country-bg", core["TenantId"].AsString);
         Assert.Equal(new DateTime(2031, 3, 20, 23, 59, 59, DateTimeKind.Utc), core["EndDay"].ToUniversalTime()); // seven days from today
@@ -139,7 +138,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
             .Select(GrantDocuments.ToGrant)
             .OfType<EventGrant>()
             .ToList();
-        Assert.Equal(3, grants.Count);
+        Assert.Equal(4, grants.Count);
         Assert.All(grants, x => Assert.Equal((report.EventId, "country-bg"), (x.EventId, x.TenantId)));
         Assert.All(grants, x => Assert.False(x.IsPending));
         var accounts = (await data.ManyAsync("users")).ToDictionary(x => x["Email"].AsString, x => x["_id"].AsGuid);
@@ -158,6 +157,10 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         Assert.Contains(
             grants,
             x => x is { Kind: GrantKind.Operator } && x.AccountId == accounts["operator@example.test"]
+        );
+        Assert.Contains(
+            grants,
+            x => x is { Kind: GrantKind.ConsoleOperator } && x.AccountId == accounts["console@example.test"]
         );
     }
 
@@ -229,9 +232,9 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         var again = await StagingSeed.Run(data.Database, Seed(), NOW);
 
         Assert.Equal(12, again.EventDocuments["event_participations"]);
-        Assert.Equal(3, again.GrantsMade);
+        Assert.Equal(4, again.GrantsMade);
         Assert.Equal(12, await data.Collection("event_participations").CountDocumentsAsync(new BsonDocument()));
-        Assert.Equal(3, await data.Collection("event_grants").CountDocumentsAsync(new BsonDocument()));
+        Assert.Equal(4, await data.Collection("event_grants").CountDocumentsAsync(new BsonDocument()));
         Assert.Equal(
             1,
             await data.Collection("event_informations")
@@ -250,7 +253,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         Assert.Equal(2, await data.Collection("event_informations").CountDocumentsAsync(new BsonDocument()));
         Assert.Equal(24, await data.Collection("event_participations").CountDocumentsAsync(new BsonDocument()));
         Assert.Equal(5, await data.Collection("users").CountDocumentsAsync(new BsonDocument())); // the same people
-        Assert.Equal(6, await data.Collection("event_grants").CountDocumentsAsync(new BsonDocument()));
+        Assert.Equal(8, await data.Collection("event_grants").CountDocumentsAsync(new BsonDocument()));
     }
 
     [Fact]
@@ -283,7 +286,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         Assert.Equal("a-stamp", officialAfter["SecurityStamp"].AsString);
         Assert.Equal("country-bg", officialAfter["HomeTenantId"].AsString);
         Assert.Equal(before.Item2["Unknown"], officialAfter["Unknown"]);
-        Assert.Equal(3, await data.Collection("event_grants").CountDocumentsAsync(new BsonDocument()));
+        Assert.Equal(4, await data.Collection("event_grants").CountDocumentsAsync(new BsonDocument()));
     }
 
     [Fact]
@@ -475,7 +478,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
     [Theory]
     [InlineData("tenant-root", "nobody")]
     [InlineData("tenant-root", "Root <root@example.test>")]
-    [InlineData("main-operator", "")]
+    [InlineData("console-operator", "")]
     [InlineData("days", "0")]
     [InlineData("days", "61")]
     [InlineData("start", "24:00")]
@@ -489,7 +492,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
             Apply = true,
             Environment = "Staging",
             TenantRoot = what == "tenant-root" ? value : "root@example.test",
-            MainOperator = what == "main-operator" ? value : "main@example.test",
+            ConsoleOperator = what == "console-operator" ? value : "console@example.test",
             Officials = what == "official" ? [(value, OfficialRole.Steward)] : [],
             Days = what == "days" ? int.Parse(value) : 7,
             StartTime = what == "start" ? TimeSpan.FromHours(24) : TimeSpan.Zero,
@@ -520,7 +523,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
             Apply = !dry,
             Environment = environment,
             TenantRoot = "root@example.test",
-            MainOperator = "Main@Example.Test",
+            ConsoleOperator = "Console@Example.Test",
             Officials =
             [
                 ("official.one@example.test", OfficialRole.Steward),

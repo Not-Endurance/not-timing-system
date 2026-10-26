@@ -19,8 +19,8 @@ namespace NoTiming.Api.Features.EventData;
 /// rows of one Event, with the <c>filter</c> that starts with it, <c>sort</c> and <c>page[...]</c>, and <c>GET /api/{type}/{id}</c>
 /// reads one. Anybody reads (ADR-0001): what an Event keeps is what its public views show, and the Tenant of a row is the
 /// Tenant of its Event, which is told by the Event and never by the caller. <c>POST</c> makes a row with the id the client
-/// made for it, <c>PATCH</c> changes the members it names and <c>DELETE</c> removes it, for the Main Operator of the Event
-/// while it is Live (ADR-0012), and a row that counts its writes is changed against the version it was read at, which the
+/// made for it, <c>PATCH</c> changes the members it names and <c>DELETE</c> removes it, for a Console Operator of the Event, or
+/// Root, while it is Live (ADR-0012), and a row that counts its writes is changed against the version it was read at, which the
 /// change names in its <c>meta</c> (ADR-0013). Every write that was stored is announced to the viewers of the Event once.
 /// </summary>
 internal static class EventDataEndpoints
@@ -461,7 +461,7 @@ internal static class EventDataEndpoints
         }
     }
 
-    /// <summary>The row as the caller reads it. A write is answered with the row as Staff read it, because it is the Main Operator that writes.</summary>
+    /// <summary>The row as the caller reads it. A write is answered with the row as Staff read it, because it is a Console Operator or Root that writes.</summary>
     static TModel Shown<TModel, TEntity>(EventDataFamily<TModel, TEntity> family, TModel row, bool seesTimeEvents)
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity

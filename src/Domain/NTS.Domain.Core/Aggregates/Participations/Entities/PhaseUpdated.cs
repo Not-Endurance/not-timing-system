@@ -1,7 +1,7 @@
 namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 /// <summary>
-/// The Main Operator's edit of a Phase in the form of the Console (ADR-0005, #620): one event that lists only the times that
+/// The Console Operator's edit of a Phase in the form of the Console (ADR-0005, #620): one event that lists only the times that
 /// differ from the ones the Phase showed, a time that was cleared as a listed time with none. It feeds each time it lists. It is
 /// an event of its own, and not an <see cref="ArriveUpdated"/> or a <see cref="PresentUpdated"/>, which are an Official's Update
 /// of a Snapshot they sent: the two are named for their source and are not alike. Disabling it undoes the whole edit.

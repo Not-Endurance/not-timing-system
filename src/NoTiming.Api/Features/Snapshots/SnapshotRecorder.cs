@@ -43,7 +43,7 @@ internal sealed class SnapshotRecorder
     ];
 
     readonly EventStore _events;
-    readonly EventGrantStore _grants;
+    readonly StandingReader _standing;
     readonly TenantCollections _tenants;
     readonly CrossTenantReads _reads;
     readonly IParticipationChanges _changes;
@@ -51,7 +51,7 @@ internal sealed class SnapshotRecorder
 
     public SnapshotRecorder(
         EventStore events,
-        EventGrantStore grants,
+        StandingReader standing,
         TenantCollections tenants,
         CrossTenantReads reads,
         IParticipationChanges changes,
@@ -59,7 +59,7 @@ internal sealed class SnapshotRecorder
     )
     {
         _events = events;
-        _grants = grants;
+        _standing = standing;
         _tenants = tenants;
         _reads = reads;
         _changes = changes;
@@ -293,8 +293,8 @@ internal sealed class SnapshotRecorder
 
     /// <summary>
     /// The Event, when the caller may send a Snapshot to it at the stage it is in, and the answer that refuses it when not:
-    /// 404 for an Event that is not there, and the policy's for a caller who is not an Operator or an Official that sends
-    /// them, or the Main Operator, or whose Event is not Live (ADR-0012).
+    /// 404 for an Event that is not there, and the policy's for a caller who is not an Operator, an Official that sends
+    /// them, a Console Operator or Root, or whose Event is not Live (ADR-0012).
     /// </summary>
     async Task<(EventFacts? Event, SnapshotAnswer? Refusal)> OpenAsync(
         NIdentityUser user,
@@ -308,11 +308,7 @@ internal sealed class SnapshotRecorder
             return (null, SnapshotAnswer.Failed(NotFound()));
         }
 
-        var verdict = AccessPolicy.Decide(
-            Capability.SendSnapshot,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(await _grants.GrantsOfAsync(facts.Record, user.Id, cancellationToken))
-        );
+        var verdict = await _standing.DecideAtEventAsync(Capability.SendSnapshot, user, facts, cancellationToken);
         return verdict.IsAllowed
             ? (facts, null)
             : (null, SnapshotAnswer.Failed(AccessResults.FailureOf(verdict.Reason!.Value)));

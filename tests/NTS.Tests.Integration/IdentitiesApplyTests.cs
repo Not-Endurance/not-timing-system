@@ -837,8 +837,6 @@ public sealed class IdentitiesApplyTests : IClassFixture<MongoFixture>
     [InlineData("an integer where a Guid is made")]
     [InlineData("a Ranking that still holds the copy of a Participation")]
     [InlineData("an integer for the actor of a time event")]
-    [InlineData("an integer for a Main Operator")]
-    [InlineData("an integer for the Main Operator of a Setup")]
     [InlineData("an integer for the group of a Snapshot")]
     [InlineData("a reference to an Event that is a text")]
     [InlineData("a collection the table does not know")]
@@ -903,20 +901,6 @@ public sealed class IdentitiesApplyTests : IClassFixture<MongoFixture>
                     .UpdateOneAsync(
                         new BsonDocument("_id", 70),
                         new BsonDocument("$set", new BsonDocument("Phases.0.Events.0.ActorId", 5))
-                    );
-                break;
-            case "an integer for a Main Operator":
-                await Collection(database, "event_informations")
-                    .UpdateOneAsync(
-                        new BsonDocument("_id", 900),
-                        new BsonDocument("$set", new BsonDocument("MainOperatorId", 5))
-                    );
-                break;
-            case "an integer for the Main Operator of a Setup":
-                await Collection(database, "configure_events")
-                    .UpdateOneAsync(
-                        new BsonDocument("_id", 902),
-                        new BsonDocument("$set", new BsonDocument("MainOperatorId", 5))
                     );
                 break;
             case "an integer for the group of a Snapshot":

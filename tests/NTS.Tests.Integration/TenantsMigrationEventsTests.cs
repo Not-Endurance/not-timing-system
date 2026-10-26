@@ -9,9 +9,9 @@ using NTS.Tools.Tenants;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// ADR-0012, #607, what <c>migrate-tenants</c> does for the Events: every Event that is not yet Historic gets its Tenant Root
-/// as its Main Operator, an Official or an Operator that was linked by email becomes a grant or a pending invitation, and
-/// the state a person kept for an Event is found again by the account that person is. Over documents in the shape the code
+/// ADR-0012, #607, #671, what <c>migrate-tenants</c> does for the Events: it assigns nobody to run one (Root does, until it
+/// assigns a Console Operator), an Official or an Operator that was linked by email becomes a grant or a pending
+/// invitation, and the state a person kept for an Event is found again by the account that person is. Over documents in the shape the code
 /// before stored them, on a MongoDB in a container, with the clock given by the test.
 /// </summary>
 public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
@@ -26,10 +26,10 @@ public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task An_Event_that_is_not_Historic_gets_the_Tenant_Root_as_Main_Operator_and_a_Historic_Event_gets_none()
+    public async Task Nobody_is_assigned_to_run_an_Event_and_the_Events_that_are_not_Historic_are_counted()
     {
         var data = await LegacyAsync();
-        var root = await TenantRootAsync(data, "root@example.test");
+        await TenantRootAsync(data, "root@example.test");
         var unstarted = await data.SetupAsync();
         var live = await data.SetupAsync();
         await data.StartedAsync(live, NOW.AddDays(2));
@@ -38,18 +38,18 @@ public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
 
         var report = await TenantsMigration.Run(data.Database, Apply(), NOW);
 
-        Assert.Equal(root, MainOperatorOf(await data.OneAsync("configure_events", unstarted)));
-        Assert.Equal(root, MainOperatorOf(await data.OneAsync("configure_events", live)));
-        Assert.Equal(root, MainOperatorOf(await data.OneAsync("event_informations", live)));
+        // Root runs every Event of its Tenant until it assigns a Console Operator (#671, ADR-0012)
+        Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", unstarted)));
+        Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", live)));
+        Assert.Null(MainOperatorOf(await data.OneAsync("event_informations", live)));
         Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", over)));
         Assert.Null(MainOperatorOf(await data.OneAsync("event_informations", over)));
+        Assert.Empty(await data.ManyAsync("event_grants"));
         Assert.Equal(2, report.EventsNotHistoric);
-        Assert.Equal(2, report.MainOperatorsAssigned);
-        Assert.Empty(report.EventsWaitingForMainOperator);
     }
 
     [Fact]
-    public async Task A_deleted_Event_is_asked_nothing_of_and_gets_neither_a_Main_Operator_nor_grants()
+    public async Task A_deleted_Event_is_asked_nothing_of_and_gets_no_grants()
     {
         var data = await LegacyAsync();
         await TenantRootAsync(data, "root@example.test");
@@ -65,14 +65,11 @@ public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
         var report = await TenantsMigration.Run(data.Database, Apply(), NOW);
 
         Assert.Equal(0, report.EventsNotHistoric);
-        Assert.Equal(0, report.MainOperatorsAssigned);
-        Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", deleted)));
-        Assert.Null(MainOperatorOf(await data.OneAsync("event_informations", deleted)));
         Assert.Empty(await data.ManyAsync("event_grants"));
     }
 
     [Fact]
-    public async Task An_Event_that_has_a_Main_Operator_keeps_it()
+    public async Task A_Main_Operator_that_an_Event_still_names_is_left_as_it_is_and_makes_no_grant()
     {
         var data = await LegacyAsync();
         await TenantRootAsync(data, "root@example.test");
@@ -80,168 +77,28 @@ public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
         var event_ = await data.SetupAsync(mainOperator: someone);
         await data.StartedAsync(event_, NOW.AddDays(2), mainOperator: someone);
 
-        var report = await TenantsMigration.Run(data.Database, Apply(), NOW);
-
-        Assert.Equal(someone, MainOperatorOf(await data.OneAsync("configure_events", event_)));
-        Assert.Equal(someone, MainOperatorOf(await data.OneAsync("event_informations", event_)));
-        Assert.Equal(0, report.MainOperatorsAssigned);
-    }
-
-    [Fact]
-    public async Task An_account_that_is_named_does_not_replace_the_Main_Operator_an_Event_has()
-    {
-        var data = await LegacyAsync();
-        await data.AccountAsync("plain@example.test", "Bulgaria");
-        var someone = Guid.NewGuid();
-        var event_ = await data.SetupAsync(mainOperator: someone);
-        await data.StartedAsync(event_, NOW.AddDays(2)); // the Core lacks what the Setup has
-
-        await TenantsMigration.Run(
-            data.Database,
-            new TenantsOptions
-            {
-                Apply = true,
-                Environment = "Staging",
-                MainOperatorEmail = "plain@example.test",
-            },
-            NOW
-        );
-
-        Assert.Equal(someone, MainOperatorOf(await data.OneAsync("configure_events", event_)));
-        Assert.Equal(someone, MainOperatorOf(await data.OneAsync("event_informations", event_)));
-    }
-
-    [Fact]
-    public async Task A_Tenant_Root_of_another_Tenant_is_not_the_Main_Operator_of_an_Event_of_this_one()
-    {
-        var data = await LegacyAsync();
-        await data.CountryAsync("Turkey", "TR");
-        var turkish = await data.AccountAsync("turkish@example.test", "Turkey");
-        await data.TenantRootAsync(turkish, "country-tr");
-        var waiting = await data.SetupAsync();
-
-        var report = await TenantsMigration.Run(data.Database, Apply(), NOW);
-
-        Assert.Equal([waiting], report.EventsWaitingForMainOperator);
-        Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", waiting)));
-    }
-
-    [Fact]
-    public async Task An_Event_that_has_a_Main_Operator_on_one_of_its_documents_gets_it_on_the_other_too()
-    {
-        var data = await LegacyAsync();
-        await TenantRootAsync(data, "root@example.test");
-        var someone = Guid.NewGuid();
-        var event_ = await data.SetupAsync(mainOperator: someone);
-        await data.StartedAsync(event_, NOW.AddDays(2));
-
         await TenantsMigration.Run(data.Database, Apply(), NOW);
 
+        // the Main Operator is retired (#671): the Api no longer reads the member, and nothing is made of it
+        Assert.Equal(someone, MainOperatorOf(await data.OneAsync("configure_events", event_)));
         Assert.Equal(someone, MainOperatorOf(await data.OneAsync("event_informations", event_)));
+        Assert.Empty(await data.ManyAsync("event_grants"));
     }
 
     [Fact]
-    public async Task With_no_Tenant_Root_nobody_is_assigned_and_the_Events_wait_for_a_second_run_after_one_is_seeded()
+    public async Task The_Events_are_migrated_whether_or_not_a_Tenant_Root_has_been_seeded()
     {
         var data = await LegacyAsync();
-        var account = await data.AccountAsync("root@example.test", "Bulgaria");
-        var waiting = await data.SetupAsync();
+        await data.AccountAsync("root@example.test", "Bulgaria");
+        var event_ = await data.SetupAsync();
 
-        var first = await TenantsMigration.Run(data.Database, Apply(), NOW);
+        var report = await TenantsMigration.Run(data.Database, Apply(), NOW);
 
-        Assert.False(first.Refused);
-        Assert.Equal([waiting], first.EventsWaitingForMainOperator);
-        Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", waiting)));
-        Assert.Equal("country-bg", (await data.OneAsync("configure_events", waiting))["TenantId"].AsString); // the rest was done
+        Assert.False(report.Refused);
+        Assert.Equal("country-bg", (await data.OneAsync("configure_events", event_))["TenantId"].AsString);
         var text = new StringWriter();
-        first.WriteTo(text);
-        Assert.Contains("no Tenant Root", text.ToString());
-
-        await data.TenantRootAsync(account);
-        var second = await TenantsMigration.Run(data.Database, Apply(), NOW);
-
-        Assert.Equal(account, MainOperatorOf(await data.OneAsync("configure_events", waiting)));
-        Assert.Equal(1, second.MainOperatorsAssigned);
-        Assert.Empty(second.EventsWaitingForMainOperator);
-    }
-
-    [Fact]
-    public async Task Without_a_Tenant_Root_the_Events_wait_again_on_a_second_run_though_every_account_has_a_Membership_now()
-    {
-        var data = await LegacyAsync();
-        await data.AccountAsync("one@example.test", "Bulgaria"); // the one account the first run gives a Membership
-        var waiting = await data.SetupAsync();
-        await TenantsMigration.Run(data.Database, Apply(), NOW);
-
-        var again = await TenantsMigration.Run(data.Database, Apply(), NOW);
-
-        Assert.Equal([waiting], again.EventsWaitingForMainOperator);
-        Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", waiting)));
-    }
-
-    [Fact]
-    public async Task With_several_Tenant_Roots_the_command_asks_which_and_uses_the_account_it_is_given()
-    {
-        var data = await LegacyAsync();
-        var one = await TenantRootAsync(data, "one@example.test");
-        var two = await TenantRootAsync(data, "two@example.test");
-        var waiting = await data.SetupAsync();
-
-        var asked = await TenantsMigration.Run(data.Database, Apply(), NOW);
-
-        Assert.Equal([waiting], asked.EventsWaitingForMainOperator);
-        Assert.Contains("--main-operator", asked.MainOperatorNote);
-        Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", waiting)));
-
-        var chosen = await TenantsMigration.Run(
-            data.Database,
-            new TenantsOptions
-            {
-                Apply = true,
-                Environment = "Staging",
-                MainOperatorEmail = " Two@Example.Test ",
-            },
-            NOW
-        );
-
-        Assert.Equal(two, MainOperatorOf(await data.OneAsync("configure_events", waiting)));
-        Assert.NotEqual(one, two);
-        Assert.Equal(1, chosen.MainOperatorsAssigned);
-    }
-
-    [Fact]
-    public async Task The_account_named_as_Main_Operator_need_not_be_a_Tenant_Root_but_has_to_exist()
-    {
-        var data = await LegacyAsync();
-        var plain = await data.AccountAsync("plain@example.test", "Bulgaria");
-        var waiting = await data.SetupAsync();
-
-        var unknown = await TenantsMigration.Run(
-            data.Database,
-            new TenantsOptions
-            {
-                Apply = true,
-                Environment = "Staging",
-                MainOperatorEmail = "nobody@example.test",
-            },
-            NOW
-        );
-        Assert.True(unknown.Refused);
-        Assert.Contains(unknown.Refusals, x => x.Contains("--main-operator"));
-        Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", waiting)));
-
-        await TenantsMigration.Run(
-            data.Database,
-            new TenantsOptions
-            {
-                Apply = true,
-                Environment = "Staging",
-                MainOperatorEmail = "plain@example.test",
-            },
-            NOW
-        );
-
-        Assert.Equal(plain, MainOperatorOf(await data.OneAsync("configure_events", waiting)));
+        report.WriteTo(text);
+        Assert.DoesNotContain("no Tenant Root", text.ToString()); // no Event waits for one
     }
 
     [Fact]
@@ -302,7 +159,6 @@ public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
         var report = await TenantsMigration.Run(data.Database, Apply(), NOW);
 
         Assert.Equal([event_], report.EventsWithoutAnEnd);
-        Assert.Null(MainOperatorOf(await data.OneAsync("event_informations", event_)));
         Assert.False(report.Refused);
     }
 

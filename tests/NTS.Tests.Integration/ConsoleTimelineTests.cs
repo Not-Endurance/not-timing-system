@@ -23,7 +23,7 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// The timeline of a Participation in the Console (#619, ADR-0005, ADR-0013): every time event of every Phase, in the order they
-/// were recorded, with who recorded it and when, and what the Main Operator may do with each; and the one change that disables
+/// were recorded, with who recorded it and when, and what the Console Operator may do with each; and the one change that disables
 /// and enables the chosen events, written to the Api against the version the Participation was read at. Over the real Api in this
 /// process, with the store and the services of the Ui built as the app builds them.
 /// </summary>
@@ -45,7 +45,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
 
         var phases = await tab.Timeline.Read();
 
@@ -76,7 +76,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         await tab.Dashboard.ChangeTimeEvents([scene.Presented], []);
 
         var entries = (await tab.Timeline.Read())[0].Entries.ToDictionary(x => x.Id);
@@ -102,7 +102,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api, strangerActor: true);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
 
         var entries = (await tab.Timeline.Read())[0].Entries;
 
@@ -115,7 +115,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var before = VersionOf(await StoredAsync(scene.ParticipationId));
         tab.Requests.Asked.Clear();
 
@@ -145,7 +145,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
             configureServices: services => services.AddSingleton<IParticipationChanges>(changes)
         );
         var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         changes.Announced.Clear();
 
         await tab.Dashboard.ChangeTimeEvents([scene.Updated], []);
@@ -161,7 +161,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         await tab.Dashboard.ChangeTimeEvents([scene.Updated], []);
 
         await tab.Dashboard.ChangeTimeEvents([], [scene.Updated]);
@@ -179,8 +179,8 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
-        await using var other = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
+        await using var other = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         other.Dashboard.Selected = other.Dashboard.Participations.Single();
         await other.Dashboard.Withdraw(); // the Participation moved on to the next version
 
@@ -199,7 +199,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api, laterPhaseHasATime: true);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var before = VersionOf(await StoredAsync(scene.ParticipationId));
 
         var refused = await Assert.ThrowsAsync<DomainException>(
@@ -220,7 +220,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var before = VersionOf(await StoredAsync(scene.ParticipationId));
         tab.Requests.Asked.Clear();
 
@@ -235,7 +235,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId, canWrite: false);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId, canWrite: false);
         tab.Requests.Asked.Clear();
 
         await Assert.ThrowsAsync<DomainException>(() => tab.Dashboard.ChangeTimeEvents([scene.Updated], []));
@@ -248,7 +248,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api);
-        await using var ui = ConsoleUi.Open(api, scene.MainOperator);
+        await using var ui = ConsoleUi.Open(api, scene.ConsoleOperator);
 
         var timeline = ui.Get<IConsoleTimeline>();
 
@@ -260,12 +260,12 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Marin Main");
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Marin Main");
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Olga Official");
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var recorded = new DateTimeOffset(DateTime.Today.AddHours(12));
@@ -290,7 +290,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
         );
         var presented = participation.Process(
             IntegrationPayloadFactory.PresentSnapshot(1, PRESENT),
-            mainOperator.Id,
+            consoleOperator.Id,
             recorded.AddMinutes(3)
         );
         if (laterPhaseHasATime)
@@ -305,7 +305,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
 
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
         return new Scene(
-            mainOperator,
+            consoleOperator,
             eventId,
             participation.Id,
             arrived.Id,
@@ -333,7 +333,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     sealed class Scene
     {
         public Scene(
-            Person mainOperator,
+            Person consoleOperator,
             Guid eventId,
             Guid participationId,
             Guid arrived,
@@ -343,7 +343,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
             DateTimeOffset recordedAt
         )
         {
-            MainOperator = mainOperator;
+            ConsoleOperator = consoleOperator;
             EventId = eventId;
             ParticipationId = participationId;
             Arrived = arrived;
@@ -353,7 +353,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
             RecordedAt = recordedAt;
         }
 
-        public Person MainOperator { get; }
+        public Person ConsoleOperator { get; }
         public Guid EventId { get; }
         public Guid ParticipationId { get; }
         public Guid Arrived { get; }

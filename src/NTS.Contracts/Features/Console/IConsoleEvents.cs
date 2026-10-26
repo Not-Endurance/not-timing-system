@@ -4,9 +4,9 @@ using NTS.Domain.Setup.Services.StartValidation;
 namespace NTS.Contracts.Features.Console;
 
 /// <summary>
-/// The Events of the Console (#646): the Setups the person sees (a Tenant Root's are the Tenant's, a Main Operator's the
-/// Events it runs), each at its stage with what the person may do, and the things that are done to an Event as a whole:
-/// making it, assigning and handing over its Main Operator, starting it and resetting it. It follows the account.
+/// The Events of the Console (#646): the Setups the person sees (Root's are the Tenant's, a Console Operator's the Events it
+/// runs), each at its stage with what the person may do, and the things that are done to an Event as a whole: making it,
+/// assigning and removing its Console Operators, starting it and resetting it. It follows the account.
 /// </summary>
 public interface IConsoleEvents : IStatefulService
 {
@@ -19,12 +19,12 @@ public interface IConsoleEvents : IStatefulService
     bool CanCreate { get; }
 
     /// <summary>
-    /// Whether the person is one the registry of Athletes, Horses and Clubs is open to for writing: a Tenant Root, or the Main
+    /// Whether the person is one the registry of Athletes, Horses and Clubs is open to for writing: Root, or a Console
     /// Operator of an Event that is not over. It decides what the pages of the registry offer; the Api decides what it takes.
     /// </summary>
     bool CanEditRegistry { get; }
 
-    /// <summary>Makes an Event in the Tenant the person acts in, with the person as its Main Operator.</summary>
+    /// <summary>Makes an Event in the Tenant the person acts in. It has no Console Operator until Root assigns one.</summary>
     Task<ConsoleEvent> Create(string name, string location, string? feiShowId);
 
     /// <summary>What is missing from the Setup for the Event to start: nothing when it can.</summary>
@@ -36,9 +36,12 @@ public interface IConsoleEvents : IStatefulService
     /// <summary>Gives the Event back as its Setup, with what it made and what was kept for it removed.</summary>
     Task Reset(Guid eventId);
 
-    Task AssignMainOperator(Guid eventId, Guid accountId);
+    /// <summary>The Console Operators of the Event, in the order of their addresses, a page of them.</summary>
+    Task<IReadOnlyList<ConsoleOperatorRow>> ConsoleOperators(Guid eventId);
 
-    Task HandOver(Guid eventId, Guid accountId);
+    Task AssignConsoleOperator(Guid eventId, Guid accountId);
+
+    Task RemoveConsoleOperator(Guid consoleOperatorId);
 
     /// <summary>The first page of the accounts of the Tenant whose name holds the words of the text, ten at most.</summary>
     Task<IReadOnlyList<AccountMatch>> FindAccounts(string text);

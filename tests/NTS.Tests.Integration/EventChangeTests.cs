@@ -10,9 +10,9 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// Changing what an Event shows (#628, ADR-0007, ADR-0012): <c>PATCH /api/events/{id}</c> names the members to change
-/// (its name, location, country, FEI show ID and days), for the Main Operator and while the Event is Live. The days are
-/// whole days in the offset they are given in, as the span of an Event makes them, and an Event is over when its last day
-/// is: it is not ended by changing its days. Who runs the Event, its Tenant and the rules it started with are not written.
+/// (its name, location, country, FEI show ID and days), for a Console Operator of it or for Root, and while the Event is
+/// Live. The days are whole days in the offset they are given in, as the span of an Event makes them, and an Event is over
+/// when its last day is: it is not ended by changing its days. Its Tenant and the rules it started with are not written.
 /// </summary>
 public sealed class EventChangeTests : IClassFixture<MongoFixture>
 {
@@ -26,17 +26,17 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_changes_the_members_it_names_while_the_Event_is_Live_and_no_other()
+    public async Task The_Console_Operator_changes_the_members_it_names_while_the_Event_is_Live_and_no_other()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var rules = new BsonDocument { { "OnlyAverageLoopSpeed", true } };
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true, rules: rules);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await StartedAsync(api, mainOperator, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await StartedAsync(api, consoleOperator, tenant);
         var before = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
 
-        var response = await ChangeAsync(mainOperator, id, new { name = "Renamed Ride", location = "Plovdiv" });
+        var response = await ChangeAsync(consoleOperator, id, new { name = "Renamed Ride", location = "Plovdiv" });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var attributes = (await ApiSessions.ReadJsonAsync(response)).GetProperty("data").GetProperty("attributes");
@@ -57,12 +57,12 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await StartedAsync(api, mainOperator, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await StartedAsync(api, consoleOperator, tenant);
 
-        var cleared = await ChangeAsync(mainOperator, id, new { feiShowId = (string?)null });
-        var nameless = await ChangeAsync(mainOperator, id, new { name = (string?)null });
-        var blank = await ChangeAsync(mainOperator, id, new { location = "  " });
+        var cleared = await ChangeAsync(consoleOperator, id, new { feiShowId = (string?)null });
+        var nameless = await ChangeAsync(consoleOperator, id, new { name = (string?)null });
+        var blank = await ChangeAsync(consoleOperator, id, new { location = "  " });
 
         Assert.Equal(HttpStatusCode.OK, cleared.StatusCode);
         Assert.False((await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!.Contains("FeiShowId"));
@@ -81,11 +81,11 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await StartedAsync(api, mainOperator, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await StartedAsync(api, consoleOperator, tenant);
 
         var response = await ChangeAsync(
-            mainOperator,
+            consoleOperator,
             id,
             new { startDay = "2030-05-20T10:30:00+03:00", endDay = "2030-06-02T10:30:00+03:00" }
         );
@@ -102,17 +102,17 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await StartedAsync(api, mainOperator, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await StartedAsync(api, consoleOperator, tenant);
         await ChangeAsync(
-            mainOperator,
+            consoleOperator,
             id,
             new { startDay = "2030-05-20T10:30:00+03:00", endDay = "2030-06-02T10:30:00+03:00" }
         );
 
-        var endOnly = await ChangeAsync(mainOperator, id, new { endDay = "2030-06-05T10:30:00+03:00" });
+        var endOnly = await ChangeAsync(consoleOperator, id, new { endDay = "2030-06-05T10:30:00+03:00" });
         var afterEnd = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
-        var startOnly = await ChangeAsync(mainOperator, id, new { startDay = "2030-05-21T15:00:00+03:00" });
+        var startOnly = await ChangeAsync(consoleOperator, id, new { startDay = "2030-05-21T15:00:00+03:00" });
         var afterStart = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
 
         Assert.Equal(HttpStatusCode.OK, endOnly.StatusCode);
@@ -131,15 +131,15 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await StartedAsync(api, mainOperator, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await StartedAsync(api, consoleOperator, tenant);
         var before = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
 
-        var startAfterEnd = await ChangeAsync(mainOperator, id, new { startDay = "2030-05-22T00:00:00Z" });
-        var endBeforeStart = await ChangeAsync(mainOperator, id, new { endDay = "2030-05-20T10:00:00Z" });
+        var startAfterEnd = await ChangeAsync(consoleOperator, id, new { startDay = "2030-05-22T00:00:00Z" });
+        var endBeforeStart = await ChangeAsync(consoleOperator, id, new { endDay = "2030-05-20T10:00:00Z" });
         var unchanged = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
         var oneDay = await ChangeAsync(
-            mainOperator,
+            consoleOperator,
             id,
             new { startDay = "2030-05-21T15:00:00Z", endDay = "2030-05-21T09:00:00Z" }
         );
@@ -160,22 +160,22 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await StartedAsync(api, mainOperator, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await StartedAsync(api, consoleOperator, tenant);
         var before = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
 
         var yesterday = await ChangeAsync(
-            mainOperator,
+            consoleOperator,
             id,
             new { startDay = DayAt(-9, "00:00:00"), endDay = DayAt(-1, "10:00:00") }
         );
         var unchanged = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
         var today = await ChangeAsync(
-            mainOperator,
+            consoleOperator,
             id,
             new { startDay = DayAt(-9, "00:00:00"), endDay = DayAt(0, "10:00:00") }
         );
-        var tomorrow = await ChangeAsync(mainOperator, id, new { endDay = DayAt(1, "10:00:00") });
+        var tomorrow = await ChangeAsync(consoleOperator, id, new { endDay = DayAt(1, "10:00:00") });
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, yesterday.StatusCode);
         Assert.Equal("invalid-attribute", await ErrorCodeAsync(yesterday));
@@ -200,12 +200,12 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await StartedAsync(api, mainOperator, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await StartedAsync(api, consoleOperator, tenant);
         var before = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
 
         var response = await ChangeAsync(
-            mainOperator,
+            consoleOperator,
             id,
             new Dictionary<string, object> { [member] = "x", ["name"] = "Changed" }
         );
@@ -216,31 +216,34 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task Only_the_Main_Operator_changes_an_Event_and_only_while_it_is_Live()
+    public async Task Only_a_Console_Operator_and_Root_change_an_Event_and_only_while_it_is_Live()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
-        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
 
-        foreach (var who in new[] { root, member, developer })
-        {
-            var refused = await ChangeAsync(who, live, new { name = "Taken over" });
-            Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
-            Assert.Equal("not-main-operator", await ErrorCodeAsync(refused));
-        }
+        var refused = await ChangeAsync(member, live, new { name = "Taken over" });
+        Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
+        Assert.Equal("not-console-operator", await ErrorCodeAsync(refused));
+        Assert.NotEqual("Taken over", (await EventSeed.CoreOfAsync(_mongo.ConnectionString, live))!["Name"].AsString);
+        Assert.Equal(HttpStatusCode.OK, (await ChangeAsync(root, live, new { name = "By Root" })).StatusCode);
+        Assert.Equal(
+            HttpStatusCode.OK,
+            (await ChangeAsync(developer, live, new { name = "By the Developer" })).StatusCode
+        );
 
-        var ended = await ChangeAsync(mainOperator, historic, new { name = "Too late" });
-        var notStarted = await ChangeAsync(mainOperator, unstarted, new { name = "Not an Event" });
+        var ended = await ChangeAsync(consoleOperator, historic, new { name = "Too late" });
+        var notStarted = await ChangeAsync(consoleOperator, unstarted, new { name = "Not an Event" });
         var notStartedForAnybody = await ChangeAsync(member, unstarted, new { name = "Not an Event" });
         var anonymous = await client.PatchAsync($"/api/events/{live}", new StringContent("{}"));
-        var mismatch = await mainOperator.Page.WriteAsync(
+        var mismatch = await consoleOperator.Page.WriteAsync(
             HttpMethod.Patch,
             $"/api/events/{live}",
             "events",
@@ -255,7 +258,6 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, mismatch.StatusCode);
         Assert.Equal("id-mismatch", await ErrorCodeAsync(mismatch));
-        Assert.NotEqual("Taken over", (await EventSeed.CoreOfAsync(_mongo.ConnectionString, live))!["Name"].AsString);
         Assert.NotEqual("Too late", (await EventSeed.CoreOfAsync(_mongo.ConnectionString, historic))!["Name"].AsString);
     }
 
@@ -264,10 +266,10 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
         return new ApiFactory(_mongo.ConnectionString, time: new FakeTimeProvider(NOW));
     }
 
-    async Task<Guid> StartedAsync(ApiFactory api, Person mainOperator, string tenant)
+    async Task<Guid> StartedAsync(ApiFactory api, Person consoleOperator, string tenant)
     {
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        var started = await mainOperator.Page.WriteAsync(
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        var started = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/events",
             "events",

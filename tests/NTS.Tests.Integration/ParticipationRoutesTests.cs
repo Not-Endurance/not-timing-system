@@ -10,7 +10,7 @@ namespace NTS.Tests.Integration;
 /// <summary>
 /// The Participations of an Event as the Api serves them (#604, ADR-0006, ADR-0008, ADR-0012): flat, with the Event as an
 /// attribute and the version of the document in the <c>meta</c> of each resource, read by anybody (ADR-0001) and written
-/// by the Main Operator of a Live Event. The Event they belong to says which Tenant they are in, so a list is asked with
+/// by the Console Operator of a Live Event. The Event they belong to says which Tenant they are in, so a list is asked with
 /// the Event, and no other Event's, nor another Tenant's, is in it. The documents are seeded straight into MongoDB.
 /// </summary>
 public sealed class ParticipationRoutesTests : IClassFixture<MongoFixture>

@@ -4,7 +4,7 @@ using NTS.Contracts.Features.Console;
 namespace NoTiming.Console.Features.Branding;
 
 /// <summary>
-/// The logos of an Event (#646, ADR-0012): the page the Main Operator puts its own in place of the federation's from, before the
+/// The logos of an Event (#646, ADR-0012): the page the Console Operator puts its own in place of the federation's from, before the
 /// Event ends. The address names the Event, and the Api says whether the person may (the capabilities of the Event), so a person who
 /// may not is shown nothing.
 /// </summary>
@@ -16,7 +16,7 @@ public class BrandingContentBehind : NStatefulComponent
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
 
-    protected bool MayEdit => Events.Events.Any(x => x.Id == EventId && x.CanEditBranding);
+    protected bool MayEdit => Events.Events.Any(x => x.Id == EventId && x.CanConfigure);
 
     [Parameter]
     public Guid EventId { get; set; }

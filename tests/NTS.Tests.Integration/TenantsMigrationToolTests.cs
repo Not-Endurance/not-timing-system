@@ -68,26 +68,6 @@ public sealed class TenantsMigrationToolTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_account_named_with_main_operator_is_the_one_that_is_given_the_Events()
-    {
-        var data = await LegacyAsync();
-        var account = await data.AccountAsync("main@example.test", "Bulgaria");
-        var setup = await data.SetupAsync();
-
-        var (code, _, _) = await RunAsync(
-            data,
-            "--apply",
-            "--environment",
-            "Staging",
-            "--main-operator",
-            "Main@Example.Test"
-        );
-
-        Assert.Equal(0, code);
-        Assert.Equal(account, (await data.OneAsync("configure_events", setup))["MainOperatorId"].AsGuid);
-    }
-
-    [Fact]
     public async Task It_prints_neither_the_connection_string_nor_what_an_account_keeps()
     {
         var data = await LegacyAsync();
@@ -145,12 +125,12 @@ public sealed class TenantsMigrationToolTests : IClassFixture<MongoFixture>
 
         Assert.Equal(0, code);
         var text = output.ToString();
-        foreach (
-            var option in new[] { "--connection-string", "--database", "--environment", "--main-operator", "--apply" }
-        )
+        foreach (var option in new[] { "--connection-string", "--database", "--environment", "--apply" })
         {
             Assert.Contains(option, text);
         }
+
+        Assert.DoesNotContain("--main-operator", text); // nobody is assigned to run an Event (#671)
     }
 
     async Task<(int Code, string Output, string Error)> RunAsync(LegacyTenantData data, params string[] more)

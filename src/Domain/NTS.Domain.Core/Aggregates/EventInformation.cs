@@ -13,8 +13,7 @@ public class EventInformation : Aggregate
         string? feiShowId,
         Guid id,
         RegionalRules? regionalRules = null,
-        string? tenantId = null,
-        Guid? mainOperatorId = null
+        string? tenantId = null
     )
         : base(id)
     {
@@ -25,7 +24,6 @@ public class EventInformation : Aggregate
         FeiShowId = feiShowId;
         RegionalRules = regionalRules ?? RegionalRules.None;
         TenantId = string.IsNullOrWhiteSpace(tenantId) ? Tenant.LEGACY_ID : tenantId;
-        MainOperatorId = mainOperatorId;
     }
 
     public Country Country { get; }
@@ -36,12 +34,6 @@ public class EventInformation : Aggregate
 
     /// <summary>The Tenant the Event belongs to (ADR-0012). An Event from before Tenants has the constant one.</summary>
     public string TenantId { get; }
-
-    /// <summary>
-    /// The one account that runs the Event, as it was when the Event started or as a hand-over left it; none for an
-    /// Event from before Tenants.
-    /// </summary>
-    public Guid? MainOperatorId { get; }
 
     /// <summary>
     /// The rules of the Regional competitions as the Tenant had them when the Event started (ADR-0012). The Phases and

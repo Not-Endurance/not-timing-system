@@ -7,7 +7,7 @@ using static NTS.Tests.Integration.Infrastructure.UiBrowser;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// The form of a Phase in the Console, in a real browser (#620, ADR-0005): the Main Operator opens it from the heading of the
+/// The form of a Phase in the Console, in a real browser (#620, ADR-0005): the Console Operator opens it from the heading of the
 /// Phase in the table of the dashboard, types the times, and one Save records one edit that lists the times it changed, a time
 /// it cleared among them; the timeline shows the edit as one entry and disabling it undoes the whole edit. A time that is out
 /// of order is said in the form and nothing is recorded, and a Save that changes nothing writes nothing.
@@ -24,13 +24,18 @@ public sealed class ConsolePhaseFormBrowserTests : IClassFixture<ApiHostFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_edits_times_in_the_form_and_the_timeline_shows_one_edit_whose_disabling_undoes_it_whole()
+    public async Task The_Console_Operator_edits_times_in_the_form_and_the_timeline_shows_one_edit_whose_disabling_undoes_it_whole()
     {
         var scene = await FormScene.CreateAsync(_host.MongoConnectionString);
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(
+            _host,
+            device,
+            scene.ConsoleOperator.Email,
+            $"/console/events/{scene.EventId}/dashboard"
+        );
         var dialog = await OpenFormAsync(page);
         await Expect(dialog.GetByLabel("Arrive", new() { Exact = true })).ToHaveValueAsync("06:30:00", Filled());
         await Expect(dialog.GetByLabel("Present", new() { Exact = true })).ToHaveValueAsync("06:40:00", Filled());
@@ -75,7 +80,12 @@ public sealed class ConsolePhaseFormBrowserTests : IClassFixture<ApiHostFixture>
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(
+            _host,
+            device,
+            scene.ConsoleOperator.Email,
+            $"/console/events/{scene.EventId}/dashboard"
+        );
         var dialog = await OpenFormAsync(page);
         var arrive = dialog.GetByLabel("Arrive", new() { Exact = true });
         await Expect(arrive).ToHaveValueAsync("06:30:00", Filled());
@@ -97,7 +107,12 @@ public sealed class ConsolePhaseFormBrowserTests : IClassFixture<ApiHostFixture>
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(
+            _host,
+            device,
+            scene.ConsoleOperator.Email,
+            $"/console/events/{scene.EventId}/dashboard"
+        );
         var dialog = await OpenFormAsync(page);
         await Expect(dialog.GetByLabel("Arrive", new() { Exact = true })).ToHaveValueAsync("06:30:00", Filled());
 
@@ -115,7 +130,12 @@ public sealed class ConsolePhaseFormBrowserTests : IClassFixture<ApiHostFixture>
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(
+            _host,
+            device,
+            scene.ConsoleOperator.Email,
+            $"/console/events/{scene.EventId}/dashboard"
+        );
         var dialog = await OpenFormAsync(page);
         var start = dialog.GetByLabel("Start", new() { Exact = true });
         await Expect(start).ToHaveValueAsync("06:00:00", Filled());
@@ -164,7 +184,7 @@ public sealed class ConsolePhaseFormBrowserTests : IClassFixture<ApiHostFixture>
 
     /// <summary>
     /// A Live Event with one Participation of two Phases whose first one was arrived at (06:30) and presented (06:40) by an
-    /// Official, and the Main Operator who runs it.
+    /// Official, and the Console Operator who runs it.
     /// </summary>
     sealed class FormScene
     {
@@ -173,9 +193,9 @@ public sealed class ConsolePhaseFormBrowserTests : IClassFixture<ApiHostFixture>
         public static async Task<FormScene> CreateAsync(string mongo)
         {
             var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-            var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+            var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
             var official = await TenancySeed.AccountAsync(mongo, tenant, name: "Olga Official");
-            var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+            var eventId = await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
             var recorded = new DateTimeOffset(DateTime.Today.AddHours(12));
             var participation = IntegrationPayloadFactory.TwoPhaseParticipation(
                 eventId,
@@ -194,21 +214,21 @@ public sealed class ConsolePhaseFormBrowserTests : IClassFixture<ApiHostFixture>
                 recorded.AddMinutes(1)
             );
             await EventSeed.ParticipationAsync(mongo, tenant, participation);
-            return new FormScene(mongo, mainOperator, eventId, participation.Id);
+            return new FormScene(mongo, consoleOperator, eventId, participation.Id);
         }
 
         readonly string _mongo;
         readonly Guid _participation;
 
-        FormScene(string mongo, TenancySeed.Seeded mainOperator, Guid eventId, Guid participation)
+        FormScene(string mongo, TenancySeed.Seeded consoleOperator, Guid eventId, Guid participation)
         {
             _mongo = mongo;
             _participation = participation;
-            MainOperator = mainOperator;
+            ConsoleOperator = consoleOperator;
             EventId = eventId;
         }
 
-        public TenancySeed.Seeded MainOperator { get; }
+        public TenancySeed.Seeded ConsoleOperator { get; }
         public Guid EventId { get; }
 
         public async Task<BsonDocument> StoredAsync()

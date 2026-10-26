@@ -9,7 +9,7 @@ using NTS.Domain.Enums;
 namespace NoTiming.Console.Features.Dashboard;
 
 /// <summary>
-/// A time the Main Operator names for the Participation it works on, recorded as an Arrival or as a Presentation (#646):
+/// A time the Console Operator names for the Participation it works on, recorded as an Arrival or as a Presentation (#646):
 /// the server records it as any other Snapshot, accepted or rejected with its reason, and says which.
 /// </summary>
 public class TimePanelBehind : NComponent

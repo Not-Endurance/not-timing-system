@@ -197,9 +197,9 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
         await asMember.ReadMany();
 
         Assert.Equal(403, refusedCreate!.Status);
-        Assert.Equal("not-allowed", refusedCreate.Code);
-        Assert.Equal("not-allowed", refusedUpdate!.Code);
-        Assert.Equal("not-allowed", refusedDelete!.Code);
+        Assert.Equal("not-console-operator", refusedCreate.Code);
+        Assert.Equal("not-console-operator", refusedUpdate!.Code);
+        Assert.Equal("not-console-operator", refusedDelete!.Code);
         Assert.False(string.IsNullOrWhiteSpace(refusedCreate.Message));
         Assert.Empty(nothing);
         Assert.Equal(401, notSignedIn!.Status);
@@ -312,8 +312,7 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
         Assert.Null(setups.LastError);
         var sent = ConfigureEventModel.From(made);
         var received = ConfigureEventModel.From(read!);
-        received.TenantId = sent.TenantId; // what the Api sets is the Api's: the Tenant and the Main Operator
-        received.MainOperatorId = sent.MainOperatorId;
+        received.TenantId = sent.TenantId; // what the Api sets is the Api's: the Tenant
         Assert.Equal(
             JsonSerializer.Serialize(sent, JsonApiResults.Options),
             JsonSerializer.Serialize(received, JsonApiResults.Options)
@@ -322,7 +321,7 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
         Assert.Equal(["POST /api/configure-events", $"PATCH /api/configure-events/{id}"], requests.Asked.Take(2));
         Assert.Empty(dispatcher.Events); // a Setup that was made is not a Setup that was updated
         var stored = (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!;
-        Assert.Equal(root.Id, stored["MainOperatorId"].AsGuid);
+        Assert.False(stored.Contains("MainOperatorId")); // Root made it and runs it; nobody is assigned (#671)
         Assert.Equal(tenant, stored["TenantId"].AsString);
         Assert.Single(stored["Competitions"].AsBsonArray);
     }
@@ -333,11 +332,11 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var dispatcher = new RecordingDispatcher();
-        var setups = new ConfigureEventApiRepository(JsonApiClients.Of(api, mainOperator, out _), dispatcher);
-        var open = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Open");
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        var setups = new ConfigureEventApiRepository(JsonApiClients.Of(api, consoleOperator, out _), dispatcher);
+        var open = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
+        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
         var openSetup = (await setups.Read(open))!;
         var liveSetup = (await setups.Read(live))!;
 

@@ -1065,26 +1065,26 @@
   <data name="Results_string" xml:space="preserve">
     <value>Резултати</value>
   </data>
-  <data name="Assign_main_operator_string" xml:space="preserve">
-    <value>Назначаване на главен оператор</value>
+  <data name="Console_operators_string" xml:space="preserve">
+    <value>Оператори на конзолата</value>
   </data>
-  <data name="Hand_over_string" xml:space="preserve">
-    <value>Предаване</value>
+  <data name="Console_operators_description_string" xml:space="preserve">
+    <value>Операторите на конзолата ръководят това събитие от конзолата. Администраторът на федерацията ръководи всяко нейно събитие и не се назначава.</value>
   </data>
-  <data name="Hand_over_event_string" xml:space="preserve">
-    <value>Предаване на събитието</value>
+  <data name="Console_operators_empty_string" xml:space="preserve">
+    <value>Все още няма назначен оператор на конзолата.</value>
+  </data>
+  <data name="Assign_console_operator_string" xml:space="preserve">
+    <value>Назначаване</value>
   </data>
   <data name="Find_account_string" xml:space="preserve">
     <value>Намерете профил по име (поне две букви)</value>
   </data>
-  <data name="Main_operator_string" xml:space="preserve">
-    <value>Главен оператор</value>
+  <data name="Console_operator_assigned_string" xml:space="preserve">
+    <value>Операторът на конзолата е назначен.</value>
   </data>
-  <data name="Main_operator_assigned_string" xml:space="preserve">
-    <value>Главният оператор е назначен.</value>
-  </data>
-  <data name="Event_handed_over_string" xml:space="preserve">
-    <value>Събитието е предадено.</value>
+  <data name="Console_operator_removed_string" xml:space="preserve">
+    <value>Операторът на конзолата е премахнат.</value>
   </data>
   <data name="Event_started_string" xml:space="preserve">
     <value>Събитието е стартирано.</value>
@@ -1099,7 +1099,7 @@
     <value>Състезанието не е намерено</value>
   </data>
   <data name="Event_not_yours_to_run_string" xml:space="preserve">
-    <value>Само главният оператор на събитието отваря неговата настройка.</value>
+    <value>Само оператор на конзолата на събитието или администратор на федерацията отваря неговата настройка.</value>
   </data>
   <data name="Access_string" xml:space="preserve">
     <value>Достъп</value>

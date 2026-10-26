@@ -17,7 +17,7 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// The Rankings and Results of an Event in the Console, in a real browser (#646): printed through the browser, exported for the
-/// FEI as a file that is downloaded, made new from the Participations the Main Operator chooses, and removed.
+/// FEI as a file that is downloaded, made new from the Participations the Console Operator chooses, and removed.
 /// </summary>
 public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>, IClassFixture<PasskeyBrowserFixture>
 {
@@ -219,10 +219,10 @@ public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>,
         )
         {
             var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-            var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+            var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
             var eventId = historic
-                ? await EventSeed.HistoricAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow)
-                : await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+                ? await EventSeed.HistoricAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow)
+                : await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
             var arrive = new DateTimeOffset(DateTime.Today.AddHours(11));
             var participations = new[] { Completed(eventId, 1, arrive), Completed(eventId, 2, arrive.AddMinutes(20)) };
             foreach (var participation in participations)
@@ -272,7 +272,7 @@ public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>,
                     new MongoDB.Bson.BsonDocument("_id", EventSeed.Binary(eventId)),
                     new MongoDB.Bson.BsonDocument("$set", new MongoDB.Bson.BsonDocument("FeiShowId", "FEI-SHOW-1"))
                 );
-            return new Scene(mongo, eventId, mainOperator.Email);
+            return new Scene(mongo, eventId, consoleOperator.Email);
         }
 
         readonly string _mongo;

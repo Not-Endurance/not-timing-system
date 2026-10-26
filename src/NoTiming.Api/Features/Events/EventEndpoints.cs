@@ -12,16 +12,15 @@ using NTS.Domain.Access;
 namespace NoTiming.Api.Features.Events;
 
 /// <summary>
-/// Creating an Event, and who runs it (#643, ADR-0012). A Tenant Root makes an Event in the Tenant it is acting in and is
-/// its Main Operator; it assigns another account while the Event has not started, and once the Event is Live only the
-/// Main Operator hands it over. What a person may do about an Event is told by <c>GET /api/events/{id}/capabilities</c>
-/// from the same policy that refuses it. The Event is made with a name and a location and nothing else: it cannot be given
-/// a Tenant or a Main Operator by what is sent, and the rest of its Setup is the Setup's own routes.
+/// Creating an Event, and what a person may do about one (#643, ADR-0012). Root makes an Event in the Tenant it is acting
+/// in and runs it, or assigns Console Operators to run it (<c>/api/console-operators</c>). What a person may do about an
+/// Event is told by <c>GET /api/events/{id}/capabilities</c> from the same policy that refuses it. The Event is made with a
+/// name and a location and nothing else: it cannot be given a Tenant by what is sent, and the rest of its Setup is the
+/// Setup's own routes.
 /// </summary>
 internal static class EventEndpoints
 {
     const string CONFIGURE_EVENTS = "configure-events";
-    const string MAIN_OPERATORS = "main-operators";
     const string CAPABILITIES = "capabilities";
     const int MAX_NAME_LENGTH = 100;
     const int MAX_FEI_SHOW_ID_LENGTH = 20;
@@ -29,8 +28,6 @@ internal static class EventEndpoints
     public static IEndpointRouteBuilder MapEvents(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/configure-events", Create).RequireAuthorization();
-        app.MapPost("/api/events/{id}/actions/assign-main-operator", AssignMainOperator).RequireAuthorization();
-        app.MapPost("/api/events/{id}/actions/hand-over", HandOver).RequireAuthorization();
         app.MapGet("/api/events/{id}/capabilities", ReadCapabilities).RequireAuthorization();
         return app;
     }
@@ -38,6 +35,7 @@ internal static class EventEndpoints
     static async Task<IResult> Create(
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         TenantStore tenants,
         TenantCollections collections,
         EventStore events,
@@ -67,10 +65,12 @@ internal static class EventEndpoints
             );
         }
 
-        var verdict = AccessPolicy.Decide(
+        var verdict = await standing.DecideAtTenantAsync(
             Capability.CreateEvent,
-            AccountRoles.CallerOf(user),
-            AccessScope.ForTenant(tenantId, await tenants.IsOperationalAsync(tenantId, context.RequestAborted))
+            user,
+            tenantId,
+            await tenants.IsOperationalAsync(tenantId, context.RequestAborted),
+            context.RequestAborted
         );
         if (!verdict.IsAllowed)
         {
@@ -134,7 +134,6 @@ internal static class EventEndpoints
             var (id, created) = await events.CreateAsync(
                 tenantId,
                 requested,
-                user.Id,
                 name,
                 location,
                 feiShowId,
@@ -167,7 +166,6 @@ internal static class EventEndpoints
                     location,
                     feiShowId,
                     tenantId,
-                    mainOperatorId = user.Id,
                 },
                 $"/api/{CONFIGURE_EVENTS}/{id}"
             );
@@ -182,118 +180,12 @@ internal static class EventEndpoints
         }
     }
 
-    static Task<IResult> AssignMainOperator(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventStore events,
-        TenancyLog log
-    )
-    {
-        return ChangeMainOperator(id, Capability.AssignMainOperator, context, users, events, log, assign: true);
-    }
-
-    static Task<IResult> HandOver(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventStore events,
-        TenancyLog log
-    )
-    {
-        return ChangeMainOperator(id, Capability.HandOverMainOperator, context, users, events, log, assign: false);
-    }
-
-    static async Task<IResult> ChangeMainOperator(
-        string id,
-        Capability capability,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventStore events,
-        TenancyLog log,
-        bool assign
-    )
-    {
-        var read = await JsonApiRequests.ReadAsync<MainOperatorAttributes>(context.Request, MAIN_OPERATORS);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var facts = Guid.TryParse(id, out var eventId) ? await events.FindAsync(eventId, context.RequestAborted) : null;
-        if (facts is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var verdict = AccessPolicy.Decide(capability, AccountRoles.CallerOf(user), facts.ScopeFor(CallerGrants.None));
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
-        var attributes = read.Attributes!;
-        if (attributes.Others is { Count: > 0 })
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "unsupported-attribute",
-                "The account that is to be the Main Operator is sent as accountId, and nothing else.",
-                string.Join(", ", attributes.Others.Keys)
-            );
-        }
-
-        if (attributes.AccountId is not { } accountId)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "malformed-request",
-                "Send the account that is to be the Main Operator as accountId."
-            );
-        }
-
-        var account = await users.FindByIdAsync(accountId.ToString());
-        if (account is null)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status422UnprocessableEntity,
-                "account-not-found",
-                "There is no such account."
-            );
-        }
-
-        var changed = assign
-            ? await events.AssignMainOperatorAsync(facts.Record, account.Id, context.RequestAborted)
-            : await events.HandOverAsync(facts.Record, account.Id, context.RequestAborted);
-        if (!changed)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        if (assign)
-        {
-            log.MainOperatorAssigned(user.Id, eventId, account.Id);
-        }
-        else
-        {
-            log.EventHandedOver(user.Id, eventId, account.Id);
-        }
-
-        return Results.NoContent();
-    }
-
     static async Task<IResult> ReadCapabilities(
         string id,
         HttpContext context,
         UserManager<NIdentityUser> users,
         EventStore events,
-        EventGrantStore grants,
+        StandingReader standings,
         TenantStore tenants
     )
     {
@@ -309,12 +201,9 @@ internal static class EventEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var caller = AccountRoles.CallerOf(user);
-        var scope = facts.ScopeFor(await grants.GrantsOfAsync(facts.Record, user.Id, context.RequestAborted));
-        var tenant = AccessScope.ForTenant(
-            facts.TenantId,
-            await tenants.IsOperationalAsync(facts.TenantId, context.RequestAborted)
-        );
+        var standing = await standings.AtEventAsync(user, facts, context.RequestAborted);
+        var inTheTenant = await standings.AtTenantAsync(user, facts.TenantId, context.RequestAborted);
+        var tenant = PlaceState.OfTenant(await tenants.IsOperationalAsync(facts.TenantId, context.RequestAborted));
         return JsonApiResults.Resource(
             StatusCodes.Status200OK,
             CAPABILITIES,
@@ -322,17 +211,15 @@ internal static class EventEndpoints
             new
             {
                 stage = facts.Stage.ToString().ToLowerInvariant(),
-                isMainOperator = AccessPolicy.IsMainOperator(caller, scope),
-                canSnapshot = AccessPolicy.Decide(Capability.SendSnapshot, caller, scope).IsAllowed,
-                canHandOver = AccessPolicy.Decide(Capability.HandOverMainOperator, caller, scope).IsAllowed,
-                canAssignMainOperator = AccessPolicy.Decide(Capability.AssignMainOperator, caller, scope).IsAllowed,
-                canCreateEvents = AccessPolicy.Decide(Capability.CreateEvent, caller, tenant).IsAllowed,
-                canConfigure = AccessPolicy.Decide(Capability.ConfigureEvent, caller, scope).IsAllowed,
-                canEditSetup = AccessPolicy.Decide(Capability.EditSetup, caller, scope).IsAllowed,
-                canEditData = AccessPolicy.Decide(Capability.EditEventData, caller, scope).IsAllowed,
-                canLinkAccounts = AccessPolicy.Decide(Capability.LinkAccounts, caller, scope).IsAllowed,
-                canEditBranding = AccessPolicy.Decide(Capability.EditEventBranding, caller, scope).IsAllowed,
-                canReset = AccessPolicy.Decide(Capability.ResetEvent, caller, scope).IsAllowed,
+                level = AccessLevelText.Of(standing.Level),
+                canSnapshot = AccessPolicy.Decide(Capability.SendSnapshot, standing, facts.State).IsAllowed,
+                canConfigure = AccessPolicy.Decide(Capability.ConfigureEvent, standing, facts.State).IsAllowed,
+                canEditSetup = AccessPolicy.Decide(Capability.EditSetup, standing, facts.State).IsAllowed,
+                canRun = AccessPolicy.Decide(Capability.RunEvent, standing, facts.State).IsAllowed,
+                canAssignConsoleOperators = AccessPolicy
+                    .Decide(Capability.AssignConsoleOperators, standing, facts.State)
+                    .IsAllowed,
+                canCreateEvents = AccessPolicy.Decide(Capability.CreateEvent, inTheTenant, tenant).IsAllowed,
             }
         );
     }
@@ -344,15 +231,6 @@ internal sealed class NewEventAttributes
     public string? Name { get; set; }
     public string? Location { get; set; }
     public string? FeiShowId { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Others { get; set; }
-}
-
-/// <summary>The account that is to be the Main Operator. A member that is not it is kept, to be refused.</summary>
-internal sealed class MainOperatorAttributes
-{
-    public Guid? AccountId { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Others { get; set; }

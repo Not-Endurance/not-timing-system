@@ -8,7 +8,7 @@ namespace NoTiming.Api.Features.Tenancy;
 
 /// <summary>The search of one registry over the rows of every Tenant: a named capability of <see cref="CrossTenantReads"/>.</summary>
 internal delegate Task<IReadOnlyList<RegistryMatch>> RegistrySearch(
-    Caller caller,
+    Standing standing,
     NameSearch search,
     CancellationToken cancellationToken
 );
@@ -24,7 +24,7 @@ internal delegate Task<IReadOnlyList<RegistryMatch>> RegistrySearch(
 /// most. It answers only the fields that are meant to leave, and draws on the budget of searches that the search of accounts
 /// draws on, a page being a search. The database does all of it. The row of an Athlete or a Horse is its name and its name in
 /// English to every signed-in account, and its whole row (FEI ID, club, country, the Tenant) to the people who set an Event up
-/// (<see cref="Capability.ReadRegistryDetailsAcrossTenants"/>), who are also the only ones whose words are matched against the FEI
+/// (<see cref="Capability.SetUpAcrossTenants"/>), who are also the only ones whose words are matched against the FEI
 /// ID. The Tenant's own list of a registry is a route of the registry's family, and no parameter turns it into this one.
 /// </summary>
 internal static class RegistrySearchEndpoints
@@ -43,13 +43,13 @@ internal static class RegistrySearchEndpoints
     /// <summary>
     /// What every search of a registry asks before it reads (the rest-api skill): the caller is signed in and may read the
     /// registries, the request is a search of the form <c>contains(name,'text')</c> with its sort and its page and nothing
-    /// else, one of the words of the text is long enough, and there is room for it in the budget of searches. The caller and
-    /// the search are the answer, or the answer that refuses.
+    /// else, one of the words of the text is long enough, and there is room for it in the budget of searches. Where the caller
+    /// stands and the search are the answer, or the answer that refuses.
     /// </summary>
     public static async Task<SearchAdmission> AdmitAsync(
         HttpContext context,
         UserManager<NIdentityUser> users,
-        CallerReader callers,
+        StandingReader standings,
         SearchRateLimiter limiter
     )
     {
@@ -59,8 +59,8 @@ internal static class RegistrySearchEndpoints
             return SearchAdmission.Refused(JsonApiResults.NotSignedIn());
         }
 
-        var caller = await callers.ReadAsync(user, context.RequestAborted);
-        var verdict = AccessPolicy.Decide(Capability.ReadRegistryAcrossTenants, caller, AccessScope.Platform);
+        var standing = await standings.AtPlatformAsync(user, context.RequestAborted);
+        var verdict = AccessPolicy.Decide(Capability.SignedIn, standing, PlaceState.Platform);
         if (!verdict.IsAllowed)
         {
             return SearchAdmission.Refused(AccessResults.Refused(verdict));
@@ -82,7 +82,7 @@ internal static class RegistrySearchEndpoints
             return SearchAdmission.Refused(JsonApiResults.RateLimited(refusal.RetryAfter));
         }
 
-        return SearchAdmission.Admitted(caller, query);
+        return SearchAdmission.Admitted(standing, query);
     }
 
     /// <summary>400 <c>search-too-short</c>: none of the words of the text has the characters that make it a search and not a listing.</summary>
@@ -103,10 +103,10 @@ internal static class RegistrySearchEndpoints
                 (
                     HttpContext context,
                     UserManager<NIdentityUser> users,
-                    CallerReader callers,
+                    StandingReader standings,
                     CrossTenantReads reads,
                     SearchRateLimiter limiter
-                ) => Search(context, users, callers, limiter, type, searchOf(reads))
+                ) => Search(context, users, standings, limiter, type, searchOf(reads))
             )
             .RequireAuthorization();
     }
@@ -114,20 +114,20 @@ internal static class RegistrySearchEndpoints
     static async Task<IResult> Search(
         HttpContext context,
         UserManager<NIdentityUser> users,
-        CallerReader callers,
+        StandingReader standings,
         SearchRateLimiter limiter,
         string type,
         RegistrySearch search
     )
     {
-        var admission = await AdmitAsync(context, users, callers, limiter);
+        var admission = await AdmitAsync(context, users, standings, limiter);
         if (admission.Refusal != null)
         {
             return admission.Refusal;
         }
 
         var query = admission.Query!;
-        var found = await search(admission.Caller!, NameSearch.Of(query), context.RequestAborted);
+        var found = await search(admission.Standing!, NameSearch.Of(query), context.RequestAborted);
         return JsonApiResults.Collection(
             type,
             found
@@ -155,12 +155,12 @@ internal static class RegistrySearchEndpoints
     }
 }
 
-/// <summary>A search of a registry that may go on, with the caller and what the search asks for, or the answer that refuses it.</summary>
+/// <summary>A search of a registry that may go on, with where the caller stands and what the search asks for, or the answer that refuses it.</summary>
 internal sealed class SearchAdmission
 {
-    public static SearchAdmission Admitted(Caller caller, JsonApiSearch query)
+    public static SearchAdmission Admitted(Standing standing, JsonApiSearch query)
     {
-        return new SearchAdmission(caller, query, null);
+        return new SearchAdmission(standing, query, null);
     }
 
     public static SearchAdmission Refused(IResult refusal)
@@ -168,14 +168,14 @@ internal sealed class SearchAdmission
         return new SearchAdmission(null, null, refusal);
     }
 
-    SearchAdmission(Caller? caller, JsonApiSearch? query, IResult? refusal)
+    SearchAdmission(Standing? standing, JsonApiSearch? query, IResult? refusal)
     {
-        Caller = caller;
+        Standing = standing;
         Query = query;
         Refusal = refusal;
     }
 
-    public Caller? Caller { get; }
+    public Standing? Standing { get; }
     public JsonApiSearch? Query { get; }
     public IResult? Refusal { get; }
 }

@@ -1,21 +1,15 @@
 using NTS.Domain.Access;
-using NTS.Domain.Enums;
 
 namespace NTS.Tests.Unit.Domain;
 
 /// <summary>
-/// The access matrix of ADR-0012, row by row: for every action, who may do it before the Event starts, while it is Live
+/// The access matrix of ADR-0012, row by row: for every action, who holds it before the Event starts, while it is Live
 /// and once it is Historic. What each row expects is written out here from the ADR and the glossary and is never
 /// computed by the policy it checks, so the table is the specification and a change to the policy shows up as a row
 /// that no longer holds.
 /// </summary>
 public sealed class AccessPolicyTests
 {
-    const string TENANT = "country-bg";
-    const string OTHER_TENANT = "country-tr";
-    static readonly Guid MAIN_OPERATOR_ID = TestId.Of(1);
-    static readonly Guid TENANT_ROOT_ID = TestId.Of(2);
-
     public static TheoryData<Capability, EventStage> EventActions()
     {
         var rows = new TheoryData<Capability, EventStage>();
@@ -53,28 +47,11 @@ public sealed class AccessPolicyTests
     }
 
     [Theory]
-    [MemberData(nameof(EventActions))]
-    public void An_action_of_an_Event_is_allowed_to_the_people_the_matrix_names_at_each_stage(
-        Capability capability,
-        EventStage stage
-    )
-    {
-        var expected = EventRows().GetValueOrDefault((capability, stage)) ?? [];
-
-        var allowed = People()
-            .Where(x => AccessPolicy.Decide(capability, x.Caller, AboutTheEvent(stage, x)).IsAllowed)
-            .Select(x => x.Who);
-
-        Assert.Equal(expected.Order(), allowed.Order());
-    }
-
-    [Theory]
     [MemberData(nameof(TenantActions))]
     public void An_action_of_a_Tenant_is_allowed_to_the_people_the_matrix_names(Capability capability)
     {
-        var allowed = People()
-            .Where(x => AccessPolicy.Decide(capability, x.Caller, AccessScope.ForTenant(TENANT, true)).IsAllowed)
-            .Select(x => x.Who);
+        var allowed = Everybody()
+            .Where(x => AccessPolicy.Decide(capability, StandingOf(x), PlaceState.OfTenant(true)).IsAllowed);
 
         Assert.Equal(TenantRows()[capability].Order(), allowed.Order());
     }
@@ -83,15 +60,14 @@ public sealed class AccessPolicyTests
     [MemberData(nameof(PlatformActions))]
     public void An_action_of_the_platform_is_allowed_to_the_people_the_matrix_names(Capability capability)
     {
-        var allowed = People()
-            .Where(x => AccessPolicy.Decide(capability, x.Caller, AccessScope.Platform).IsAllowed)
-            .Select(x => x.Who);
+        var allowed = Everybody()
+            .Where(x => AccessPolicy.Decide(capability, StandingOf(x), PlaceState.Platform).IsAllowed);
 
         Assert.Equal(PlatformRows()[capability].Order(), allowed.Order());
     }
 
     [Fact]
-    public void Every_action_of_the_matrix_has_a_row_in_this_table()
+    public void Every_row_of_the_matrix_has_a_row_in_this_table()
     {
         var covered = EventCapabilities().Concat(TenantRows().Keys).Concat(PlatformRows().Keys);
 
@@ -99,163 +75,55 @@ public sealed class AccessPolicyTests
     }
 
     [Theory]
-    [InlineData(Capability.CreateEvent)]
-    [InlineData(Capability.EditRegistry)]
-    [InlineData(Capability.EditTenantRules)]
-    [InlineData(Capability.EditTenantBranding)]
-    [InlineData(Capability.SearchAccounts)]
-    public void A_Tenant_Root_or_a_Main_Operator_of_one_Tenant_has_no_authority_in_another(Capability capability)
-    {
-        var tenantRoot = Caller.Of(TestId.Of(30), tenantRootIn: [TENANT]);
-        var mainOperator = Caller.Of(TestId.Of(31), openMainOperatorIn: [TENANT]);
-        var elsewhere = AccessScope.ForTenant(OTHER_TENANT, true);
-
-        Assert.False(AccessPolicy.Decide(capability, tenantRoot, elsewhere).IsAllowed);
-        Assert.False(AccessPolicy.Decide(capability, mainOperator, elsewhere).IsAllowed);
-    }
-
-    [Theory]
-    [InlineData(Capability.ConfigureEvent, EventStage.Unstarted)]
-    [InlineData(Capability.ConfigureEvent, EventStage.Live)]
-    [InlineData(Capability.AssignMainOperator, EventStage.Unstarted)]
-    [InlineData(Capability.LinkAccounts, EventStage.Live)]
-    [InlineData(Capability.DeleteEvent, EventStage.Unstarted)]
-    public void A_Tenant_Root_has_no_authority_over_an_Event_of_another_Tenant(Capability capability, EventStage stage)
-    {
-        var tenantRoot = Caller.Of(TestId.Of(32), tenantRootIn: [OTHER_TENANT]);
-        var scope = AccessScope.ForEvent(TENANT, MAIN_OPERATOR_ID, stage);
-
-        Assert.False(AccessPolicy.Decide(capability, tenantRoot, scope).IsAllowed);
-    }
-
-    [Theory]
-    [InlineData(EventStage.Unstarted, Capability.AssignMainOperator, true)]
-    [InlineData(EventStage.Unstarted, Capability.DeleteEvent, true)]
-    [InlineData(EventStage.Unstarted, Capability.ConfigureEvent, true)]
-    [InlineData(EventStage.Live, Capability.ConfigureEvent, true)]
-    [InlineData(EventStage.Live, Capability.HandOverMainOperator, true)]
-    [InlineData(EventStage.Live, Capability.SendSnapshot, true)]
-    [InlineData(EventStage.Live, Capability.ResetEvent, true)]
-    [InlineData(EventStage.Live, Capability.AssignMainOperator, false)]
-    [InlineData(EventStage.Live, Capability.DeleteEvent, false)]
-    [InlineData(EventStage.Historic, Capability.ConfigureEvent, false)]
-    [InlineData(EventStage.Historic, Capability.HandOverMainOperator, false)]
-    public void A_Tenant_Root_who_created_the_Event_holds_the_rights_of_both_roles(
-        EventStage stage,
+    [MemberData(nameof(EventActions))]
+    public void An_action_of_an_Event_is_allowed_to_the_people_the_matrix_names_at_each_stage(
         Capability capability,
-        bool allowed
+        EventStage stage
     )
     {
-        var creator = Caller.Of(TENANT_ROOT_ID, tenantRootIn: [TENANT], openMainOperatorIn: [TENANT]);
-        var scope = AccessScope.ForEvent(TENANT, TENANT_ROOT_ID, stage);
+        var expected = EventRows().GetValueOrDefault((capability, stage)) ?? [];
 
-        Assert.Equal(allowed, AccessPolicy.Decide(capability, creator, scope).IsAllowed);
-    }
+        var allowed = Everybody()
+            .Where(x => AccessPolicy.Decide(capability, StandingOf(x), PlaceState.OfEvent(stage)).IsAllowed);
 
-    [Theory]
-    [InlineData(EventStage.Unstarted, true)]
-    [InlineData(EventStage.Live, true)]
-    [InlineData(EventStage.Historic, false)]
-    public void A_Developer_who_was_appointed_Main_Operator_acts_as_one_because_the_Event_is_theirs(
-        EventStage stage,
-        bool canConfigure
-    )
-    {
-        var developer = Caller.Of(TestId.Of(33), isDeveloper: true);
-        var scope = AccessScope.ForEvent(TENANT, TestId.Of(33), stage);
-
-        Assert.Equal(canConfigure, AccessPolicy.Decide(Capability.ConfigureEvent, developer, scope).IsAllowed);
-    }
-
-    [Theory]
-    [InlineData(EventStage.Unstarted)]
-    [InlineData(EventStage.Live)]
-    [InlineData(EventStage.Historic)]
-    public void Nobody_is_the_Main_Operator_of_an_Event_that_has_none(EventStage stage)
-    {
-        var anAccount = Caller.Of(TestId.Of(34));
-        var scope = AccessScope.ForEvent(TENANT, mainOperatorId: null, stage);
-
-        Assert.False(AccessPolicy.Decide(Capability.ConfigureEvent, anAccount, scope).IsAllowed);
-        Assert.False(AccessPolicy.Decide(Capability.HandOverMainOperator, anAccount, scope).IsAllowed);
-        Assert.False(AccessPolicy.Decide(Capability.SendSnapshot, anAccount, scope).IsAllowed);
-        Assert.False(AccessPolicy.IsMainOperator(anAccount, scope));
-        Assert.False(AccessPolicy.IsMainOperator(Caller.Anonymous, scope));
-    }
-
-    [Fact]
-    public void An_Event_is_not_created_in_a_Tenant_that_is_not_operational_by_anybody()
-    {
-        var tenantRoot = Caller.Of(TENANT_ROOT_ID, tenantRootIn: [TENANT]);
-        var developer = Caller.Of(TestId.Of(20), isDeveloper: true);
-        var notOperational = AccessScope.ForTenant(TENANT, isOperational: false);
-
-        Assert.Equal(
-            Refusal.TenantNotOperational,
-            AccessPolicy.Decide(Capability.CreateEvent, tenantRoot, notOperational).Reason
-        );
-        Assert.Equal(
-            Refusal.TenantNotOperational,
-            AccessPolicy.Decide(Capability.CreateEvent, developer, notOperational).Reason
-        );
+        Assert.Equal(expected.Order(), allowed.Order());
     }
 
     [Theory]
     [InlineData(Who.Anonymous, Capability.SendSnapshot, EventStage.Live, Refusal.NotSignedIn)]
     [InlineData(Who.Anonymous, Capability.ConfigureEvent, EventStage.Unstarted, Refusal.NotSignedIn)]
-    [InlineData(Who.SomeAccount, Capability.SendSnapshot, EventStage.Live, Refusal.NotAllowed)]
-    [InlineData(Who.VeterinaryOfficial, Capability.SendSnapshot, EventStage.Live, Refusal.NotAllowed)]
-    [InlineData(Who.SomeAccount, Capability.SeeTimeEvents, EventStage.Live, Refusal.NotAllowed)]
-    [InlineData(Who.SomeAccount, Capability.SendSnapshot, EventStage.Historic, Refusal.NotAllowed)]
-    [InlineData(Who.SomeAccount, Capability.SendSnapshot, EventStage.Unstarted, Refusal.NotAllowed)]
-    [InlineData(Who.TenantRoot, Capability.ConfigureEvent, EventStage.Unstarted, Refusal.NotMainOperator)]
-    [InlineData(Who.TenantRoot, Capability.ConfigureEvent, EventStage.Historic, Refusal.NotMainOperator)]
-    [InlineData(Who.TenantRoot, Capability.HandOverMainOperator, EventStage.Live, Refusal.NotMainOperator)]
-    [InlineData(Who.Developer, Capability.ConfigureEvent, EventStage.Live, Refusal.NotMainOperator)]
-    [InlineData(Who.Developer, Capability.HandOverMainOperator, EventStage.Live, Refusal.NotMainOperator)]
-    [InlineData(Who.MainOperator, Capability.AssignMainOperator, EventStage.Unstarted, Refusal.NotTenantRoot)]
-    [InlineData(Who.MainOperator, Capability.AssignMainOperator, EventStage.Live, Refusal.NotTenantRoot)]
-    [InlineData(Who.MainOperator, Capability.DeleteEvent, EventStage.Unstarted, Refusal.NotTenantRoot)]
-    [InlineData(Who.TenantRoot, Capability.AssignMainOperator, EventStage.Live, Refusal.EventStarted)]
-    [InlineData(Who.TenantRoot, Capability.AssignMainOperator, EventStage.Historic, Refusal.EventEnded)]
-    [InlineData(Who.TenantRoot, Capability.DeleteEvent, EventStage.Live, Refusal.EventStarted)]
-    [InlineData(Who.TenantRoot, Capability.DeleteEvent, EventStage.Historic, Refusal.EventEnded)]
-    [InlineData(Who.MainOperator, Capability.HandOverMainOperator, EventStage.Unstarted, Refusal.EventNotStarted)]
-    [InlineData(Who.MainOperator, Capability.HandOverMainOperator, EventStage.Historic, Refusal.EventEnded)]
-    [InlineData(Who.MainOperator, Capability.ResetEvent, EventStage.Unstarted, Refusal.EventNotStarted)]
-    [InlineData(Who.MainOperator, Capability.ResetEvent, EventStage.Historic, Refusal.EventEnded)]
-    [InlineData(Who.MainOperator, Capability.ConfigureEvent, EventStage.Historic, Refusal.EventEnded)]
-    [InlineData(Who.MainOperator, Capability.LinkAccounts, EventStage.Historic, Refusal.EventEnded)]
-    [InlineData(Who.Steward, Capability.SendSnapshot, EventStage.Unstarted, Refusal.EventNotStarted)]
-    [InlineData(Who.Steward, Capability.SendSnapshot, EventStage.Historic, Refusal.EventEnded)]
-    [InlineData(Who.SomeAccount, Capability.EditSetup, EventStage.Unstarted, Refusal.NotMainOperator)]
-    [InlineData(Who.TenantRoot, Capability.EditSetup, EventStage.Unstarted, Refusal.NotMainOperator)]
-    [InlineData(Who.Developer, Capability.EditSetup, EventStage.Live, Refusal.NotMainOperator)]
-    [InlineData(Who.MainOperator, Capability.EditSetup, EventStage.Live, Refusal.EventStarted)]
-    [InlineData(Who.MainOperator, Capability.EditSetup, EventStage.Historic, Refusal.EventEnded)]
-    [InlineData(Who.Anonymous, Capability.EditEventData, EventStage.Live, Refusal.NotSignedIn)]
-    [InlineData(Who.SomeAccount, Capability.EditEventData, EventStage.Live, Refusal.NotMainOperator)]
-    [InlineData(Who.Steward, Capability.EditEventData, EventStage.Live, Refusal.NotMainOperator)]
-    [InlineData(Who.TenantRoot, Capability.EditEventData, EventStage.Live, Refusal.NotMainOperator)]
-    [InlineData(Who.Developer, Capability.EditEventData, EventStage.Live, Refusal.NotMainOperator)]
-    [InlineData(Who.MainOperator, Capability.EditEventData, EventStage.Unstarted, Refusal.EventNotStarted)]
-    [InlineData(Who.MainOperator, Capability.EditEventData, EventStage.Historic, Refusal.EventEnded)]
-    [InlineData(Who.Developer, Capability.EditEventData, EventStage.Unstarted, Refusal.EventNotStarted)]
-    [InlineData(Who.Developer, Capability.EditEventData, EventStage.Historic, Refusal.EventEnded)]
-    [InlineData(Who.Anonymous, Capability.ReadSetup, EventStage.Unstarted, Refusal.NotSignedIn)]
-    [InlineData(Who.SomeAccount, Capability.ReadSetup, EventStage.Unstarted, Refusal.NotAllowed)]
-    [InlineData(Who.Steward, Capability.ReadSetup, EventStage.Live, Refusal.NotAllowed)]
-    [InlineData(Who.TenantRootOfAnotherTenant, Capability.ReadSetup, EventStage.Historic, Refusal.NotAllowed)]
-    public void A_refusal_says_what_is_missing_the_role_before_the_stage(
+    [InlineData(Who.Anonymous, Capability.RunEvent, EventStage.Unstarted, Refusal.NotSignedIn)]
+    [InlineData(Who.Account, Capability.SendSnapshot, EventStage.Live, Refusal.NotAllowed)]
+    [InlineData(Who.StaffWhoMayNotRecord, Capability.SendSnapshot, EventStage.Live, Refusal.NotAllowed)]
+    [InlineData(Who.Account, Capability.SeeTimeEvents, EventStage.Live, Refusal.NotAllowed)]
+    [InlineData(Who.StaffWhoMayRecord, Capability.ConfigureEvent, EventStage.Unstarted, Refusal.NotConsoleOperator)]
+    [InlineData(Who.Account, Capability.EditSetup, EventStage.Unstarted, Refusal.NotConsoleOperator)]
+    [InlineData(Who.StaffWhoMayRecord, Capability.RunEvent, EventStage.Live, Refusal.NotConsoleOperator)]
+    [InlineData(Who.Account, Capability.ReadConfiguration, EventStage.Live, Refusal.NotConsoleOperator)]
+    [InlineData(Who.ConsoleOperator, Capability.AssignConsoleOperators, EventStage.Unstarted, Refusal.NotRoot)]
+    [InlineData(Who.ConsoleOperator, Capability.AssignConsoleOperators, EventStage.Live, Refusal.NotRoot)]
+    [InlineData(Who.ConsoleOperator, Capability.DeleteEvent, EventStage.Unstarted, Refusal.NotRoot)]
+    [InlineData(Who.ConsoleOperator, Capability.AssignConsoleOperators, EventStage.Historic, Refusal.NotRoot)]
+    [InlineData(Who.Account, Capability.RunEvent, EventStage.Historic, Refusal.NotConsoleOperator)]
+    [InlineData(Who.Root, Capability.DeleteEvent, EventStage.Live, Refusal.EventStarted)]
+    [InlineData(Who.Root, Capability.DeleteEvent, EventStage.Historic, Refusal.EventEnded)]
+    [InlineData(Who.Root, Capability.AssignConsoleOperators, EventStage.Historic, Refusal.EventEnded)]
+    [InlineData(Who.Root, Capability.RunEvent, EventStage.Historic, Refusal.EventEnded)]
+    [InlineData(Who.ConsoleOperator, Capability.RunEvent, EventStage.Unstarted, Refusal.EventNotStarted)]
+    [InlineData(Who.ConsoleOperator, Capability.RunEvent, EventStage.Historic, Refusal.EventEnded)]
+    [InlineData(Who.ConsoleOperator, Capability.EditSetup, EventStage.Live, Refusal.EventStarted)]
+    [InlineData(Who.ConsoleOperator, Capability.EditSetup, EventStage.Historic, Refusal.EventEnded)]
+    [InlineData(Who.ConsoleOperator, Capability.ConfigureEvent, EventStage.Historic, Refusal.EventEnded)]
+    [InlineData(Who.StaffWhoMayRecord, Capability.SendSnapshot, EventStage.Unstarted, Refusal.EventNotStarted)]
+    [InlineData(Who.StaffWhoMayRecord, Capability.SendSnapshot, EventStage.Historic, Refusal.EventEnded)]
+    public void A_refusal_says_what_is_missing_the_Level_before_the_stage(
         Who who,
         Capability capability,
         EventStage stage,
         Refusal expected
     )
     {
-        var person = People().Single(x => x.Who == who);
-
-        var verdict = AccessPolicy.Decide(capability, person.Caller, AboutTheEvent(stage, person));
+        var verdict = AccessPolicy.Decide(capability, StandingOf(who), PlaceState.OfEvent(stage));
 
         Assert.False(verdict.IsAllowed);
         Assert.Equal(expected, verdict.Reason);
@@ -263,136 +131,117 @@ public sealed class AccessPolicyTests
 
     [Theory]
     [InlineData(Who.Anonymous, Capability.CreateEvent, Refusal.NotSignedIn)]
-    [InlineData(Who.SomeAccount, Capability.CreateEvent, Refusal.NotTenantRoot)]
-    [InlineData(Who.SomeAccount, Capability.EditTenantRules, Refusal.NotTenantRoot)]
-    [InlineData(Who.MainOperator, Capability.EditTenantBranding, Refusal.NotTenantRoot)]
-    [InlineData(Who.SomeAccount, Capability.EditRegistry, Refusal.NotAllowed)]
-    [InlineData(Who.SomeAccount, Capability.SearchAccounts, Refusal.NotAllowed)]
+    [InlineData(Who.Account, Capability.CreateEvent, Refusal.NotRoot)]
+    [InlineData(Who.ConsoleOperator, Capability.CreateEvent, Refusal.NotRoot)]
+    [InlineData(Who.Account, Capability.EditTenant, Refusal.NotRoot)]
+    [InlineData(Who.ConsoleOperator, Capability.EditTenant, Refusal.NotRoot)]
+    [InlineData(Who.Account, Capability.EditRegistry, Refusal.NotConsoleOperator)]
+    [InlineData(Who.StaffWhoMayRecord, Capability.EditRegistry, Refusal.NotConsoleOperator)]
     public void A_refusal_of_an_action_of_a_Tenant_says_what_is_missing(
         Who who,
         Capability capability,
         Refusal expected
     )
     {
-        var person = People().Single(x => x.Who == who);
-
-        var verdict = AccessPolicy.Decide(capability, person.Caller, AccessScope.ForTenant(TENANT, true));
+        var verdict = AccessPolicy.Decide(capability, StandingOf(who), PlaceState.OfTenant(true));
 
         Assert.False(verdict.IsAllowed);
         Assert.Equal(expected, verdict.Reason);
     }
 
     [Theory]
-    [InlineData(Who.TenantRoot, Capability.SeedTenantRoot, Refusal.NotDeveloper)]
-    [InlineData(Who.TenantRoot, Capability.GrantDeveloper, Refusal.NotDeveloper)]
-    [InlineData(Who.Anonymous, Capability.ReadRegistryAcrossTenants, Refusal.NotSignedIn)]
-    [InlineData(Who.SomeAccount, Capability.SearchAccountsAcrossTenants, Refusal.NotAllowed)]
-    [InlineData(Who.SomeAccount, Capability.ReadRegistryDetailsAcrossTenants, Refusal.NotAllowed)]
-    [InlineData(Who.Anonymous, Capability.ReadRegistryDetailsAcrossTenants, Refusal.NotSignedIn)]
-    [InlineData(Who.TenantRoot, Capability.EditCountries, Refusal.NotDeveloper)]
+    [InlineData(Who.Anonymous, Capability.SignedIn, Refusal.NotSignedIn)]
+    [InlineData(Who.Anonymous, Capability.SetUpAcrossTenants, Refusal.NotSignedIn)]
+    [InlineData(Who.Account, Capability.SetUpAcrossTenants, Refusal.NotConsoleOperator)]
     [InlineData(Who.Anonymous, Capability.EditCountries, Refusal.NotSignedIn)]
+    [InlineData(Who.Account, Capability.EditCountries, Refusal.NotDeveloper)]
+    [InlineData(Who.ConsoleOperator, Capability.EditCountries, Refusal.NotDeveloper)]
     public void A_refusal_of_an_action_of_the_platform_says_what_is_missing(
         Who who,
         Capability capability,
         Refusal expected
     )
     {
-        var person = People().Single(x => x.Who == who);
-
-        var verdict = AccessPolicy.Decide(capability, person.Caller, AccessScope.Platform);
+        var verdict = AccessPolicy.Decide(capability, StandingOf(who), PlaceState.Platform);
 
         Assert.False(verdict.IsAllowed);
         Assert.Equal(expected, verdict.Reason);
     }
 
     [Fact]
-    public void Public_views_are_allowed_to_everybody_and_say_nothing_when_they_are()
+    public void An_Event_is_not_created_in_a_Tenant_that_is_not_operational_by_anybody_who_may_create_one()
     {
-        var verdict = AccessPolicy.Decide(Capability.ReadPublicViews, Caller.Anonymous, AccessScope.Platform);
+        var notOperational = PlaceState.OfTenant(false);
+
+        var root = AccessPolicy.Decide(Capability.CreateEvent, StandingOf(Who.Root), notOperational);
+        var account = AccessPolicy.Decide(Capability.CreateEvent, StandingOf(Who.Account), notOperational);
+
+        Assert.Equal(Refusal.TenantNotOperational, root.Reason);
+        Assert.Equal(Refusal.NotRoot, account.Reason);
+    }
+
+    [Fact]
+    public void Public_views_are_allowed_to_everybody_in_any_place_and_say_nothing_when_they_are()
+    {
+        var verdict = AccessPolicy.Decide(
+            Capability.ReadPublicViews,
+            Standing.Anonymous,
+            PlaceState.OfEvent(EventStage.Live)
+        );
 
         Assert.True(verdict.IsAllowed);
         Assert.Null(verdict.Reason);
     }
 
     [Fact]
-    public void An_action_is_asked_about_in_the_scope_it_belongs_to()
+    public void An_action_is_asked_about_in_the_place_it_belongs_to()
     {
-        var caller = Caller.Of(TestId.Of(40));
+        var account = StandingOf(Who.Account);
 
         Assert.Throws<ArgumentException>(
-            () => AccessPolicy.Decide(Capability.ConfigureEvent, caller, AccessScope.ForTenant(TENANT, true))
+            () => AccessPolicy.Decide(Capability.ConfigureEvent, account, PlaceState.OfTenant(true))
         );
         Assert.Throws<ArgumentException>(
-            () => AccessPolicy.Decide(Capability.CreateEvent, caller, AccessScope.Platform)
+            () => AccessPolicy.Decide(Capability.CreateEvent, account, PlaceState.Platform)
         );
         Assert.Throws<ArgumentException>(
-            () =>
-                AccessPolicy.Decide(
-                    Capability.SeedTenantRoot,
-                    caller,
-                    AccessScope.ForEvent(TENANT, MAIN_OPERATOR_ID, EventStage.Live)
-                )
+            () => AccessPolicy.Decide(Capability.EditCountries, account, PlaceState.OfEvent(EventStage.Live))
         );
     }
 
     [Fact]
-    public void An_action_asked_about_in_the_wrong_scope_is_a_mistake_even_when_nobody_is_signed_in()
+    public void An_action_asked_about_in_the_wrong_place_is_a_mistake_even_when_nobody_is_signed_in()
     {
         Assert.Throws<ArgumentException>(
-            () => AccessPolicy.Decide(Capability.ConfigureEvent, Caller.Anonymous, AccessScope.Platform)
+            () => AccessPolicy.Decide(Capability.ConfigureEvent, Standing.Anonymous, PlaceState.Platform)
         );
     }
 
     [Fact]
-    public void The_roles_that_may_send_a_Snapshot_are_the_four_the_domain_names()
+    public void A_row_the_matrix_does_not_have_is_a_mistake()
     {
-        OfficialRole[] expected =
-        [
-            OfficialRole.Steward,
-            OfficialRole.ChiefSteward,
-            OfficialRole.GroundJury,
-            OfficialRole.GroundJuryPresident,
-        ];
-
-        Assert.Equal(expected, AccessPolicy.SnapshotOfficialRoles);
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => AccessPolicy.Decide((Capability)99, StandingOf(Who.Root), PlaceState.Platform)
+        );
     }
 
-    static AccessScope AboutTheEvent(EventStage stage, Person person)
+    static Standing StandingOf(Who who)
     {
-        return AccessScope.ForEvent(TENANT, MAIN_OPERATOR_ID, stage, person.Grants);
+        return who switch
+        {
+            Who.Anonymous => Standing.Anonymous,
+            Who.Account => Standing.Of(AccessLevel.Account),
+            Who.StaffWhoMayNotRecord => Standing.Of(AccessLevel.Staff, mayRecord: false),
+            Who.StaffWhoMayRecord => Standing.Of(AccessLevel.Staff, mayRecord: true),
+            Who.ConsoleOperator => Standing.Of(AccessLevel.ConsoleOperator),
+            Who.Root => Standing.Of(AccessLevel.Root),
+            _ => throw new ArgumentOutOfRangeException(nameof(who), who, "A person the table does not know."),
+        };
     }
 
-    /// <summary>
-    /// Everybody the matrix mentions, in relation to one Event of the Tenant whose Main Operator was appointed by a
-    /// Tenant Root.
-    /// </summary>
-    static Person[] People()
+    static Who[] Everybody()
     {
-        return
-        [
-            new(Who.Anonymous, Caller.Anonymous),
-            new(Who.SomeAccount, Caller.Of(TestId.Of(10))),
-            new(Who.Operator, Caller.Of(TestId.Of(11)), CallerGrants.AsOperator()),
-            new(Who.Steward, Caller.Of(TestId.Of(12)), CallerGrants.AsOfficial(OfficialRole.Steward)),
-            new(Who.ChiefSteward, Caller.Of(TestId.Of(13)), CallerGrants.AsOfficial(OfficialRole.ChiefSteward)),
-            new(Who.GroundJury, Caller.Of(TestId.Of(14)), CallerGrants.AsOfficial(OfficialRole.GroundJury)),
-            new(
-                Who.GroundJuryPresident,
-                Caller.Of(TestId.Of(15)),
-                CallerGrants.AsOfficial(OfficialRole.GroundJuryPresident)
-            ),
-            new(
-                Who.VeterinaryOfficial,
-                Caller.Of(TestId.Of(16)),
-                CallerGrants.AsOfficial(OfficialRole.VeterinaryCommissionMember)
-            ),
-            new(Who.MainOperator, Caller.Of(MAIN_OPERATOR_ID, openMainOperatorIn: [TENANT])),
-            new(Who.TenantRoot, Caller.Of(TENANT_ROOT_ID, tenantRootIn: [TENANT])),
-            new(Who.TenantRootOfAnotherTenant, Caller.Of(TestId.Of(17), tenantRootIn: [OTHER_TENANT])),
-            new(Who.MainOperatorOfAnotherEventOfTheTenant, Caller.Of(TestId.Of(18), openMainOperatorIn: [TENANT])),
-            new(Who.MainOperatorOfAnotherTenantsEvent, Caller.Of(TestId.Of(19), openMainOperatorIn: [OTHER_TENANT])),
-            new(Who.Developer, Caller.Of(TestId.Of(20), isDeveloper: true)),
-        ];
+        return [.. Enum.GetValues<Who>()];
     }
 
     static Capability[] EventCapabilities()
@@ -403,49 +252,11 @@ public sealed class AccessPolicyTests
             Capability.SendSnapshot,
             Capability.ConfigureEvent,
             Capability.EditSetup,
-            Capability.EditEventData,
-            Capability.ReadSetup,
-            Capability.AssignMainOperator,
-            Capability.HandOverMainOperator,
-            Capability.LinkAccounts,
-            Capability.EditEventBranding,
-            Capability.ResetEvent,
+            Capability.ReadConfiguration,
+            Capability.RunEvent,
+            Capability.AssignConsoleOperators,
             Capability.DeleteEvent,
         ];
-    }
-
-    static Who[] Everybody()
-    {
-        return [.. Enum.GetValues<Who>()];
-    }
-
-    static Who[] SignedIn()
-    {
-        return [.. Everybody().Where(x => x != Who.Anonymous)];
-    }
-
-    static Who[] Staff()
-    {
-        return
-        [
-            Who.Operator,
-            Who.Steward,
-            Who.ChiefSteward,
-            Who.GroundJury,
-            Who.GroundJuryPresident,
-            Who.VeterinaryOfficial,
-            Who.MainOperator,
-        ];
-    }
-
-    static Who[] WhoCanSnapshot()
-    {
-        return [Who.Operator, Who.Steward, Who.ChiefSteward, Who.GroundJury, Who.GroundJuryPresident, Who.MainOperator];
-    }
-
-    static Who[] WhoHoldsAuthorityInTheTenant()
-    {
-        return [Who.TenantRoot, Who.MainOperator, Who.MainOperatorOfAnotherEventOfTheTenant, Who.Developer];
     }
 
     /// <summary>
@@ -454,41 +265,34 @@ public sealed class AccessPolicyTests
     /// </summary>
     static Dictionary<(Capability, EventStage), Who[]> EventRows()
     {
+        Who[] staff = [Who.StaffWhoMayNotRecord, Who.StaffWhoMayRecord, Who.ConsoleOperator, Who.Root];
+        Who[] whoMayRecord = [Who.StaffWhoMayRecord, Who.ConsoleOperator, Who.Root];
+        Who[] whoWorkTheConsole = [Who.ConsoleOperator, Who.Root];
+        Who[] rootAlone = [Who.Root];
         return new()
         {
-            // "See how times were recorded: Staff: Officials, Operators, the Main Operator". The Developer has every right.
-            [(Capability.SeeTimeEvents, EventStage.Unstarted)] = [.. Staff(), Who.Developer],
-            [(Capability.SeeTimeEvents, EventStage.Live)] = [.. Staff(), Who.Developer],
-            [(Capability.SeeTimeEvents, EventStage.Historic)] = [.. Staff(), Who.Developer],
-            // "Send a Snapshot: An Official in {Steward, ChiefSteward, GroundJury, GroundJuryPresident}, any Operator, the Main
-            // Operator". Only a Live Event takes one, and the Developer's every right stops short of acting as its Main Operator.
-            [(Capability.SendSnapshot, EventStage.Live)] = WhoCanSnapshot(),
-            // "Configure an Event and use the Console: The Main Operator".
-            [(Capability.ConfigureEvent, EventStage.Unstarted)] = [Who.MainOperator, Who.Developer],
-            [(Capability.ConfigureEvent, EventStage.Live)] = [Who.MainOperator],
-            // The Setup is what the Event is configured with before it starts: the Main Operator edits it until the Event
-            // starts and then the Console works on the copies in the Core, so a started Event's Setup is changed by nobody.
-            [(Capability.EditSetup, EventStage.Unstarted)] = [Who.MainOperator, Who.Developer],
-            // What a started Event keeps is what the Console works on ("use the Console: The Main Operator"): only a Live
-            // Event has it to change, and the Developer's every right stops short of acting as the Main Operator of one.
-            [(Capability.EditEventData, EventStage.Live)] = [Who.MainOperator],
-            // Reading a Setup is for the people who run the Event and the Tenant that holds it, at every stage.
-            [(Capability.ReadSetup, EventStage.Unstarted)] = [Who.MainOperator, Who.TenantRoot, Who.Developer],
-            [(Capability.ReadSetup, EventStage.Live)] = [Who.MainOperator, Who.TenantRoot, Who.Developer],
-            [(Capability.ReadSetup, EventStage.Historic)] = [Who.MainOperator, Who.TenantRoot, Who.Developer],
-            // "Assign the Main Operator: The Tenant Root while the Event is not [yet] Live; once Live, only the Main Operator
-            // hands it over".
-            [(Capability.AssignMainOperator, EventStage.Unstarted)] = [Who.TenantRoot, Who.Developer],
-            [(Capability.HandOverMainOperator, EventStage.Live)] = [Who.MainOperator],
-            // "Link accounts to Officials and Operators: The Main Operator".
-            [(Capability.LinkAccounts, EventStage.Unstarted)] = [Who.MainOperator, Who.Developer],
-            [(Capability.LinkAccounts, EventStage.Live)] = [Who.MainOperator],
-            // "an Event's branding override: the Main Operator".
-            [(Capability.EditEventBranding, EventStage.Unstarted)] = [Who.MainOperator, Who.Developer],
-            [(Capability.EditEventBranding, EventStage.Live)] = [Who.MainOperator],
-            // "The Main Operator may reset while Live; a Tenant Root may delete before it starts; neither once Historic".
-            [(Capability.ResetEvent, EventStage.Live)] = [Who.MainOperator],
-            [(Capability.DeleteEvent, EventStage.Unstarted)] = [Who.TenantRoot, Who.Developer],
+            // "See how times were recorded: Staff", and Root holds everything below it.
+            [(Capability.SeeTimeEvents, EventStage.Unstarted)] = staff,
+            [(Capability.SeeTimeEvents, EventStage.Live)] = staff,
+            [(Capability.SeeTimeEvents, EventStage.Historic)] = staff,
+            // "Send a Snapshot: Staff whose grant may record", while the Event is Live.
+            [(Capability.SendSnapshot, EventStage.Live)] = whoMayRecord,
+            // "Configure an Event: Console Operator", until the Event ends.
+            [(Capability.ConfigureEvent, EventStage.Unstarted)] = whoWorkTheConsole,
+            [(Capability.ConfigureEvent, EventStage.Live)] = whoWorkTheConsole,
+            // The Setup is what the Event is configured with before it starts, and the Console works on copies after.
+            [(Capability.EditSetup, EventStage.Unstarted)] = whoWorkTheConsole,
+            // "Read the Setup and who has access: Console Operator", at every stage.
+            [(Capability.ReadConfiguration, EventStage.Unstarted)] = whoWorkTheConsole,
+            [(Capability.ReadConfiguration, EventStage.Live)] = whoWorkTheConsole,
+            [(Capability.ReadConfiguration, EventStage.Historic)] = whoWorkTheConsole,
+            // "Run the Event: edit what it keeps, reset it", only while it is Live.
+            [(Capability.RunEvent, EventStage.Live)] = whoWorkTheConsole,
+            // "Assign and remove Console Operators: Root", until the Event ends.
+            [(Capability.AssignConsoleOperators, EventStage.Unstarted)] = rootAlone,
+            [(Capability.AssignConsoleOperators, EventStage.Live)] = rootAlone,
+            // "Delete an Event: Root", before it starts.
+            [(Capability.DeleteEvent, EventStage.Unstarted)] = rootAlone,
         };
     }
 
@@ -497,79 +301,47 @@ public sealed class AccessPolicyTests
     {
         return new()
         {
-            // "Create an Event: A Tenant Root".
-            [Capability.CreateEvent] = [Who.TenantRoot, Who.Developer],
-            // "Edit the Tenant's registry: A Tenant Root, and the Main Operator of any Event of that Tenant that is not yet Historic".
-            [Capability.EditRegistry] = WhoHoldsAuthorityInTheTenant(),
-            // "Tenant rules and Tenant branding: A Tenant Root".
-            [Capability.EditTenantRules] = [Who.TenantRoot, Who.Developer],
-            [Capability.EditTenantBranding] = [Who.TenantRoot, Who.Developer],
-            // "Search accounts by name: A Tenant Root, the Main Operator".
-            [Capability.SearchAccounts] = WhoHoldsAuthorityInTheTenant(),
+            // "Create an Event: Root".
+            [Capability.CreateEvent] = [Who.Root],
+            // "Tenant rules and Tenant branding: Root".
+            [Capability.EditTenant] = [Who.Root],
+            // "Edit the Tenant's registry, search its accounts by name: Console Operator", which is one of any Event of the Tenant
+            // that has not ended, and above that Root.
+            [Capability.EditRegistry] = [Who.ConsoleOperator, Who.Root],
         };
     }
 
     /// <summary>The actions that belong to no Tenant and no Event.</summary>
     static Dictionary<Capability, Who[]> PlatformRows()
     {
-        Who[] whoSetsAnEventUp =
-        [
-            Who.TenantRoot,
-            Who.TenantRootOfAnotherTenant,
-            Who.MainOperator,
-            Who.MainOperatorOfAnotherEventOfTheTenant,
-            Who.MainOperatorOfAnotherTenantsEvent,
-            Who.Developer,
-        ];
         return new()
         {
-            // "Read public Event views: Anyone, signed in or not".
+            // "Read public Event views: Anonymous", which is anybody.
             [Capability.ReadPublicViews] = Everybody(),
-            // "Read an Athlete's or Horse's history, search the registry across Tenants: Any signed-in account".
-            [Capability.ReadRegistryAcrossTenants] = SignedIn(),
-            // The account search "reaches across Tenants only when the caller asks for it explicitly": for the people who may
-            // search at all, in any Tenant.
-            [Capability.SearchAccountsAcrossTenants] = whoSetsAnEventUp,
-            // The whole row of an Athlete or a Horse of another Tenant (its FEI ID, its club, its country), and a search that matches the FEI ID:
-            // the people who set an Event up, which the Setup needs. Any other signed-in account reads the name and the name in English.
-            [Capability.ReadRegistryDetailsAcrossTenants] = whoSetsAnEventUp,
-            // "Seed a Tenant Root, grant Developer: The Developer, by command".
-            [Capability.SeedTenantRoot] = [Who.Developer],
-            [Capability.GrantDeveloper] = [Who.Developer],
+            // What an account does for itself or reads of the registries: any signed-in account.
+            [Capability.SignedIn] =
+            [
+                Who.Account,
+                Who.StaffWhoMayNotRecord,
+                Who.StaffWhoMayRecord,
+                Who.ConsoleOperator,
+                Who.Root,
+            ],
+            // The whole row of a rider of another Tenant, a search that matches the FEI ID, the account search across Tenants:
+            // the people who set an Event up.
+            [Capability.SetUpAcrossTenants] = [Who.ConsoleOperator, Who.Root],
             // The countries are the platform's reference data, which the owner of the platform keeps.
-            [Capability.EditCountries] = [Who.Developer],
+            [Capability.EditCountries] = [Who.Root],
         };
-    }
-
-    sealed class Person
-    {
-        public Person(Who who, Caller caller, CallerGrants? grants = null)
-        {
-            Who = who;
-            Caller = caller;
-            Grants = grants ?? CallerGrants.None;
-        }
-
-        public Who Who { get; }
-        public Caller Caller { get; }
-        public CallerGrants Grants { get; }
     }
 
     public enum Who
     {
         Anonymous,
-        SomeAccount,
-        Operator,
-        Steward,
-        ChiefSteward,
-        GroundJury,
-        GroundJuryPresident,
-        VeterinaryOfficial,
-        MainOperator,
-        TenantRoot,
-        TenantRootOfAnotherTenant,
-        MainOperatorOfAnotherEventOfTheTenant,
-        MainOperatorOfAnotherTenantsEvent,
-        Developer,
+        Account,
+        StaffWhoMayNotRecord,
+        StaffWhoMayRecord,
+        ConsoleOperator,
+        Root,
     }
 }

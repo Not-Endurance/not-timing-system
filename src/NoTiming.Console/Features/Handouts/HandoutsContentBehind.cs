@@ -5,7 +5,7 @@ using NTS.Domain.Access;
 namespace NoTiming.Console.Features.Handouts;
 
 /// <summary>
-/// The Handouts of a Live Event (#646): the page the Main Operator prints them from. The address names the Event, and the Api
+/// The Handouts of a Live Event (#646): the page the Console Operator prints them from. The address names the Event, and the Api
 /// says who runs it (the capabilities of the Event), so a person who does not, and an Event that has not started, are shown
 /// nothing: the Console offers no more than the Api would take. An Event that has ended is not shown the page either, and is
 /// told so by the view (#631).
@@ -16,7 +16,7 @@ public class HandoutsContentBehind : NStatefulComponent
     IConsoleEvents Events { get; set; } = default!;
 
     protected bool MayRun =>
-        Events.Events.Any(x => x.Id == EventId && x is { IsMainOperator: true } && x.Stage != EventStage.Unstarted);
+        Events.Events.Any(x => x.Id == EventId && x is { RunsTheConsole: true } && x.Stage != EventStage.Unstarted);
 
     [Parameter]
     public Guid EventId { get; set; }

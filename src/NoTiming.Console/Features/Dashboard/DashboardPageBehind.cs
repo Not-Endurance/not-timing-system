@@ -8,7 +8,7 @@ using NTS.Domain.Core.Aggregates;
 namespace NoTiming.Console.Features.Dashboard;
 
 /// <summary>
-/// The dashboard of the Event the page opened: the Participation the Main Operator works on is chosen by its number or by
+/// The dashboard of the Event the page opened: the Participation the Console Operator works on is chosen by its number or by
 /// what is typed, and its times, its Representation and Inspection requests and its elimination are the panels beside it.
 /// </summary>
 public class DashboardPageBehind : NStatefulComponent

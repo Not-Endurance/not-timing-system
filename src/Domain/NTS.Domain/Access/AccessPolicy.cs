@@ -1,234 +1,111 @@
-using NTS.Domain.Enums;
-
 namespace NTS.Domain.Access;
 
 /// <summary>
-/// The access matrix of ADR-0012 as one pure function: for a caller and the place an action is done in, whether the
-/// action is allowed and, if it is not, what is missing. Every write route and the capabilities endpoint ask this and
-/// nothing else, so what a screen offers and what the server accepts cannot differ.
-/// <para>
-/// A role is checked before the stage of the Event, so a person who may not do an action is only told that. The
-/// Developer holds every right across Tenants except acting as the Main Operator of a Live Event: what the Main
-/// Operator does there is the Main Operator's alone, and a Live Event whose Main Operator is locked out is a database
-/// fix and not an action of the product. Being the Main Operator by appointment is a role like any other, whoever holds
-/// it.
-/// </para>
+/// The access matrix of ADR-0012 as one pure function: whether who stands at a place may do an action there, at the
+/// stage the place is in. Every route and the capabilities answers ask this and nothing else, so what a screen offers
+/// and what the server accepts cannot differ.
 /// </summary>
 public static class AccessPolicy
 {
-    static readonly EventStage[] BEFORE_THE_END = [EventStage.Unstarted, EventStage.Live];
     static readonly EventStage[] ANY_STAGE = [EventStage.Unstarted, EventStage.Live, EventStage.Historic];
+    static readonly EventStage[] BEFORE_THE_END = [EventStage.Unstarted, EventStage.Live];
     static readonly EventStage[] UNSTARTED = [EventStage.Unstarted];
     static readonly EventStage[] LIVE = [EventStage.Live];
+    static readonly EventStage[] NO_STAGE = [];
 
-    public static Verdict Decide(Capability capability, Caller caller, AccessScope scope)
+    public static Verdict Decide(Capability capability, Standing standing, PlaceState state)
     {
-        RequireScope(capability, scope);
-        if (capability == Capability.ReadPublicViews)
+        var requirement = RequirementOf(capability);
+        if (requirement.Level == AccessLevel.Anonymous)
         {
             return Verdict.Allowed;
         }
 
-        if (!caller.IsSignedIn)
+        // An action is asked about in the place it belongs to: asking about it anywhere else is a mistake of the caller of
+        // the policy and not a refusal.
+        if (requirement.Place != state.Place)
+        {
+            throw new ArgumentException($"{capability} is not an action of the place '{state.Place}'.", nameof(state));
+        }
+
+        if (standing.Level == AccessLevel.Anonymous)
         {
             return Verdict.Refused(Refusal.NotSignedIn);
         }
 
-        return scope.Kind switch
+        if (!Holds(standing, requirement))
         {
-            ScopeKind.Event => DecideForEvent(capability, caller, scope),
-            ScopeKind.Tenant => DecideForTenant(capability, caller, scope),
-            _ => DecideForPlatform(capability, caller),
-        };
-    }
+            return Verdict.Refused(MissingLevel(requirement));
+        }
 
-    /// <summary>Whether the caller is the one Main Operator of the Event. An Event that has none has nobody.</summary>
-    public static bool IsMainOperator(Caller caller, AccessScope scope)
-    {
-        return scope.Kind == ScopeKind.Event
-            && caller.AccountId is { } account
-            && scope.MainOperatorId is { } mainOperator
-            && account == mainOperator;
-    }
-
-    /// <summary>
-    /// The roles of an Official that may send a Snapshot. Any Operator may, and so may the Main Operator; the other
-    /// Officials, such as the veterinary commission, are Staff who see how times were recorded but do not record them.
-    /// </summary>
-    public static IReadOnlyList<OfficialRole> SnapshotOfficialRoles { get; } =
-        [OfficialRole.Steward, OfficialRole.ChiefSteward, OfficialRole.GroundJury, OfficialRole.GroundJuryPresident];
-
-    static Verdict DecideForEvent(Capability capability, Caller caller, AccessScope scope)
-    {
-        var isMainOperator = IsMainOperator(caller, scope);
-        var isTenantRoot = caller.TenantRootIn.Contains(scope.TenantId!);
-        var developerMayAct = caller.IsDeveloper && scope.Stage != EventStage.Live;
-
-        return capability switch
+        if (requirement.NeedsOperationalTenant && !state.IsOperational)
         {
-            Capability.SeeTimeEvents => Check(
-                isMainOperator || scope.CallerGrants.IsStaff || caller.IsDeveloper,
-                Refusal.NotAllowed,
-                scope,
-                ANY_STAGE
-            ),
-            Capability.SendSnapshot => Check(
-                isMainOperator || scope.CallerGrants.MaySendSnapshot,
-                Refusal.NotAllowed,
-                scope,
-                LIVE
-            ),
-            Capability.ConfigureEvent or Capability.LinkAccounts or Capability.EditEventBranding => Check(
-                isMainOperator || developerMayAct,
-                Refusal.NotMainOperator,
-                scope,
-                BEFORE_THE_END
-            ),
-            Capability.EditSetup => Check(isMainOperator || developerMayAct, Refusal.NotMainOperator, scope, UNSTARTED),
-            Capability.EditEventData => Check(isMainOperator || developerMayAct, Refusal.NotMainOperator, scope, LIVE),
-            Capability.ReadSetup => Check(
-                isMainOperator || isTenantRoot || caller.IsDeveloper,
-                Refusal.NotAllowed,
-                scope,
-                ANY_STAGE
-            ),
-            Capability.AssignMainOperator or Capability.DeleteEvent => Check(
-                isTenantRoot || caller.IsDeveloper,
-                Refusal.NotTenantRoot,
-                scope,
-                UNSTARTED
-            ),
-            Capability.HandOverMainOperator or Capability.ResetEvent => Check(
-                isMainOperator,
-                Refusal.NotMainOperator,
-                scope,
-                LIVE
-            ),
-            _ => throw NotAnActionOf(capability, ScopeKind.Event),
-        };
-    }
+            return Verdict.Refused(Refusal.TenantNotOperational);
+        }
 
-    static Verdict DecideForTenant(Capability capability, Caller caller, AccessScope scope)
-    {
-        var tenantId = scope.TenantId!;
-        var isTenantRoot = caller.TenantRootIn.Contains(tenantId);
-        var hasAuthority = isTenantRoot || caller.OpenMainOperatorIn.Contains(tenantId);
-
-        return capability switch
+        if (requirement.Place == Place.Event && !requirement.Stages.Contains(state.Stage))
         {
-            Capability.CreateEvent => CreateEvent(isTenantRoot || caller.IsDeveloper, scope),
-            Capability.EditTenantRules or Capability.EditTenantBranding => Role(
-                isTenantRoot || caller.IsDeveloper,
-                Refusal.NotTenantRoot
-            ),
-            Capability.EditRegistry or Capability.SearchAccounts => Role(
-                hasAuthority || caller.IsDeveloper,
-                Refusal.NotAllowed
-            ),
-            _ => throw NotAnActionOf(capability, ScopeKind.Tenant),
-        };
+            return Verdict.Refused(MissingStage(state.Stage));
+        }
+
+        return Verdict.Allowed;
     }
 
-    static Verdict DecideForPlatform(Capability capability, Caller caller)
+    public static Requirement RequirementOf(Capability capability)
     {
         return capability switch
         {
-            Capability.ReadRegistryAcrossTenants => Verdict.Allowed,
-            Capability.SearchAccountsAcrossTenants or Capability.ReadRegistryDetailsAcrossTenants => Role(
-                caller.TenantRootIn.Count > 0 || caller.OpenMainOperatorIn.Count > 0 || caller.IsDeveloper,
-                Refusal.NotAllowed
+            Capability.ReadPublicViews => new Requirement(Place.Platform, AccessLevel.Anonymous, NO_STAGE),
+            Capability.SignedIn => new Requirement(Place.Platform, AccessLevel.Account, NO_STAGE),
+            Capability.SeeTimeEvents => new Requirement(Place.Event, AccessLevel.Staff, ANY_STAGE),
+            Capability.SendSnapshot => new Requirement(Place.Event, AccessLevel.Staff, LIVE, mustRecord: true),
+            Capability.ConfigureEvent => new Requirement(Place.Event, AccessLevel.ConsoleOperator, BEFORE_THE_END),
+            Capability.EditSetup => new Requirement(Place.Event, AccessLevel.ConsoleOperator, UNSTARTED),
+            Capability.ReadConfiguration => new Requirement(Place.Event, AccessLevel.ConsoleOperator, ANY_STAGE),
+            Capability.RunEvent => new Requirement(Place.Event, AccessLevel.ConsoleOperator, LIVE),
+            Capability.AssignConsoleOperators => new Requirement(Place.Event, AccessLevel.Root, BEFORE_THE_END),
+            Capability.DeleteEvent => new Requirement(Place.Event, AccessLevel.Root, UNSTARTED),
+            Capability.CreateEvent => new Requirement(
+                Place.Tenant,
+                AccessLevel.Root,
+                NO_STAGE,
+                needsOperationalTenant: true
             ),
-            Capability.SeedTenantRoot or Capability.GrantDeveloper or Capability.EditCountries => Role(
-                caller.IsDeveloper,
-                Refusal.NotDeveloper
+            Capability.EditTenant => new Requirement(Place.Tenant, AccessLevel.Root, NO_STAGE),
+            Capability.EditRegistry => new Requirement(Place.Tenant, AccessLevel.ConsoleOperator, NO_STAGE),
+            Capability.SetUpAcrossTenants => new Requirement(Place.Platform, AccessLevel.ConsoleOperator, NO_STAGE),
+            Capability.EditCountries => new Requirement(Place.Platform, AccessLevel.Root, NO_STAGE),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(capability),
+                capability,
+                "A row the matrix does not have."
             ),
-            _ => throw NotAnActionOf(capability, ScopeKind.Platform),
         };
     }
 
-    static Verdict CreateEvent(bool mayCreate, AccessScope scope)
+    static bool Holds(Standing standing, Requirement requirement)
     {
-        if (!mayCreate)
-        {
-            return Verdict.Refused(Refusal.NotTenantRoot);
-        }
-
-        return scope.IsOperational ? Verdict.Allowed : Verdict.Refused(Refusal.TenantNotOperational);
+        return standing.Level >= requirement.Level && (!requirement.MustRecord || standing.MayRecord);
     }
 
-    static Verdict Role(bool holds, Refusal ifNot)
+    /// <summary>The refusal that names the Level a row needs: the one a person who lacks it is told. At the platform Root is the Developer.</summary>
+    static Refusal MissingLevel(Requirement requirement)
     {
-        return holds ? Verdict.Allowed : Verdict.Refused(ifNot);
-    }
-
-    /// <summary>The role first, then the stage of the Event: an Event that is not at a stage that takes the action refuses it.</summary>
-    static Verdict Check(bool holdsRole, Refusal ifNot, AccessScope scope, EventStage[] stages)
-    {
-        if (!holdsRole)
+        return requirement.Level switch
         {
-            return Verdict.Refused(ifNot);
-        }
-
-        if (stages.Contains(scope.Stage))
-        {
-            return Verdict.Allowed;
-        }
-
-        return Verdict.Refused(
-            scope.Stage switch
-            {
-                EventStage.Unstarted => Refusal.EventNotStarted,
-                EventStage.Live => Refusal.EventStarted,
-                _ => Refusal.EventEnded,
-            }
-        );
-    }
-
-    /// <summary>
-    /// An action is asked about in the place it belongs to: a Snapshot is sent to an Event, an Event is created in a
-    /// Tenant. Asking about it anywhere else is a mistake of the caller of the policy and not a refusal.
-    /// </summary>
-    static void RequireScope(Capability capability, AccessScope scope)
-    {
-        if (capability == Capability.ReadPublicViews)
-        {
-            return;
-        }
-
-        var expected = ScopeOf(capability);
-        if (scope.Kind != expected)
-        {
-            throw NotAnActionOf(capability, scope.Kind);
-        }
-    }
-
-    static ScopeKind ScopeOf(Capability capability)
-    {
-        return capability switch
-        {
-            Capability.SeeTimeEvents
-            or Capability.SendSnapshot
-            or Capability.ConfigureEvent
-            or Capability.EditSetup
-            or Capability.EditEventData
-            or Capability.ReadSetup
-            or Capability.AssignMainOperator
-            or Capability.HandOverMainOperator
-            or Capability.LinkAccounts
-            or Capability.EditEventBranding
-            or Capability.ResetEvent
-            or Capability.DeleteEvent => ScopeKind.Event,
-            Capability.CreateEvent
-            or Capability.EditRegistry
-            or Capability.EditTenantRules
-            or Capability.EditTenantBranding
-            or Capability.SearchAccounts => ScopeKind.Tenant,
-            _ => ScopeKind.Platform,
+            AccessLevel.ConsoleOperator => Refusal.NotConsoleOperator,
+            AccessLevel.Root => requirement.Place == Place.Platform ? Refusal.NotDeveloper : Refusal.NotRoot,
+            _ => Refusal.NotAllowed,
         };
     }
 
-    static ArgumentException NotAnActionOf(Capability capability, ScopeKind kind)
+    static Refusal MissingStage(EventStage stage)
     {
-        return new ArgumentException($"{capability} is not an action of the scope '{kind}'.", nameof(capability));
+        return stage switch
+        {
+            EventStage.Unstarted => Refusal.EventNotStarted,
+            EventStage.Live => Refusal.EventStarted,
+            _ => Refusal.EventEnded,
+        };
     }
 }

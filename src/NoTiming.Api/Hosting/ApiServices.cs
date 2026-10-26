@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Branding;
 using NoTiming.Api.Features.EventData;
@@ -59,7 +60,7 @@ internal static class ApiServices
         services.AddSingleton<EventGrantStore>();
         services.AddSingleton<GrantInvitations>();
         services.AddHostedService<TenancyIndexes>();
-        services.AddSingleton<CallerReader>();
+        services.AddSingleton<StandingReader>();
         services.AddSingleton<GlobalCollections>();
         services.AddSingleton<ReferenceAccess>();
         services.AddSingleton<EventDataAccess>();

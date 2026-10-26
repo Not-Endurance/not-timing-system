@@ -334,13 +334,15 @@ namespace NTS.Localization
         public static string Create_event_string => LocalizeString(nameof(Create_event_string));
         public static string No_events_to_run_string => LocalizeString(nameof(No_events_to_run_string));
         public static string Results_string => LocalizeString(nameof(Results_string));
-        public static string Assign_main_operator_string => LocalizeString(nameof(Assign_main_operator_string));
-        public static string Hand_over_string => LocalizeString(nameof(Hand_over_string));
-        public static string Hand_over_event_string => LocalizeString(nameof(Hand_over_event_string));
+        public static string Console_operators_string => LocalizeString(nameof(Console_operators_string));
+        public static string Console_operators_description_string =>
+            LocalizeString(nameof(Console_operators_description_string));
+        public static string Console_operators_empty_string => LocalizeString(nameof(Console_operators_empty_string));
+        public static string Assign_console_operator_string => LocalizeString(nameof(Assign_console_operator_string));
         public static string Find_account_string => LocalizeString(nameof(Find_account_string));
-        public static string Main_operator_string => LocalizeString(nameof(Main_operator_string));
-        public static string Main_operator_assigned_string => LocalizeString(nameof(Main_operator_assigned_string));
-        public static string Event_handed_over_string => LocalizeString(nameof(Event_handed_over_string));
+        public static string Console_operator_assigned_string =>
+            LocalizeString(nameof(Console_operator_assigned_string));
+        public static string Console_operator_removed_string => LocalizeString(nameof(Console_operator_removed_string));
         public static string Event_started_string => LocalizeString(nameof(Event_started_string));
         public static string Event_was_reset_string => LocalizeString(nameof(Event_was_reset_string));
         public static string Close_string => LocalizeString(nameof(Close_string));

@@ -25,14 +25,14 @@
                         Immediate="true"
                         />
 
-            @if (CanEditRules)
+            @if (MayEdit)
             {
                 <MudStack Row Justify="Justify.FlexEnd">
                     <NButtonPrimary Text="@Save_string" OnClick="Save" />
                 </MudStack>
             }
 
-            @if (CanEditBranding)
+            @if (MayEdit)
             {
                 <BrandingPanel CanEdit="true" />
             }

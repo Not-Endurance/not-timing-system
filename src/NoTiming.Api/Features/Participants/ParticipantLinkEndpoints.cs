@@ -6,6 +6,7 @@ using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
 using NTS.Contracts.Features.Participants;
+using NTS.Domain.Access;
 
 namespace NoTiming.Api.Features.Participants;
 
@@ -188,12 +189,7 @@ internal static class ParticipantLinkEndpoints
         CancellationToken cancellationToken
     )
     {
-        var found = await reads.FindParticipantsAsync(
-            AccountRoles.CallerOf(user),
-            kind,
-            [participantId],
-            cancellationToken
-        );
+        var found = await reads.FindParticipantsAsync(Standing.Account, kind, [participantId], cancellationToken);
         return found.FirstOrDefault();
     }
 

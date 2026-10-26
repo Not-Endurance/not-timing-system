@@ -10,7 +10,7 @@ namespace NoTiming.Ui.Features.Console;
 /// <summary>
 /// The timeline of the selected Participation in the Console (#619, ADR-0005): its time events by Phase, each with the name of
 /// the account that recorded it, which the Api tells to the people who may see how times were recorded and which a time event
-/// does not carry. What a Participation tells the Main Operator is what is stored, so the events are the dashboard's own; they
+/// does not carry. What a Participation tells the Console Operator is what is stored, so the events are the dashboard's own; they
 /// are read again from it each time the timeline is read.
 /// </summary>
 public class ConsoleTimeline : IConsoleTimeline, IScoped

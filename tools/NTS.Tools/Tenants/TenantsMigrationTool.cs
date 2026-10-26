@@ -27,12 +27,7 @@ public static class TenantsMigrationTool
         output.WriteLine($"Database: {options.Database}");
         var report = await TenantsMigration.Run(
             database,
-            new TenantsOptions
-            {
-                Apply = options.Apply,
-                Environment = options.Environment,
-                MainOperatorEmail = options.MainOperator,
-            },
+            new TenantsOptions { Apply = options.Apply, Environment = options.Environment },
             now ?? TimeProvider.System.GetUtcNow()
         );
         report.WriteTo(output);
@@ -54,9 +49,6 @@ public static class TenantsMigrationTool
                     break;
                 case "--environment" when i + 1 < args.Length:
                     options.Environment = args[++i];
-                    break;
-                case "--main-operator" when i + 1 < args.Length:
-                    options.MainOperator = args[++i];
                     break;
                 case "--apply":
                     options.Apply = true;
@@ -88,24 +80,21 @@ public static class TenantsMigrationTool
         output.WriteLine(
             """
             Usage:
-              dotnet run --project tools/NTS.Tools -- migrate-tenants --connection-string <mongo> [--database nts] [--environment <name>] [--main-operator <email>] [--apply]
+              dotnet run --project tools/NTS.Tools -- migrate-tenants --connection-string <mongo> [--database nts] [--environment <name>] [--apply]
 
             Turns the data of before Tenants into the data of Tenants (ADR-0012): marks the database with its environment,
             completes the accounts with the fields of Identity (the address unconfirmed), places each account in the Tenant of
             the country of its profile, makes the Tenants, stamps every document a Tenant owns with the Tenant of Bulgaria,
-            gives every Event that is not yet Historic its Tenant Root as Main Operator, turns the Officials and Operators that
-            were linked by email into grants or pending invitations, finds the state a person kept again under their account,
-            drops the settings and makes the indexes. A dry run reports all of it and changes nothing. --apply needs
-            --environment and refuses, writing nothing, while two accounts share an email, Bulgaria is not among the countries,
-            or the database is marked as another environment. Running it again changes nothing, and it is run again once a
-            Tenant Root has been seeded, which is what gives the Events their Main Operator.
+            turns the Officials and Operators that were linked by email into grants or pending invitations, finds the state a
+            person kept again under their account, drops the settings and makes the indexes. A dry run reports all of it and
+            changes nothing. --apply needs --environment and refuses, writing nothing, while two accounts share an email,
+            Bulgaria is not among the countries, or the database is marked as another environment. Running it again changes
+            nothing. It assigns nobody to run an Event: Root runs it until Root assigns a Console Operator.
 
             Options:
               --connection-string <mongo>   MongoDB connection string.
               --database <name>             Database name. Defaults to nts.
               --environment <name>          Production, Staging or Development: what the database is. Written as its marker.
-              --main-operator <email>       The account that becomes the Main Operator of the Events that have none, in place of
-                                            the Tenant Root of their Tenant.
               --apply                       Persist changes. Omit for a dry run.
             """
         );
@@ -116,7 +105,6 @@ public static class TenantsMigrationTool
         public string? ConnectionString { get; set; }
         public string Database { get; set; } = DEFAULT_DATABASE;
         public string? Environment { get; set; }
-        public string? MainOperator { get; set; }
         public bool Apply { get; set; }
         public bool ShowHelp { get; set; }
         public bool IsValid { get; set; } = true;

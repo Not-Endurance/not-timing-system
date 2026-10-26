@@ -84,11 +84,11 @@ public sealed class WitnessAccessOfTheFollowedEventTests : IClassFixture<MongoFi
     async Task<(Guid EventId, TenancySeed.Person Official)> SceneAsync(ApiFactory api, HttpClient client)
     {
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);

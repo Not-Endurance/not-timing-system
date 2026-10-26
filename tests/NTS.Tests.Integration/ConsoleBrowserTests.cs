@@ -65,7 +65,7 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
     }
 
     [Fact]
-    public async Task A_Tenant_Root_makes_an_Event_and_assigns_its_Main_Operator_who_then_runs_it_from_the_Console()
+    public async Task A_Tenant_Root_makes_an_Event_and_assigns_a_Console_Operator_who_then_runs_it_from_the_Console_beside_it()
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
@@ -86,14 +86,20 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
 
         var row = page.GetByRole(AriaRole.Row).Filter(new() { HasText = "The Cup" });
         await Expect(row).ToBeVisibleAsync(Loaded());
-        await Expect(row.GetByRole(AriaRole.Button, new() { Name = "Setup", Exact = true })).ToBeVisibleAsync(); // it runs it, as its maker
-        await row.GetByRole(AriaRole.Button, new() { Name = "Assign the Main Operator" }).ClickAsync();
-        await page.GetByLabel("Find an account by name").FillAsync("Boris Iv");
-        await page.GetByText("Boris Ivanov").First.ClickAsync();
-        await page.GetByRole(AriaRole.Button, new() { Name = "Confirm", Exact = true }).ClickAsync();
+        await Expect(row.GetByRole(AriaRole.Button, new() { Name = "Setup", Exact = true })).ToBeVisibleAsync(); // it runs it, as Root
+        await row.GetByRole(AriaRole.Button, new() { Name = "Console Operators" }).ClickAsync();
+        var dialog = page.GetByRole(AriaRole.Dialog);
+        await Expect(dialog.GetByTestId("console-operators-empty")).ToBeVisibleAsync(Loaded()); // nobody is assigned when an Event is made
+        await dialog.GetByLabel("Find an account by name").FillAsync("Boris Iv");
+        await page.Locator(".mud-popover-open .mud-list-item")
+            .Filter(new() { HasText = "Boris Ivanov" })
+            .First.ClickAsync();
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Assign", Exact = true }).ClickAsync();
+        await Expect(dialog.GetByTestId("console-operators-list").GetByText("Boris Ivanov")).ToBeVisibleAsync(Loaded());
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Close", Exact = true }).ClickAsync();
 
-        await Expect(row.GetByRole(AriaRole.Button, new() { Name = "Setup", Exact = true }))
-            .ToHaveCountAsync(0, Counted()); // and having assigned it away, it does not
+        await Expect(dialog).ToHaveCountAsync(0, Counted());
+        await Expect(row.GetByRole(AriaRole.Button, new() { Name = "Setup", Exact = true })).ToBeVisibleAsync(); // and having assigned one, it still does
         await Expect(row.GetByRole(AriaRole.Button, new() { Name = "Results", Exact = true }))
             .ToHaveCountAsync(0, Counted()); // there are no Results of an Event that has not started
         await device.FetchAsync("DELETE", "/api/sessions/current");
@@ -105,20 +111,22 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
         await Expect(theirs.GetByRole(AriaRole.Button, new() { Name = "Setup", Exact = true }))
             .ToBeVisibleAsync(Loaded());
         await Expect(theirs.GetByRole(AriaRole.Button, new() { Name = "start", Exact = true })).ToBeVisibleAsync();
+        await Expect(theirs.GetByRole(AriaRole.Button, new() { Name = "Console Operators" }))
+            .ToHaveCountAsync(0, Counted()); // only Root assigns them
     }
 
     [Fact]
-    public async Task A_Live_Event_is_reset_when_the_Main_Operator_types_the_code_and_confirms_and_not_when_it_does_not()
+    public async Task A_Live_Event_is_reset_when_the_Console_Operator_types_the_code_and_confirms_and_not_when_it_does_not()
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        var id = await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "The Cup");
-        await EventSeed.StartAsync(mongo, id, tenant, mainOperator.Id, DateTimeOffset.UtcNow.AddDays(1));
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var id = await EventSeed.SetupAsync(mongo, tenant, consoleOperator.Id, "The Cup");
+        await EventSeed.StartAsync(mongo, id, tenant, consoleOperator.Id, DateTimeOffset.UtcNow.AddDays(1));
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator.Email, "/console");
+        await SignInAndOpenAsync(_host, device, consoleOperator.Email, "/console");
         var row = page.GetByRole(AriaRole.Row).Filter(new() { HasText = "The Cup" });
         var dashboard = row.GetByRole(AriaRole.Button, new() { Name = "Dashboard", Exact = true });
         var dialog = page.GetByRole(AriaRole.Dialog);
@@ -149,18 +157,18 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
         var id = await EventSeed.FullSetupAsync(
             mongo,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             "Same Number Cup",
             startNumberInTwoCompetitions: true
         );
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator.Email, "/console");
+        await SignInAndOpenAsync(_host, device, consoleOperator.Email, "/console");
         var row = page.GetByRole(AriaRole.Row).Filter(new() { HasText = "Same Number Cup" });
 
         await row.GetByRole(AriaRole.Button, new() { Name = "start", Exact = true }).ClickAsync();
@@ -188,11 +196,11 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
         var id = await EventSeed.FullSetupAsync(
             mongo,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             "Empty Competition Cup",
             startNumberInTwoCompetitions: true,
             eachHasAnother: false
@@ -200,7 +208,7 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator.Email, "/console");
+        await SignInAndOpenAsync(_host, device, consoleOperator.Email, "/console");
         var row = page.GetByRole(AriaRole.Row).Filter(new() { HasText = "Empty Competition Cup" });
         await row.GetByRole(AriaRole.Button, new() { Name = "start", Exact = true }).ClickAsync();
         var dialog = page.GetByRole(AriaRole.Dialog);
@@ -226,19 +234,19 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
     }
 
     [Fact]
-    public async Task The_Main_Operator_sets_up_its_Event_from_the_Console_and_a_page_that_is_reloaded_goes_back_to_the_Setup()
+    public async Task The_Console_Operator_sets_up_its_Event_from_the_Console_and_a_page_that_is_reloaded_goes_back_to_the_Setup()
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        var id = await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "The Cup");
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var id = await EventSeed.SetupAsync(mongo, tenant, consoleOperator.Id, "The Cup");
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
 
         await page.GotoAsync(device.Url("/console"));
         await page.WaitForURLAsync(new Regex(@"/sign-in\?returnUrl="), new() { Timeout = PATIENCE });
-        await SignInOnTheHostPagesAsync(_host, page, mainOperator.Email);
+        await SignInOnTheHostPagesAsync(_host, page, consoleOperator.Email);
         await page.WaitForURLAsync(device.Url("/console"), new() { Timeout = PATIENCE });
         var row = page.GetByRole(AriaRole.Row).Filter(new() { HasText = "The Cup" });
         await row.GetByRole(AriaRole.Button, new() { Name = "Setup", Exact = true }).ClickAsync();
@@ -287,17 +295,25 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
         await Expect(page.GetByText("Invitation pending")).ToHaveCountAsync(0, Counted());
         Assert.Equal(
             0,
-            await EventSeed.Grants(mongo).CountDocumentsAsync(new BsonDocument("EventId", EventSeed.Binary(id)))
+            await EventSeed
+                .Grants(mongo)
+                .CountDocumentsAsync(
+                    new BsonDocument
+                    {
+                        { "EventId", EventSeed.Binary(id) },
+                        { "Kind", new BsonDocument("$ne", "ConsoleOperator") }, // the Console Operator is not one of the people linked
+                    }
+                )
         );
     }
 
     [Fact]
-    public async Task The_Main_Operator_registers_a_Horse_and_an_Athlete_and_a_Combination_of_the_Setup_picks_them()
+    public async Task The_Console_Operator_registers_a_Horse_and_an_Athlete_and_a_Combination_of_the_Setup_picks_them()
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "The Cup");
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        await EventSeed.SetupAsync(mongo, tenant, consoleOperator.Id, "The Cup");
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
@@ -305,7 +321,7 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
 
         await page.GotoAsync(device.Url("/console"));
         await page.WaitForURLAsync(new Regex(@"/sign-in\?returnUrl="), new() { Timeout = PATIENCE });
-        await SignInOnTheHostPagesAsync(_host, page, mainOperator.Email);
+        await SignInOnTheHostPagesAsync(_host, page, consoleOperator.Email);
         await page.WaitForURLAsync(device.Url("/console"), new() { Timeout = PATIENCE });
         await page.GetByRole(AriaRole.Button, new() { Name = "Athletes and Horses", Exact = true }).ClickAsync();
 
@@ -334,20 +350,25 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
     }
 
     [Fact]
-    public async Task The_Main_Operator_runs_a_Live_Event_from_the_dashboard_recording_a_time_and_eliminating_a_Participation()
+    public async Task The_Console_Operator_runs_a_Live_Event_from_the_dashboard_recording_a_time_and_eliminating_a_Participation()
     {
         var mongo = _host.MongoConnectionString;
         var scene = await LiveScene.CreateAsync(mongo);
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(
+            _host,
+            device,
+            scene.ConsoleOperator.Email,
+            $"/console/events/{scene.EventId}/dashboard"
+        );
 
         // the Participations of the Event, one of which is selected
         await Expect(ChipOf(page, 2)).ToBeVisibleAsync(Loaded());
         await ChipOf(page, 2).ClickAsync();
 
-        // a time the Main Operator names is recorded by the server and shows in the table of the Participation
+        // a time the Console Operator names is recorded by the server and shows in the table of the Participation
         var time = page.GetByTestId("console-time-panel").GetByLabel("Time");
         await page.GetByTestId("console-time-panel")
             .GetByRole(AriaRole.Button, new() { Name = "Arrive", Exact = true })
@@ -396,7 +417,7 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
         var path = $"/console/events/{scene.EventId}/dashboard";
         var first = device.Page;
         first.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, path);
+        await SignInAndOpenAsync(_host, device, scene.ConsoleOperator.Email, path);
         var second = await device.Context.NewPageAsync(); // the same person, in another tab
         second.SetDefaultTimeout(PATIENCE);
         await second.GotoAsync(device.Url(path));
@@ -445,14 +466,14 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
             .ClickAsync();
     }
 
-    /// <summary>A Live Event with two Participations that started at six in the morning, and the Main Operator who runs it.</summary>
+    /// <summary>A Live Event with two Participations that started at six in the morning, and the Console Operator who runs it.</summary>
     sealed class LiveScene
     {
         public static async Task<LiveScene> CreateAsync(string mongo)
         {
             var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-            var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-            var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+            var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+            var eventId = await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
             var ids = new List<Guid>();
             foreach (var number in new[] { 1, 2 })
             {
@@ -466,21 +487,21 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
                 ids.Add(participation.Id);
             }
 
-            return new LiveScene(mongo, mainOperator, eventId, ids);
+            return new LiveScene(mongo, consoleOperator, eventId, ids);
         }
 
         readonly string _mongo;
         readonly IReadOnlyList<Guid> _participations;
 
-        LiveScene(string mongo, TenancySeed.Seeded mainOperator, Guid eventId, IReadOnlyList<Guid> participations)
+        LiveScene(string mongo, TenancySeed.Seeded consoleOperator, Guid eventId, IReadOnlyList<Guid> participations)
         {
             _mongo = mongo;
             _participations = participations;
-            MainOperator = mainOperator;
+            ConsoleOperator = consoleOperator;
             EventId = eventId;
         }
 
-        public TenancySeed.Seeded MainOperator { get; }
+        public TenancySeed.Seeded ConsoleOperator { get; }
         public Guid EventId { get; }
 
         public async Task<MongoDB.Bson.BsonDocument> StoredAsync(int number)

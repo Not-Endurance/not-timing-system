@@ -4,7 +4,7 @@ using NTS.Domain.Enums;
 namespace NTS.Contracts.Features.Console.Setup;
 
 /// <summary>
-/// The people the Main Operator links to the Officials and Operators of its Event (#646, ADR-0012): by the exact email, which
+/// The people the Console Operator links to the Officials and Operators of its Event (#646, ADR-0012): by the exact email, which
 /// gives an account the access at once, or, for an address that has no account, a pending invitation that attaches when the
 /// person registers. An address is never given back whole.
 /// </summary>

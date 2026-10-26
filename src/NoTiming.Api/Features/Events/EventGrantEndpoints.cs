@@ -12,11 +12,12 @@ using NTS.Domain.Enums;
 namespace NoTiming.Api.Features.Events;
 
 /// <summary>
-/// The Main Operator links people to the Officials and Operators of its Event (#643, ADR-0012): by the exact email, or by
-/// the id of an account found by name. An email that has an account gives that account the grant at once, and one that has
-/// none is a pending invitation that attaches when the person registers. A grant is of a kind the Event has, an Operator or
-/// an Official of a role, and never a role of the Tenant or of the platform. The emails that come back are masked. The list of
-/// the grants of an Event is in the order of the emails, or the other way round (<c>sort</c>), a page at a time.
+/// A Console Operator of an Event, or Root, links people to its Officials and Operators (#643, ADR-0012): by the exact email,
+/// or by the id of an account found by name. An email that has an account gives that account the grant at once, and one that
+/// has none is a pending invitation that attaches when the person registers. A grant is of a kind the Event has, an Operator
+/// or an Official of a role, and never a role of the Tenant or of the platform; a Console Operator is a grant of its own
+/// resource (<see cref="ConsoleOperatorEndpoints"/>). The emails that come back are masked. The list of the grants of an
+/// Event is in the order of the emails, or the other way round (<c>sort</c>), a page at a time.
 /// </summary>
 internal static class EventGrantEndpoints
 {
@@ -35,6 +36,7 @@ internal static class EventGrantEndpoints
     static async Task<IResult> Link(
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         EventStore events,
         EventGrantStore grants,
         TenancyLog log
@@ -68,11 +70,7 @@ internal static class EventGrantEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var verdict = AccessPolicy.Decide(
-            Capability.LinkAccounts,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(CallerGrants.None)
-        );
+        var verdict = await standing.DecideAtEventAsync(Capability.ConfigureEvent, user, facts, context.RequestAborted);
         if (!verdict.IsAllowed)
         {
             return AccessResults.Refused(verdict);
@@ -139,6 +137,7 @@ internal static class EventGrantEndpoints
     static async Task<IResult> List(
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         EventStore events,
         EventGrantStore grants
     )
@@ -170,13 +169,14 @@ internal static class EventGrantEndpoints
             return JsonApiResults.NotFound();
         }
 
-        // Seeing who has access is the Main Operator's, however far on the Event is: only the role counts here.
-        var verdict = AccessPolicy.Decide(
-            Capability.LinkAccounts,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(CallerGrants.None)
+        // Seeing who has access is a Console Operator's and Root's, however far on the Event is.
+        var verdict = await standing.DecideAtEventAsync(
+            Capability.ReadConfiguration,
+            user,
+            facts,
+            context.RequestAborted
         );
-        if (!verdict.IsAllowed && verdict.Reason != Refusal.EventEnded)
+        if (!verdict.IsAllowed)
         {
             return AccessResults.Refused(verdict);
         }
@@ -184,6 +184,7 @@ internal static class EventGrantEndpoints
         var items = new List<(string Id, object Attributes)>();
         var (page, hasMore) = await grants.ListAsync(
             facts.Record,
+            consoleOperators: false,
             query.Descending,
             query.Skip,
             query.Size,
@@ -207,6 +208,7 @@ internal static class EventGrantEndpoints
         string id,
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         EventStore events,
         EventGrantStore grants,
         TenancyLog log
@@ -220,19 +222,15 @@ internal static class EventGrantEndpoints
 
         var grant = Guid.TryParse(id, out var grantId) ? await grants.FindAsync(grantId, context.RequestAborted) : null;
         var facts = grant == null ? null : await events.FindAsync(grant.EventId, context.RequestAborted);
-        if (grant is null || facts is null)
+        if (grant is null || facts is null || grant.Kind == GrantKind.ConsoleOperator)
         {
             return JsonApiResults.NotFound();
         }
 
-        var verdict = AccessPolicy.Decide(
-            Capability.LinkAccounts,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(CallerGrants.None)
-        );
+        var verdict = await standing.DecideAtEventAsync(Capability.ConfigureEvent, user, facts, context.RequestAborted);
         if (!verdict.IsAllowed)
         {
-            // A grant is the Main Operator's to see: to anybody else it is not there, as it is not for a missing one.
+            // A grant is a Console Operator's to see: to anybody else it is not there, as it is not for a missing one.
             return verdict.Reason == Refusal.EventEnded ? AccessResults.Refused(verdict) : JsonApiResults.NotFound();
         }
 

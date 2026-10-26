@@ -5,7 +5,7 @@ using NTS.Domain.Enums;
 namespace NTS.Contracts.Features.Console.Rankings;
 
 /// <summary>
-/// A Ranking that the Main Operator makes of Participations it chooses, over the settings of one that exists (#646): it is
+/// A Ranking that the Console Operator makes of Participations it chooses, over the settings of one that exists (#646): it is
 /// always made new, and a Ranking that was copied from keeps its settings but not its name or its id.
 /// </summary>
 public record CustomRankingModel : KrudFormModel<Ranking>

@@ -13,12 +13,10 @@ namespace NoTiming.Api.Features.Events;
 
 /// <summary>
 /// The Setup of an Event, the <c>configure-events</c> resource (#603, ADR-0012): what an Event is configured with until it
-/// starts. A Tenant Root makes the Event (<see cref="EventEndpoints"/>); this reads, changes and deletes it. It is read by
-/// the Main Operator, a Tenant Root of the Tenant that holds it and the Developer; changed by its Main Operator, or by the
-/// Developer, until the Event starts, and then by nobody, with 409 and the stage the Event is at, because from the start the
-/// Console works on the copies the Event made of it; deleted, with the grants of the Event, by a Tenant Root or the
-/// Developer before it starts. The Tenant and the Main Operator of the Event are shown and cannot be written: what the
-/// Event has now is the Core document's once it has started, so that is what is shown. The members and the filter, the
+/// starts. Root makes the Event (<see cref="EventEndpoints"/>); this reads, changes and deletes it. It is read by a Console
+/// Operator of the Event and by Root; changed by them until the Event starts, and then by nobody, with 409 and the stage the
+/// Event is at, because from the start the Console works on the copies the Event made of it; deleted, with the grants of the
+/// Event, by Root before it starts. The Tenant of the Event is shown and cannot be written. The members and the filter, the
 /// sort and the pages of a list are those of every family of reference data (<see cref="ReferenceEndpoints"/>).
 /// </summary>
 internal static class SetupEndpoints
@@ -34,15 +32,14 @@ internal static class SetupEndpoints
         return app;
     }
 
-    /// <summary>The members the Setup is shown with: its own, and the Main Operator, which only the server sets.</summary>
-    public static ReferenceMembers<ConfigureEventModel> Members { get; } =
-        new([], [nameof(ConfigureEventModel.MainOperatorId)]);
+    /// <summary>The members the Setup is shown with: its own, and the Tenant, which only the server sets.</summary>
+    public static ReferenceMembers<ConfigureEventModel> Members { get; } = new([], []);
 
     static async Task<IResult> ListAsync(
         HttpContext context,
         UserManager<NIdentityUser> users,
         TenantCollections tenants,
-        EventStore events
+        EventGrantStore grants
     )
     {
         var user = await users.GetUserAsync(context.User);
@@ -57,12 +54,12 @@ internal static class SetupEndpoints
             return query.Refusal;
         }
 
-        // A Tenant Root sees the Setups of its Tenant, the Developer those of the Tenant it acts in, and anybody else the
-        // ones of the Events it runs now: the Setup is for the people who run the Event and the Tenant that holds it.
+        // Root sees the Setups of the Tenant it acts in, and anybody else the ones of the Events it is a Console Operator of:
+        // the Setup is for the people who run the Event and the Tenant that holds it.
         var tenantId = AccountRoles.CurrentTenantOf(user);
-        var caller = AccountRoles.CallerOf(user);
-        var all = caller.IsDeveloper || (tenantId != null && caller.TenantRootIn.Contains(tenantId));
-        Guid[]? running = all ? null : [.. await events.RunByAsync(tenantId, user.Id, context.RequestAborted)];
+        var roles = AccountRoles.RolesOf(user);
+        var all = roles.IsDeveloper || (tenantId != null && roles.IsRootAt(tenantId));
+        Guid[]? running = all ? null : [.. await grants.EventsRunByAsync(tenantId, user.Id, context.RequestAborted)];
         var (rows, unsupported) = await ReferenceEndpoints.ReadPageAsync(
             () =>
                 tenants
@@ -82,13 +79,6 @@ internal static class SetupEndpoints
 
         var page = rows!.Take(query.Size).ToList();
 
-        // An Event that has started has the Main Operator its Core says, which a hand-over changes.
-        var started = await events.StartedOperatorsAsync(tenantId, [.. page.Select(x => x.Id)], context.RequestAborted);
-        foreach (var setup in page.Where(x => started.ContainsKey(x.Id)))
-        {
-            setup.MainOperatorId = started[setup.Id];
-        }
-
         return JsonApiResults.Collection(
             CONFIGURE_EVENTS,
             page.Select(x => (x.Id.ToString(), (object)Members.AttributesOf(x))),
@@ -101,6 +91,7 @@ internal static class SetupEndpoints
         string id,
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         EventStore events,
         TenantCollections tenants
     )
@@ -117,10 +108,11 @@ internal static class SetupEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var verdict = AccessPolicy.Decide(
-            Capability.ReadSetup,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(CallerGrants.None)
+        var verdict = await standing.DecideAtEventAsync(
+            Capability.ReadConfiguration,
+            user,
+            facts,
+            context.RequestAborted
         );
         if (!verdict.IsAllowed)
         {
@@ -135,6 +127,7 @@ internal static class SetupEndpoints
         string id,
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         EventStore events,
         TenantCollections tenants
     )
@@ -157,11 +150,7 @@ internal static class SetupEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var verdict = AccessPolicy.Decide(
-            Capability.EditSetup,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(CallerGrants.None)
-        );
+        var verdict = await standing.DecideAtEventAsync(Capability.EditSetup, user, facts, context.RequestAborted);
         if (!verdict.IsAllowed)
         {
             return AccessResults.Refused(verdict);
@@ -193,6 +182,7 @@ internal static class SetupEndpoints
         string id,
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         EventStore events,
         TenantCollections tenants,
         EventGrantStore grants,
@@ -212,11 +202,7 @@ internal static class SetupEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var verdict = AccessPolicy.Decide(
-            Capability.DeleteEvent,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(CallerGrants.None)
-        );
+        var verdict = await standing.DecideAtEventAsync(Capability.DeleteEvent, user, facts, context.RequestAborted);
         if (!verdict.IsAllowed)
         {
             return AccessResults.Refused(verdict);
@@ -227,7 +213,7 @@ internal static class SetupEndpoints
             return JsonApiResults.NotFound();
         }
 
-        // What the Main Operator gave on the Event goes with it, so that no grant is left waiting for an Event that is not there.
+        // What was given on the Event goes with it, so that no grant is left waiting for an Event that is not there.
         await grants.RemoveAllOfAsync(facts.Record, context.RequestAborted);
         await branding.RemoveOfEventAsync(facts.TenantId, eventId, context.RequestAborted); // and the logos it put in place of the Tenant's
         log.EventDeleted(user.Id, eventId, facts.TenantId);
@@ -241,7 +227,6 @@ internal static class SetupEndpoints
 
     static IResult Resource(ConfigureEventModel setup, EventFacts facts, int status)
     {
-        setup.MainOperatorId = facts.Record.MainOperatorId;
         return JsonApiResults.Resource(status, CONFIGURE_EVENTS, setup.Id.ToString(), Members.AttributesOf(setup));
     }
 }

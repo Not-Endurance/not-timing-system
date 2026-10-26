@@ -106,15 +106,15 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var historicOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var rootElsewhere = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(other));
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
         await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, historicOperator.Id, DateTimeOffset.UtcNow);
 
-        foreach (var who in new[] { root, mainOperator, developer })
+        foreach (var who in new[] { root, consoleOperator, developer })
         {
             Assert.Equal(HttpStatusCode.Created, (await CreateAsync(who, "Allowed")).StatusCode);
         }
@@ -123,7 +123,7 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         {
             var response = await CreateAsync(who, "Refused");
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-            Assert.Equal("not-allowed", await ErrorCodeAsync(response));
+            Assert.Equal("not-console-operator", await ErrorCodeAsync(response));
         }
 
         Assert.Equal(3, await RegistrySeed.CountAsync(_mongo.ConnectionString, "clubs", tenant));
@@ -540,7 +540,7 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         var anonymous = await client.DeleteAsync($"/api/clubs/{id}");
 
         Assert.Equal(HttpStatusCode.Forbidden, change.StatusCode);
-        Assert.Equal("not-allowed", await ErrorCodeAsync(change));
+        Assert.Equal("not-console-operator", await ErrorCodeAsync(change));
         Assert.Equal(HttpStatusCode.Forbidden, remove.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
         Assert.Equal("Kept", (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id))!["Name"].AsString);

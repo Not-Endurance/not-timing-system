@@ -7,7 +7,7 @@ namespace NTS.Contracts.Features.Console;
 
 /// <summary>
 /// The Handouts of a Live Event in the Console (#646, ADR-0006): the sheet of a Participation that is handed out when one of
-/// its Phases is complete, made by the Main Operator or by the Console while a page that watches is open, printed and, once
+/// its Phases is complete, made by the Console Operator or by the Console while a page that watches is open, printed and, once
 /// the person confirms it was printed, removed. A Handout names its Participation and holds none of its data, so what its
 /// document shows is the Participation as it is when it is composed, a later correction included. A Participation has one
 /// Handout: the id of the Handout is the id of the Participation, so that a Handout made again, by another tab or by hand,

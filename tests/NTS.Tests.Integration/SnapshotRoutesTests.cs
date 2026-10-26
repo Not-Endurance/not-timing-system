@@ -493,8 +493,8 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
 
     [Theory]
     [InlineData(null, null, false, false, false)] // an account with nothing
-    [InlineData(null, null, true, false, false)] // the Developer, who is not linked
-    [InlineData(null, null, false, true, false)] // a Tenant Root, who is not linked
+    [InlineData(null, null, true, false, true)] // the Developer, who is Root and needs no link
+    [InlineData(null, null, false, true, true)] // a Tenant Root, who is Root at its own Events and needs no link
     [InlineData("Official", "TreatingVeterinaryCommissionMember", false, false, false)]
     [InlineData("Official", "VeterinaryServiceMember", false, false, false)]
     [InlineData("Official", "Steward", false, false, true)]
@@ -549,14 +549,14 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_of_the_Event_sends_a_Snapshot_too()
+    public async Task The_Console_Operator_of_the_Event_sends_a_Snapshot_too()
     {
         await using var scene = await SceneAsync();
 
-        var response = await PostAsync(scene.MainOperator, scene.EventId, 1, "Arrive", ARRIVE);
+        var response = await PostAsync(scene.ConsoleOperator, scene.EventId, 1, "Arrive", ARRIVE);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        Assert.Equal(scene.MainOperator.Id, EventsOf(await StoredAsync(scene.One), 0).Single()["ActorId"].AsGuid);
+        Assert.Equal(scene.ConsoleOperator.Id, EventsOf(await StoredAsync(scene.One), 0).Single()["ActorId"].AsGuid);
     }
 
     [Fact]
@@ -579,11 +579,11 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
     public async Task An_Event_that_has_not_started_or_has_ended_takes_no_Snapshot_and_writes_nothing()
     {
         await using var scene = await SceneAsync();
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, scene.Tenant, scene.MainOperator.Id);
+        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, scene.Tenant, scene.ConsoleOperator.Id);
         var historic = await EventSeed.HistoricAsync(
             _mongo.ConnectionString,
             scene.Tenant,
-            scene.MainOperator.Id,
+            scene.ConsoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var early = IntegrationPayloadFactory.ActiveParticipation(unstarted, 1, Guid.NewGuid(), startTime: START);
@@ -622,8 +622,8 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
         var length = TimeSpan.FromHours(2);
         var time = new FakeTimeProvider(now);
         await using var scene = await SceneAsync(time);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, scene.Tenant, scene.MainOperator.Id);
-        await EventSeed.StartAsync(_mongo.ConnectionString, id, scene.Tenant, scene.MainOperator.Id, now + length);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, scene.Tenant, scene.ConsoleOperator.Id);
+        await EventSeed.StartAsync(_mongo.ConnectionString, id, scene.Tenant, scene.ConsoleOperator.Id, now + length);
         await EventSeed.ParticipationAsync(
             _mongo.ConnectionString,
             scene.Tenant,
@@ -864,7 +864,7 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
         var historic = await EventSeed.HistoricAsync(
             _mongo.ConnectionString,
             scene.Tenant,
-            scene.MainOperator.Id,
+            scene.ConsoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var ended = IntegrationPayloadFactory.ActiveParticipation(historic, 1, Guid.NewGuid(), startTime: START);
@@ -941,9 +941,9 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
         );
         var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var clock = time?.GetUtcNow() ?? DateTimeOffset.UtcNow;
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, clock);
+        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, clock);
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var grant = await EventSeed.GrantAsync(
             _mongo.ConnectionString,
@@ -958,7 +958,19 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
         var two = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 2, Guid.NewGuid(), startTime: START);
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, one);
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, two);
-        return new Scene(api, client, changes, tenant, eventId, mainOperator, official, grant, one.Id, two.Id, clock);
+        return new Scene(
+            api,
+            client,
+            changes,
+            tenant,
+            eventId,
+            consoleOperator,
+            official,
+            grant,
+            one.Id,
+            two.Id,
+            clock
+        );
     }
 
     async Task<BsonDocument> StoredAsync(Guid participation)
@@ -1090,7 +1102,7 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
             RecordedChanges changes,
             string tenant,
             Guid eventId,
-            Person mainOperator,
+            Person consoleOperator,
             Person official,
             Guid officialGrant,
             Guid one,
@@ -1103,7 +1115,7 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
             Changes = changes;
             Tenant = tenant;
             EventId = eventId;
-            MainOperator = mainOperator;
+            ConsoleOperator = consoleOperator;
             Official = official;
             OfficialGrant = officialGrant;
             One = one;
@@ -1116,7 +1128,7 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
         public RecordedChanges Changes { get; }
         public string Tenant { get; }
         public Guid EventId { get; }
-        public Person MainOperator { get; }
+        public Person ConsoleOperator { get; }
 
         /// <summary>A Steward of the Event.</summary>
         public Person Official { get; }

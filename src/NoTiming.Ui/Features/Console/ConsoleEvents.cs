@@ -18,7 +18,7 @@ namespace NoTiming.Ui.Features.Console;
 /// <summary>
 /// The Events of the Console's home (#646). What the person sees is what the Api lists for them, and what they may do about
 /// each is what the Api says for the person and the Event as they are now (<c>GET /api/events/{id}/capabilities</c>): the
-/// Ui keeps no rule of its own about who may configure, start, reset or hand over. It follows the account.
+/// Ui keeps no rule of its own about who may configure, start, reset or assign. It follows the account.
 /// </summary>
 public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
 {
@@ -116,28 +116,38 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
         await ReloadState();
     }
 
-    public async Task AssignMainOperator(Guid eventId, Guid accountId)
+    public async Task<IReadOnlyList<ConsoleOperatorRow>> ConsoleOperators(Guid eventId)
     {
-        Accepted(
-            await _api.Send(
-                HttpMethod.Post,
-                $"events/{eventId}/actions/assign-main-operator",
-                Document("main-operators", null, new { accountId })
-            )
-        );
-        await ReloadState();
+        var filter = Uri.EscapeDataString($"eventId eq {eventId}");
+        var listed = Accepted(await _api.Send(HttpMethod.Get, $"console-operators?filter={filter}&sort=email"));
+        return
+        [
+            .. listed
+                .Document!.Value.GetProperty("data")
+                .EnumerateArray()
+                .Select(x => new ConsoleOperatorRow(
+                    Guid.Parse(x.GetProperty("id").GetString()!),
+                    Text(x.GetProperty("attributes"), "displayName") ?? string.Empty,
+                    Text(x.GetProperty("attributes"), "email") ?? string.Empty,
+                    Flag(x.GetProperty("attributes"), "pending")
+                )),
+        ];
     }
 
-    public async Task HandOver(Guid eventId, Guid accountId)
+    public async Task AssignConsoleOperator(Guid eventId, Guid accountId)
     {
         Accepted(
             await _api.Send(
                 HttpMethod.Post,
-                $"events/{eventId}/actions/hand-over",
-                Document("main-operators", null, new { accountId })
+                "console-operators",
+                Document("console-operators", null, new { eventId, accountId })
             )
         );
-        await ReloadState();
+    }
+
+    public async Task RemoveConsoleOperator(Guid consoleOperatorId)
+    {
+        Accepted(await _api.Send(HttpMethod.Delete, $"console-operators/{consoleOperatorId}"));
     }
 
     public async Task<IReadOnlyList<AccountMatch>> FindAccounts(string text)
@@ -174,15 +184,11 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
             Name = setup.Name,
             Location = setup.Location,
             Stage = Enum.Parse<EventStage>(capabilities.GetProperty("stage").GetString()!, ignoreCase: true),
-            IsMainOperator = Flag(capabilities, "isMainOperator"),
+            Level = Enum.Parse<AccessLevel>(capabilities.GetProperty("level").GetString()!, ignoreCase: true),
             CanConfigure = Flag(capabilities, "canConfigure"),
             CanEditSetup = Flag(capabilities, "canEditSetup"),
-            CanEditData = Flag(capabilities, "canEditData"),
-            CanLinkAccounts = Flag(capabilities, "canLinkAccounts"),
-            CanEditBranding = Flag(capabilities, "canEditBranding"),
-            CanReset = Flag(capabilities, "canReset"),
-            CanHandOver = Flag(capabilities, "canHandOver"),
-            CanAssignMainOperator = Flag(capabilities, "canAssignMainOperator"),
+            CanRun = Flag(capabilities, "canRun"),
+            CanAssignConsoleOperators = Flag(capabilities, "canAssignConsoleOperators"),
         };
     }
 

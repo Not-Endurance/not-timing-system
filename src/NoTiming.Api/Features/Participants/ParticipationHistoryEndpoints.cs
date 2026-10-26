@@ -6,6 +6,7 @@ using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
+using NTS.Domain.Access;
 
 namespace NoTiming.Api.Features.Participants;
 
@@ -72,7 +73,7 @@ internal static class ParticipationHistoryEndpoints
         var (page, refusal) = await ReferenceEndpoints.ReadPageAsync(
             () =>
                 reader.ReadAsync(
-                    AccountRoles.CallerOf(user),
+                    Standing.Account,
                     subject.Kind,
                     subject.Id,
                     culture,

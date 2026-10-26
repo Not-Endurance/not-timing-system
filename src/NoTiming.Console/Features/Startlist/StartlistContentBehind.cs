@@ -5,7 +5,7 @@ using NTS.Domain.Access;
 namespace NoTiming.Console.Features.Startlist;
 
 /// <summary>
-/// The Startlist of a Live Event as a sheet to print (#646): the page the Main Operator hands it out from. The address names
+/// The Startlist of a Live Event as a sheet to print (#646): the page the Console Operator hands it out from. The address names
 /// the Event, and the Api says who runs it (the capabilities of the Event), so a person who does not, and an Event that has
 /// not started, are shown nothing: the Console offers no more than the Api would take. An Event that has ended is not shown
 /// the page either, and is told so by the view (#631).
@@ -16,7 +16,7 @@ public class StartlistContentBehind : NStatefulComponent
     IConsoleEvents Events { get; set; } = default!;
 
     protected bool MayRun =>
-        Events.Events.Any(x => x.Id == EventId && x is { IsMainOperator: true } && x.Stage != EventStage.Unstarted);
+        Events.Events.Any(x => x.Id == EventId && x is { RunsTheConsole: true } && x.Stage != EventStage.Unstarted);
 
     [Parameter]
     public Guid EventId { get; set; }

@@ -37,8 +37,7 @@ public sealed class ConsoleTenantTests : IClassFixture<MongoFixture>
 
         Assert.Equal(tenant, console.Tenant.TenantId);
         Assert.NotEmpty(console.Tenant.Name);
-        Assert.True(console.Tenant.CanEditRules);
-        Assert.True(console.Tenant.CanEditBranding);
+        Assert.True(console.Tenant.CanEdit);
         Assert.Equal((false, null), before);
         Assert.Equal((true, "BG-2026"), (console.Tenant.OnlyAverageLoopSpeed, console.Tenant.RankerCode));
         Assert.Equal((true, "BG-2026"), await StoredRulesAsync(tenant));
@@ -93,8 +92,7 @@ public sealed class ConsoleTenantTests : IClassFixture<MongoFixture>
         var refused = await Assert.ThrowsAsync<DomainException>(() => console.Tenant.SaveRules(true, "BG-2026"));
 
         Assert.Equal(tenant, console.Tenant.TenantId);
-        Assert.False(console.Tenant.CanEditRules);
-        Assert.False(console.Tenant.CanEditBranding);
+        Assert.False(console.Tenant.CanEdit);
         Assert.NotEmpty(refused.Message);
         Assert.Equal((false, null), await StoredRulesAsync(tenant));
     }
@@ -110,7 +108,7 @@ public sealed class ConsoleTenantTests : IClassFixture<MongoFixture>
         var account = new AccountSession(json);
         using var console = new Opened(account, new ConsoleTenant(account, json));
         await console.Tenant.Load();
-        var before = (console.Tenant.TenantId, console.Tenant.CanEditRules, console.Tenant.CanEditBranding);
+        var before = (console.Tenant.TenantId, console.Tenant.CanEdit);
         requests.Answer = request =>
             request.RequestUri!.AbsolutePath.StartsWith("/api/tenants/", StringComparison.Ordinal)
                 ? new HttpResponseMessage(System.Net.HttpStatusCode.ServiceUnavailable)
@@ -118,10 +116,9 @@ public sealed class ConsoleTenantTests : IClassFixture<MongoFixture>
 
         await account.Refresh(); // the account is asked again, and the Tenant with it
 
-        Assert.Equal((tenant, true, true), before);
+        Assert.Equal((tenant, true), before);
         await UiBrowser.Eventually(async () => console.Tenant.TenantId == null);
-        Assert.False(console.Tenant.CanEditRules);
-        Assert.False(console.Tenant.CanEditBranding);
+        Assert.False(console.Tenant.CanEdit);
         Assert.Empty(console.Tenant.Name);
     }
 
@@ -136,7 +133,7 @@ public sealed class ConsoleTenantTests : IClassFixture<MongoFixture>
         await console.Tenant.Load();
 
         Assert.Null(console.Tenant.TenantId);
-        Assert.False(console.Tenant.CanEditRules);
+        Assert.False(console.Tenant.CanEdit);
         await Assert.ThrowsAsync<DomainException>(() => console.Tenant.SaveRules(true, null));
     }
 

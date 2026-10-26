@@ -11,17 +11,15 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// What reaches across Tenants does it as a named capability of a collection (ADR-0012, #643): an Event by its id,
-/// the search of Athletes, Horses, Clubs and Officials that any signed-in account may make, and the Events a Main
+/// the search of Athletes, Horses, Clubs and Officials that any signed-in account may make, and the Events a Console
 /// Operator runs. Each is a method of its own, takes what it needs and nothing that could widen it, and returns only
 /// the fields that are meant to leave: an Athlete's account, if the row has one, never does. The tests seed two
 /// Tenants and read as a person who belongs to neither.
 /// </summary>
 public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
 {
-    static readonly Caller SIGNED_IN = Caller.Of(TestId.Of(1));
-
-    /// <summary>A Tenant Root: one of the people who set an Event up, who read the whole row of an Athlete or a Horse.</summary>
-    static readonly Caller STAFF = Caller.Of(TestId.Of(2), tenantRootIn: ["country-bg"]);
+    static readonly Standing SIGNED_IN = Standing.Account;
+    static readonly Standing STAFF = Standing.AtPlatform(Roles.Of(tenantRootIn: ["country-bg"]), false); // a Tenant Root: sets Events up, reads whole rows
 
     readonly MongoFixture _mongo;
 
@@ -34,32 +32,28 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
     public async Task An_Event_is_found_by_its_id_in_whatever_Tenant_it_is()
     {
         var tenant = NewTenant();
-        var mainOperator = Guid.NewGuid();
-        var unstarted = await AddSetupEventAsync(tenant, mainOperator);
+        var unstarted = await AddSetupEventAsync(tenant);
 
         var found = await Reads().FindEventAsync(unstarted, default);
 
         Assert.NotNull(found);
         Assert.Equal(tenant, found.TenantId);
-        Assert.Equal(mainOperator, found.MainOperatorId);
         Assert.False(found.IsStarted);
         Assert.Null(found.EndDay);
     }
 
     [Fact]
-    public async Task A_started_Event_is_the_Core_one_and_its_Main_Operator_and_Tenant_are_the_ones_it_has_now()
+    public async Task A_started_Event_is_the_Core_one_with_the_end_of_its_last_day()
     {
         var tenant = NewTenant();
-        var first = Guid.NewGuid();
-        var handedTo = Guid.NewGuid();
         var end = new DateTimeOffset(2026, 5, 2, 20, 59, 59, TimeSpan.Zero);
-        var id = await AddSetupEventAsync(tenant, first);
-        await AddCoreEventAsync(id, tenant, handedTo, end);
+        var id = await AddSetupEventAsync(tenant);
+        await AddCoreEventAsync(id, tenant, end);
 
         var found = await Reads().FindEventAsync(id, default);
 
         Assert.True(found!.IsStarted);
-        Assert.Equal(handedTo, found.MainOperatorId);
+        Assert.Equal(tenant, found.TenantId);
         Assert.Equal(end, found.EndDay);
         Assert.Equal(EventStage.Live, found.StageAt(end.AddSeconds(-1)));
         Assert.Equal(EventStage.Historic, found.StageAt(end));
@@ -70,18 +64,17 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
     {
         var tenant = NewTenant();
         var id = Guid.NewGuid();
-        await AddCoreEventAsync(id, tenant, null, DateTimeOffset.UtcNow.AddDays(1));
+        await AddCoreEventAsync(id, tenant, DateTimeOffset.UtcNow.AddDays(1));
 
         var found = await Reads().FindEventAsync(id, default);
         var missing = await Reads().FindEventAsync(Guid.NewGuid(), default);
 
         Assert.True(found!.IsStarted);
-        Assert.Null(found.MainOperatorId);
         Assert.Null(missing);
     }
 
     [Fact]
-    public async Task An_Event_from_before_Tenants_has_the_constant_Tenant_and_no_Main_Operator()
+    public async Task An_Event_from_before_Tenants_has_the_constant_Tenant()
     {
         var id = Guid.NewGuid();
         await Collection("configure_events")
@@ -101,29 +94,52 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         var older = await Reads().FindEventAsync(unmarked, default);
 
         Assert.Equal("nts", legacy!.TenantId);
-        Assert.Null(legacy.MainOperatorId);
         Assert.Equal("nts", older!.TenantId);
     }
 
     [Fact]
-    public async Task The_Events_a_Main_Operator_runs_that_are_not_Historic_are_told_by_their_Tenants()
+    public async Task The_Events_a_Console_Operator_runs_that_are_not_Historic_are_told_by_their_Tenants()
     {
-        var mainOperator = Guid.NewGuid();
+        var account = Guid.NewGuid();
+        var someoneElse = Guid.NewGuid();
         var now = DateTimeOffset.UtcNow;
         var inA = NewTenant();
         var inB = NewTenant();
         var onlyHistoric = NewTenant();
-        await AddSetupEventAsync(inA, mainOperator);
-        var live = await AddSetupEventAsync(inB, Guid.NewGuid()); // set up by someone else, handed over once started
-        await AddCoreEventAsync(live, inB, mainOperator, now.AddDays(1));
-        var past = await AddSetupEventAsync(onlyHistoric, Guid.NewGuid());
-        await AddCoreEventAsync(past, onlyHistoric, mainOperator, now.AddDays(-1));
-        var handedAway = await AddSetupEventAsync(NewTenant(), mainOperator); // the Core event says somebody else holds it now
-        await AddCoreEventAsync(handedAway, "x", Guid.NewGuid(), now.AddDays(1));
-        await AddSetupEventAsync(NewTenant(), Guid.NewGuid()); // somebody else's, not started
-        await AddSetupEventAsync(NewTenant(), null); // nobody's, not started
+        var notConsoleOperator = NewTenant();
+        var pending = NewTenant();
+        var other = NewTenant();
+        var gone = NewTenant();
+        await ConsoleOperatorOfAsync(await AddSetupEventAsync(inA), inA, account); // not started
+        var live = await AddSetupEventAsync(inB);
+        await AddCoreEventAsync(live, inB, now.AddDays(1));
+        await ConsoleOperatorOfAsync(live, inB, account);
+        var past = await AddSetupEventAsync(onlyHistoric);
+        await AddCoreEventAsync(past, onlyHistoric, now.AddDays(-1));
+        await ConsoleOperatorOfAsync(past, onlyHistoric, account);
+        var operatorOnly = await AddSetupEventAsync(notConsoleOperator); // a grant of another kind gives no Console
+        await EventSeed.GrantAsync(
+            _mongo.ConnectionString,
+            notConsoleOperator,
+            operatorOnly,
+            "Operator",
+            null,
+            "o@x.test",
+            account
+        );
+        await EventSeed.GrantAsync(
+            _mongo.ConnectionString,
+            pending,
+            await AddSetupEventAsync(pending),
+            "ConsoleOperator",
+            null,
+            "p@x.test",
+            null
+        );
+        await ConsoleOperatorOfAsync(await AddSetupEventAsync(other), other, someoneElse); // somebody else's
+        await ConsoleOperatorOfAsync(Guid.NewGuid(), gone, account); // of an Event that is not there
 
-        var tenants = await Reads().OpenEventTenantsOfAsync(mainOperator, now, default);
+        var tenants = await Reads().OpenEventTenantsOfAsync(account, now, default);
 
         Assert.Equal(new[] { inA, inB }.Order(), tenants.Order());
     }
@@ -320,13 +336,13 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         await AddAsync("athletes", NewTenant(), "Open Rider");
 
         await Assert.ThrowsAsync<CrossTenantRefusedException>(
-            () => Reads().SearchAthletesAsync(Caller.Anonymous, SearchOf("open rider"), default)
+            () => Reads().SearchAthletesAsync(Standing.Anonymous, SearchOf("open rider"), default)
         );
         await Assert.ThrowsAsync<CrossTenantRefusedException>(
-            () => Reads().SearchClubsAsync(Caller.Anonymous, SearchOf("open rider"), default)
+            () => Reads().SearchClubsAsync(Standing.Anonymous, SearchOf("open rider"), default)
         );
         await Assert.ThrowsAsync<CrossTenantRefusedException>(
-            () => Reads().SearchOfficialsAsync(Caller.Anonymous, SearchOf("open rider"), default)
+            () => Reads().SearchOfficialsAsync(Standing.Anonymous, SearchOf("open rider"), default)
         );
     }
 
@@ -364,7 +380,7 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         return new BsonBinaryData(id, GuidRepresentation.Standard);
     }
 
-    async Task<Guid> AddSetupEventAsync(string tenant, Guid? mainOperator)
+    async Task<Guid> AddSetupEventAsync(string tenant)
     {
         var id = Guid.NewGuid();
         var document = new BsonDocument
@@ -373,16 +389,12 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
             { "TenantId", tenant },
             { "Name", "Event " + id },
         };
-        if (mainOperator != null)
-        {
-            document["MainOperatorId"] = Bson(mainOperator.Value);
-        }
 
         await Collection("configure_events").InsertOneAsync(document);
         return id;
     }
 
-    async Task AddCoreEventAsync(Guid id, string tenant, Guid? mainOperator, DateTimeOffset end)
+    async Task AddCoreEventAsync(Guid id, string tenant, DateTimeOffset end)
     {
         var document = new BsonDocument
         {
@@ -392,12 +404,22 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
             { "StartDay", new BsonDateTime(end.AddDays(-2).UtcDateTime) },
             { "EndDay", new BsonDateTime(end.UtcDateTime) },
         };
-        if (mainOperator != null)
-        {
-            document["MainOperatorId"] = Bson(mainOperator.Value);
-        }
 
         await Collection("event_informations").InsertOneAsync(document);
+    }
+
+    /// <summary>The account is a Console Operator of the Event, by a grant that is theirs.</summary>
+    async Task ConsoleOperatorOfAsync(Guid eventId, string tenant, Guid account)
+    {
+        await EventSeed.GrantAsync(
+            _mongo.ConnectionString,
+            tenant,
+            eventId,
+            "ConsoleOperator",
+            null,
+            $"{account:N}@x.test",
+            account
+        );
     }
 
     async Task<Guid> AddAsync(

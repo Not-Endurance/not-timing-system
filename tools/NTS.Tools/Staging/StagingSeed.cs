@@ -17,7 +17,7 @@ namespace NTS.Tools.Staging;
 
 /// <summary>
 /// <c>seed-staging</c> (#607): makes, in the Tenant of Bulgaria, what a person who tries the platform on a staging database
-/// needs: a Tenant Root (which makes the Tenant operational), a Main Operator, Officials and Operators, and a Live Event with
+/// needs: a Tenant Root (which makes the Tenant operational), a Console Operator, Officials and Operators, and a Live Event with
 /// twelve Participations that the Officials may send Snapshots to. The accounts are the ones named by their email, made when
 /// they are not there and otherwise left as they are but for what the seed gives them (a membership of the Tenant, the role of
 /// Tenant Root); the person signs in with a code sent to the address, which confirms it. The Event is made the way the Api
@@ -215,7 +215,7 @@ public static class StagingSeed
                 var (what, email) in new[]
                 {
                     ("--tenant-root", _options.TenantRoot),
-                    ("--main-operator", _options.MainOperator),
+                    ("--console-operator", _options.ConsoleOperator),
                 }
             )
             {
@@ -324,7 +324,7 @@ public static class StagingSeed
         async Task ReadAccountsAsync()
         {
             var emails = new List<(string Email, bool Root)> { (NormalEmail(_options.TenantRoot)!, true) };
-            emails.Add((NormalEmail(_options.MainOperator)!, false));
+            emails.Add((NormalEmail(_options.ConsoleOperator)!, false));
             emails.AddRange(_options.Officials.Select(x => (NormalEmail(x.Email)!, false)));
             emails.AddRange(_options.Operators.Select(x => (NormalEmail(x)!, false)));
             var made = new List<Guid>();
@@ -443,7 +443,7 @@ public static class StagingSeed
 
         async Task ReadEventAsync(Country country)
         {
-            var mainOperator = _people.First(x => x.Email == NormalEmail(_options.MainOperator));
+            var consoleOperator = _people.First(x => x.Email == NormalEmail(_options.ConsoleOperator));
             SeededPerson Seeded(string email, OfficialRole role)
             {
                 return new SeededPerson(
@@ -461,7 +461,6 @@ public static class StagingSeed
                 start,
                 country,
                 StagingDataset.TENANT_ID,
-                mainOperator.Id,
                 officials,
                 operators
             );
@@ -518,11 +517,12 @@ public static class StagingSeed
             }
 
             Report.EventDocuments = counts;
-            await ReadGrantsAsync(setup.Id, officials, operators);
+            await ReadGrantsAsync(setup.Id, consoleOperator, officials, operators);
         }
 
         async Task ReadGrantsAsync(
             Guid eventId,
+            Person consoleOperator,
             IReadOnlyList<SeededPerson> officials,
             IReadOnlyList<SeededPerson> operators
         )
@@ -534,6 +534,17 @@ public static class StagingSeed
             {
                 existing.Add(GrantKeyOf(grant));
             }
+
+            Want(
+                EventGrant.ForConsoleOperator(
+                    Guid.NewGuid(),
+                    eventId,
+                    StagingDataset.TENANT_ID,
+                    consoleOperator.Email,
+                    consoleOperator.Id
+                ),
+                existing
+            );
 
             foreach (var official in officials)
             {

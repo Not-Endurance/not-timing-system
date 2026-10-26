@@ -10,8 +10,8 @@ using NTS.Domain.Access;
 namespace NoTiming.Api.Features.Branding;
 
 /// <summary>
-/// The logos that go at the head of what an Event prints (#646, ADR-0012): the Tenant's own, which a Tenant Root edits, and the
-/// ones an Event puts in place of them, which its Main Operator edits while it has not ended. They are the <c>brandings</c>
+/// The logos that go at the head of what an Event prints (#646, ADR-0012): the Tenant's own, which Root edits, and the
+/// ones an Event puts in place of them, which Root and the Console Operators of the Event edit while it has not ended. They are the <c>brandings</c>
 /// resource of a Tenant and of an Event, a document of what it has for the left and for the right of the header, each as an
 /// image sent as base64 (JSON:API has no body but a document), of at most 512 KiB and of a kind a browser prints. What a document
 /// of an Event is printed with is the Event's logo for a position, and the Tenant's where it has none. A PATCH names the positions
@@ -36,6 +36,7 @@ internal static class BrandingEndpoints
         string id,
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         TenantStore tenants,
         BrandingStore branding
     )
@@ -51,7 +52,7 @@ internal static class BrandingEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var verdict = await DecideForTenant(user, id, tenants, context.RequestAborted);
+        var verdict = await DecideForTenant(standing, user, id, tenants, context.RequestAborted);
         return verdict.IsAllowed
             ? await TenantResource(id, branding, context.RequestAborted)
             : AccessResults.Refused(verdict);
@@ -61,6 +62,7 @@ internal static class BrandingEndpoints
         string id,
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         TenantStore tenants,
         BrandingStore branding,
         TenancyLog log
@@ -88,7 +90,7 @@ internal static class BrandingEndpoints
             return JsonApiResults.IdMismatch();
         }
 
-        var verdict = await DecideForTenant(user, id, tenants, context.RequestAborted);
+        var verdict = await DecideForTenant(standing, user, id, tenants, context.RequestAborted);
         if (!verdict.IsAllowed)
         {
             return AccessResults.Refused(verdict);
@@ -127,6 +129,7 @@ internal static class BrandingEndpoints
         string id,
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         EventStore events,
         BrandingStore branding,
         TenancyLog log
@@ -155,11 +158,7 @@ internal static class BrandingEndpoints
             return JsonApiResults.IdMismatch();
         }
 
-        var verdict = AccessPolicy.Decide(
-            Capability.EditEventBranding,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(CallerGrants.None)
-        );
+        var verdict = await standing.DecideAtEventAsync(Capability.ConfigureEvent, user, facts, context.RequestAborted);
         if (!verdict.IsAllowed)
         {
             return AccessResults.Refused(verdict);
@@ -177,16 +176,19 @@ internal static class BrandingEndpoints
     }
 
     static async Task<Verdict> DecideForTenant(
+        StandingReader standing,
         NIdentityUser user,
         string tenantId,
         TenantStore tenants,
         CancellationToken cancellationToken
     )
     {
-        return AccessPolicy.Decide(
-            Capability.EditTenantBranding,
-            AccountRoles.CallerOf(user),
-            AccessScope.ForTenant(tenantId, await tenants.IsOperationalAsync(tenantId, cancellationToken))
+        return await standing.DecideAtTenantAsync(
+            Capability.EditTenant,
+            user,
+            tenantId,
+            await tenants.IsOperationalAsync(tenantId, cancellationToken),
+            cancellationToken
         );
     }
 

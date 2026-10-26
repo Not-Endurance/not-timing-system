@@ -1,7 +1,7 @@
 namespace NTS.Contracts.Features.Console;
 
 /// <summary>
-/// The timeline of the Participation the Main Operator works on in the Console (#619, ADR-0005): every time event of every
+/// The timeline of the Participation the Console Operator works on in the Console (#619, ADR-0005): every time event of every
 /// Phase, in the order they were recorded, with what became of it, how it was acquired, who recorded it and when, which is
 /// what a Participation tells only to Staff. The people are named here and nowhere else. What is done with the events is the
 /// dashboard's: the chosen ones are disabled and enabled by its one change, which is written to the Api against the version

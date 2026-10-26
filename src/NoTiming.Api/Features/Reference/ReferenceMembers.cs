@@ -9,7 +9,7 @@ namespace NoTiming.Api.Features.Reference;
 /// <summary>
 /// The members of a model of reference data as the resource shows them (#603, the rest-api skill): the attributes of
 /// the document are its members in camelCase, without the id, which is the resource's own. A member the server owns,
-/// such as the Tenant or the Main Operator, is shown and cannot be written, and one the resource keeps to itself, such as
+/// such as the Tenant, is shown and cannot be written, and one the resource keeps to itself, such as
 /// the account an Athlete is linked to, is neither shown nor written, so that a document read can be sent back as it is
 /// after the id and what the server owns are taken out. A document that names a member the resource has not is refused,
 /// whatever it says, so nothing it names is ignored without telling.

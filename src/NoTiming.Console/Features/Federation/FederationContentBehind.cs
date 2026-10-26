@@ -6,7 +6,7 @@ using NTS.Contracts.Features.Console;
 namespace NoTiming.Console.Features.Federation;
 
 /// <summary>
-/// The federation (the Tenant) the person acts in (#646, ADR-0012): the rules of its Regional competitions, which a Tenant Root edits and
+/// The federation (the Tenant) the person acts in (#646, ADR-0012): the rules of its Regional competitions, which Root edits and
 /// an Event copies when it starts. What the person may do is what the Api says of them, and a person who may do nothing here
 /// is shown nothing.
 /// </summary>
@@ -26,9 +26,7 @@ public class FederationContentBehind : NStatefulComponent
     INotifier Notifier { get; set; } = default!;
 
     protected string Title => string.IsNullOrWhiteSpace(Federation.Name) ? Federation_string : Federation.Name;
-    protected bool MayEdit => Federation.CanEditRules || Federation.CanEditBranding;
-    protected bool CanEditRules => Federation.CanEditRules;
-    protected bool CanEditBranding => Federation.CanEditBranding;
+    protected bool MayEdit => Federation.CanEdit;
 
     protected bool OnlyAverageLoopSpeed
     {

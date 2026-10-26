@@ -15,7 +15,7 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// The Startlist of a Live Event in the Console, in a real browser (#646): the starts that have a time, by stage, printed
-/// through the browser, and the page shown to nobody but the Main Operator.
+/// through the browser, and the page shown to nobody but the Console Operator.
 /// </summary>
 public sealed class ConsoleStartlistBrowserTests : IClassFixture<ApiHostFixture>, IClassFixture<PasskeyBrowserFixture>
 {
@@ -33,15 +33,15 @@ public sealed class ConsoleStartlistBrowserTests : IClassFixture<ApiHostFixture>
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var eventId = await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
         var start = new DateTimeOffset(DateTime.Today.AddHours(6));
         await EventSeed.ParticipationAsync(mongo, tenant, TwoPhases(eventId, 1, start, complete: false));
         await EventSeed.ParticipationAsync(mongo, tenant, TwoPhases(eventId, 2, start.AddMinutes(30), complete: true));
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator.Email, $"/console/events/{eventId}/startlist");
+        await SignInAndOpenAsync(_host, device, consoleOperator.Email, $"/console/events/{eventId}/startlist");
 
         // the starts of the first stage, and the one of the second that the Participation which completed the first has
         await Expect(page.GetByText("Stage 1", new() { Exact = true }).First).ToBeVisibleAsync(Loaded());
@@ -66,9 +66,9 @@ public sealed class ConsoleStartlistBrowserTests : IClassFixture<ApiHostFixture>
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
         var stranger = await TenancySeed.AccountAsync(mongo, tenant, name: "Elena Petrova");
-        var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var eventId = await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
         await EventSeed.ParticipationAsync(
             mongo,
             tenant,
@@ -79,7 +79,11 @@ public sealed class ConsoleStartlistBrowserTests : IClassFixture<ApiHostFixture>
         page.SetDefaultTimeout(PATIENCE);
         await SignInAndOpenAsync(_host, device, stranger.Email, $"/console/events/{eventId}/startlist");
 
-        await Expect(page.GetByText("Only the Main Operator of an Event opens its Setup.").First)
+        await Expect(
+                page.GetByText(
+                    "Only a Console Operator of an Event, or an administrator of the federation, opens its Setup."
+                ).First
+            )
             .ToBeVisibleAsync(Loaded());
         await Expect(page.GetByText("Athlete 1")).ToHaveCountAsync(0, Counted());
     }

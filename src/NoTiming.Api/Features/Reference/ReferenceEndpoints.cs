@@ -17,7 +17,7 @@ namespace NoTiming.Api.Features.Reference;
 /// <summary>Who may write a family of reference data.</summary>
 internal enum ReferenceWrites
 {
-    /// <summary>The Tenant's registry: a Tenant Root, and the Main Operator of an Event of the Tenant that is not yet Historic.</summary>
+    /// <summary>The Tenant's registry: Root, and a Console Operator of an Event of the Tenant that is not yet Historic.</summary>
     Registry = 1,
 
     /// <summary>The platform's reference data: the Developer.</summary>
@@ -100,21 +100,21 @@ internal sealed class ReferenceAccess
     readonly TenantCollections _tenants;
     readonly GlobalCollections _globals;
     readonly TenantStore _tenantStore;
-    readonly CallerReader _callers;
+    readonly StandingReader _standing;
     readonly CrossTenantReads _reads;
 
     public ReferenceAccess(
         TenantCollections tenants,
         GlobalCollections globals,
         TenantStore tenantStore,
-        CallerReader callers,
+        StandingReader standing,
         CrossTenantReads reads
     )
     {
         _tenants = tenants;
         _globals = globals;
         _tenantStore = tenantStore;
-        _callers = callers;
+        _standing = standing;
         _reads = reads;
     }
 
@@ -147,11 +147,7 @@ internal sealed class ReferenceAccess
     {
         if (family.Writes == ReferenceWrites.Developer)
         {
-            var verdict = AccessPolicy.Decide(
-                Capability.EditCountries,
-                AccountRoles.CallerOf(user),
-                AccessScope.Platform
-            );
+            var verdict = await _standing.DecideAtPlatformAsync(Capability.EditCountries, user, cancellationToken);
             return verdict.IsAllowed ? null : AccessResults.Refused(verdict);
         }
 
@@ -165,9 +161,13 @@ internal sealed class ReferenceAccess
             );
         }
 
-        var caller = await _callers.ReadAsync(user, cancellationToken);
-        var scope = AccessScope.ForTenant(tenantId, await _tenantStore.IsOperationalAsync(tenantId, cancellationToken));
-        var allowed = AccessPolicy.Decide(Capability.EditRegistry, caller, scope);
+        var allowed = await _standing.DecideAtTenantAsync(
+            Capability.EditRegistry,
+            user,
+            tenantId,
+            await _tenantStore.IsOperationalAsync(tenantId, cancellationToken),
+            cancellationToken
+        );
         return allowed.IsAllowed ? null : AccessResults.Refused(allowed);
     }
 }

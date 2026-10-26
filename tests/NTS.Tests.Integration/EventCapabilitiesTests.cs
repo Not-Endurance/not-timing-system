@@ -10,8 +10,8 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// <c>GET /api/events/{id}/capabilities</c> says what the caller may do about an Event, and it is the policy that says it
-/// (ADR-0012, #643): the Event's Tenant, its one Main Operator, its stage by the clock of the host, and what the caller has
-/// been granted on it, read from the data and put to the same function that the unit tests check against the matrix.
+/// (ADR-0012, #643, #671): the Event's Tenant, its stage by the clock of the host, the roles the caller holds and what the
+/// caller has been granted on it, read from the data and put to the same function that the unit tests check against the matrix.
 /// Every kind of person the matrix names is asked about an Event that has not started, one that is Live and one that is
 /// Historic, and what the endpoint answers is what the policy answers over the same facts.
 /// </summary>
@@ -32,10 +32,9 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var people = new[]
         {
-            await PersonAsync(api, client, "main operator", mainOperator),
+            await PersonAsync(api, client, "console operator", tenant, kind: "ConsoleOperator"),
             await PersonAsync(api, client, "member", tenant),
             await PersonAsync(api, client, "operator", tenant, kind: "Operator"),
             await PersonAsync(api, client, "steward", tenant, kind: "Official", role: "Steward"),
@@ -72,14 +71,9 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
         var now = time.GetUtcNow();
         var events = new Dictionary<EventStage, Guid>
         {
-            [EventStage.Unstarted] = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id),
-            [EventStage.Live] = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, now),
-            [EventStage.Historic] = await EventSeed.HistoricAsync(
-                _mongo.ConnectionString,
-                tenant,
-                mainOperator.Id,
-                now
-            ),
+            [EventStage.Unstarted] = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, null),
+            [EventStage.Live] = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, now),
+            [EventStage.Historic] = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, null, now),
         };
         foreach (var person in people.Where(x => x.Kind != null))
         {
@@ -101,35 +95,31 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
         {
             foreach (var person in people)
             {
-                var scope = AccessScope.ForEvent(tenant, mainOperator.Id, stage, person.GrantsOn(eventId, tenant));
-                var inTheTenant = AccessScope.ForTenant(tenant, isOperational: true);
+                var standing = Standing.AtEvent(person.Roles, tenant, person.GrantsOn(eventId, tenant));
+                var state = PlaceState.OfEvent(stage);
+                var inTheTenant = Standing.AtTenant(
+                    person.Roles,
+                    tenant,
+                    isConsoleOperatorOfAnOpenEvent: person.Kind == "ConsoleOperator"
+                );
 
                 var said = await CapabilitiesAsync(person.Person, eventId);
 
                 var where = $"{person.Name} at {stage}";
                 Assert.True(said.GetProperty("stage").GetString() == stage.ToString().ToLowerInvariant(), where);
+                Assert.True(said.GetProperty("level").GetString() == LevelText(standing.Level), where + ": level");
                 Assert.True(
-                    AccessPolicy.IsMainOperator(person.Caller, scope)
-                        == said.GetProperty("isMainOperator").GetBoolean(),
-                    where + ": isMainOperator"
-                );
-                Assert.True(
-                    AccessPolicy.Decide(Capability.SendSnapshot, person.Caller, scope).IsAllowed
+                    AccessPolicy.Decide(Capability.SendSnapshot, standing, state).IsAllowed
                         == said.GetProperty("canSnapshot").GetBoolean(),
                     where + ": canSnapshot"
                 );
                 Assert.True(
-                    AccessPolicy.Decide(Capability.HandOverMainOperator, person.Caller, scope).IsAllowed
-                        == said.GetProperty("canHandOver").GetBoolean(),
-                    where + ": canHandOver"
+                    AccessPolicy.Decide(Capability.AssignConsoleOperators, standing, state).IsAllowed
+                        == said.GetProperty("canAssignConsoleOperators").GetBoolean(),
+                    where + ": canAssignConsoleOperators"
                 );
                 Assert.True(
-                    AccessPolicy.Decide(Capability.AssignMainOperator, person.Caller, scope).IsAllowed
-                        == said.GetProperty("canAssignMainOperator").GetBoolean(),
-                    where + ": canAssignMainOperator"
-                );
-                Assert.True(
-                    AccessPolicy.Decide(Capability.CreateEvent, person.Caller, inTheTenant).IsAllowed
+                    AccessPolicy.Decide(Capability.CreateEvent, inTheTenant, PlaceState.OfTenant(true)).IsAllowed
                         == said.GetProperty("canCreateEvents").GetBoolean(),
                     where + ": canCreateEvents"
                 );
@@ -143,8 +133,13 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var live = await EventSeed.LiveAsync(
+            _mongo.ConnectionString,
+            tenant,
+            consoleOperator.Id,
+            DateTimeOffset.UtcNow
+        );
         var allowed = 0;
         foreach (
             var (kind, role, mayRecord) in new[]
@@ -175,7 +170,7 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
         }
 
         Assert.Equal(5, allowed);
-        Assert.True((await CapabilitiesAsync(mainOperator, live)).GetProperty("canSnapshot").GetBoolean());
+        Assert.True((await CapabilitiesAsync(consoleOperator, live)).GetProperty("canSnapshot").GetBoolean());
     }
 
     [Fact]
@@ -214,13 +209,7 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
             tenantRoot == null ? null : TenantRootOf(tenantRoot),
             isDeveloper
         );
-        return new Persona(name, person, Caller.Of(person.Id, isDeveloper, tenantRoot), kind, role);
-    }
-
-    /// <summary>A person who exists already, such as the Main Operator, who holds no grant.</summary>
-    static Task<Persona> PersonAsync(ApiFactory api, HttpClient client, string name, Person person)
-    {
-        return Task.FromResult(new Persona(name, person, Caller.Of(person.Id), null, null));
+        return new Persona(name, person, Roles.Of(isDeveloper, tenantRoot), kind, role);
     }
 
     static async Task<JsonElement> CapabilitiesAsync(Person person, Guid eventId)
@@ -230,45 +219,55 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
         return (await ApiSessions.ReadJsonAsync(response)).GetProperty("data").GetProperty("attributes");
     }
 
+    /// <summary>The level as the Api tells it: the name of the level, in camel case.</summary>
+    static string LevelText(AccessLevel level)
+    {
+        var name = level.ToString();
+        return char.ToLowerInvariant(name[0]) + name[1..];
+    }
+
     sealed class Persona
     {
-        public Persona(string name, Person person, Caller caller, string? kind, string? role)
+        public Persona(string name, Person person, Roles roles, string? kind, string? role)
         {
             Name = name;
             Person = person;
-            Caller = caller;
+            Roles = roles;
             Kind = kind;
             Role = role;
         }
 
         public string Name { get; }
         public Person Person { get; }
-        public Caller Caller { get; }
+        public Roles Roles { get; }
 
-        /// <summary>The grant the person holds on every Event of the test: <c>Operator</c> or <c>Official</c>; none for most.</summary>
+        /// <summary>The grant the person holds on every Event of the test: <c>ConsoleOperator</c>, <c>Operator</c> or <c>Official</c>; none for most.</summary>
         public string? Kind { get; }
 
         public string? Role { get; }
 
-        public CallerGrants GrantsOn(Guid eventId, string tenant)
+        public IReadOnlyList<EventGrant> GrantsOn(Guid eventId, string tenant)
         {
-            if (Kind == null)
+            return Kind switch
             {
-                return CallerGrants.None;
-            }
-
-            var grant =
-                Kind == "Operator"
-                    ? EventGrant.ForOperator(Guid.NewGuid(), eventId, tenant, Person.Email, Person.Id)
-                    : EventGrant.ForOfficial(
+                null => [],
+                "ConsoleOperator" =>
+                [
+                    EventGrant.ForConsoleOperator(Guid.NewGuid(), eventId, tenant, Person.Email, Person.Id),
+                ],
+                "Operator" => [EventGrant.ForOperator(Guid.NewGuid(), eventId, tenant, Person.Email, Person.Id)],
+                _ =>
+                [
+                    EventGrant.ForOfficial(
                         Guid.NewGuid(),
                         eventId,
                         tenant,
                         Enum.Parse<OfficialRole>(Role!),
                         Person.Email,
                         Person.Id
-                    );
-            return CallerGrants.Of([grant]);
+                    ),
+                ],
+            };
         }
     }
 }

@@ -271,7 +271,7 @@ public sealed class ViewedEventProviderTests
 
     [Theory]
     [InlineData("participation-changed")]
-    [InlineData("not-main-operator")]
+    [InlineData("not-console-operator")]
     [InlineData("not-allowed")]
     [InlineData("event-not-started")]
     [InlineData("participation-busy")]

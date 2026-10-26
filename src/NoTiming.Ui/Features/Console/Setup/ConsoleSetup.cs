@@ -10,7 +10,7 @@ using NTS.Domain.Setup.Aggregates;
 namespace NoTiming.Ui.Features.Console.Setup;
 
 /// <summary>
-/// Opens the Setup of an Event for its Main Operator and makes it the one the Krud pages of the Setup edit (#646). What a
+/// Opens the Setup of an Event for the person who runs it and makes it the one the Krud pages of the Setup edit (#646). What a
 /// person may do is the Api's word (the capabilities of the Event), and what the Setup holds is read from the Api each time
 /// it is opened, so a page that was left and came back shows what is stored and not what it remembered.
 /// </summary>
@@ -38,7 +38,7 @@ public class ConsoleSetup : IConsoleSetup, ITransient
     {
         await _events.Load();
         var row = _events.Events.FirstOrDefault(x => x.Id == eventId);
-        if (row is not { IsMainOperator: true })
+        if (row is not { RunsTheConsole: true })
         {
             return null;
         }
@@ -57,7 +57,7 @@ public class ConsoleSetup : IConsoleSetup, ITransient
 
         var model = new ConfigureEventFormModel();
         model.MapFrom(setup);
-        return new OpenedSetup(model, row.CanEditSetup, row.CanLinkAccounts);
+        return new OpenedSetup(model, row.CanEditSetup, row.CanConfigure);
     }
 
     public async Task RemoveParticipation(Guid eventId, int participationNumber, Guid competitionId)

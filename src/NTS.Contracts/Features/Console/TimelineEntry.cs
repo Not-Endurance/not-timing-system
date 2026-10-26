@@ -4,8 +4,8 @@ namespace NTS.Contracts.Features.Console;
 
 /// <summary>
 /// A time event as the timeline of the Console shows it (#619): what kind of time it is, the time, what became of it, how it
-/// was acquired, the name of the person who recorded it and when, when the Main Operator disabled it if it did, and whether it
-/// is the time its Phase shows now. The Main Operator disables an event that was accepted and enables one that it disabled; what
+/// was acquired, the name of the person who recorded it and when, when the Console Operator disabled it if it did, and whether it
+/// is the time its Phase shows now. The Console Operator disables an event that was accepted and enables one that it disabled; what
 /// the rules rejected is neither.
 /// </summary>
 public sealed class TimelineEntry
@@ -28,9 +28,9 @@ public sealed class TimelineEntry
     /// <summary>Whether the Phase shows this time: it is the latest accepted event of its kind.</summary>
     public bool IsShown { get; init; }
 
-    /// <summary>Whether the Main Operator may disable the event: it was accepted.</summary>
+    /// <summary>Whether the Console Operator may disable the event: it was accepted.</summary>
     public bool CanDisable { get; init; }
 
-    /// <summary>Whether the Main Operator may enable the event: it disabled it. What the rules rejected is neither.</summary>
+    /// <summary>Whether the Console Operator may enable the event: it disabled it. What the rules rejected is neither.</summary>
     public bool CanEnable { get; init; }
 }

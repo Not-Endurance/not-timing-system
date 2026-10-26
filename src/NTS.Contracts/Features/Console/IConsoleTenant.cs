@@ -15,11 +15,8 @@ public interface IConsoleTenant : IStatefulService
 
     string Name { get; }
 
-    /// <summary>Whether the person may edit the rules of the Tenant: a Tenant Root of it.</summary>
-    bool CanEditRules { get; }
-
-    /// <summary>Whether the person may edit the branding of the Tenant: a Tenant Root of it.</summary>
-    bool CanEditBranding { get; }
+    /// <summary>Whether the person may edit the rules and the logos of the Tenant: Root.</summary>
+    bool CanEdit { get; }
 
     /// <summary>Whether a Regional competition judges the speed of a loop on the average only.</summary>
     bool OnlyAverageLoopSpeed { get; }

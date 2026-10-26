@@ -1,99 +1,56 @@
 namespace NTS.Domain.Access;
 
-/// <summary>
-/// The actions of the access matrix of ADR-0012, one for each row of it (a row that names two actors, or two actions,
-/// is split). The policy answers for one of them at a time, for a caller and the place it is done in: an Event, a
-/// Tenant, or the platform.
-/// </summary>
+/// <summary>The rows of the access matrix of ADR-0012. The policy answers for one of them at a time, for who stands at a place.</summary>
 public enum Capability
 {
-    /// <summary>Read the public views of an Event: anyone, signed in or not.</summary>
+    /// <summary>Read the public views of an Event: anybody, signed in or not.</summary>
     ReadPublicViews = 1,
 
     /// <summary>
-    /// Read an Athlete's or a Horse's history and search the registries of every Tenant by name: any signed-in account. What it
-    /// reads of an Athlete or a Horse is its name and its name in English (<see cref="ReadRegistryDetailsAcrossTenants"/> is the rest).
+    /// What an account does for itself or reads of the registries (its profile, state and passkeys, its link to a rider, the
+    /// history of a Participant, the registry of its Tenant, the search by name): any signed-in account.
     /// </summary>
-    ReadRegistryAcrossTenants = 2,
+    SignedIn = 2,
 
-    /// <summary>See how times were recorded: Staff, which is every Official, every Operator and the Main Operator.</summary>
+    /// <summary>See how times were recorded: Staff.</summary>
     SeeTimeEvents = 3,
 
-    /// <summary>Send a Snapshot: an Official of a role that may, any Operator, the Main Operator; to a Live Event.</summary>
+    /// <summary>Send a Snapshot: Staff whose grant may record, while the Event is Live.</summary>
     SendSnapshot = 4,
 
-    /// <summary>Configure an Event and use the Console: the Main Operator.</summary>
+    /// <summary>Configure an Event: start it, change it, brand it, link Operators and Officials.</summary>
     ConfigureEvent = 5,
 
-    /// <summary>Create an Event in a Tenant: a Tenant Root of it.</summary>
-    CreateEvent = 6,
+    /// <summary>Edit the Setup, which is what the Event is configured with until it starts.</summary>
+    EditSetup = 6,
 
-    /// <summary>Assign the Main Operator while the Event is not started: a Tenant Root of its Tenant.</summary>
-    AssignMainOperator = 7,
+    /// <summary>Read the Setup and who has access.</summary>
+    ReadConfiguration = 7,
 
-    /// <summary>Hand the Event to another account once it is Live: only the Main Operator.</summary>
-    HandOverMainOperator = 8,
+    /// <summary>Run the Event: edit what it keeps and reset it, while it is Live.</summary>
+    RunEvent = 8,
 
-    /// <summary>Link accounts to the Event's Officials and Operators: the Main Operator.</summary>
-    LinkAccounts = 9,
+    /// <summary>Assign and remove Console Operators: Root.</summary>
+    AssignConsoleOperators = 9,
 
-    /// <summary>
-    /// Edit the Tenant's registry: a Tenant Root, and the Main Operator of an Event of the Tenant that is not yet Historic.
-    /// </summary>
-    EditRegistry = 10,
+    /// <summary>Delete an Event that has not started: Root.</summary>
+    DeleteEvent = 10,
 
-    /// <summary>Edit the rules of the Tenant's Regional competitions: a Tenant Root.</summary>
-    EditTenantRules = 11,
+    /// <summary>Create an Event in a Tenant: Root.</summary>
+    CreateEvent = 11,
 
-    /// <summary>Edit the Tenant's branding: a Tenant Root.</summary>
-    EditTenantBranding = 12,
+    /// <summary>Edit the rules and the logos of a Tenant: Root.</summary>
+    EditTenant = 12,
 
-    /// <summary>Edit an Event's branding override: the Main Operator.</summary>
-    EditEventBranding = 13,
-
-    /// <summary>Reset a started Event: the Main Operator, while it is Live.</summary>
-    ResetEvent = 14,
-
-    /// <summary>Delete an Event that has not started: a Tenant Root of its Tenant.</summary>
-    DeleteEvent = 15,
-
-    /// <summary>Search the accounts of a Tenant by name: a Tenant Root, the Main Operator.</summary>
-    SearchAccounts = 16,
-
-    /// <summary>Search accounts across Tenants, which the caller has to ask for explicitly: the same people.</summary>
-    SearchAccountsAcrossTenants = 17,
-
-    /// <summary>Seed a Tenant Root: the Developer, by command and never through a route.</summary>
-    SeedTenantRoot = 18,
-
-    /// <summary>Grant Developer: the Developer, by command and never through a route.</summary>
-    GrantDeveloper = 19,
+    /// <summary>Edit the Tenant's registry and search its accounts by name: a Console Operator of an Event of it, and Root.</summary>
+    EditRegistry = 13,
 
     /// <summary>
-    /// Edit the Setup of an Event that has not started: the Main Operator. The Setup is what the Event is configured
-    /// with until it starts and is not edited after (the Console works on the copies the Event made of it), so this is
-    /// narrower than configuring the Event, which the Main Operator does while it is Live too.
+    /// Read the whole row of a rider of another Tenant, match a search against its FEI ID and search accounts across Tenants:
+    /// the people who set an Event up.
     /// </summary>
-    EditSetup = 20,
-
-    /// <summary>Read the Setup of an Event: the Main Operator, and a Tenant Root of the Tenant that holds it.</summary>
-    ReadSetup = 21,
+    SetUpAcrossTenants = 14,
 
     /// <summary>Edit the countries, the platform's reference data: the Developer.</summary>
-    EditCountries = 22,
-
-    /// <summary>
-    /// Change what a started Event keeps, its Participations, Rankings, Officials and Handouts: the Main Operator, while
-    /// it is Live. It is the Console's work on the copies the Event made when it started, so there is nothing to change
-    /// before the start and nothing once the Event has ended.
-    /// </summary>
-    EditEventData = 23,
-
-    /// <summary>
-    /// Read the whole row of an Athlete or a Horse of another Tenant in the search across Tenants (its FEI ID, its club, its country
-    /// and the Tenant that registered it) and match the words of a search against its FEI ID: the people who set an Event up, which
-    /// the Setup needs, a Tenant Root, the Main Operator of an Event that is not yet Historic and the Developer. Any other
-    /// signed-in account reads the name and the name in English and nothing else of a person.
-    /// </summary>
-    ReadRegistryDetailsAcrossTenants = 24,
+    EditCountries = 15,
 }

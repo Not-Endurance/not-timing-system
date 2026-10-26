@@ -1,7 +1,7 @@
 namespace NTS.Contracts.Features.Console.Setup;
 
 /// <summary>
-/// The Setup of an Event as the Console edits it (#646): opened by the Main Operator of the Event, edited until the Event
+/// The Setup of an Event as the Console edits it (#646): opened by the Console Operator of the Event, edited until the Event
 /// starts, one form for the Event and one for each Competition, Loop, Combination and Official of it. What the Api refuses
 /// (an Event that has started, a person who does not run it) comes back as a domain error in the Api's own words.
 /// </summary>

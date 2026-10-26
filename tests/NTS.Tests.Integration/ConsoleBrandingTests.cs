@@ -18,7 +18,7 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// The logos at the head of what an Event prints, as the Console has them (#646, ADR-0012): the Tenant's, which a Tenant Root edits,
-/// an Event's own in place of them, which its Main Operator edits, and what the pages print with, which is what the Api says an
+/// an Event's own in place of them, which its Console Operator edits, and what the pages print with, which is what the Api says an
 /// Event is printed with. Over the real Api in this process, with the services of the Ui built as the app builds them.
 /// </summary>
 public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
@@ -64,18 +64,18 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_puts_a_logo_of_its_Event_in_place_of_the_Tenants_and_the_pages_print_with_what_the_Api_says()
+    public async Task The_Console_Operator_puts_a_logo_of_its_Event_in_place_of_the_Tenants_and_the_pages_print_with_what_the_Api_says()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
         await using var rootUi = ConsoleUi.Open(api, root);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Left, "image/png", PNG);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Right, "image/jpeg", JPEG);
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         var branding = ui.Get<IConsoleBranding>();
         var view = new StubViewedEvent(new NoParticipations(), IntegrationPayloadFactory.EventInformation(eventId));
         var changed = 0;
@@ -105,12 +105,12 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
         await using var rootUi = ConsoleUi.Open(api, root);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Left, "image/png", PNG);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Right, "image/jpeg", JPEG);
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         var branding = ui.Get<IConsoleBranding>();
 
         await branding.SetOfEvent(eventId, LogoPosition.Right, "image/png", OTHER_PNG);
@@ -165,8 +165,8 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var plain = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
         await using var ui = ConsoleUi.Open(api, plain);
         var branding = ui.Get<IConsoleBranding>();
 
@@ -219,12 +219,12 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
         await using var rootUi = ConsoleUi.Open(api, root);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Left, "image/png", PNG);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Right, "image/jpeg", JPEG);
-        var json = JsonApiClients.Of(api, mainOperator, out _);
+        var json = JsonApiClients.Of(api, consoleOperator, out _);
         var notifier = new Notifier();
         var warned = new List<string>();
         notifier.Warned.Subscribe(warned.Add);

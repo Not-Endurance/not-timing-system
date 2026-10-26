@@ -10,9 +10,9 @@ namespace NoTiming.Ui.Storage.REST;
 
 /// <summary>
 /// The Setup of an Event as the Api serves it (#603): JSON:API documents at <c>/api/configure-events</c> (ADR-0008, ADR-0012).
-/// A Tenant Root makes an Event with a name, a location and a FEI show ID, and the Main Operator configures the rest of it
-/// until it starts: so a Setup that is made with more than that is made, and then changed to the rest. The Tenant and the
-/// Main Operator are the Api's to set and are not sent. An update announces itself only when the Api took it.
+/// Root makes an Event with a name, a location and a FEI show ID, and Root or a Console Operator configures the rest of it
+/// until it starts: so a Setup that is made with more than that is made, and then changed to the rest. The Tenant is the
+/// Api's to set and is not sent. An update announces itself only when the Api took it.
 /// </summary>
 public class ConfigureEventApiRepository : JsonApiRepository<ConfigureEvent, ConfigureEventModel>
 {

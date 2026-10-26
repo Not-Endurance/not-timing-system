@@ -12,7 +12,7 @@ using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// The search of accounts by name (ADR-0012, #643) is how a Tenant Root or a Main Operator finds the person to link or
+/// The search of accounts by name (ADR-0012, #643) is how a Tenant Root or a Console Operator finds the person to link or
 /// to assign, in place of a listing of everybody. It takes words of a name, one of at least two characters, answers a page
 /// (ten by default) of accounts in the order of their names with a display name and an email that is partly masked, is
 /// limited in how often it can be asked, a page being a search, and finds
@@ -314,36 +314,36 @@ public sealed class AccountSearchTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task Only_a_Tenant_Root_a_Main_Operator_of_an_Event_that_is_not_Historic_or_the_Developer_searches()
+    public async Task Only_a_Tenant_Root_a_Console_Operator_of_an_Event_that_is_not_Historic_or_the_Developer_searches()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var formerMainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var formerConsoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
         var rootElsewhere = await SignedInAsync(api, client, _mongo.ConnectionString, other, TenantRootOf(other));
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, formerMainOperator.Id, DateTimeOffset.UtcNow);
+        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, formerConsoleOperator.Id, DateTimeOffset.UtcNow);
 
         Assert.Equal(HttpStatusCode.OK, (await SearchAsync(root, "abc")).StatusCode);
-        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(mainOperator, "abc")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(consoleOperator, "abc")).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await SearchAsync(developer, "abc")).StatusCode);
-        foreach (var refused in new[] { member, formerMainOperator })
+        foreach (var refused in new[] { member, formerConsoleOperator })
         {
             var response = await SearchAsync(refused, "abc");
 
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-            Assert.Equal("not-allowed", await ErrorCodeAsync(response));
+            Assert.Equal("not-console-operator", await ErrorCodeAsync(response));
         }
 
         // A Tenant Root of another Tenant has authority there, and searches the Tenant it is in as itself: its own.
         Assert.Equal(HttpStatusCode.OK, (await SearchAsync(rootElsewhere, "abc")).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await SearchAsync(member, "abc", acrossTenants: true)).StatusCode);
-        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(mainOperator, "abc", acrossTenants: true)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(consoleOperator, "abc", acrossTenants: true)).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await SearchAsync(rootElsewhere, "abc", acrossTenants: true)).StatusCode);
     }
 

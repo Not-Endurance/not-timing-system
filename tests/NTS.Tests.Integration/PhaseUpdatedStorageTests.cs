@@ -78,7 +78,7 @@ public sealed class PhaseUpdatedStorageTests : IClassFixture<MongoFixture>
     }
 
     /// <summary>
-    /// A Phase that an Official arrived at and presented, and that the Main Operator edited in the form: the Arrive time was
+    /// A Phase that an Official arrived at and presented, and that the Console Operator edited in the form: the Arrive time was
     /// moved and the Present time was cleared.
     /// </summary>
     static Participation Edited(Guid eventId, Guid id)

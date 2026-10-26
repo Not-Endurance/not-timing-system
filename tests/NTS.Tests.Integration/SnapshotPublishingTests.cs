@@ -163,7 +163,7 @@ public sealed class SnapshotPublishingTests : IClassFixture<MongoFixture>
         var historic = await EventSeed.HistoricAsync(
             _mongo.ConnectionString,
             scene.Tenant,
-            scene.MainOperator.Id,
+            scene.ConsoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         await EventSeed.GrantAsync(
@@ -312,11 +312,11 @@ public sealed class SnapshotPublishingTests : IClassFixture<MongoFixture>
         var api = new ApiFactory(_mongo.ConnectionString);
         var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
@@ -343,7 +343,7 @@ public sealed class SnapshotPublishingTests : IClassFixture<MongoFixture>
         }
 
         var publisher = new SnapshotApiPublisher(JsonApiClients.Of(api, official, out var requests));
-        return new Scene(api, client, tenant, eventId, mainOperator, official, ids, publisher, requests);
+        return new Scene(api, client, tenant, eventId, consoleOperator, official, ids, publisher, requests);
     }
 
     async Task<List<BsonDocument>> EventsAsync(Guid participation)
@@ -379,7 +379,7 @@ public sealed class SnapshotPublishingTests : IClassFixture<MongoFixture>
             HttpClient client,
             string tenant,
             Guid eventId,
-            Person mainOperator,
+            Person consoleOperator,
             Person official,
             IReadOnlyList<Guid> participationIds,
             SnapshotApiPublisher publisher,
@@ -390,7 +390,7 @@ public sealed class SnapshotPublishingTests : IClassFixture<MongoFixture>
             Client = client;
             Tenant = tenant;
             EventId = eventId;
-            MainOperator = mainOperator;
+            ConsoleOperator = consoleOperator;
             Official = official;
             ParticipationIds = participationIds;
             Publisher = publisher;
@@ -401,7 +401,7 @@ public sealed class SnapshotPublishingTests : IClassFixture<MongoFixture>
         public HttpClient Client { get; }
         public string Tenant { get; }
         public Guid EventId { get; }
-        public Person MainOperator { get; }
+        public Person ConsoleOperator { get; }
         public Person Official { get; }
 
         /// <summary>The Participations of the numbers 1, 2 and so on.</summary>

@@ -27,12 +27,12 @@ public static class EventLinks
 
     static IEnumerable<(string Text, string Template)> PagesOf(ConsoleEvent row)
     {
-        if (row is { Stage: EventStage.Unstarted, IsMainOperator: true })
+        if (row is { Stage: EventStage.Unstarted, RunsTheConsole: true })
         {
             yield return (Setup_string, ConsoleRoutes.EVENT_SETUP_PAGE);
             yield return (Logos_string, ConsoleRoutes.EVENT_BRANDING_PAGE);
         }
-        else if (row is { Stage: EventStage.Live, IsMainOperator: true })
+        else if (row is { Stage: EventStage.Live, RunsTheConsole: true })
         {
             yield return (Dashboard_string, ConsoleRoutes.EVENT_DASHBOARD_PAGE);
             yield return (Startlist_string, ConsoleRoutes.EVENT_STARTLIST_PAGE);

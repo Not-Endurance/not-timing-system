@@ -737,7 +737,7 @@ public sealed partial class IntegrationHarnessCheckTest
         var persistedSetup = await api.ReadSetupConfigureEvent(eventId);
         Assert.Single(persistedSetup.Operators);
 
-        var eventInformation = await StartAsMainOperator(eventId);
+        var eventInformation = await StartAsConsoleOperator(eventId);
         var activeOfficials = await api.ReadOfficials(eventInformation.Id);
         var activeOperators = await api.ReadOperators(eventInformation.Id);
         var activeRankings = await api.ReadRankings(eventInformation.Id);
@@ -929,13 +929,13 @@ public sealed partial class IntegrationHarnessCheckTest
     }
 
     /// <summary>
-    /// Parked with the scenario: the Functions API no longer starts an Event. The Main Operator of its Setup starts it with
+    /// Parked with the scenario: the Functions API no longer starts an Event. The Console Operator of its Setup starts it with
     /// <c>POST /api/events</c> on the Api, signed in as a person is (<c>EventStartTests</c> shows how), or through the
     /// repository of the Ui that the Console uses, and the scenario is re-based on that when it comes back (#642).
     /// </summary>
-    static Task<EventInformation> StartAsMainOperator(Guid eventId)
+    static Task<EventInformation> StartAsConsoleOperator(Guid eventId)
     {
-        throw new NotSupportedException($"Start Event '{eventId}' as its Main Operator through POST /api/events.");
+        throw new NotSupportedException($"Start Event '{eventId}' as its Console Operator through POST /api/events.");
     }
 
     static SnapshotGroup CreateSnapshotGroup()

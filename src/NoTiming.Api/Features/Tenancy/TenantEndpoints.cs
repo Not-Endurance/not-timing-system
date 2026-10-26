@@ -14,8 +14,8 @@ namespace NoTiming.Api.Features.Tenancy;
 /// <summary>
 /// The account's place in the Tenants and the Tenants themselves (#643, ADR-0012). The account chooses the Tenant that
 /// what it reads and writes belongs to from among the ones it is a member of. Any signed-in account reads a Tenant: its
-/// name, whether it is operational and the rules of its Regional competitions. A Tenant Root of it, or the Developer,
-/// edits the rules, and what an account may do in it is told by the same policy that refuses it. Nothing here gives a
+/// name, whether it is operational and the rules of its Regional competitions. Root edits the rules, and what an
+/// account may do in it is told by the same policy that refuses it. Nothing here gives a
 /// role: roles are written by the Developer's command alone.
 /// </summary>
 internal static class TenantEndpoints
@@ -140,6 +140,7 @@ internal static class TenantEndpoints
         string id,
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         TenantStore tenants,
         TenancyLog log
     )
@@ -172,10 +173,12 @@ internal static class TenantEndpoints
         }
 
         var operational = await tenants.IsOperationalAsync(id, context.RequestAborted);
-        var verdict = AccessPolicy.Decide(
-            Capability.EditTenantRules,
-            AccountRoles.CallerOf(user),
-            AccessScope.ForTenant(id, operational)
+        var verdict = await standing.DecideAtTenantAsync(
+            Capability.EditTenant,
+            user,
+            id,
+            operational,
+            context.RequestAborted
         );
         if (!verdict.IsAllowed)
         {
@@ -219,7 +222,7 @@ internal static class TenantEndpoints
         HttpContext context,
         UserManager<NIdentityUser> users,
         TenantStore tenants,
-        CallerReader callers
+        StandingReader standings
     )
     {
         var user = await users.GetUserAsync(context.User);
@@ -233,19 +236,18 @@ internal static class TenantEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var caller = await callers.ReadAsync(user, context.RequestAborted);
-        var scope = AccessScope.ForTenant(id, await tenants.IsOperationalAsync(id, context.RequestAborted));
+        var standing = await standings.AtTenantAsync(user, id, context.RequestAborted);
+        var state = PlaceState.OfTenant(await tenants.IsOperationalAsync(id, context.RequestAborted));
         return JsonApiResults.Resource(
             StatusCodes.Status200OK,
             CAPABILITIES,
             id,
             new
             {
-                canCreateEvents = AccessPolicy.Decide(Capability.CreateEvent, caller, scope).IsAllowed,
-                canEditRules = AccessPolicy.Decide(Capability.EditTenantRules, caller, scope).IsAllowed,
-                canEditBranding = AccessPolicy.Decide(Capability.EditTenantBranding, caller, scope).IsAllowed,
-                canEditRegistry = AccessPolicy.Decide(Capability.EditRegistry, caller, scope).IsAllowed,
-                canSearchAccounts = AccessPolicy.Decide(Capability.SearchAccounts, caller, scope).IsAllowed,
+                level = AccessLevelText.Of(standing.Level),
+                canCreateEvents = AccessPolicy.Decide(Capability.CreateEvent, standing, state).IsAllowed,
+                canEditTenant = AccessPolicy.Decide(Capability.EditTenant, standing, state).IsAllowed,
+                canEditRegistry = AccessPolicy.Decide(Capability.EditRegistry, standing, state).IsAllowed,
             }
         );
     }

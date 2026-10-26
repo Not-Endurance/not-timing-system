@@ -44,7 +44,7 @@ public class TimeEventModel
     public DateTimeOffset? RecordedAt { get; init; }
     public Guid? ActorId { get; init; }
 
-    /// <summary>When the Main Operator disabled the event; none while it is not disabled.</summary>
+    /// <summary>When the Console Operator disabled the event; none while it is not disabled.</summary>
     public DateTimeOffset? DisabledAt { get; init; }
 
     public TimeEvent MapToEntity()
@@ -131,6 +131,6 @@ public enum TimeEventKind
     /// <summary>An Official corrected the Present time of a Snapshot they sent, or the Represent time when the Phase has one.</summary>
     PresentUpdated = 4,
 
-    /// <summary>The Main Operator edited the Phase in the form of the Console: one event that lists the times that were changed.</summary>
+    /// <summary>The Console Operator edited the Phase in the form of the Console: one event that lists the times that were changed.</summary>
     PhaseUpdated = 5,
 }

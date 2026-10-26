@@ -7,7 +7,7 @@ using NTS.Contracts.Features.Console;
 namespace NoTiming.Console.Features.Dashboard.Timeline;
 
 /// <summary>
-/// The timeline of the Participation the Main Operator works on (#619, ADR-0005): every time event of every Phase, in the order
+/// The timeline of the Participation the Console Operator works on (#619, ADR-0005): every time event of every Phase, in the order
 /// they were recorded, and the choosing of the ones to disable and to enable. A click stages the change of an event and applies
 /// nothing, a second click takes it back, and nothing is applied until the person saves: the chosen events are written as one
 /// change, against the version of the Participation that the person saw. Closing the dialog leaves the choice behind. What the

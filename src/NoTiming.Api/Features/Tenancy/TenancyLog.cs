@@ -6,13 +6,13 @@ namespace NoTiming.Api.Features.Tenancy;
 /// <summary>
 /// The events that change who may do what, and the Events that start and reset (#643, #628, ADR-0012), each with an id
 /// and a name that stay as they are, so that a dashboard or an alert can key off them whatever the wording of a message
-/// becomes. They are the 11xx range, next to the 10xx of signing in (<c>AuthEvents</c>).
+/// becomes. They are the 11xx range, next to the 10xx of signing in (<c>AuthEvents</c>). 1102 (a Main Operator was
+/// assigned) and 1103 (an Event was handed over) are retired with the Main Operator (#671, ADR-0012) and are not reused: a
+/// Console Operator is a grant, and the log says it as one (<c>GrantLinked</c>, <c>GrantRemoved</c>).
 /// </summary>
 internal static class TenancyEvents
 {
     public static readonly EventId EVENT_CREATED = new(1101, "EventCreated");
-    public static readonly EventId MAIN_OPERATOR_ASSIGNED = new(1102, "MainOperatorAssigned");
-    public static readonly EventId EVENT_HANDED_OVER = new(1103, "EventHandedOver");
     public static readonly EventId GRANT_LINKED = new(1104, "GrantLinked");
     public static readonly EventId GRANT_REMOVED = new(1105, "GrantRemoved");
     public static readonly EventId TENANT_RULES_EDITED = new(1106, "TenantRulesEdited");
@@ -81,28 +81,6 @@ internal sealed class TenancyLog
             user,
             eventId,
             tenantId
-        );
-    }
-
-    public void MainOperatorAssigned(Guid user, Guid eventId, Guid mainOperator)
-    {
-        _logger.LogInformation(
-            TenancyEvents.MAIN_OPERATOR_ASSIGNED,
-            "User {UserId} assigned user {MainOperatorId} as the Main Operator of Event {EventId}.",
-            user,
-            mainOperator,
-            eventId
-        );
-    }
-
-    public void EventHandedOver(Guid user, Guid eventId, Guid mainOperator)
-    {
-        _logger.LogInformation(
-            TenancyEvents.EVENT_HANDED_OVER,
-            "User {UserId} handed Event {EventId} over to user {MainOperatorId}.",
-            user,
-            eventId,
-            mainOperator
         );
     }
 

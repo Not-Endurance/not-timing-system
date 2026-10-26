@@ -23,9 +23,9 @@ namespace NoTiming.Api.Features.Events;
 /// from then on: liveness is derived and never stored. Who runs an Event is not part of what the public sees.
 /// <para>
 /// A <c>POST</c> names the Setup an Event is started from, as the id of the resource, and starts it (<see cref="EventStarter"/>):
-/// the Main Operator's, before the Event starts, and the same Setup again is the Event that was started. A <c>PATCH</c>
-/// changes what the Event shows, while it is Live, and a <c>DELETE</c> resets it to its Setup, while it is Live; both are
-/// the Main Operator's, and neither can end the Event, because an Event is over when its last day is.
+/// a Console Operator's or Root's, before the Event starts, and the same Setup again is the Event that was started. A
+/// <c>PATCH</c> changes what the Event shows, while it is Live, and a <c>DELETE</c> resets it to its Setup, while it is Live;
+/// both are theirs, and neither can end the Event, because an Event is over when its last day is.
 /// </para>
 /// </summary>
 internal static class EventResourceEndpoints
@@ -67,7 +67,7 @@ internal static class EventResourceEndpoints
 
     /// <summary>What an Event shows, and what a change of it may name: the rules the Tenant had when it started are shown and not written.</summary>
     public static ReferenceMembers<EventInformationModel> Members { get; } =
-        new(["MainOperatorId", "IsDeleted", "DeletedVersion"], ["RegionalRules"]);
+        new(["IsDeleted", "DeletedVersion"], ["RegionalRules"]);
 
     static async Task<IResult> ListAsync(
         EventStage? stage,
@@ -112,6 +112,7 @@ internal static class EventResourceEndpoints
     static async Task<IResult> StartAsync(
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         EventStore events,
         EventStarter starter,
         TenantStore tenantStore,
@@ -165,11 +166,7 @@ internal static class EventResourceEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var verdict = AccessPolicy.Decide(
-            Capability.ConfigureEvent,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(CallerGrants.None)
-        );
+        var verdict = await standing.DecideAtEventAsync(Capability.ConfigureEvent, user, facts, context.RequestAborted);
         if (!verdict.IsAllowed)
         {
             return AccessResults.Refused(verdict);
@@ -223,6 +220,7 @@ internal static class EventResourceEndpoints
         string id,
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         EventStore events,
         TenantCollections tenants,
         TimeProvider time
@@ -247,11 +245,7 @@ internal static class EventResourceEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var verdict = AccessPolicy.Decide(
-            Capability.ConfigureEvent,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(CallerGrants.None)
-        );
+        var verdict = await standing.DecideAtEventAsync(Capability.ConfigureEvent, user, facts, context.RequestAborted);
         if (!verdict.IsAllowed)
         {
             return AccessResults.Refused(verdict);
@@ -330,6 +324,7 @@ internal static class EventResourceEndpoints
         string id,
         HttpContext context,
         UserManager<NIdentityUser> users,
+        StandingReader standing,
         EventStore events,
         EventStarter starter,
         TenancyLog log
@@ -347,11 +342,7 @@ internal static class EventResourceEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var verdict = AccessPolicy.Decide(
-            Capability.ResetEvent,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(CallerGrants.None)
-        );
+        var verdict = await standing.DecideAtEventAsync(Capability.RunEvent, user, facts, context.RequestAborted);
         if (!verdict.IsAllowed)
         {
             return AccessResults.Refused(verdict);

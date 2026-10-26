@@ -107,7 +107,7 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_time_that_the_Main_Operator_records_after_the_Event_ended_is_told_to_the_view()
+    public async Task A_time_that_the_Console_Operator_records_after_the_Event_ended_is_told_to_the_view()
     {
         await using var scene = await SceneAsync();
         await using var tab = await ConsoleTab.OpenAsync(scene);
@@ -135,7 +135,7 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_Ranking_that_the_Main_Operator_makes_or_removes_after_the_Event_ended_is_told_to_the_view()
+    public async Task A_Ranking_that_the_Console_Operator_makes_or_removes_after_the_Event_ended_is_told_to_the_view()
     {
         await using var scene = await SceneAsync();
         await using var tab = await ConsoleTab.OpenAsync(scene);
@@ -159,7 +159,7 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_Handout_that_the_Main_Operator_makes_or_removes_after_the_Event_ended_is_told_to_the_view()
+    public async Task A_Handout_that_the_Console_Operator_makes_or_removes_after_the_Event_ended_is_told_to_the_view()
     {
         await using var scene = await SceneAsync();
         await using var tab = await ConsoleTab.OpenAsync(scene);
@@ -180,7 +180,7 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
     public async Task The_Console_lists_an_Event_that_has_ended_as_a_Historic_one_when_it_reads_the_Events_again_and_not_before()
     {
         await using var scene = await SceneAsync();
-        await using var ui = ConsoleUi.Open(scene.Api, scene.MainOperator);
+        await using var ui = ConsoleUi.Open(scene.Api, scene.ConsoleOperator);
         var events = ui.Get<IConsoleEvents>();
         await events.Load();
         Assert.Equal(EventStage.Live, events.Events.Single(x => x.Id == scene.EventId).Stage);
@@ -204,8 +204,8 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
         var api = new ApiFactory(_mongo.ConnectionString, time: clock);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, clock.GetUtcNow());
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, clock.GetUtcNow());
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         await EventSeed.GrantAsync(
             _mongo.ConnectionString,
@@ -228,7 +228,7 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
             await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
         }
 
-        return new Scene(api, clock, mainOperator, official, stranger, eventId);
+        return new Scene(api, clock, consoleOperator, official, stranger, eventId);
     }
 
     sealed class Scene : IAsyncDisposable
@@ -239,7 +239,7 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
         public Scene(
             ApiFactory api,
             FakeTimeProvider clock,
-            Person mainOperator,
+            Person consoleOperator,
             Person official,
             Person stranger,
             Guid eventId
@@ -247,14 +247,14 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
         {
             _api = api;
             _clock = clock;
-            MainOperator = mainOperator;
+            ConsoleOperator = consoleOperator;
             Official = official;
             Stranger = stranger;
             EventId = eventId;
         }
 
         public ApiFactory Api => _api;
-        public Person MainOperator { get; }
+        public Person ConsoleOperator { get; }
         public Person Official { get; }
         public Person Stranger { get; }
         public Guid EventId { get; }
@@ -317,12 +317,12 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
         }
     }
 
-    /// <summary>The Console of the Main Operator: the services the dashboard, the Rankings and the Handouts call, over one view.</summary>
+    /// <summary>The Console of the Console Operator: the services the dashboard, the Rankings and the Handouts call, over one view.</summary>
     sealed class ConsoleTab : IAsyncDisposable
     {
         public static async Task<ConsoleTab> OpenAsync(Scene scene)
         {
-            var json = JsonApiClients.Of(scene.Api, scene.MainOperator, out _);
+            var json = JsonApiClients.Of(scene.Api, scene.ConsoleOperator, out _);
             var selected = new SelectedEvent(scene.EventId);
             var store = new ParticipationStore(
                 new ParticipationEventScopedApiRepository(json, new EventScopeFactory<Participation>(selected))

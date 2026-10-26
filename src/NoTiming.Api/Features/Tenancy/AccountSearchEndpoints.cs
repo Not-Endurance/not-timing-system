@@ -7,8 +7,8 @@ using NTS.Domain.Access;
 namespace NoTiming.Api.Features.Tenancy;
 
 /// <summary>
-/// The search of accounts by name (#643, ADR-0012), which is how a Tenant Root or a Main Operator finds the person to link
-/// or to assign. <c>GET /api/accounts</c> looks among the members of the Tenant the account acts in, and
+/// The search of accounts by name (#643, ADR-0012), which is how Root or a Console Operator finds the person to link or to
+/// assign. <c>GET /api/accounts</c> looks among the members of the Tenant the account acts in, and
 /// <c>GET /api/accounts/all-tenants</c> is the named view that reaches across Tenants for the people who may search at all:
 /// no parameter turns the first into the second. Both take <c>filter=contains(name,'text')</c>, whose words have to be parts of
 /// the name in any order and in any case, with one of at least two characters, the <c>sort</c> of the names and the pages
@@ -30,7 +30,7 @@ internal static class AccountSearchEndpoints
     static async Task<IResult> SearchInTheTenant(
         HttpContext context,
         UserManager<NIdentityUser> users,
-        CallerReader callers,
+        StandingReader standing,
         TenantStore tenants,
         AccountSearch search,
         SearchRateLimiter limiter
@@ -42,17 +42,18 @@ internal static class AccountSearchEndpoints
             return JsonApiResults.NotSignedIn();
         }
 
-        var caller = await callers.ReadAsync(user, context.RequestAborted);
         var tenantId = AccountRoles.CurrentTenantOf(user);
 
         // With no Tenant there is nobody to find, but whether the caller may search is still told as it is anywhere.
         var verdict =
             tenantId == null
-                ? AccessPolicy.Decide(Capability.SearchAccountsAcrossTenants, caller, AccessScope.Platform)
-                : AccessPolicy.Decide(
-                    Capability.SearchAccounts,
-                    caller,
-                    AccessScope.ForTenant(tenantId, await tenants.IsOperationalAsync(tenantId, context.RequestAborted))
+                ? await standing.DecideAtPlatformAsync(Capability.SetUpAcrossTenants, user, context.RequestAborted)
+                : await standing.DecideAtTenantAsync(
+                    Capability.EditRegistry,
+                    user,
+                    tenantId,
+                    await tenants.IsOperationalAsync(tenantId, context.RequestAborted),
+                    context.RequestAborted
                 );
         return await AnswerAsync(context, user, verdict, tenantId, search, limiter);
     }
@@ -60,7 +61,7 @@ internal static class AccountSearchEndpoints
     static async Task<IResult> SearchEveryTenant(
         HttpContext context,
         UserManager<NIdentityUser> users,
-        CallerReader callers,
+        StandingReader standing,
         AccountSearch search,
         SearchRateLimiter limiter
     )
@@ -71,8 +72,7 @@ internal static class AccountSearchEndpoints
             return JsonApiResults.NotSignedIn();
         }
 
-        var caller = await callers.ReadAsync(user, context.RequestAborted);
-        var verdict = AccessPolicy.Decide(Capability.SearchAccountsAcrossTenants, caller, AccessScope.Platform);
+        var verdict = await standing.DecideAtPlatformAsync(Capability.SetUpAcrossTenants, user, context.RequestAborted);
         return await AnswerAsync(context, user, verdict, null, search, limiter, acrossTenants: true);
     }
 

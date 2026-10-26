@@ -168,7 +168,7 @@ public class Participation : Aggregate, IEventScoped
     }
 
     /// <summary>
-    /// The Main Operator disables and enables time events as one change (ADR-0005): a disabled event stays in the history with
+    /// The Console Operator disables and enables time events as one change (ADR-0005): a disabled event stays in the history with
     /// the outcome of a manual reject and the instant it was disabled, so that the previous accepted time of its kind takes
     /// over again, and an enabled one is accepted again. Only an accepted event is disabled and only a disabled one is enabled:
     /// what the rules rejected stays as it is, and so does an event that is no longer as it was when it was chosen, which

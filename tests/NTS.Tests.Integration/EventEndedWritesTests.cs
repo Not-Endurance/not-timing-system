@@ -17,12 +17,12 @@ using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// An Event that is no longer Live takes no write (#629, ADR-0007, ADR-0012): what the Main Operator may make, change and
+/// An Event that is no longer Live takes no write (#629, ADR-0007, ADR-0012): what the Console Operator may make, change and
 /// remove while it runs is refused from the instant its last day ends, with 409 <c>event-ended</c>, and nothing is
 /// written. The clock is the host's and is moved to the last second of the Event and to its end, so that the instant the
 /// rule turns on is the instant tested, and a delete by id, which names no Event, is refused as well: the Event is found
-/// from the row. Reads are never refused. The one write the host makes by itself to an Event that has ended is a named
-/// rule, and no client reaches it.
+/// from the row. Reads are never refused. The one write the host makes by itself to an Event that has ended, the
+/// finalisation of the placings, is the finaliser's own and no client reaches it (<see cref="RankingFinalisationTests"/>).
 /// </summary>
 public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
 {
@@ -51,8 +51,8 @@ public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         using var anonymous = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await StartedAsync(tenant, mainOperator.Id);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var eventId = await StartedAsync(tenant, consoleOperator.Id);
         var changed = EventDataRow.Of(route, eventId);
         var removed = EventDataRow.Of(route, eventId);
         var made = EventDataRow.Of(route, eventId);
@@ -62,9 +62,9 @@ public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
 
         time.Advance(LENGTH - TimeSpan.FromSeconds(1)); // the last second of the Event
 
-        var created = await PostAsync(mainOperator, made);
-        var updated = await PatchAsync(mainOperator, changed, version: 0);
-        var deleted = await DeleteAsync(mainOperator, removed);
+        var created = await PostAsync(consoleOperator, made);
+        var updated = await PatchAsync(consoleOperator, changed, version: 0);
+        var deleted = await DeleteAsync(consoleOperator, removed);
         var whileLive = await StoredAsync(changed.Collection, eventId);
 
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
@@ -75,9 +75,9 @@ public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
 
         time.Advance(TimeSpan.FromSeconds(1)); // the end of its last day
 
-        await AssertRefusedAsync(mainOperator, route, eventId, changed, made, whileLive, version: 1);
+        await AssertRefusedAsync(consoleOperator, route, eventId, changed, made, whileLive, version: 1);
         time.Advance(TimeSpan.FromDays(1)); // and it stays so
-        await AssertRefusedAsync(mainOperator, route, eventId, changed, made, whileLive, version: 1);
+        await AssertRefusedAsync(consoleOperator, route, eventId, changed, made, whileLive, version: 1);
 
         var list = await anonymous.GetAsync($"/api/{route}?filter=eventId eq {eventId}");
         var read = await anonymous.GetAsync($"/api/{route}/{changed.Id}");
@@ -92,10 +92,10 @@ public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
         await using var api = NewApi(out var time);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var first = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var second = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await StartedAsync(tenant, mainOperator.Id);
+        var eventId = await StartedAsync(tenant, consoleOperator.Id);
         var existing = await EventSeed.GrantAsync(
             _mongo.ConnectionString,
             tenant,
@@ -107,19 +107,19 @@ public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
         );
 
         time.Advance(LENGTH - TimeSpan.FromSeconds(1));
-        var linked = await LinkOperatorAsync(mainOperator, eventId, first.Email);
-        var unlinked = await mainOperator.Page.DeleteAsync($"/api/event-grants/{existing}");
+        var linked = await LinkOperatorAsync(consoleOperator, eventId, first.Email);
+        var unlinked = await consoleOperator.Page.DeleteAsync($"/api/event-grants/{existing}");
         var grant = Guid.Parse(
             (await ApiSessions.ReadJsonAsync(linked)).GetProperty("data").GetProperty("id").GetString()!
         );
         var whileLive = await GrantsOfAsync(eventId);
         time.Advance(TimeSpan.FromSeconds(1));
-        var linkedAgain = await LinkOperatorAsync(mainOperator, eventId, second.Email);
-        var unlinkedAgain = await mainOperator.Page.DeleteAsync($"/api/event-grants/{grant}");
+        var linkedAgain = await LinkOperatorAsync(consoleOperator, eventId, second.Email);
+        var unlinkedAgain = await consoleOperator.Page.DeleteAsync($"/api/event-grants/{grant}");
 
         Assert.Equal(HttpStatusCode.Created, linked.StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, unlinked.StatusCode);
-        Assert.Equal([grant], whileLive.Select(IdOf));
+        Assert.Equal([grant], whileLive.Where(x => x["Kind"].AsString != "ConsoleOperator").Select(IdOf)); // beside the Console Operator's
         foreach (var refused in new[] { linkedAgain, unlinkedAgain })
         {
             Assert.Equal(HttpStatusCode.Conflict, refused.StatusCode);
@@ -135,44 +135,44 @@ public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
         await using var api = NewApi(out var time);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await StartedAsync(tenant, mainOperator.Id);
+        var eventId = await StartedAsync(tenant, consoleOperator.Id);
         var participation = EventDataRow.Of("participations", eventId);
         await participation.SeedAsync(_mongo.ConnectionString, tenant);
         var scope = new EventScopeFactory<Participation>(new SelectedEvent(eventId));
-        var asMainOperator = new ParticipationEventScopedApiRepository(
-            JsonApiClients.Of(api, mainOperator, out _),
+        var asConsoleOperator = new ParticipationEventScopedApiRepository(
+            JsonApiClients.Of(api, consoleOperator, out _),
             scope
         );
         var asMember = new ParticipationEventScopedApiRepository(JsonApiClients.Of(api, member, out _), scope);
-        var read = (await asMainOperator.Read(participation.Id))!;
-        var staleRead = (await asMainOperator.Read(participation.Id))!;
+        var read = (await asConsoleOperator.Read(participation.Id))!;
+        var staleRead = (await asConsoleOperator.Read(participation.Id))!;
         var readByMember = (await asMember.Read(participation.Id))!;
 
         read.Withdraw();
-        await asMainOperator.Update(read);
-        var whileLive = asMainOperator.LastError;
+        await asConsoleOperator.Update(read);
+        var whileLive = asConsoleOperator.LastError;
         staleRead.Retire();
-        await asMainOperator.Update(staleRead);
-        var stale = asMainOperator.LastError;
+        await asConsoleOperator.Update(staleRead);
+        var stale = asConsoleOperator.LastError;
         readByMember.Retire();
         await asMember.Update(readByMember);
         var notTheirs = asMember.LastError;
 
         time.Advance(LENGTH);
-        var afterTheEnd = (await asMainOperator.Read(participation.Id))!; // reads are never refused
+        var afterTheEnd = (await asConsoleOperator.Read(participation.Id))!; // reads are never refused
         afterTheEnd.Restore();
-        await asMainOperator.Update(afterTheEnd);
-        var updated = asMainOperator.LastError;
-        await asMainOperator.Delete(participation.Id);
-        var deleted = asMainOperator.LastError;
-        await asMainOperator.Create(Created(eventId));
-        var created = asMainOperator.LastError;
+        await asConsoleOperator.Update(afterTheEnd);
+        var updated = asConsoleOperator.LastError;
+        await asConsoleOperator.Delete(participation.Id);
+        var deleted = asConsoleOperator.LastError;
+        await asConsoleOperator.Create(Created(eventId));
+        var created = asConsoleOperator.LastError;
 
         Assert.Null(whileLive);
         Assert.Equal("participation-changed", stale?.Code);
-        Assert.Equal("not-main-operator", notTheirs?.Code);
+        Assert.Equal("not-console-operator", notTheirs?.Code);
         foreach (var refused in new[] { updated, deleted, created })
         {
             Assert.Equal("event-ended", refused?.Code);
@@ -184,31 +184,23 @@ public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_host_may_finalise_the_Rankings_of_an_Event_that_has_ended_by_a_named_rule_and_a_client_may_not_write_them()
+    public async Task A_client_may_write_a_Ranking_while_the_Event_is_Live_and_not_once_it_has_ended()
     {
         await using var api = NewApi(out var time);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await StartedAsync(tenant, mainOperator.Id);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var eventId = await StartedAsync(tenant, consoleOperator.Id);
         var ranking = EventDataRow.Of("rankings", eventId);
         await ranking.SeedAsync(_mongo.ConnectionString, tenant);
-        var access = api.Services.GetRequiredService<EventDataAccess>();
 
-        var whileLive = await access.OpenForHostAsync(HostOperation.RankingFinalisation, eventId, default);
-        var clientWhileLive = await PatchAsync(mainOperator, ranking, version: 0);
+        var clientWhileLive = await PatchAsync(consoleOperator, ranking, version: 0);
         time.Advance(LENGTH);
-        var atTheEnd = await access.OpenForHostAsync(HostOperation.RankingFinalisation, eventId, default);
-        var clientAtTheEnd = await PatchAsync(mainOperator, ranking, version: 0);
-        var notThere = await access.OpenForHostAsync(HostOperation.RankingFinalisation, Guid.NewGuid(), default);
+        var clientAtTheEnd = await PatchAsync(consoleOperator, ranking, version: 0);
 
-        Assert.Null(whileLive); // not before the Event has ended
         Assert.Equal(HttpStatusCode.OK, clientWhileLive.StatusCode);
-        Assert.Equal(eventId, atTheEnd?.Id);
-        Assert.Equal(tenant, atTheEnd?.TenantId); // the host writes in the Tenant of the Event
         Assert.Equal(HttpStatusCode.Conflict, clientAtTheEnd.StatusCode); // the same Ranking, written by a client, is refused
         Assert.Equal("event-ended", await ErrorCodeAsync(clientAtTheEnd));
-        Assert.Null(notThere);
     }
 
     [Fact]
@@ -258,7 +250,7 @@ public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
 
     /// <summary>The three writes that are refused, and the proof that none of them wrote anything.</summary>
     async Task AssertRefusedAsync(
-        Person mainOperator,
+        Person consoleOperator,
         string route,
         Guid eventId,
         EventDataRow changed,
@@ -269,9 +261,9 @@ public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
     {
         var refused = new[]
         {
-            await PostAsync(mainOperator, EventDataRow.Of(route, eventId)),
-            await PatchAsync(mainOperator, changed, version),
-            await DeleteAsync(mainOperator, made), // by its id alone: the Event is found from the row
+            await PostAsync(consoleOperator, EventDataRow.Of(route, eventId)),
+            await PatchAsync(consoleOperator, changed, version),
+            await DeleteAsync(consoleOperator, made), // by its id alone: the Event is found from the row
         };
 
         foreach (var response in refused)
@@ -290,10 +282,10 @@ public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
     }
 
     /// <summary>An Event that has started and ends <see cref="LENGTH"/> after the clock of the host says it is.</summary>
-    async Task<Guid> StartedAsync(string tenant, Guid mainOperator)
+    async Task<Guid> StartedAsync(string tenant, Guid consoleOperator)
     {
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator);
-        await EventSeed.StartAsync(_mongo.ConnectionString, id, tenant, mainOperator, NOW + LENGTH);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator);
+        await EventSeed.StartAsync(_mongo.ConnectionString, id, tenant, consoleOperator, NOW + LENGTH);
         return id;
     }
 

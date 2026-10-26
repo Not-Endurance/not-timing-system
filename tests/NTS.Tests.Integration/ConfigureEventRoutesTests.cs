@@ -10,11 +10,10 @@ using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// The Setup of an Event, the <c>configure-events</c> resource (#603, ADR-0012, ADR-0006): what the Main Operator
-/// configures an Event with until it starts. A Tenant Root makes the Event (see <c>EventAccessTests</c>) and the Main
-/// Operator configures it, and once it has started the Setup is not changed again, because the Console works on the
-/// copies the Event made of it. The Setup is read by the people who run the Event and the Tenant that holds it, and by
-/// nobody else.
+/// The Setup of an Event, the <c>configure-events</c> resource (#603, ADR-0012, ADR-0006, #671): what Root and the Console
+/// Operators configure an Event with until it starts. Root makes the Event (see <c>EventAccessTests</c>) and Root or a
+/// Console Operator of it configures it, and once it has started the Setup is not changed again, because the Console works
+/// on the copies the Event made of it. The Setup is read by the people who run the Event, and by nobody else.
 /// </summary>
 public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
 {
@@ -48,7 +47,7 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.OK, again.StatusCode);
         var attributes = (await ApiSessions.ReadJsonAsync(again)).GetProperty("data").GetProperty("attributes");
         Assert.Equal("First Name", attributes.GetProperty("name").GetString());
-        Assert.Equal(root.Id.ToString(), attributes.GetProperty("mainOperatorId").GetString());
+        Assert.False(attributes.TryGetProperty("mainOperatorId", out _)); // nobody is assigned to run it (#671)
         var stored = (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!;
         Assert.Equal("First Name", stored["Name"].AsString);
         Assert.Equal(tenant, stored["TenantId"].AsString);
@@ -72,20 +71,20 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Setup_is_read_by_the_Main_Operator_a_Tenant_Root_of_the_Tenant_and_the_Developer_and_by_nobody_else()
+    public async Task The_Setup_is_read_by_the_Console_Operator_a_Tenant_Root_of_the_Tenant_and_the_Developer_and_by_nobody_else()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
         var developer = await SignedInAsync(api, client, _mongo.ConnectionString, other, isDeveloper: true);
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var rootElsewhere = await SignedInAsync(api, client, _mongo.ConnectionString, other, TenantRootOf(other));
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Unstarted");
-        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Unstarted");
+        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
         foreach (var eventId in new[] { unstarted, historic })
         {
             await EventSeed.GrantAsync(
@@ -101,7 +100,7 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
 
         foreach (var eventId in new[] { unstarted, historic })
         {
-            foreach (var reader in new[] { mainOperator, root, developer })
+            foreach (var reader in new[] { consoleOperator, root, developer })
             {
                 var response = await reader.Page.GetAsync($"/api/configure-events/{eventId}");
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -111,7 +110,7 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
             {
                 var response = await reader.Page.GetAsync($"/api/configure-events/{eventId}");
                 Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-                Assert.Equal("not-allowed", await ErrorCodeAsync(response));
+                Assert.Equal("not-console-operator", await ErrorCodeAsync(response));
             }
         }
 
@@ -124,98 +123,94 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Setup_shows_the_Tenant_and_the_Main_Operator_the_Event_has_now_and_what_it_was_configured_with()
+    public async Task The_Setup_shows_the_Tenant_of_the_Event_and_what_it_was_configured_with_and_names_nobody_to_run_it()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var successor = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, successor.Id, NOW);
-        await EventSeed
-            .Setups(_mongo.ConnectionString)
-            .UpdateOneAsync(
-                new BsonDocument("_id", EventSeed.Binary(live)),
-                new BsonDocument("$set", new BsonDocument("MainOperatorId", EventSeed.Binary(mainOperator.Id)))
-            );
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
 
-        var response = await successor.Page.GetAsync($"/api/configure-events/{live}");
+        var response = await consoleOperator.Page.GetAsync($"/api/configure-events/{live}");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var attributes = (await ApiSessions.ReadJsonAsync(response)).GetProperty("data").GetProperty("attributes");
         Assert.Equal(tenant, attributes.GetProperty("tenantId").GetString());
-        Assert.Equal(successor.Id.ToString(), attributes.GetProperty("mainOperatorId").GetString());
+        Assert.False(attributes.TryGetProperty("mainOperatorId", out _)); // who runs it is told by console-operators (#671)
         Assert.Equal("Sofia", attributes.GetProperty("location").GetString());
         Assert.Equal("BG", attributes.GetProperty("country").GetProperty("isoCode").GetString());
     }
 
     [Fact]
-    public async Task The_Setups_listed_are_those_of_the_Tenant_to_a_Tenant_Root_and_the_ones_it_runs_to_a_Main_Operator()
+    public async Task The_Setups_listed_are_those_of_the_Tenant_to_a_Tenant_Root_and_the_ones_it_runs_to_a_Console_Operator()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Mine");
+        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Mine");
         await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, root.Id, "The root's");
         await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, null, "Nobody's");
-        await EventSeed.SetupAsync(_mongo.ConnectionString, other, mainOperator.Id, "Elsewhere");
+        await EventSeed.SetupAsync(_mongo.ConnectionString, other, consoleOperator.Id, "Elsewhere");
 
         Assert.Equal(["Mine", "Nobody's", "The root's"], Names(await ListAsync(root)).Order());
-        Assert.Equal(["Mine"], Names(await ListAsync(mainOperator)));
+        Assert.Equal(["Mine"], Names(await ListAsync(consoleOperator)));
         Assert.Empty(Names(await ListAsync(member)));
         Assert.Equal(["The root's"], Names(await ListAsync(root, "?filter=name eq 'The root''s'")));
     }
 
     [Fact]
-    public async Task A_hand_over_moves_the_Setup_of_a_Live_Event_from_the_list_of_the_Main_Operator_that_had_it_to_the_one_that_has_it_now()
+    public async Task Assigning_and_removing_a_Console_Operator_moves_the_Setup_of_a_Live_Event_into_and_out_of_its_list()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var before = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var after = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, before.Id, DateTimeOffset.UtcNow);
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, before.Id, "Not started");
+        var first = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var second = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, first.Id, DateTimeOffset.UtcNow);
+        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, first.Id, "Not started");
 
-        var handedOver = await before.Page.WriteAsync(
+        var assigned = await root.Page.WriteAsync(
             HttpMethod.Post,
-            $"/api/events/{live}/actions/hand-over",
-            "main-operators",
-            new { accountId = after.Id }
+            "/api/console-operators",
+            "console-operators",
+            new { eventId = live, accountId = second.Id }
         );
 
-        Assert.Equal(HttpStatusCode.NoContent, handedOver.StatusCode);
-        Assert.Equal([unstarted], Ids(await ListAsync(before)));
-        Assert.Equal([live], Ids(await ListAsync(after)));
-        var listed = (await ListAsync(root))
-            .GetProperty("data")
-            .EnumerateArray()
-            .Single(x => x.GetProperty("id").GetString() == live.ToString());
-        Assert.Equal(after.Id.ToString(), listed.GetProperty("attributes").GetProperty("mainOperatorId").GetString());
-        Assert.Equal(
-            HttpStatusCode.Forbidden,
-            (await before.Page.GetAsync($"/api/configure-events/{live}")).StatusCode
-        );
-        Assert.Equal(HttpStatusCode.OK, (await after.Page.GetAsync($"/api/configure-events/{live}")).StatusCode);
+        Assert.Equal(HttpStatusCode.Created, assigned.StatusCode);
+        Assert.Equal([live], Ids(await ListAsync(second)));
+        Assert.Equal(new[] { live, unstarted }.Order(), Ids(await ListAsync(first)).Order());
+
+        var held = await EventSeed
+            .Grants(_mongo.ConnectionString)
+            .Find(
+                new BsonDocument { { "EventId", EventSeed.Binary(live) }, { "AccountId", EventSeed.Binary(first.Id) } }
+            )
+            .SingleAsync();
+        var removed = await root.Page.DeleteAsync($"/api/console-operators/{held["_id"].AsGuid}");
+
+        Assert.Equal(HttpStatusCode.NoContent, removed.StatusCode);
+        Assert.Equal([unstarted], Ids(await ListAsync(first)));
+        Assert.Equal(HttpStatusCode.Forbidden, (await first.Page.GetAsync($"/api/configure-events/{live}")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await second.Page.GetAsync($"/api/configure-events/{live}")).StatusCode);
     }
 
     [Fact]
-    public async Task A_Setup_with_everything_in_it_is_sent_by_the_Main_Operator_and_read_back_as_it_was_sent()
+    public async Task A_Setup_with_everything_in_it_is_sent_by_a_Console_Operator_and_read_back_as_it_was_sent()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
         var sent = ConfigureEventModel.From(SetupFactory.Full(id, "Full Setup"));
 
-        var response = await ChangeAsync(mainOperator, id, AttributesOf(sent));
-        var read = await mainOperator.Page.GetAsync($"/api/configure-events/{id}");
+        var response = await ChangeAsync(consoleOperator, id, AttributesOf(sent));
+        var read = await consoleOperator.Page.GetAsync($"/api/configure-events/{id}");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var attributes = (await ApiSessions.ReadJsonAsync(read)).GetProperty("data").GetProperty("attributes");
@@ -225,14 +220,12 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
         )!;
         received.Id = id;
         received.TenantId = sent.TenantId;
-        received.MainOperatorId = sent.MainOperatorId;
         Assert.Equal(
             JsonSerializer.Serialize(sent, JsonApiResults.Options),
             JsonSerializer.Serialize(received, JsonApiResults.Options)
         );
         var stored = (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!;
         Assert.Equal(tenant, stored["TenantId"].AsString);
-        Assert.Equal(mainOperator.Id, stored["MainOperatorId"].AsGuid);
         Assert.Equal("Full Setup", stored["Name"].AsString);
         Assert.Single(stored["Competitions"].AsBsonArray);
     }
@@ -243,11 +236,11 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        await ChangeAsync(mainOperator, id, AttributesOf(ConfigureEventModel.From(SetupFactory.Full(id))));
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        await ChangeAsync(consoleOperator, id, AttributesOf(ConfigureEventModel.From(SetupFactory.Full(id))));
 
-        var renamed = await ChangeAsync(mainOperator, id, new { name = "Renamed", feiShowId = (string?)null });
+        var renamed = await ChangeAsync(consoleOperator, id, new { name = "Renamed", feiShowId = (string?)null });
 
         Assert.Equal(HttpStatusCode.OK, renamed.StatusCode);
         var stored = (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!;
@@ -259,33 +252,31 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task Only_the_Main_Operator_and_before_the_start_the_Developer_change_a_Setup()
+    public async Task Only_a_Console_Operator_and_Root_change_a_Setup_and_an_account_that_holds_nothing_does_not()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Original");
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Original");
 
-        foreach (var who in new[] { root, member })
-        {
-            var refused = await ChangeAsync(who, id, new { name = "Taken" });
-            Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
-            Assert.Equal("not-main-operator", await ErrorCodeAsync(refused));
-        }
+        var refused = await ChangeAsync(member, id, new { name = "Taken" });
+        Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
+        Assert.Equal("not-console-operator", await ErrorCodeAsync(refused));
 
         var anonymous = await client.SendAsync(new HttpRequestMessage(HttpMethod.Patch, $"/api/configure-events/{id}"));
         Assert.Equal("Original", (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!["Name"].AsString);
+        Assert.Equal(HttpStatusCode.OK, (await ChangeAsync(root, id, new { name = "By Root" })).StatusCode);
         Assert.Equal(
             HttpStatusCode.OK,
             (await ChangeAsync(developer, id, new { name = "By the Developer" })).StatusCode
         );
         Assert.Equal(
             HttpStatusCode.OK,
-            (await ChangeAsync(mainOperator, id, new { name = "By the Main Operator" })).StatusCode
+            (await ChangeAsync(consoleOperator, id, new { name = "By the Console Operator" })).StatusCode
         );
         Assert.True(anonymous.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.BadRequest);
     }
@@ -296,10 +287,10 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Kept Name");
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Kept Name");
 
-        var response = await mainOperator.Page.WriteAsync(
+        var response = await consoleOperator.Page.WriteAsync(
             HttpMethod.Patch,
             $"/api/configure-events/{id}",
             "configure-events",
@@ -318,12 +309,12 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
-        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
 
-        var duringTheEvent = await ChangeAsync(mainOperator, live, new { name = "Too late" });
-        var afterTheEvent = await ChangeAsync(mainOperator, historic, new { name = "Far too late" });
+        var duringTheEvent = await ChangeAsync(consoleOperator, live, new { name = "Too late" });
+        var afterTheEvent = await ChangeAsync(consoleOperator, historic, new { name = "Far too late" });
 
         Assert.Equal(HttpStatusCode.Conflict, duringTheEvent.StatusCode);
         Assert.Equal("event-started", await ErrorCodeAsync(duringTheEvent));
@@ -337,16 +328,16 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
     [InlineData("mainOperatorId")]
     [InlineData("id")]
     [InlineData("bogus")]
-    public async Task A_change_cannot_give_a_Setup_a_Tenant_a_Main_Operator_or_a_member_it_does_not_have(string member)
+    public async Task A_change_cannot_give_a_Setup_a_Tenant_an_owner_or_a_member_it_does_not_have(string member)
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Original");
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Original");
 
         var response = await ChangeAsync(
-            mainOperator,
+            consoleOperator,
             id,
             new Dictionary<string, object> { ["name"] = "Taken", [member] = Guid.NewGuid() }
         );
@@ -365,10 +356,10 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Original");
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Original");
 
-        var response = await ChangeAsync(mainOperator, id, new Dictionary<string, object?> { [member] = null });
+        var response = await ChangeAsync(consoleOperator, id, new Dictionary<string, object?> { [member] = null });
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("invalid-attribute", await ErrorCodeAsync(response));
@@ -385,18 +376,18 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        var kept = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        var kept = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
         await EventSeed.GrantAsync(_mongo.ConnectionString, tenant, id, "Operator", null, "one@example.test", null);
         await EventSeed.GrantAsync(_mongo.ConnectionString, tenant, kept, "Operator", null, "two@example.test", null);
 
-        var refusedForTheMainOperator = await mainOperator.Page.DeleteAsync($"/api/configure-events/{id}");
+        var refusedForTheConsoleOperator = await consoleOperator.Page.DeleteAsync($"/api/configure-events/{id}");
         var removed = await root.Page.DeleteAsync($"/api/configure-events/{id}");
         var again = await root.Page.DeleteAsync($"/api/configure-events/{id}");
 
-        Assert.Equal(HttpStatusCode.Forbidden, refusedForTheMainOperator.StatusCode);
-        Assert.Equal("not-tenant-root", await ErrorCodeAsync(refusedForTheMainOperator));
+        Assert.Equal(HttpStatusCode.Forbidden, refusedForTheConsoleOperator.StatusCode);
+        Assert.Equal("not-root", await ErrorCodeAsync(refusedForTheConsoleOperator));
         Assert.Equal(HttpStatusCode.NoContent, removed.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, again.StatusCode);
         Assert.Null(await EventSeed.SetupOfAsync(_mongo.ConnectionString, id));
@@ -407,11 +398,14 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
                 .Find(new BsonDocument("EventId", EventSeed.Binary(id)))
                 .ToListAsync()
         );
-        Assert.Single(
-            await EventSeed
-                .Grants(_mongo.ConnectionString)
-                .Find(new BsonDocument("EventId", EventSeed.Binary(kept)))
-                .ToListAsync()
+        Assert.Equal(
+            2, // the Console Operator and the Operator
+            (
+                await EventSeed
+                    .Grants(_mongo.ConnectionString)
+                    .Find(new BsonDocument("EventId", EventSeed.Binary(kept)))
+                    .ToListAsync()
+            ).Count
         );
     }
 
@@ -462,7 +456,7 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
         return JsonSerializer
             .SerializeToElement(model, JsonApiResults.Options)
             .EnumerateObject()
-            .Where(x => x.Name is not ("id" or "tenantId" or "mainOperatorId"))
+            .Where(x => x.Name is not ("id" or "tenantId"))
             .ToDictionary(x => x.Name, x => x.Value);
     }
 

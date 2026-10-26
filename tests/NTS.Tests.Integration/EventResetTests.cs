@@ -26,21 +26,26 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_resets_a_Live_Event_and_everything_it_made_and_everything_kept_for_it_goes()
+    public async Task The_Console_Operator_resets_a_Live_Event_and_everything_it_made_and_everything_kept_for_it_goes()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        var other = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Another Event");
-        await StartAsync(mainOperator, id);
-        await StartAsync(mainOperator, other);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        var other = await EventSeed.FullSetupAsync(
+            _mongo.ConnectionString,
+            tenant,
+            consoleOperator.Id,
+            "Another Event"
+        );
+        await StartAsync(consoleOperator, id);
+        await StartAsync(consoleOperator, other);
         await EventSeed.KeepsAsync(_mongo.ConnectionString, tenant, id);
         await EventSeed.KeepsAsync(_mongo.ConnectionString, tenant, other);
         var otherBefore = await EventSeed.CountOfAsync(_mongo.ConnectionString, "event_participations", other);
 
-        var response = await mainOperator.Page.DeleteAsync($"/api/events/{id}");
+        var response = await consoleOperator.Page.DeleteAsync($"/api/events/{id}");
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
@@ -57,7 +62,7 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
         using var anonymous = ApiClients.Of(api);
         Assert.Equal(HttpStatusCode.NotFound, (await anonymous.GetAsync($"/api/events/{id}")).StatusCode);
         var capabilities = await ApiSessions.ReadJsonAsync(
-            await mainOperator.Page.GetAsync($"/api/events/{id}/capabilities")
+            await consoleOperator.Page.GetAsync($"/api/events/{id}/capabilities")
         );
         Assert.Equal(
             "unstarted",
@@ -71,12 +76,12 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        await StartAsync(mainOperator, id);
-        await mainOperator.Page.DeleteAsync($"/api/events/{id}");
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        await StartAsync(consoleOperator, id);
+        await consoleOperator.Page.DeleteAsync($"/api/events/{id}");
 
-        var again = await StartAsync(mainOperator, id);
+        var again = await StartAsync(consoleOperator, id);
 
         Assert.Equal(HttpStatusCode.Created, again.StatusCode);
         Assert.Equal(1, await EventSeed.CountOfAsync(_mongo.ConnectionString, "event_participations", id));
@@ -89,11 +94,11 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
         await EventSeed.KeepsAsync(_mongo.ConnectionString, tenant, id);
 
-        var response = await mainOperator.Page.DeleteAsync($"/api/events/{id}");
+        var response = await consoleOperator.Page.DeleteAsync($"/api/events/{id}");
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
@@ -106,9 +111,9 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        await StartAsync(mainOperator, id);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        await StartAsync(consoleOperator, id);
         // Nothing can be removed from a view, which is how the reset stops after what the Event made is gone.
         var database = RegistrySeed.Collection(_mongo.ConnectionString, "event_user_sessions").Database;
         await database.DropCollectionAsync("event_user_sessions");
@@ -121,7 +126,7 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
         {
             try
             {
-                await mainOperator.Page.DeleteAsync($"/api/events/{id}");
+                await consoleOperator.Page.DeleteAsync($"/api/events/{id}");
             }
             catch (Exception)
             {
@@ -136,39 +141,36 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
             await database.DropCollectionAsync("event_user_sessions");
         }
 
-        var again = await mainOperator.Page.DeleteAsync($"/api/events/{id}");
+        var again = await consoleOperator.Page.DeleteAsync($"/api/events/{id}");
 
         Assert.Equal(HttpStatusCode.NoContent, again.StatusCode);
         Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
     }
 
     [Fact]
-    public async Task Only_the_Main_Operator_resets_and_only_while_the_Event_is_Live()
+    public async Task Only_a_Console_Operator_and_Root_reset_and_only_while_the_Event_is_Live()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
-        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
         await EventSeed.KeepsAsync(_mongo.ConnectionString, tenant, live);
 
-        foreach (var who in new[] { root, member, developer })
-        {
-            var refused = await who.Page.DeleteAsync($"/api/events/{live}");
-            Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
-            Assert.Equal("not-main-operator", await ErrorCodeAsync(refused));
-        }
+        var refused = await member.Page.DeleteAsync($"/api/events/{live}");
+        Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
+        Assert.Equal("not-console-operator", await ErrorCodeAsync(refused));
 
-        var ended = await mainOperator.Page.DeleteAsync($"/api/events/{historic}");
-        var notStarted = await mainOperator.Page.DeleteAsync($"/api/events/{unstarted}");
+        var ended = await consoleOperator.Page.DeleteAsync($"/api/events/{historic}");
+        var notStarted = await consoleOperator.Page.DeleteAsync($"/api/events/{unstarted}");
         var anonymous = await client.DeleteAsync($"/api/events/{live}");
-        var missing = await mainOperator.Page.DeleteAsync($"/api/events/{Guid.NewGuid()}");
-        var notAnId = await mainOperator.Page.DeleteAsync("/api/events/spring-ride");
+        var missing = await consoleOperator.Page.DeleteAsync($"/api/events/{Guid.NewGuid()}");
+        var notAnId = await consoleOperator.Page.DeleteAsync("/api/events/spring-ride");
 
         Assert.Equal(HttpStatusCode.Conflict, ended.StatusCode);
         Assert.Equal("event-ended", await ErrorCodeAsync(ended));
@@ -180,6 +182,28 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
         Assert.NotNull(await EventSeed.CoreOfAsync(_mongo.ConnectionString, live));
         Assert.NotNull(await EventSeed.CoreOfAsync(_mongo.ConnectionString, historic));
         Assert.Equal(1, await EventSeed.CountOfAsync(_mongo.ConnectionString, "event_participations", live));
+    }
+
+    [Theory]
+    [InlineData("a Tenant Root")]
+    [InlineData("the Developer")]
+    public async Task Root_resets_a_Live_Event_it_is_not_assigned_to(string who)
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root =
+            who == "a Tenant Root"
+                ? await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant))
+                : await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
+        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, NOW);
+        await EventSeed.KeepsAsync(_mongo.ConnectionString, tenant, live);
+
+        var reset = await root.Page.DeleteAsync($"/api/events/{live}");
+
+        Assert.Equal(HttpStatusCode.NoContent, reset.StatusCode);
+        Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, live));
+        Assert.Equal(0, await EventSeed.CountOfAsync(_mongo.ConnectionString, "event_participations", live));
     }
 
     ApiFactory NewApi()

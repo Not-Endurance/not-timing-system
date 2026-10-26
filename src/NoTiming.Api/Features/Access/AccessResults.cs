@@ -38,15 +38,15 @@ internal static class AccessResults
                 "not-allowed",
                 "You may not do this."
             ),
-            Refusal.NotTenantRoot => new JsonApiFailure(
+            Refusal.NotRoot => new JsonApiFailure(
                 StatusCodes.Status403Forbidden,
-                "not-tenant-root",
+                "not-root",
                 "Only a Tenant Root of the Tenant may do this."
             ),
-            Refusal.NotMainOperator => new JsonApiFailure(
+            Refusal.NotConsoleOperator => new JsonApiFailure(
                 StatusCodes.Status403Forbidden,
-                "not-main-operator",
-                "Only the Main Operator of the Event may do this."
+                "not-console-operator",
+                "Only a Console Operator of the Event may do this."
             ),
             Refusal.NotDeveloper => new JsonApiFailure(
                 StatusCodes.Status403Forbidden,

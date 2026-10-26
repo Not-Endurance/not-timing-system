@@ -124,23 +124,27 @@ public sealed class ViewedEventEndedBrowserTests : IClassFixture<ApiHostFixture>
     }
 
     [Fact]
-    public async Task The_pages_that_run_an_Event_say_to_its_Main_Operator_that_the_Event_has_ended_and_not_that_they_may_not_run_it()
+    public async Task The_pages_that_run_an_Event_say_to_its_Console_Operator_that_the_Event_has_ended_and_not_that_they_may_not_run_it()
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        var eventId = await EventSeed.HistoricAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var eventId = await EventSeed.HistoricAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator.Email, $"/console/events/{eventId}/dashboard");
+        await SignInAndOpenAsync(_host, device, consoleOperator.Email, $"/console/events/{eventId}/dashboard");
 
         foreach (var path in new[] { "dashboard", "handouts", "startlist" })
         {
             await page.EvaluateAsync($"Blazor.navigateTo('/console/events/{eventId}/{path}')");
 
             await Expect(page.GetByText(NOT_AVAILABLE).First).ToBeVisibleAsync(Loaded());
-            await Expect(page.GetByText("Only the Main Operator of an Event opens its Setup."))
+            await Expect(
+                    page.GetByText(
+                        "Only a Console Operator of an Event, or an administrator of the federation, opens its Setup."
+                    )
+                )
                 .ToHaveCountAsync(0, Counted());
         }
     }
@@ -324,14 +328,14 @@ public sealed class ViewedEventEndedBrowserTests : IClassFixture<ApiHostFixture>
         }
     }
 
-    /// <summary>A Live Event of two Participations that have started, its Rankings, and the Main Operator who runs it.</summary>
+    /// <summary>A Live Event of two Participations that have started, its Rankings, and the Console Operator who runs it.</summary>
     sealed class ConsoleScene
     {
         public static async Task<ConsoleScene> CreateAsync(string mongo)
         {
             var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-            var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-            var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+            var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+            var eventId = await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
             var participations = new List<Participation>();
             foreach (var number in new[] { 1, 2 })
             {
@@ -359,7 +363,7 @@ public sealed class ViewedEventEndedBrowserTests : IClassFixture<ApiHostFixture>
                 );
             }
 
-            return new ConsoleScene(mongo, mainOperator.Email, eventId, participations.Select(x => x.Id).ToList());
+            return new ConsoleScene(mongo, consoleOperator.Email, eventId, participations.Select(x => x.Id).ToList());
         }
 
         readonly string _mongo;

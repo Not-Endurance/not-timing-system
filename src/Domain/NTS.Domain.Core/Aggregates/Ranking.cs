@@ -101,7 +101,7 @@ public class Ranking : Aggregate, IEventScoped
     /// <summary>
     /// Whether this is the Ranking of the ride's own Competition and Category (#638, ADR-0006): the one that the start of the
     /// Event makes for each Category of each Competition, which carries the name and the ruleset of the Competition and the
-    /// Category of the ride. A Ranking that the Main Operator made and that happens to share all three is not told from it.
+    /// Category of the ride. A Ranking that the Console Operator made and that happens to share all three is not told from it.
     /// </summary>
     public bool IsOwnOf(Participation participation)
     {

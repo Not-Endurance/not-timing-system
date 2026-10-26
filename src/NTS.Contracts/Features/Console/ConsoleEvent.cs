@@ -14,20 +14,43 @@ public sealed class ConsoleEvent
     public required string Location { get; init; }
     public required EventStage Stage { get; init; }
 
-    /// <summary>Whether the caller is the Main Operator of the Event: the one who reaches its Console.</summary>
-    public required bool IsMainOperator { get; init; }
+    /// <summary>Where the caller stands at the Event, which is the Api's answer.</summary>
+    public required AccessLevel Level { get; init; }
 
+    /// <summary>Whether the caller works the Console of the Event: a Console Operator of it, or Root.</summary>
+    public bool RunsTheConsole => Level >= AccessLevel.ConsoleOperator;
+
+    /// <summary>Whether the caller may configure the Event: start it, change it, brand it and link its Operators and Officials.</summary>
     public bool CanConfigure { get; init; }
+
     public bool CanEditSetup { get; init; }
-    public bool CanEditData { get; init; }
-    public bool CanLinkAccounts { get; init; }
-    public bool CanEditBranding { get; init; }
-    public bool CanReset { get; init; }
-    public bool CanHandOver { get; init; }
-    public bool CanAssignMainOperator { get; init; }
+
+    /// <summary>Whether the caller may run the Event: edit what it keeps, and reset it.</summary>
+    public bool CanRun { get; init; }
+
+    public bool CanAssignConsoleOperators { get; init; }
 }
 
-/// <summary>An account that was found by name, to be named the Main Operator: its id, the name it is shown by and its address, partly masked as the Api gives it.</summary>
+/// <summary>A Console Operator of an Event as the Api lists it: the grant, the name it is shown by (none while an invitation waits) and its address, partly masked.</summary>
+public sealed class ConsoleOperatorRow
+{
+    public ConsoleOperatorRow(Guid id, string displayName, string email, bool isPending)
+    {
+        Id = id;
+        DisplayName = displayName;
+        Email = email;
+        IsPending = isPending;
+    }
+
+    public Guid Id { get; }
+    public string DisplayName { get; }
+    public string Email { get; }
+
+    /// <summary>Whether the address has no account yet, so that the grant waits for the person to register.</summary>
+    public bool IsPending { get; }
+}
+
+/// <summary>An account that was found by name, to be made a Console Operator: its id, the name it is shown by and its address, partly masked as the Api gives it.</summary>
 public sealed class AccountMatch
 {
     public AccountMatch(Guid id, string displayName, string email)

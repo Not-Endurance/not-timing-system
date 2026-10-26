@@ -13,7 +13,7 @@ using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// The people a Main Operator links to the Officials and Operators of its Event, by the exact email, and what the forms of the
+/// The people a Console Operator links to the Officials and Operators of its Event, by the exact email, and what the forms of the
 /// Setup pick from (#646, ADR-0010, ADR-0012). Over the real Api in this process and the container the app builds.
 /// </summary>
 public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
@@ -26,15 +26,15 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_Main_Operator_links_an_account_by_its_exact_email_and_an_address_with_no_account_waits_as_an_invitation()
+    public async Task A_Console_Operator_links_an_account_by_its_exact_email_and_an_address_with_no_account_waits_as_an_invitation()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var known = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Georgi Ivanov");
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Open");
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         var grants = ui.Get<IConsoleGrants>();
 
         var official = await grants.Link(
@@ -69,9 +69,9 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Open");
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         var grants = ui.Get<IConsoleGrants>();
         var marker = Guid.NewGuid().ToString("N");
         var linked = new List<Guid>();
@@ -107,11 +107,11 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Open");
-        await using var mine = ConsoleUi.Open(api, mainOperator);
-        await using var theirs = ConsoleUi.Open(api, root);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
+        await using var mine = ConsoleUi.Open(api, consoleOperator);
+        await using var theirs = ConsoleUi.Open(api, member);
 
         var notAnAddress = await Assert.ThrowsAsync<DomainException>(
             () => mine.Get<IConsoleGrants>().Link(id, GrantKind.Operator, null, "not an address")
@@ -124,7 +124,7 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         );
 
         Assert.Contains("email", notAnAddress.Message, StringComparison.OrdinalIgnoreCase);
-        Assert.NotEmpty(notTheirs.Message); // a Tenant Root who assigned the role away does not link people to the Event
+        Assert.NotEmpty(notTheirs.Message); // an account that holds nothing does not link people to the Event
         Assert.NotEmpty(noRole.Message);
         Assert.Empty(await mine.Get<IConsoleGrants>().List(id));
     }
@@ -135,11 +135,11 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Open");
-        await using var mine = ConsoleUi.Open(api, mainOperator);
-        await using var theirs = ConsoleUi.Open(api, root);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
+        await using var mine = ConsoleUi.Open(api, consoleOperator);
+        await using var theirs = ConsoleUi.Open(api, member);
         var grant = await mine.Get<IConsoleGrants>().Link(id, GrantKind.Operator, null, "someone@example.test");
         var asked = mine.Requests.Asked.Count;
 
@@ -161,7 +161,7 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
         var own = await RegistrySeed.AthleteAsync(
             _mongo.ConnectionString,
@@ -177,7 +177,7 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
             bulgaria,
             "Conan O'Brien"
         );
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         var lookups = ui.Get<IConsoleLookups>();
         int Searches() => ui.Requests.Asked.Count(x => x.Contains("/all-tenants", StringComparison.Ordinal));
 
@@ -236,7 +236,7 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var (latin, cyrillic) = HistorySeed.NameMarker(); // the registries are shared by the tests of this class: the name is this test's own
         var theirs = await RegistrySeed.AthleteAsync(
             _mongo.ConnectionString,
@@ -245,7 +245,7 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
             RegistrySeed.CountryOf("Bulgaria", "BG"),
             $"Conan {latin}"
         );
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         var lookups = ui.Get<IConsoleLookups>();
         int Searches() => ui.Requests.Asked.Count(x => x.Contains("/all-tenants", StringComparison.Ordinal));
 
@@ -264,7 +264,7 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
         var (latin, cyrillic) = HistorySeed.NameMarker(); // the registries are shared by the tests of this class: the names are this test's own
         var own = await RegistrySeed.AthleteAsync(
@@ -283,7 +283,7 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         );
         await RegistrySeed.HorseAsync(_mongo.ConnectionString, other, $"Далечен {cyrillic}", $"Faraway {latin}");
         await RegistrySeed.ClubAsync(_mongo.ConnectionString, other, $"Далечен клуб {cyrillic}");
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         var lookups = ui.Get<IConsoleLookups>();
 
         var byName = await lookups.SearchAthletes(latin);
@@ -326,9 +326,9 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
                 }
             ); // the first of the countries by its id, which is not the country of the Tenant
         var tenant = await TenantAsync(_mongo.ConnectionString, "Land of Test", withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var nobody = await SignedInAsync(api, client, _mongo.ConnectionString, null);
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         await using var none = ConsoleUi.Open(api, nobody);
         var lookups = ui.Get<IConsoleLookups>();
 

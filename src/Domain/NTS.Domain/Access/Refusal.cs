@@ -1,15 +1,15 @@
 namespace NTS.Domain.Access;
 
 /// <summary>
-/// Why an action is refused. The role that is missing comes before the stage of the Event that does not take the
+/// Why an action is refused. The Level that is missing comes before the stage of the Event that does not take the
 /// action, so a person who may not do it never learns anything but that. The Api gives each a status and a stable code.
 /// </summary>
 public enum Refusal
 {
     NotSignedIn = 1,
     NotAllowed = 2,
-    NotTenantRoot = 3,
-    NotMainOperator = 4,
+    NotRoot = 3,
+    NotConsoleOperator = 4,
     NotDeveloper = 5,
     TenantNotOperational = 6,
 

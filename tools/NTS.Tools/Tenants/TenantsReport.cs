@@ -8,9 +8,6 @@ public sealed class TenantsOptions
 
     /// <summary>The environment the database is, as it was typed: the marker is written with it, and an apply needs it.</summary>
     public string? Environment { get; init; }
-
-    /// <summary>The email of the account that becomes the Main Operator of the Events that have none; the Tenant Root when it is not given.</summary>
-    public string? MainOperatorEmail { get; init; }
 }
 
 /// <summary>
@@ -78,15 +75,6 @@ public sealed class TenantsReport
     public IReadOnlyDictionary<string, long> Stamped => _stamped;
 
     public int EventsNotHistoric { get; internal set; }
-
-    /// <summary>The Events that were given their Tenant Root, or the account that was named, as their Main Operator.</summary>
-    public int MainOperatorsAssigned { get; internal set; }
-
-    /// <summary>The Events that are not Historic and have no Main Operator because nobody could be told to be it.</summary>
-    public IReadOnlyList<Guid> EventsWaitingForMainOperator { get; internal set; } = [];
-
-    /// <summary>Why they wait, and what to do.</summary>
-    public string? MainOperatorNote { get; internal set; }
 
     /// <summary>The started Events whose last day is not a date: they cannot be told from Historic ones and are taken to be over.</summary>
     public IReadOnlyList<Guid> EventsWithoutAnEnd { get; internal set; } = [];
@@ -181,18 +169,7 @@ public sealed class TenantsReport
             output.WriteLine($"{collection}: {documents} documents to stamp with country-bg");
         }
 
-        output.WriteLine(
-            $"Events that are not Historic: {EventsNotHistoric}, {MainOperatorsAssigned} to give a Main Operator, {EventsWaitingForMainOperator.Count} waiting"
-        );
-        if (MainOperatorNote != null)
-        {
-            output.WriteLine($"  {MainOperatorNote}");
-        }
-
-        foreach (var waiting in EventsWaitingForMainOperator)
-        {
-            output.WriteLine($"  event {waiting}: no Main Operator yet");
-        }
+        output.WriteLine($"Events that are not Historic: {EventsNotHistoric}, which nobody is assigned to run");
 
         if (EventsWithOtherIds > 0)
         {

@@ -7,7 +7,7 @@ namespace NoTiming.Api.Features.Events;
 
 /// <summary>
 /// A grant as a document of the <c>event_grants</c> collection and back. The document holds the Tenant of the Event, the
-/// Event, the kind (<c>Operator</c> or <c>Official</c>) and the role of an Official as its name, the email in the form
+/// Event, the kind (<c>ConsoleOperator</c>, <c>Operator</c> or <c>Official</c>) and the role of an Official as its name, the email in the form
 /// grants and accounts are matched by it, and the account once there is one: a pending invitation has no
 /// <c>AccountId</c> at all. A document that is not of that shape is not a grant.
 /// </summary>
@@ -65,6 +65,11 @@ internal static class GrantDocuments
             if (grantKind == GrantKind.Operator)
             {
                 return EventGrant.ForOperator(id, eventId, tenant.AsString, email.AsString, account);
+            }
+
+            if (grantKind == GrantKind.ConsoleOperator)
+            {
+                return EventGrant.ForConsoleOperator(id, eventId, tenant.AsString, email.AsString, account);
             }
 
             return

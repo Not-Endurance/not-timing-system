@@ -14,7 +14,7 @@ namespace NTS.Tests.Integration;
 /// <summary>
 /// The Events as the Ui reaches them (#628, ADR-0007, ADR-0008): the repository of the Ui over the real Api, on the JSON:API
 /// variant of the client's repository. The Live Events and the Historic Events are the two named collections, read by
-/// anybody; an Event is started from its Setup, changed and reset by its Main Operator, and what the Api refuses comes back
+/// anybody; an Event is started from its Setup, changed and reset by its Console Operator, and what the Api refuses comes back
 /// with its code. Whether an Event is Live is told by the clock of the Api, and nothing is stored or asked of a flag.
 /// </summary>
 public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture>
@@ -59,15 +59,20 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
     }
 
     [Fact]
-    public async Task The_Main_Operator_starts_an_Event_from_its_Setup_and_it_is_one_of_the_Live_Events()
+    public async Task The_Console_Operator_starts_an_Event_from_its_Setup_and_it_is_one_of_the_Live_Events()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Started By The Ui");
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(
+            _mongo.ConnectionString,
+            tenant,
+            consoleOperator.Id,
+            "Started By The Ui"
+        );
         var events = new EventInformationApiRepository(
-            JsonApiClients.Of(api, mainOperator, out var requests),
+            JsonApiClients.Of(api, consoleOperator, out var requests),
             new SocketOf(null)
         );
 
@@ -87,23 +92,23 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var empty = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Empty");
-        var full = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        var asMainOperator = new EventInformationApiRepository(
-            JsonApiClients.Of(api, mainOperator, out _),
+        var empty = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Empty");
+        var full = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        var asConsoleOperator = new EventInformationApiRepository(
+            JsonApiClients.Of(api, consoleOperator, out _),
             new SocketOf(null)
         );
         var asMember = new EventInformationApiRepository(JsonApiClients.Of(api, member, out _), new SocketOf(null));
 
-        var invalid = await Assert.ThrowsAsync<DomainException>(() => asMainOperator.Start(empty));
-        var invalidCode = asMainOperator.LastError?.Code;
+        var invalid = await Assert.ThrowsAsync<DomainException>(() => asConsoleOperator.Start(empty));
+        var invalidCode = asConsoleOperator.LastError?.Code;
         var refused = await Assert.ThrowsAsync<DomainException>(() => asMember.Start(full));
 
         Assert.False(string.IsNullOrWhiteSpace(invalid.Message));
         Assert.Equal("invalid-setup", invalidCode);
-        Assert.Equal("not-main-operator", asMember.LastError?.Code);
+        Assert.Equal("not-console-operator", asMember.LastError?.Code);
         Assert.False(string.IsNullOrWhiteSpace(refused.Message));
         Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, empty));
         Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, full));
@@ -115,9 +120,9 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var events = new EventInformationApiRepository(
-            JsonApiClients.Of(api, mainOperator, out var requests),
+            JsonApiClients.Of(api, consoleOperator, out var requests),
             new SocketOf(null)
         );
         requests.Answer = _ => new HttpResponseMessage(HttpStatusCode.Created)
@@ -136,9 +141,12 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
-        var events = new EventInformationApiRepository(JsonApiClients.Of(api, mainOperator, out _), new SocketOf(null));
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var events = new EventInformationApiRepository(
+            JsonApiClients.Of(api, consoleOperator, out _),
+            new SocketOf(null)
+        );
         var read = (await events.Read(id))!;
         var changed = new EventInformation(
             read.Country,
@@ -156,24 +164,24 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
         Assert.Equal("Renamed By The Ui", stored["Name"].AsString);
         Assert.Equal("Plovdiv", stored["Location"].AsString);
         Assert.Equal("FEI9", stored["FeiShowId"].AsString);
-        Assert.Equal(mainOperator.Id, stored["MainOperatorId"].AsGuid);
+        Assert.False(stored.Contains("MainOperatorId")); // the Main Operator is retired (#671)
     }
 
     [Fact]
-    public async Task The_Event_the_Ui_has_selected_is_reset_by_its_Main_Operator_and_is_no_longer_Live()
+    public async Task The_Event_the_Ui_has_selected_is_reset_by_its_Console_Operator_and_is_no_longer_Live()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
         var starter = new EventInformationApiRepository(
-            JsonApiClients.Of(api, mainOperator, out _),
+            JsonApiClients.Of(api, consoleOperator, out _),
             new SocketOf(null)
         );
         var started = await starter.Start(id);
         var events = new EventInformationApiRepository(
-            JsonApiClients.Of(api, mainOperator, out _),
+            JsonApiClients.Of(api, consoleOperator, out _),
             new SocketOf(started)
         );
 
@@ -191,10 +199,10 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
         var events = new EventInformationApiRepository(
-            JsonApiClients.Of(api, mainOperator, out var requests),
+            JsonApiClients.Of(api, consoleOperator, out var requests),
             new SocketOf(null)
         );
 

@@ -28,15 +28,15 @@ public sealed class ConsoleRegistryBrowserTests : IClassFixture<ApiHostFixture>,
         var token = Guid.NewGuid().ToString("N")[..8];
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
         var other = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "The Cup");
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        await EventSeed.SetupAsync(mongo, tenant, consoleOperator.Id, "The Cup");
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
         await RegistrySeed.AthleteAsync(mongo, tenant, $"Ivan Petrov {token}", bulgaria, null, "777");
         await RegistrySeed.AthleteAsync(mongo, other, $"Maria Elsewhere {token}", bulgaria, null, "888");
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator.Email, "/console/registry/athletes-horses");
+        await SignInAndOpenAsync(_host, device, consoleOperator.Email, "/console/registry/athletes-horses");
         await AddToListAsync(page, "Athletes");
         var dialog = page.GetByRole(AriaRole.Dialog);
         var alert = dialog.GetByTestId("console-same-rows");

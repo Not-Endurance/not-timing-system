@@ -13,10 +13,10 @@ namespace NTS.Tools.Tenants;
 /// needs first and refuses to apply, writing nothing, when it finds what it cannot decide (two accounts that share an email,
 /// no Bulgaria among the countries, a database marked as another environment); then it marks the database with the
 /// environment it is, completes the accounts with the fields of Identity (the address unconfirmed), places each in the Tenant
-/// of the country of its profile, makes the Tenants, stamps every document a Tenant owns with the Tenant of Bulgaria, gives
-/// every Event that is not yet Historic its Tenant Root as Main Operator, turns the Officials and Operators that were linked
-/// by email into grants, finds the state a person kept under the account that person is, drops the settings and makes the
-/// indexes. What a Tenant owns is every collection of <see cref="Owned"/>, the list of the Api (<c>TenantOwned</c>). It is a
+/// of the country of its profile, makes the Tenants, stamps every document a Tenant owns with the Tenant of Bulgaria,
+/// turns the Officials and Operators that were linked by email into grants, finds the state a person kept under the account
+/// that person is, drops the settings and makes the indexes. It assigns nobody to run an Event: Root runs it until Root
+/// assigns a Console Operator. What a Tenant owns is every collection of <see cref="Owned"/>, the list of the Api (<c>TenantOwned</c>). It is a
 /// dry run unless asked to apply, every step writes only what is not there, and so running it again changes nothing.
 /// Documents are read and written as they are stored, so what the command does not know of them is kept.
 /// </summary>
@@ -31,7 +31,6 @@ public static class TenantsMigration
     const string CORES = "event_informations";
     const string OFFICIALS = "event_officials";
     const string OPERATORS = "event_operators";
-    const string MAIN_OPERATOR = "MainOperatorId";
     const string BULGARIA_ISO = "BG";
 
     /// <param name="now">The instant an Event is told Live or Historic at: the clock of the machine unless a test gives one.</param>
@@ -111,11 +110,6 @@ public static class TenantsMigration
             : null;
     }
 
-    static Guid? MainOperatorOf(BsonDocument? document)
-    {
-        return document == null ? null : GuidOf(document, MAIN_OPERATOR);
-    }
-
     sealed class Migration
     {
         readonly IMongoDatabase _database;
@@ -126,7 +120,6 @@ public static class TenantsMigration
         readonly List<(string Id, BsonDocument Document)> _tenantsToMake = [];
         readonly List<(string Id, UpdateDefinition<BsonDocument> Update)> _tenantsToComplete = [];
         readonly Dictionary<string, FilterDefinition<BsonDocument>> _stamps = [];
-        readonly List<(string Collection, BsonValue Document, Guid MainOperator)> _mainOperators = [];
         readonly List<BsonDocument> _grants = [];
         readonly List<UpdateOneModel<BsonDocument>> _sessionUpdates = [];
         readonly List<(string Collection, CreateIndexModel<BsonDocument> Index)> _indexes = [];
@@ -167,15 +160,6 @@ public static class TenantsMigration
             {
                 await Collection(collection)
                     .UpdateManyAsync(filter, Builders<BsonDocument>.Update.Set(TENANT_ID, _bulgaria));
-            }
-
-            foreach (var (collection, document, account) in _mainOperators)
-            {
-                await Collection(collection)
-                    .UpdateOneAsync(
-                        new BsonDocument { { "_id", document }, { MAIN_OPERATOR, new BsonDocument("$exists", false) } },
-                        Builders<BsonDocument>.Update.Set(MAIN_OPERATOR, Uuid(account))
-                    );
             }
 
             await WriteGrantsAsync();
@@ -531,92 +515,7 @@ public static class TenantsMigration
 
             Report.EventsWithoutAnEnd = withoutAnEnd;
             Report.EventsNotHistoric = live.Count;
-            ReadMainOperators(live);
             await ReadGrantsAsync(live);
-        }
-
-        void ReadMainOperators(List<LiveEvent> live)
-        {
-            Guid? named = null;
-            if (!string.IsNullOrWhiteSpace(_options.MainOperatorEmail))
-            {
-                var email = NormalEmail(_options.MainOperatorEmail)!;
-                named = _accounts.FirstOrDefault(x => x.Email == email)?.Id;
-                if (named == null)
-                {
-                    Report.Refuse(
-                        "--main-operator names an email that no account has: the account has to exist, so that it can be signed in as."
-                    );
-                }
-            }
-
-            var waiting = new List<Guid>();
-            var notes = new List<string>();
-            var assigned = 0;
-            foreach (var @event in live)
-            {
-                var documents = new[] { (SETUPS, @event.Setup), (CORES, @event.Core) }
-                    .Where(x => x.Item2 != null && MainOperatorOf(x.Item2) == null)
-                    .ToList();
-                if (documents.Count == 0)
-                {
-                    continue;
-                }
-
-                // The one document that has a Main Operator says who it is on the other, and Core is the authority of a started Event.
-                var account = MainOperatorOf(@event.Core) ?? MainOperatorOf(@event.Setup) ?? named;
-                if (account == null)
-                {
-                    var roots = TenantRootsOf(@event.Tenant);
-                    if (roots.Count != 1)
-                    {
-                        waiting.Add(@event.Id);
-                        var note =
-                            roots.Count == 0
-                                ? $"{@event.Tenant} has no Tenant Root: seed one with seed-tenant-root and run again, or name the account with --main-operator."
-                                : $"{@event.Tenant} has {roots.Count} Tenant Roots: name the account that becomes the Main Operator with --main-operator.";
-                        if (!notes.Contains(note))
-                        {
-                            notes.Add(note);
-                        }
-
-                        continue;
-                    }
-
-                    account = roots[0];
-                }
-
-                foreach (var (collection, document) in documents)
-                {
-                    _mainOperators.Add((collection, document!["_id"], account.Value));
-                }
-
-                assigned++;
-            }
-
-            Report.MainOperatorsAssigned = assigned;
-            Report.EventsWaitingForMainOperator = waiting;
-            Report.MainOperatorNote = notes.Count == 0 ? null : string.Join(" ", notes);
-        }
-
-        IReadOnlyList<Guid> TenantRootsOf(string tenant)
-        {
-            return
-            [
-                .. _accounts
-                    .Where(x =>
-                        x.Document.TryGetValue(MEMBERSHIPS, out var memberships)
-                        && memberships.IsBsonArray
-                        && memberships.AsBsonArray.Any(m =>
-                            m.IsBsonDocument
-                            && m.AsBsonDocument.GetValue(TENANT_ID, BsonNull.Value) == tenant
-                            && m.AsBsonDocument.TryGetValue("Roles", out var roles)
-                            && roles.IsBsonArray
-                            && roles.AsBsonArray.Contains(NTS.Domain.Aggregates.Membership.TENANT_ROOT)
-                        )
-                    )
-                    .Select(x => x.Id),
-            ];
         }
 
         async Task ReadGrantsAsync(List<LiveEvent> live)

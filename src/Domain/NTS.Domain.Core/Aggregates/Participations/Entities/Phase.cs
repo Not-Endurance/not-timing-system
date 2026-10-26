@@ -460,7 +460,7 @@ public class Phase : Entity
 
     /// <summary>
     /// The time a Present Update changes: the Represent time when the Phase shows one, which is then the latest presentation,
-    /// and the Present time otherwise. What the Main Operator edits in the Phase form does not change which it is, and a
+    /// and the Present time otherwise. What the Console Operator edits in the Phase form does not change which it is, and a
     /// Represent time that was cleared is not made again by an Update.
     /// </summary>
     TimeSlot PresentationSlot()
