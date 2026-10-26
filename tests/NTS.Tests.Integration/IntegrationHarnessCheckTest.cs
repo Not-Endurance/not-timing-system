@@ -72,7 +72,7 @@ public sealed partial class IntegrationHarnessCheckTest : IClassFixture<NtsInteg
         await accessContext.Load();
 
         Assert.Null(profileContext.Profile);
-        Assert.Equal(WitnessAccessLevel.Anonymous, accessContext.AccessLevel);
+        Assert.Equal(WitnessSays.Visitor, WitnessSays.Of(accessContext));
 
         await witness.SignIn(signingInUser);
 
@@ -80,10 +80,7 @@ public sealed partial class IntegrationHarnessCheckTest : IClassFixture<NtsInteg
         Assert.Equal("Late", profile.GivenName);
         Assert.Equal("Late", profileContext.WelcomeName);
         Assert.Equal(signingInUser.Email, witness.GetRequiredService<IAccountSession>().Current!.Email);
-        Assert.Equal(
-            WitnessAccessLevel.Registered,
-            await WaitForAccessLevel(accessContext, WitnessAccessLevel.Registered)
-        );
+        Assert.Equal(WitnessSays.Registered, await WaitForWitnessToSay(accessContext, WitnessSays.Registered));
     }
 
     static async Task<AccountProfile> WaitForProfile(IWitnessProfileContext profileContext)
@@ -105,22 +102,19 @@ public sealed partial class IntegrationHarnessCheckTest : IClassFixture<NtsInteg
         );
     }
 
-    static async Task<WitnessAccessLevel> WaitForAccessLevel(
-        IWitnessAccessContext accessContext,
-        WitnessAccessLevel expected
-    )
+    static async Task<WitnessSays> WaitForWitnessToSay(IWitnessAccessContext accessContext, WitnessSays expected)
     {
         var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
         while (DateTimeOffset.UtcNow < deadline)
         {
-            if (accessContext.AccessLevel == expected)
+            if (WitnessSays.Of(accessContext) == expected)
             {
-                return accessContext.AccessLevel;
+                return expected;
             }
 
             await Task.Delay(50);
         }
 
-        return accessContext.AccessLevel;
+        return WitnessSays.Of(accessContext);
     }
 }

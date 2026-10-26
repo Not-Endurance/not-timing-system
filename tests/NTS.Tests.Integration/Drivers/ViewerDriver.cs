@@ -100,7 +100,7 @@ internal sealed class ViewerDriver : IAsyncDisposable
         _fixture = fixture;
     }
 
-    public WitnessAccessLevel AccessLevel => _accessContext.AccessLevel;
+    public WitnessSays Says => WitnessSays.Of(_accessContext);
 
     /// <summary>What the browser of this Witness keeps of a group that was sent and not answered.</summary>
     public MemoryUnansweredSnapshots Unanswered => _unanswered;

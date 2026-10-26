@@ -134,12 +134,11 @@ public sealed class ViewedEventProviderTests
     }
 
     [Theory]
-    [InlineData(WitnessAccessLevel.Anonymous)]
-    [InlineData(WitnessAccessLevel.Registered)]
-    [InlineData(WitnessAccessLevel.Official)]
-    public async Task A_Historic_Event_takes_no_write_from_a_view_whoever_looks_at_it(WitnessAccessLevel level)
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task A_Historic_Event_takes_no_write_from_a_view_whoever_looks_at_it(bool canSendSnapshots)
     {
-        var fixture = Open(historic: [EventOf(HISTORIC_EVENT_ID)], access: level);
+        var fixture = Open(historic: [EventOf(HISTORIC_EVENT_ID)], access: canSendSnapshots);
         var view = await fixture.Provider.Open(HISTORIC_EVENT_ID);
 
         Assert.False(view!.CanWrite);
@@ -193,15 +192,13 @@ public sealed class ViewedEventProviderTests
     }
 
     [Theory]
-    [InlineData(WitnessAccessLevel.Anonymous, false)]
-    [InlineData(WitnessAccessLevel.Registered, false)]
-    [InlineData(WitnessAccessLevel.Official, true)]
-    public async Task A_Live_Event_may_be_written_to_by_an_Official_and_by_no_one_else(
-        WitnessAccessLevel level,
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task A_Live_Event_may_be_written_to_by_a_person_who_may_send_Snapshots_and_by_no_one_else(
         bool canWrite
     )
     {
-        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: level);
+        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: canWrite);
         var view = await fixture.Provider.Open(LIVE_EVENT_ID);
 
         Assert.Equal(canWrite, view!.CanWrite);
@@ -218,13 +215,13 @@ public sealed class ViewedEventProviderTests
     [Fact]
     public async Task What_the_person_may_do_is_followed_when_they_sign_in()
     {
-        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: WitnessAccessLevel.Anonymous);
+        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: false);
         var view = await fixture.Provider.Open(LIVE_EVENT_ID);
         var changes = 0;
         view!.ObservableEvent.Subscribe(() => changes++);
         Assert.False(view.CanWrite);
 
-        fixture.Access.Become(WitnessAccessLevel.Official);
+        fixture.Access.Become(true);
 
         Assert.True(view.CanWrite);
         Assert.True(changes > 0);
@@ -241,7 +238,7 @@ public sealed class ViewedEventProviderTests
     [Fact]
     public async Task A_refusal_that_says_the_Event_has_ended_is_told_by_the_provider_once_and_the_view_is_left_for_the_page_to_replace()
     {
-        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: WitnessAccessLevel.Official);
+        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: true);
         var view = await fixture.Provider.Open(LIVE_EVENT_ID);
         var ended = new List<Guid>();
         fixture.Provider.EventEnded.Subscribe(ended.Add);
@@ -257,7 +254,7 @@ public sealed class ViewedEventProviderTests
     [Fact]
     public async Task Each_view_of_an_Event_tells_that_it_has_ended_once_and_the_Event_opened_again_is_Historic()
     {
-        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: WitnessAccessLevel.Official);
+        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: true);
         var first = await fixture.Provider.Open(LIVE_EVENT_ID);
         var second = await fixture.Provider.Open(LIVE_EVENT_ID);
         var ended = new List<Guid>();
@@ -279,7 +276,7 @@ public sealed class ViewedEventProviderTests
     [InlineData(null)]
     public async Task A_refusal_for_any_other_reason_tells_nothing_and_the_view_may_still_write(string? code)
     {
-        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: WitnessAccessLevel.Official);
+        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: true);
         var view = await fixture.Provider.Open(LIVE_EVENT_ID);
         var ended = new List<Guid>();
         fixture.Provider.EventEnded.Subscribe(ended.Add);
@@ -346,7 +343,7 @@ public sealed class ViewedEventProviderTests
         Ranking[]? rankings = null,
         Official[]? officials = null,
         Participation[]? liveStore = null,
-        WitnessAccessLevel access = WitnessAccessLevel.Anonymous
+        bool access = false
     )
     {
         var socket = new RecordingSocketService();

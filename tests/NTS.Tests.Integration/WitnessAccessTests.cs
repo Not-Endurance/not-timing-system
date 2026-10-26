@@ -14,21 +14,21 @@ using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// What the Witness shows of a person who may send Snapshots (#645): their level does not dip to Registered while the Api is
-/// asked again what they may do (a page that decides by it, such as the Snapshot page, would send an Official away for the
-/// time it takes), and it does change when the Api says they may not. Over the real Api in this process.
+/// What the Witness shows of a person who may send Snapshots (#645): it does not dip to "may not" while the Api is asked
+/// again what they may do (a page that decides by it, such as the Snapshot page, would send an Official away for the time it
+/// takes), and it does change when the Api says they may not. Over the real Api in this process.
 /// </summary>
-public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
+public sealed class WitnessAccessTests : IClassFixture<MongoFixture>
 {
     readonly MongoFixture _mongo;
 
-    public WitnessAccessLevelTests(MongoFixture mongo)
+    public WitnessAccessTests(MongoFixture mongo)
     {
         _mongo = mongo;
     }
 
     [Fact]
-    public async Task The_level_of_a_person_who_may_send_Snapshots_does_not_dip_while_the_Api_is_asked_again()
+    public async Task What_a_person_who_may_send_Snapshots_may_do_does_not_dip_while_the_Api_is_asked_again()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = api.CreateClient();
@@ -37,10 +37,10 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
         using var account = new AccountSession(json);
         using var access = new WitnessAccessContext(new SelectedEvent(eventId), account, json);
         await access.Load();
-        Assert.Equal(WitnessAccessLevel.Official, access.AccessLevel);
+        Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
         var held = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var told = new List<WitnessAccessLevel>();
-        access.ObservableEvent.Subscribe(() => told.Add(access.AccessLevel));
+        var told = new List<WitnessSays>();
+        access.ObservableEvent.Subscribe(() => told.Add(WitnessSays.Of(access)));
         asked.Before = request =>
             request.RequestUri!.AbsolutePath.EndsWith("/capabilities", StringComparison.Ordinal)
                 ? held.Task
@@ -50,15 +50,15 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
         await account.Refresh(); // the account says the same, and the Api is asked what the person may do again
         await Eventually(() => CapabilityRequests(asked) > before);
 
-        Assert.Equal(WitnessAccessLevel.Official, access.AccessLevel); // while the question is on its way
+        Assert.Equal(WitnessSays.Official, WitnessSays.Of(access)); // while the question is on its way
         held.SetResult();
         await Eventually(() => told.Count > 0);
-        Assert.Equal(WitnessAccessLevel.Official, access.AccessLevel);
-        Assert.DoesNotContain(WitnessAccessLevel.Registered, told);
+        Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
+        Assert.DoesNotContain(WitnessSays.Registered, told);
     }
 
     [Fact]
-    public async Task The_level_changes_when_the_Api_says_the_person_may_no_longer_send_Snapshots()
+    public async Task What_the_person_may_do_changes_when_the_Api_says_they_may_no_longer_send_Snapshots()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = api.CreateClient();
@@ -67,12 +67,12 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
         using var account = new AccountSession(json);
         using var access = new WitnessAccessContext(new SelectedEvent(eventId), account, json);
         await access.Load();
-        Assert.Equal(WitnessAccessLevel.Official, access.AccessLevel);
+        Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
         await EventSeed.Grants(_mongo.ConnectionString).DeleteManyAsync(new BsonDocument("Email", official.Email));
 
         await account.Refresh();
 
-        await Eventually(() => access.AccessLevel == WitnessAccessLevel.Registered);
+        await Eventually(() => WitnessSays.Of(access) == WitnessSays.Registered);
     }
 
     [Theory]
@@ -89,8 +89,8 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
         using var account = new AccountSession(json);
         using var access = new WitnessAccessContext(new SelectedEvent(eventId), account, json);
         await access.Load();
-        var told = new List<WitnessAccessLevel>();
-        access.ObservableEvent.Subscribe(() => told.Add(access.AccessLevel));
+        var told = new List<WitnessSays>();
+        access.ObservableEvent.Subscribe(() => told.Add(WitnessSays.Of(access)));
         asked.Answer = request =>
             !request.RequestUri!.AbsolutePath.EndsWith("/capabilities", StringComparison.Ordinal) ? null
             : failsWithAStatus ? new HttpResponseMessage(HttpStatusCode.BadGateway)
@@ -99,13 +99,13 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
         await account.Refresh(); // the connection is back and the Api is asked what the person may do, and cannot answer
         await Eventually(() => told.Count > 0);
 
-        Assert.Equal(WitnessAccessLevel.Official, access.AccessLevel);
+        Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
         await EventSeed.Grants(_mongo.ConnectionString).DeleteManyAsync(new BsonDocument("Email", official.Email));
         asked.Answer = null;
         await account.Refresh();
         await Eventually(() => told.Count > 1);
 
-        Assert.Equal(WitnessAccessLevel.Registered, access.AccessLevel); // what the Api says is what the level is
+        Assert.Equal(WitnessSays.Registered, WitnessSays.Of(access)); // what the Api says is what the Witness says
     }
 
     [Fact]
@@ -119,15 +119,15 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
         var followed = new FollowedEvent(eventId);
         using var access = new WitnessAccessContext(followed, account, json);
         await access.Load();
-        var told = new List<WitnessAccessLevel>();
-        access.ObservableEvent.Subscribe(() => told.Add(access.AccessLevel));
+        var told = new List<WitnessSays>();
+        access.ObservableEvent.Subscribe(() => told.Add(WitnessSays.Of(access)));
         followed.Follow(Guid.NewGuid()); // the person is looking at another Event
         asked.Answer = _ => throw new HttpRequestException("The connection dropped.");
 
         await account.Refresh();
         await Eventually(() => told.Count > 0);
 
-        Assert.Equal(WitnessAccessLevel.Registered, access.AccessLevel); // nothing was said of this one
+        Assert.Equal(WitnessSays.Registered, WitnessSays.Of(access)); // nothing was said of this one
     }
 
     [Fact]
@@ -149,9 +149,9 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
         using var account = new AccountSession(json);
         using var access = new WitnessAccessContext(new SelectedEvent(eventId), account, json);
         await access.Load();
-        Assert.Equal(WitnessAccessLevel.Official, access.AccessLevel);
-        var told = new List<WitnessAccessLevel>();
-        access.ObservableEvent.Subscribe(() => told.Add(access.AccessLevel));
+        Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
+        var told = new List<WitnessSays>();
+        access.ObservableEvent.Subscribe(() => told.Add(WitnessSays.Of(access)));
         cookie.Value = $"{ApiSessions.COOKIE_NAME}={somebodyElse.Page.Cookie(ApiSessions.COOKIE_NAME)}"; // another person has signed in
         asked.Answer = request =>
             request.RequestUri!.AbsolutePath.EndsWith("/capabilities", StringComparison.Ordinal)
@@ -161,11 +161,11 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
         await account.Refresh();
         await Eventually(() => told.Count > 0);
 
-        Assert.Equal(WitnessAccessLevel.Registered, access.AccessLevel); // what the first person was is not what this one is
+        Assert.Equal(WitnessSays.Registered, WitnessSays.Of(access)); // what the first person was is not what this one is
     }
 
     [Fact]
-    public async Task The_level_is_not_said_while_the_host_has_not_said_who_is_signed_in_and_is_asked_again()
+    public async Task What_the_person_may_do_is_not_said_while_the_host_has_not_said_who_is_signed_in_and_is_asked_again()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var json = JsonApiClients.Of(api, null, out var asked);
@@ -175,12 +175,12 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
 
         await access.Load();
 
-        Assert.Equal(WitnessAccessLevel.Unknown, access.AccessLevel); // nobody is not what the host said
+        Assert.Equal(WitnessSays.Nothing, WitnessSays.Of(access)); // nobody is not what the host said
 
         asked.Answer = null;
         await access.Load();
 
-        Assert.Equal(WitnessAccessLevel.Anonymous, access.AccessLevel); // it said, and a visitor is what it said
+        Assert.Equal(WitnessSays.Visitor, WitnessSays.Of(access)); // it said, and a visitor is what it said
     }
 
     static int CapabilityRequests(JsonApiClients.Requests asked)

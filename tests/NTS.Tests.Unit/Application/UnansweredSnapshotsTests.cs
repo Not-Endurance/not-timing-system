@@ -291,7 +291,7 @@ public sealed class UnansweredSnapshotsTests
         using var view = await rig.ViewAsync();
         await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
         var service = await rig.ReloadAsync();
-        using var registered = await rig.ViewAsync(WitnessAccessLevel.Registered);
+        using var registered = await rig.ViewAsync(canSendSnapshots: false);
 
         service.Resume(registered);
 
@@ -311,7 +311,7 @@ public sealed class UnansweredSnapshotsTests
         using var opened = view;
         await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
         var sent = rig.Publisher.Published.Count;
-        access.Become(WitnessAccessLevel.Registered); // what they may do was taken from them while the group waited
+        access.Become(canSendSnapshots: false); // what they may do was taken from them while the group waited
 
         rig.Timer.Elapse();
         await rig.Resent(rig.Service);
@@ -542,22 +542,22 @@ public sealed class UnansweredSnapshotsTests
             return Service;
         }
 
-        public async Task<IViewedEvent> ViewAsync(WitnessAccessLevel level = WitnessAccessLevel.Official)
+        public async Task<IViewedEvent> ViewAsync(bool canSendSnapshots = true)
         {
-            return await LiveView(_store, level);
+            return await LiveView(_store, canSendSnapshots);
         }
 
         /// <summary>The Event the app follows, opened, with what the person may do about it in the hands of the test.</summary>
         public async Task<(IViewedEvent View, AccessOf Access)> ViewWithAccessAsync()
         {
-            var access = new AccessOf(WitnessAccessLevel.Official);
+            var access = new AccessOf(canSendSnapshots: true);
             return (await OpenAsync(LIVE_EVENT_ID, access), access);
         }
 
         /// <summary>Another Live Event, opened, as a person who may write to it sees it.</summary>
         public Task<IViewedEvent> ViewOfAnotherEventAsync()
         {
-            return OpenAsync(OTHER_LIVE_EVENT_ID, new AccessOf(WitnessAccessLevel.Official));
+            return OpenAsync(OTHER_LIVE_EVENT_ID, new AccessOf(canSendSnapshots: true));
         }
 
         /// <summary>Selects the Participations of the numbers and captures a time for each.</summary>
@@ -583,7 +583,7 @@ public sealed class UnansweredSnapshotsTests
         /// <summary>The Event the app follows, opened, with what is told of the end of the Event kept for the test.</summary>
         public Task<IViewedEvent> ViewThatTellsAsync(List<Guid> ended)
         {
-            return OpenAsync(LIVE_EVENT_ID, new AccessOf(WitnessAccessLevel.Official), ended.Add);
+            return OpenAsync(LIVE_EVENT_ID, new AccessOf(canSendSnapshots: true), ended.Add);
         }
 
         async Task<IViewedEvent> OpenAsync(Guid eventId, AccessOf access, Action<Guid>? ended = null)

@@ -337,19 +337,19 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
             IntegrationPayloadFactory.Official(eventId, visitor.Id, Guid.NewGuid())
         );
 
-        var anonymous = await AccessLevelOfAsync(api, null, eventId);
-        var withoutAnEvent = await AccessLevelOfAsync(api, visitor, null);
-        var asVisitor = await AccessLevelOfAsync(api, visitor, eventId);
-        var asVeterinary = await AccessLevelOfAsync(api, veterinary, eventId);
-        var asSteward = await AccessLevelOfAsync(api, steward, eventId);
-        var asConsoleOperator = await AccessLevelOfAsync(api, consoleOperator, eventId);
+        var anonymous = await WhatIsSaidAsync(api, null, eventId);
+        var withoutAnEvent = await WhatIsSaidAsync(api, visitor, null);
+        var asVisitor = await WhatIsSaidAsync(api, visitor, eventId);
+        var asVeterinary = await WhatIsSaidAsync(api, veterinary, eventId);
+        var asSteward = await WhatIsSaidAsync(api, steward, eventId);
+        var asConsoleOperator = await WhatIsSaidAsync(api, consoleOperator, eventId);
 
-        Assert.Equal(WitnessAccessLevel.Anonymous, anonymous);
-        Assert.Equal(WitnessAccessLevel.Registered, withoutAnEvent);
-        Assert.Equal(WitnessAccessLevel.Registered, asVisitor);
-        Assert.Equal(WitnessAccessLevel.Registered, asVeterinary);
-        Assert.Equal(WitnessAccessLevel.Official, asSteward);
-        Assert.Equal(WitnessAccessLevel.Official, asConsoleOperator);
+        Assert.Equal(WitnessSays.Visitor, anonymous);
+        Assert.Equal(WitnessSays.Registered, withoutAnEvent);
+        Assert.Equal(WitnessSays.Registered, asVisitor);
+        Assert.Equal(WitnessSays.Registered, asVeterinary);
+        Assert.Equal(WitnessSays.Official, asSteward);
+        Assert.Equal(WitnessSays.Official, asConsoleOperator);
     }
 
     [Fact]
@@ -359,9 +359,9 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
         var tenant = await TenantAsync(_mongo.ConnectionString);
         var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
 
-        var level = await AccessLevelOfAsync(api, null, eventId);
+        var said = await WhatIsSaidAsync(api, null, eventId);
 
-        Assert.Equal(WitnessAccessLevel.Anonymous, level);
+        Assert.Equal(WitnessSays.Visitor, said);
     }
 
     [Fact]
@@ -413,15 +413,15 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
         requests.Answer = _ => throw new HttpRequestException("The Api is down.");
 
         await context.Load();
-        var whileItIsDown = context.AccessLevel;
+        var whileItIsDown = WitnessSays.Of(context);
         requests.Answer = null;
         await context.Load();
 
-        Assert.Equal(WitnessAccessLevel.Registered, whileItIsDown);
-        Assert.Equal(WitnessAccessLevel.Official, context.AccessLevel);
+        Assert.Equal(WitnessSays.Registered, whileItIsDown);
+        Assert.Equal(WitnessSays.Official, WitnessSays.Of(context));
     }
 
-    async Task<WitnessAccessLevel> AccessLevelOfAsync(ApiFactory api, Person? person, Guid? eventId)
+    async Task<WitnessSays> WhatIsSaidAsync(ApiFactory api, Person? person, Guid? eventId)
     {
         var json = JsonApiClients.Of(api, person, out _);
         using var account = new AccountSession(json);
@@ -429,7 +429,7 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
 
         await context.Load();
 
-        return context.AccessLevel;
+        return WitnessSays.Of(context);
     }
 
     /// <summary>A Participation of two Phases with an arrival recorded in the first.</summary>

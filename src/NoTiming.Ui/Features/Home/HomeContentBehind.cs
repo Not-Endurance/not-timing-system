@@ -42,7 +42,7 @@ public class HomeContentBehind : NStatefulComponent
             return;
         }
 
-        Navigator.NavigateTo(WitnessAccessPolicy.ResolveHomeRoute(AccessState.AccessLevel));
+        Navigator.NavigateTo(AccessState.CanSendSnapshots ? Routes.SNAPSHOT_PAGE : Routes.PERFORMANCE_PAGE);
     }
 
     public override void Dispose()

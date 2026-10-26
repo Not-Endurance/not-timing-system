@@ -173,9 +173,9 @@ public sealed partial class IntegrationHarnessCheckTest
         Assert.Equal(eventId, registeredReceived.EventId);
         Assert.Equal(42, anonymousReceived.Combination.Number);
         Assert.Equal(eventId, anonymousReceived.EventId);
-        Assert.Equal(WitnessAccessLevel.Official, officialWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Registered, registeredWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Anonymous, anonymousWitness.AccessLevel);
+        Assert.Equal(WitnessSays.Official, officialWitness.Says);
+        Assert.Equal(WitnessSays.Registered, registeredWitness.Says);
+        Assert.Equal(WitnessSays.Visitor, anonymousWitness.Says);
 
         var anonymousDenied = await Assert.ThrowsAnyAsync<Exception>(
             () => anonymousWitness.Publish(CreateSnapshotGroup())
@@ -784,10 +784,10 @@ public sealed partial class IntegrationHarnessCheckTest
         await ineligibleOfficialWitness.Connect(eventInformation);
         await registeredWitness.Connect(eventInformation);
 
-        Assert.Equal(WitnessAccessLevel.Official, operatorWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Official, eligibleOfficialWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Registered, ineligibleOfficialWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Registered, registeredWitness.AccessLevel);
+        Assert.Equal(WitnessSays.Official, operatorWitness.Says);
+        Assert.Equal(WitnessSays.Official, eligibleOfficialWitness.Says);
+        Assert.Equal(WitnessSays.Registered, ineligibleOfficialWitness.Says);
+        Assert.Equal(WitnessSays.Registered, registeredWitness.Says);
 
         await operatorWitness.Publish(CreateSnapshotGroup());
         await eligibleOfficialWitness.Publish(CreateSnapshotGroup());
