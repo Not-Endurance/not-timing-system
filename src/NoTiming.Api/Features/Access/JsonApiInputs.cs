@@ -37,6 +37,9 @@ internal enum DocumentIds
 
     /// <summary>It has to be given, and to be a Guid that is not the empty one (ADR-0009): the id a device makes for what is recorded once.</summary>
     RequiredGuid,
+
+    /// <summary>It is the server's: a document that brings one is refused.</summary>
+    Forbidden,
 }
 
 /// <summary>The attributes of a resource a body carries: the type of resource it is, and whether what it says is valid.</summary>
@@ -125,6 +128,7 @@ internal sealed class JsonApiBody<TAttributes> : IJsonApiInput
         {
             DocumentIds.OptionalGuid when Id != null && !Guid.TryParse(Id, out _) => JsonApiFailures.InvalidId,
             DocumentIds.MatchesRoute when Id != null && Id != _routeId => TAttributes.IdMismatch,
+            DocumentIds.Forbidden when Id != null => JsonApiFailures.IdForbidden,
             DocumentIds.RequiredGuid when Id is null => TAttributes.IdRequired,
             DocumentIds.RequiredGuid when !Guid.TryParse(Id, out var given) || given == Guid.Empty =>
                 JsonApiFailures.InvalidId,
@@ -198,6 +202,9 @@ internal static class JsonApiFailures
 
     public static JsonApiFailure IdMismatch { get; } =
         new(StatusCodes.Status409Conflict, "id-mismatch", "The id of the resource is not the one of the route.");
+
+    public static JsonApiFailure IdForbidden { get; } =
+        new(StatusCodes.Status403Forbidden, "client-id-not-supported", "The id of a record is made by the server.");
 
     public static JsonApiFailure IdRequired { get; } =
         new(

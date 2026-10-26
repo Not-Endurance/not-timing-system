@@ -4,10 +4,12 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Net.Http.Headers;
 using Not.Identity;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Participants;
 using NoTiming.Api.JsonApi;
 using NTS.Contracts.API;
+using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
 
 namespace NoTiming.Api.Features.Profile;
@@ -28,8 +30,8 @@ internal static class ProfileEndpoints
 
     public static IEndpointRouteBuilder MapProfile(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/me/profile", Read).RequireAuthorization();
-        app.MapPatch("/api/me/profile", Edit).RequireAuthorization();
+        app.MapGet("/api/me/profile", Read);
+        app.MapPatch("/api/me/profile", Edit);
         return app;
     }
 
@@ -71,22 +73,23 @@ internal static class ProfileEndpoints
             && user.TextOf("CountryRegion") != null;
     }
 
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
     static async Task<IResult> Read(
         HttpContext context,
-        UserManager<NIdentityUser> users,
+        AccessContext access,
         SelectableCountries countries,
         LinkedParticipants linked,
         AccountText text
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        return user is null
-            ? JsonApiResults.NotSignedIn()
-            : await ResourceAsync(context, user, countries, linked, text);
+        return await ResourceAsync(context, access.User, countries, linked, text);
     }
 
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
     static async Task<IResult> Edit(
+        JsonApiBody<ProfileAttributes> body,
         HttpContext context,
+        AccessContext access,
         UserManager<NIdentityUser> users,
         SelectableCountries countries,
         ProfileStore store,
@@ -95,21 +98,11 @@ internal static class ProfileEndpoints
         AccountText text
     )
     {
-        var read = await JsonApiRequests.ReadAsync<ProfileAttributes>(context.Request, PROFILES);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
+        var user = access.User;
 
         // The route names nobody, so a document that names an account must name the caller's: it is never a way to
         // reach another.
-        if (read.Id != null && read.Id != user.Id.ToString())
+        if (body.Id != null && body.Id != user.Id.ToString())
         {
             return JsonApiResults.Error(
                 StatusCodes.Status409Conflict,
@@ -120,7 +113,7 @@ internal static class ProfileEndpoints
 
         // Members are found whatever their case, as those of every other document are (the Web options of the Api).
         var members = new Dictionary<string, JsonElement>(StringComparer.OrdinalIgnoreCase);
-        foreach (var (name, value) in read.Attributes!.Members ?? [])
+        foreach (var (name, value) in body.Attributes.Members ?? [])
         {
             members[name] = value;
         }
@@ -317,8 +310,16 @@ internal static class ProfileEndpoints
 /// The members of a profile that a PATCH names. They are kept as they were sent, because "not named" and "null" mean
 /// different things: the first leaves a member alone and the second clears it.
 /// </summary>
-internal sealed class ProfileAttributes
+internal sealed class ProfileAttributes : IResourceAttributes
 {
+    public static string? ResourceType => "profiles";
+
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Members { get; set; }
+
+    /// <summary>The members are checked against the account they are merged into, which only the handler has.</summary>
+    public JsonApiFailure? Invalid()
+    {
+        return null;
+    }
 }

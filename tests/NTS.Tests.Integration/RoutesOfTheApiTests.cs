@@ -43,13 +43,13 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task Every_route_of_the_Api_is_public_or_declares_what_it_needs_or_is_named_as_not_yet_guarded()
+    public async Task Every_route_of_the_Api_is_public_or_declares_what_it_needs()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
 
         var endpoints = api.Services.GetServices<EndpointDataSource>().SelectMany(x => x.Endpoints);
 
-        Assert.Empty(EndpointGuard.Mistakes(endpoints, UnguardedRoutes.NotYet));
+        Assert.Empty(EndpointGuard.Mistakes(endpoints));
     }
 
     [Fact]

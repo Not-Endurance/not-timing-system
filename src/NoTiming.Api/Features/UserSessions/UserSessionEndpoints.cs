@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Identity;
-using Not.Identity;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.JsonApi;
 using NTS.Contracts.Watcher.Models;
+using NTS.Domain.Access;
 
 namespace NoTiming.Api.Features.UserSessions;
 
@@ -20,22 +20,23 @@ internal static class UserSessionEndpoints
 
     public static IEndpointRouteBuilder MapUserSessions(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/user-sessions", List).RequireAuthorization();
-        app.MapGet("/api/user-sessions/{id}", Read).RequireAuthorization();
-        app.MapPost("/api/user-sessions", Make).RequireAuthorization();
-        app.MapPatch("/api/user-sessions/{id}", Change).RequireAuthorization();
-        app.MapDelete("/api/user-sessions/{id}", Remove).RequireAuthorization();
+        app.MapGet("/api/user-sessions", List);
+        app.MapGet("/api/user-sessions/{id}", Read);
+        app.MapPost("/api/user-sessions", Make);
+        app.MapPatch("/api/user-sessions/{id}", Change);
+        app.MapDelete("/api/user-sessions/{id}", Remove);
         return app;
     }
 
-    static async Task<IResult> List(HttpContext context, UserManager<NIdentityUser> users, UserSessionStore store)
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    static async Task<IResult> List(
+        [ListOf(EVENT_ID, EVENT_ID)] ListQuery list,
+        HttpRequest request,
+        AccessContext access,
+        UserSessionStore store,
+        CancellationToken cancellationToken
+    )
     {
-        var list = JsonApiQuery.ReadList(context.Request, EVENT_ID, EVENT_ID);
-        if (list.Refusal != null)
-        {
-            return list.Refusal;
-        }
-
         Guid? eventId = null;
         if (list.EqualTo.TryGetValue(EVENT_ID, out var written))
         {
@@ -48,100 +49,74 @@ internal static class UserSessionEndpoints
         }
 
         var (sessions, hasMore) = await store.ListAsync(
-            users.GetUserId(context.User)!,
+            access.User.Id.ToString(),
             eventId,
             list.Descending,
             list.Skip,
             list.Size,
-            context.RequestAborted
+            cancellationToken
         );
         return JsonApiResults.Collection(
             USER_SESSIONS,
             sessions.Select(x => (x.Id.ToString(), AttributesOf(x))),
-            links: JsonApiPaging.Links(context.Request, list.Number, hasMore),
+            links: JsonApiPaging.Links(request, list.Number, hasMore),
             meta: JsonApiPaging.Meta(list.Size, list.Number)
         );
     }
 
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
     static async Task<IResult> Read(
-        HttpContext context,
-        UserManager<NIdentityUser> users,
+        string id,
+        AccessContext access,
         UserSessionStore store,
-        string id
+        CancellationToken cancellationToken
     )
     {
         var session = Guid.TryParse(id, out var parsed)
-            ? await store.FindAsync(users.GetUserId(context.User)!, parsed, context.RequestAborted)
+            ? await store.FindAsync(access.User.Id.ToString(), parsed, cancellationToken)
             : null;
         return session is null ? JsonApiResults.NotFound() : ResourceOf(StatusCodes.Status200OK, session);
     }
 
-    static async Task<IResult> Make(HttpContext context, UserManager<NIdentityUser> users, UserSessionStore store)
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    static async Task<IResult> Make(
+        JsonApiBody<NewUserSession> body,
+        AccessContext access,
+        UserSessionStore store,
+        CancellationToken cancellationToken
+    )
     {
-        var read = await JsonApiRequests.ReadAsync<UserSessionAttributes>(context.Request, USER_SESSIONS);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        if (read.Id != null)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status403Forbidden,
-                "client-id-not-supported",
-                "The id of a record is made by the server."
-            );
-        }
-
-        var attributes = read.Attributes!;
-        if (!Guid.TryParse(attributes.EventId, out var eventId) || eventId == Guid.Empty)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-event",
-                "Name the Event the state is for by its id."
-            );
-        }
-
-        if (attributes.State != null && !IsWhole(attributes.State))
-        {
-            return InvalidState();
-        }
-
+        var attributes = body.Attributes;
         var (session, created) = await store.MakeAsync(
-            users.GetUserId(context.User)!,
-            eventId,
+            access.User.Id.ToString(),
+            Guid.Parse(attributes.EventId!),
             attributes.State,
-            context.RequestAborted
+            cancellationToken
         );
         return created
             ? ResourceOf(StatusCodes.Status201Created, session, $"/api/user-sessions/{session.Id}")
             : ResourceOf(StatusCodes.Status200OK, session);
     }
 
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
     static async Task<IResult> Change(
-        HttpContext context,
-        UserManager<NIdentityUser> users,
+        string id,
+        JsonApiBody<UserSessionChange> body,
+        AccessContext access,
         UserSessionStore store,
-        string id
+        CancellationToken cancellationToken
     )
     {
-        var read = await JsonApiRequests.ReadAsync<UserSessionAttributes>(context.Request, USER_SESSIONS);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var owner = users.GetUserId(context.User)!;
+        var owner = access.User.Id.ToString();
         var session = Guid.TryParse(id, out var parsed)
-            ? await store.FindAsync(owner, parsed, context.RequestAborted)
+            ? await store.FindAsync(owner, parsed, cancellationToken)
             : null;
         if (session is null)
         {
             return JsonApiResults.NotFound();
         }
 
-        var attributes = read.Attributes!;
+        var attributes = body.Attributes;
         if (
             attributes.EventId != null
             && !(Guid.TryParse(attributes.EventId, out var named) && named == session.EventId)
@@ -154,14 +129,9 @@ internal static class UserSessionEndpoints
             );
         }
 
-        if (attributes.State != null && !IsWhole(attributes.State))
-        {
-            return InvalidState();
-        }
-
         if (attributes.State != null)
         {
-            session = await store.ReplaceStateAsync(owner, session.Id, attributes.State, context.RequestAborted);
+            session = await store.ReplaceStateAsync(owner, session.Id, attributes.State, cancellationToken);
             if (session is null)
             {
                 return JsonApiResults.NotFound(); // it was deleted while this request was on its way
@@ -171,16 +141,17 @@ internal static class UserSessionEndpoints
         return ResourceOf(StatusCodes.Status200OK, session);
     }
 
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
     static async Task<IResult> Remove(
-        HttpContext context,
-        UserManager<NIdentityUser> users,
+        string id,
+        AccessContext access,
         UserSessionStore store,
-        string id
+        CancellationToken cancellationToken
     )
     {
         var removed =
             Guid.TryParse(id, out var parsed)
-            && await store.DeleteAsync(users.GetUserId(context.User)!, parsed, context.RequestAborted);
+            && await store.DeleteAsync(access.User.Id.ToString(), parsed, cancellationToken);
         return removed ? Results.NoContent() : JsonApiResults.NotFound();
     }
 
@@ -192,25 +163,6 @@ internal static class UserSessionEndpoints
     static object AttributesOf(UserSession session)
     {
         return new { eventId = session.EventId, state = session.State };
-    }
-
-    /// <summary>A state has both its lists, and no list and no entry in one is null: JSON can say that, the model cannot.</summary>
-    static bool IsWhole(NtsUserSessionStateModel state)
-    {
-        return state.SnapshotHistory != null
-            && state.SnapshotSelections != null
-            && state.SnapshotHistory.All(group => group?.Entries != null && group.Entries.All(entry => entry != null))
-            && state.SnapshotSelections.All(entry => entry != null);
-    }
-
-    static IResult InvalidState()
-    {
-        return JsonApiResults.Error(
-            StatusCodes.Status400BadRequest,
-            "invalid-state",
-            "The state is not valid.",
-            "Send both lists, and no null in them or in the entries of a group."
-        );
     }
 
     static IResult InvalidFilter()
@@ -225,10 +177,53 @@ internal static class UserSessionEndpoints
 }
 
 /// <summary>What a document of a user session may bring: the Event it is for and its state.</summary>
-internal sealed class UserSessionAttributes
+internal class UserSessionAttributes : IResourceAttributes
 {
+    public static string? ResourceType => "user-sessions";
+
     /// <summary>A text and not a Guid, so that an id that is not one is refused with a code of its own.</summary>
     public string? EventId { get; set; }
 
     public NtsUserSessionStateModel? State { get; set; }
+
+    public virtual JsonApiFailure? Invalid()
+    {
+        return State != null && !IsWhole(State)
+            ? new JsonApiFailure(
+                StatusCodes.Status400BadRequest,
+                "invalid-state",
+                "The state is not valid.",
+                "Send both lists, and no null in them or in the entries of a group."
+            )
+            : null;
+    }
+
+    /// <summary>A state has both its lists, and no list and no entry in one is null: JSON can say that, the model cannot.</summary>
+    static bool IsWhole(NtsUserSessionStateModel state)
+    {
+        return state.SnapshotHistory != null
+            && state.SnapshotSelections != null
+            && state.SnapshotHistory.All(group => group?.Entries != null && group.Entries.All(entry => entry != null))
+            && state.SnapshotSelections.All(entry => entry != null);
+    }
 }
+
+/// <summary>A record that is made: for an Event, whose id is the server's to make.</summary>
+internal sealed class NewUserSession : UserSessionAttributes, IResourceAttributes
+{
+    public static DocumentIds Ids => DocumentIds.Forbidden;
+
+    public override JsonApiFailure? Invalid()
+    {
+        return !Guid.TryParse(EventId, out var eventId) || eventId == Guid.Empty
+            ? new JsonApiFailure(
+                StatusCodes.Status400BadRequest,
+                "invalid-event",
+                "Name the Event the state is for by its id."
+            )
+            : base.Invalid();
+    }
+}
+
+/// <summary>A change of a record: the state it should have, and the Event it is for when the document says so, which has to be the one it has.</summary>
+internal sealed class UserSessionChange : UserSessionAttributes { }

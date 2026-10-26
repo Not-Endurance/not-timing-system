@@ -10,19 +10,17 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// The guard that fails closed (ADR-0012, #671): a route of the Api that is neither public nor declares what it needs is a
-/// mistake, and so is a route named as not yet guarded that is guarded, or that is not a route. The routes are made up for
-/// each case, with no host and no database, and the real ones are held to the same rule beside them.
+/// mistake. The routes are made up for each case, with no host and no database, and the real ones are held to the same
+/// rule beside them.
 /// </summary>
 public sealed class EndpointGuardTests
 {
-    static readonly IReadOnlySet<string> NONE = new HashSet<string>();
-
     [Fact]
     public void A_route_of_the_Api_that_declares_nothing_and_is_not_public_is_a_mistake()
     {
         var routes = new[] { Route("GET", "/api/secrets") };
 
-        var mistakes = EndpointGuard.Mistakes(routes, NONE);
+        var mistakes = EndpointGuard.Mistakes(routes);
 
         Assert.Equal(["GET api/secrets declares no requirement and is not public"], mistakes);
     }
@@ -36,7 +34,7 @@ public sealed class EndpointGuardTests
             Route("POST", "/api/secrets", new RequiresAttribute(Capability.SignedIn, PlaceIn.Platform)),
         };
 
-        Assert.Empty(EndpointGuard.Mistakes(routes, NONE));
+        Assert.Empty(EndpointGuard.Mistakes(routes));
     }
 
     [Fact]
@@ -44,7 +42,7 @@ public sealed class EndpointGuardTests
     {
         var routes = new[] { Route("GET", "/api/events/live"), Route("POST", "/api/sessions") };
 
-        Assert.Empty(EndpointGuard.Mistakes(routes, NONE));
+        Assert.Empty(EndpointGuard.Mistakes(routes));
     }
 
     [Fact]
@@ -57,7 +55,7 @@ public sealed class EndpointGuardTests
             Route("DELETE", "/api/rows/{id}", requires, new NoRows()),
         };
 
-        var mistakes = EndpointGuard.Mistakes(routes, NONE);
+        var mistakes = EndpointGuard.Mistakes(routes);
 
         Assert.Equal(
             ["PATCH api/rows/{id} is about a row of what an Event keeps and does not say which rows"],
@@ -70,43 +68,17 @@ public sealed class EndpointGuardTests
     {
         var routes = new[] { Route("GET", "/sign-in"), Route("GET", "/healthz"), Route("GET", "/live-hub") };
 
-        Assert.Empty(EndpointGuard.Mistakes(routes, NONE));
+        Assert.Empty(EndpointGuard.Mistakes(routes));
     }
 
     [Fact]
-    public void A_route_named_as_not_yet_guarded_is_let_through_until_it_is_guarded()
+    public void A_route_a_host_says_is_public_needs_no_requirement_and_is_a_mistake_where_the_host_does_not_say_it()
     {
-        var routes = new[] { Route("GET", "/api/secrets") };
+        var routes = new[] { Route("POST", "/api/dev/sessions") };
+        var hostEntries = new[] { new PublicEndpoint(EndpointAccess.SignIn, "POST", "api/dev/sessions") };
 
-        var mistakes = EndpointGuard.Mistakes(routes, new HashSet<string> { "GET api/secrets" });
-
-        Assert.Empty(mistakes);
-    }
-
-    [Fact]
-    public void A_route_that_is_guarded_and_still_named_as_not_yet_guarded_is_a_mistake_so_the_list_only_shrinks()
-    {
-        var routes = new[]
-        {
-            Route("GET", "/api/secrets", new RequiresAttribute(Capability.SignedIn, PlaceIn.Platform)),
-        };
-
-        var mistakes = EndpointGuard.Mistakes(routes, new HashSet<string> { "GET api/secrets" });
-
-        Assert.Equal(["GET api/secrets is guarded already and is still named as not yet guarded"], mistakes);
-    }
-
-    [Fact]
-    public void A_name_that_is_not_a_route_is_a_mistake_so_a_route_that_is_gone_leaves_the_list()
-    {
-        var routes = new[]
-        {
-            Route("GET", "/api/secrets", new RequiresAttribute(Capability.SignedIn, PlaceIn.Platform)),
-        };
-
-        var mistakes = EndpointGuard.Mistakes(routes, new HashSet<string> { "DELETE api/gone" });
-
-        Assert.Equal(["DELETE api/gone is named as not yet guarded and is not a route"], mistakes);
+        Assert.Empty(EndpointGuard.Mistakes(routes, hostEntries));
+        Assert.Equal(["POST api/dev/sessions declares no requirement and is not public"], EndpointGuard.Mistakes(routes));
     }
 
     [Fact]
@@ -114,7 +86,7 @@ public sealed class EndpointGuardTests
     {
         var routes = new[] { Route("GET", "/api/secrets"), Route("DELETE", "/api/secrets/{id}") };
 
-        var stopped = Assert.Throws<InvalidOperationException>(() => EndpointGuard.ThrowWhenUnguarded(routes, NONE));
+        var stopped = Assert.Throws<InvalidOperationException>(() => EndpointGuard.ThrowWhenUnguarded(routes));
 
         Assert.Contains("GET api/secrets declares no requirement", stopped.Message);
         Assert.Contains("DELETE api/secrets/{id} declares no requirement", stopped.Message);
@@ -126,10 +98,10 @@ public sealed class EndpointGuardTests
         var routes = new[]
         {
             Route("GET", "/api/secrets", new RequiresAttribute(Capability.SignedIn, PlaceIn.Platform)),
-            Route("GET", "/api/old"),
+            Route("GET", "/api/events/live"),
         };
 
-        EndpointGuard.ThrowWhenUnguarded(routes, new HashSet<string> { "GET api/old" });
+        EndpointGuard.ThrowWhenUnguarded(routes);
     }
 
     [Fact]
@@ -140,7 +112,7 @@ public sealed class EndpointGuardTests
             Route(["GET", "POST"], "/api/secrets", new RequiresAttribute(Capability.SignedIn, PlaceIn.Platform)),
         };
 
-        Assert.Empty(EndpointGuard.Mistakes(routes, NONE));
+        Assert.Empty(EndpointGuard.Mistakes(routes));
     }
 
     static RouteEndpoint Route(string method, string pattern, params object[] metadata)

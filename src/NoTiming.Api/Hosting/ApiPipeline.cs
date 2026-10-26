@@ -59,11 +59,11 @@ internal static class ApiPipeline
         );
         // The routes that declare what they need are mapped through the group the endpoint filter is on (ADR-0012, #671).
         var guarded = app.MapGroup(string.Empty).AddEndpointFilter<AccessFilter>();
-        app.MapAccount();
+        guarded.MapAccount();
 #if DEBUG
         app.MapLocalSignIn();
 #endif
-        app.MapProfile();
+        guarded.MapProfile();
         guarded.MapTenancy();
         guarded.MapBranding();
         guarded.MapEvents();
@@ -80,7 +80,7 @@ internal static class ApiPipeline
         guarded.MapEventData();
         guarded.MapTimeEventActors();
         guarded.MapSnapshots();
-        app.MapUserSessions();
+        guarded.MapUserSessions();
         app.MapHub<LiveHub>(ApplicationConstants.LIVE_HUB).RequireCors(ApiServices.CORS_POLICY_NAME);
 
         // An unknown API route is a 404 in the error format of the rest-api skill, never the Ui's page.
@@ -109,9 +109,14 @@ internal static class ApiPipeline
         app.MapFallbackToFile("{**path:nonfile}", "index.html");
 
         // Fail closed: a route of the Api that is neither public nor declares what it needs does not let the host start.
+#if DEBUG
+        var hostEntries = app.Services.GetService<HostPublicEndpoints>()?.Entries;
+#else
+        IEnumerable<PublicEndpoint>? hostEntries = null;
+#endif
         EndpointGuard.ThrowWhenUnguarded(
             ((IEndpointRouteBuilder)app).DataSources.SelectMany(x => x.Endpoints),
-            UnguardedRoutes.NotYet
+            hostEntries
         );
 
         return app;
