@@ -1,10 +1,8 @@
-using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
-using Not.Identity;
 using NoTiming.Api.Features.Access;
-using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
+using NTS.Domain.Access;
 
 namespace NoTiming.Api.Features.EventData;
 
@@ -13,9 +11,9 @@ namespace NoTiming.Api.Features.EventData;
 /// answers one resource for each account that is the actor of a time event of the Event, whose id is the account's and whose
 /// only attribute is its display name. Time events carry the id of the account that recorded them and never a name, so this is
 /// how the timeline of the Console says who it was. It is for the people who may see how times were recorded and nobody else
-/// (403 <c>not-allowed</c>), it names only accounts that recorded a time of this Event, and it takes the Event, the
-/// <c>sort</c> by the display name and the pages of every list, and nothing else. An account that is gone is not named,
-/// and the timeline says it does not know it.
+/// (403 <c>not-allowed</c>, decided by the endpoint filter), it names only accounts that recorded a time of this Event, and it
+/// takes the Event, the <c>sort</c> by the display name and the pages of every list, and nothing else. An account that is gone
+/// is not named, and the timeline says it does not know it.
 /// </summary>
 internal static class TimeEventActorsEndpoints
 {
@@ -27,82 +25,35 @@ internal static class TimeEventActorsEndpoints
 
     public static IEndpointRouteBuilder MapTimeEventActors(this IEndpointRouteBuilder app)
     {
-        app.MapGet(
-                "/api/" + TYPE,
-                (
-                    HttpContext context,
-                    UserManager<NIdentityUser> users,
-                    EventStore events,
-                    TenantCollections tenants,
-                    TimeEventViewers viewers,
-                    AccountSearch accounts
-                ) => ReadAsync(context, users, events, tenants, viewers, accounts)
-            )
-            .RequireAuthorization();
+        app.MapGet("/api/" + TYPE, ReadAsync);
         return app;
     }
 
+    [Requires(Capability.SeeTimeEvents, PlaceIn.EventInFilter)]
     static async Task<IResult> ReadAsync(
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventStore events,
+        [ListOf(DISPLAY_NAME, EVENT_ID)] ListQuery query,
+        HttpRequest request,
+        AccessContext access,
         TenantCollections tenants,
-        TimeEventViewers viewers,
-        AccountSearch accounts
+        AccountSearch accounts,
+        CancellationToken cancellationToken
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var query = JsonApiQuery.ReadList(context.Request, DISPLAY_NAME, EVENT_ID);
-        if (query.Refusal != null)
-        {
-            return query.Refusal;
-        }
-
-        if (!query.EqualTo.TryGetValue(EVENT_ID, out var named) || !Guid.TryParse(named, out var eventId))
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "event-required",
-                "Name the Event the people recorded times of.",
-                "Send filter=eventId eq <id> and nothing else."
-            );
-        }
-
-        var facts = await events.FindAsync(eventId, context.RequestAborted);
-        if (facts is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var verdict = await viewers.DecideAsync(user, facts, context.RequestAborted);
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
+        var facts = access.Event;
         var recorded = await tenants
             .Of(TenantOwned.EVENT_PARTICIPATIONS, facts.TenantId)
-            .DistinctAsync(
-                ACTOR_ID,
-                new BsonDocument(EVENT_ID_FIELD, BsonGuids.Binary(eventId)),
-                context.RequestAborted
-            );
+            .DistinctAsync(ACTOR_ID, new BsonDocument(EVENT_ID_FIELD, BsonGuids.Binary(facts.Id)), cancellationToken);
         var (actors, hasMore) = await accounts.NamesOfAsync(
             [.. recorded.OfType<BsonBinaryData>().Select(x => x.ToGuid(GuidRepresentation.Standard)).Distinct()],
             query.Descending,
             query.Skip,
             query.Size,
-            context.RequestAborted
+            cancellationToken
         );
         return JsonApiResults.Collection(
             TYPE,
             actors.Select(x => (x.Id.ToString(), (object)new { displayName = x.DisplayName })),
-            links: JsonApiPaging.Links(context.Request, query.Number, hasMore),
+            links: JsonApiPaging.Links(request, query.Number, hasMore),
             meta: JsonApiPaging.Meta(query.Size, query.Number)
         );
     }

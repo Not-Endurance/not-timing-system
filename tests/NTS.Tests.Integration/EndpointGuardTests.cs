@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using NoTiming.Api.Features.Access;
+using NoTiming.Api.Features.Tenancy;
 using NTS.Domain.Access;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Tests.Integration;
 
@@ -43,6 +45,24 @@ public sealed class EndpointGuardTests
         var routes = new[] { Route("GET", "/api/events/live"), Route("POST", "/api/sessions") };
 
         Assert.Empty(EndpointGuard.Mistakes(routes, NONE));
+    }
+
+    [Fact]
+    public void A_route_that_is_about_a_row_has_to_say_which_rows_it_is_about()
+    {
+        var requires = new RequiresAttribute(Capability.RunEvent, PlaceIn.EventOfRow);
+        var routes = new[]
+        {
+            Route("PATCH", "/api/rows/{id}", requires),
+            Route("DELETE", "/api/rows/{id}", requires, new NoRows()),
+        };
+
+        var mistakes = EndpointGuard.Mistakes(routes, NONE);
+
+        Assert.Equal(
+            ["PATCH api/rows/{id} is about a row of what an Event keeps and does not say which rows"],
+            mistakes
+        );
     }
 
     [Fact]
@@ -137,5 +157,13 @@ public sealed class EndpointGuardTests
             new EndpointMetadataCollection([new HttpMethodMetadata(methods), .. metadata]),
             pattern
         );
+    }
+
+    sealed class NoRows : IEventRows
+    {
+        public Task<IEventScoped?> FindAsync(CrossTenantReads reads, Guid id, CancellationToken cancellationToken)
+        {
+            return Task.FromResult<IEventScoped?>(null);
+        }
     }
 }

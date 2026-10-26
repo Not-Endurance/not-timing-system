@@ -5,11 +5,13 @@ using Microsoft.Net.Http.Headers;
 using Not.Domain.Abstractions;
 using Not.Identity;
 using Not.Krud.Abstractions;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
 using NTS.Contracts.Shared;
+using NTS.Domain.Access;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Api.Features.EventData;
@@ -21,7 +23,9 @@ namespace NoTiming.Api.Features.EventData;
 /// Tenant of its Event, which is told by the Event and never by the caller. <c>POST</c> makes a row with the id the client
 /// made for it, <c>PATCH</c> changes the members it names and <c>DELETE</c> removes it, for a Console Operator of the Event, or
 /// Root, while it is Live (ADR-0012), and a row that counts its writes is changed against the version it was read at, which the
-/// change names in its <c>meta</c> (ADR-0013). Every write that was stored is announced to the viewers of the Event once.
+/// change names in its <c>meta</c> (ADR-0013). Every write that was stored is announced to the viewers of the Event once. A
+/// write declares what it needs and the endpoint filter decides it (#671): the Event is the one the document names, or the one
+/// the row belongs to, and the handler is reached by a caller who may run it, with the row the route names found once.
 /// </summary>
 internal static class EventDataEndpoints
 {
@@ -53,22 +57,33 @@ internal static class EventDataEndpoints
         );
         app.MapPost(
                 path,
-                (HttpContext context, UserManager<NIdentityUser> users, EventDataAccess access) =>
-                    CreateAsync(family, context, users, access)
+                [Requires(Capability.RunEvent, PlaceIn.EventInBody)]
+                (
+                    JsonApiBody<NewRow> body,
+                    AccessContext access,
+                    EventDataAccess data,
+                    CancellationToken cancellationToken
+                ) => CreateAsync(family, body, access, data, cancellationToken)
             )
-            .RequireAuthorization();
+            .WithMetadata(new ResourceAttribute(family.Route));
         app.MapPatch(
                 path + "/{id}",
-                (string id, HttpContext context, UserManager<NIdentityUser> users, EventDataAccess access) =>
-                    ChangeAsync(family, id, context, users, access)
+                [Requires(Capability.RunEvent, PlaceIn.EventOfRow)]
+                (
+                    JsonApiBody<RowChange> body,
+                    AccessContext access,
+                    EventDataAccess data,
+                    CancellationToken cancellationToken
+                ) => ChangeAsync(family, body, access, data, cancellationToken)
             )
-            .RequireAuthorization();
+            .WithMetadata(new ResourceAttribute(family.Route), new EventRowsOf<TModel>(family.Collection));
         app.MapDelete(
                 path + "/{id}",
-                (string id, HttpContext context, UserManager<NIdentityUser> users, EventDataAccess access) =>
-                    RemoveAsync(family, id, context, users, access)
+                [Requires(Capability.RunEvent, PlaceIn.EventOfRow)]
+                (AccessContext access, EventDataAccess data, CancellationToken cancellationToken) =>
+                    RemoveAsync(family, access, data, cancellationToken)
             )
-            .RequireAuthorization();
+            .WithMetadata(new EventRowsOf<TModel>(family.Collection));
     }
 
     static async Task<IResult> ListAsync<TModel, TEntity>(
@@ -180,52 +195,25 @@ internal static class EventDataEndpoints
 
     static async Task<IResult> CreateAsync<TModel, TEntity>(
         EventDataFamily<TModel, TEntity> family,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventDataAccess access
+        JsonApiBody<NewRow> body,
+        AccessContext access,
+        EventDataAccess data,
+        CancellationToken cancellationToken
     )
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, family.Route);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var id = Guid.NewGuid();
-        if (read.Id != null && !Guid.TryParse(read.Id, out id))
-        {
-            return JsonApiResults.InvalidId();
-        }
-
+        var id = body.Id is null ? Guid.NewGuid() : Guid.Parse(body.Id);
         var row = new TModel();
-        if (family.Made.Apply(row, read.Attributes!.Members ?? [], []) is { } malformed)
+        if (family.Made.Apply(row, body.Attributes.Members ?? [], []) is { } malformed)
         {
             return malformed;
         }
 
-        // The Event says whose the row is and who may write it, so the document has to name it.
-        if (row.EventId == Guid.Empty)
+        // The Event the caller was allowed to run is the Event of the row: a document cannot say one and be let in by another.
+        if (row.EventId != access.Event.Id)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "event-required",
-                "Name the Event the row is of.",
-                "The Event is the eventId attribute of the document."
-            );
-        }
-
-        var (facts, refusal) = await access.OpenAsync(user, row.EventId, context.RequestAborted);
-        if (refusal != null)
-        {
-            return refusal;
+            throw new InvalidOperationException("The Event of the row is not the Event the caller was let in to.");
         }
 
         ReferenceEndpoints.SetId(row, id);
@@ -234,16 +222,16 @@ internal static class EventDataEndpoints
             return invalid;
         }
 
-        var collection = access.Collection(family, facts!);
-        if (await collection.InsertAsync(row, context.RequestAborted))
+        var collection = data.Collection(family, access.Event);
+        if (await collection.InsertAsync(row, cancellationToken))
         {
-            await access.AnnounceAsync(family, row);
+            await data.AnnounceAsync(family, row);
             return Resource(family, row, StatusCodes.Status201Created, true, $"/api/{family.Route}/{id}");
         }
 
         // The same id again is the row that was made, as it is for anything a client makes the id of; the id of a row of
         // another Event, or of another Tenant, is not that, and is not told about.
-        var existing = await collection.FindAsync(id, context.RequestAborted);
+        var existing = await collection.FindAsync(id, cancellationToken);
         return existing is not null && existing.EventId == row.EventId
             ? Resource(family, existing, StatusCodes.Status200OK, true)
             : JsonApiResults.IdTaken();
@@ -251,47 +239,16 @@ internal static class EventDataEndpoints
 
     static async Task<IResult> ChangeAsync<TModel, TEntity>(
         EventDataFamily<TModel, TEntity> family,
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventDataAccess access
+        JsonApiBody<RowChange> body,
+        AccessContext access,
+        EventDataAccess data,
+        CancellationToken cancellationToken
     )
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, family.Route);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        if (!Guid.TryParse(id, out var rowId))
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        if (read.Id != null && read.Id != id)
-        {
-            return JsonApiResults.IdMismatch();
-        }
-
-        var row = await access.FindAsync(family, rowId, context.RequestAborted);
-        if (row is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var (facts, refusal) = await access.OpenAsync(user, row.EventId, context.RequestAborted);
-        if (refusal != null)
-        {
-            return refusal;
-        }
+        // The members are checked against the row they are applied to, which is the one the filter found.
+        var row = access.RowOf<TModel>();
 
         // A row that counts its writes is changed against the version the change was made on, and a change that was made on
         // another one changes nothing: the caller reads the row again and makes the change on what it is now.
@@ -299,7 +256,7 @@ internal static class EventDataEndpoints
         var basedOn = 0;
         if (counted != null)
         {
-            var (given, unusable) = VersionOf(read.Meta);
+            var (given, unusable) = VersionOf(body.Meta);
             if (unusable != null)
             {
                 return unusable;
@@ -314,7 +271,7 @@ internal static class EventDataEndpoints
         }
 
         var named = new List<PropertyInfo>();
-        if (family.Changed.Apply(row, read.Attributes!.Members ?? [], named) is { } malformed)
+        if (family.Changed.Apply(row, body.Attributes.Members ?? [], named) is { } malformed)
         {
             return malformed;
         }
@@ -330,66 +287,46 @@ internal static class EventDataEndpoints
             return Resource(family, row, StatusCodes.Status200OK, true);
         }
 
-        var collection = access.Collection(family, facts!);
+        var collection = data.Collection(family, access.Event);
         if (counted != null)
         {
-            if (!await collection.UpdateAtVersionAsync(rowId, update, basedOn, context.RequestAborted))
+            if (!await collection.UpdateAtVersionAsync(row.Id, update, basedOn, cancellationToken))
             {
                 return StaleParticipation();
             }
 
             counted.Version = basedOn + 1;
         }
-        else if (!await collection.UpdateAsync(rowId, update, context.RequestAborted))
+        else if (!await collection.UpdateAsync(row.Id, update, cancellationToken))
         {
             return JsonApiResults.NotFound();
         }
 
-        await access.AnnounceAsync(family, row);
+        await data.AnnounceAsync(family, row);
         return Resource(family, row, StatusCodes.Status200OK, true);
     }
 
     static async Task<IResult> RemoveAsync<TModel, TEntity>(
         EventDataFamily<TModel, TEntity> family,
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventDataAccess access
+        AccessContext access,
+        EventDataAccess data,
+        CancellationToken cancellationToken
     )
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var row = Guid.TryParse(id, out var rowId)
-            ? await access.FindAsync(family, rowId, context.RequestAborted)
-            : null;
-        if (row is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var (facts, refusal) = await access.OpenAsync(user, row.EventId, context.RequestAborted);
-        if (refusal != null)
-        {
-            return refusal;
-        }
-
-        if (await access.IsReferencedAsync(family, row, facts!, context.RequestAborted))
+        var row = access.RowOf<TModel>();
+        if (await data.IsReferencedAsync(family, row, access.Event, cancellationToken))
         {
             return InUse();
         }
 
-        if (!await access.Collection(family, facts!).DeleteAsync(rowId, context.RequestAborted))
+        if (!await data.Collection(family, access.Event).DeleteAsync(row.Id, cancellationToken))
         {
             return JsonApiResults.NotFound();
         }
 
-        await access.AnnounceAsync(family, row);
+        await data.AnnounceAsync(family, row);
         return Results.NoContent();
     }
 
@@ -488,4 +425,49 @@ internal static class EventDataEndpoints
             EventDataFamily<TModel, TEntity>.MetaOf(row)
         );
     }
+}
+
+/// <summary>
+/// The document of a row that is made: the members of the row as they were sent, and the Event it names, which is where the
+/// row is made. The id of it is the one the client made for the row, a Guid, and may be left out.
+/// </summary>
+internal sealed class NewRow : MemberAttributes, INamesEvent, IResourceAttributes
+{
+    const string EVENT_ID = "eventId";
+
+    /// <summary>
+    /// The Event the document names, as the text it gave; none when it names none. It is no member of the class, or the
+    /// <c>eventId</c> of the document would be skipped instead of kept with the members the row is made of.
+    /// </summary>
+    string? INamesEvent.EventId =>
+        (Members ?? []).FirstOrDefault(x => string.Equals(x.Key, EVENT_ID, StringComparison.OrdinalIgnoreCase))
+            is { Key: not null } named
+            ? named.Value.ValueKind switch
+            {
+                JsonValueKind.String => named.Value.GetString(),
+                JsonValueKind.Null or JsonValueKind.Undefined => null,
+                _ => named.Value.GetRawText(),
+            }
+            : null;
+
+    public static DocumentIds Ids => DocumentIds.OptionalGuid;
+
+    /// <summary>The Event is named once: the caller is let in to one, and the row is made in the one that was named.</summary>
+    public override JsonApiFailure? Invalid()
+    {
+        return (Members ?? []).Keys.Count(x => string.Equals(x, EVENT_ID, StringComparison.OrdinalIgnoreCase)) > 1
+            ? new JsonApiFailure(
+                StatusCodes.Status400BadRequest,
+                "malformed-request",
+                "The request is malformed.",
+                "The Event is named once."
+            )
+            : null;
+    }
+}
+
+/// <summary>The document of a change of a row: the members it names, and the id of the row, which it may give.</summary>
+internal sealed class RowChange : MemberAttributes, IResourceAttributes
+{
+    public static DocumentIds Ids => DocumentIds.MatchesRoute;
 }

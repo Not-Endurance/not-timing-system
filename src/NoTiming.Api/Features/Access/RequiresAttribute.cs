@@ -29,6 +29,9 @@ internal enum PlaceIn
     /// <summary>The Event of the Console Operator grant whose id is the route value <c>id</c>.</summary>
     EventOfConsoleOperator,
 
+    /// <summary>The Event of the row, of what an Event keeps, whose id is the route value <c>id</c>; the endpoint says which rows with <see cref="IEventRows"/>.</summary>
+    EventOfRow,
+
     /// <summary>The Tenant whose id is the route value <c>id</c>.</summary>
     TenantRoute,
 

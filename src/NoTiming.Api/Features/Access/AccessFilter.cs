@@ -23,6 +23,7 @@ internal sealed class AccessFilter : IEndpointFilter
     readonly EventStore _events;
     readonly EventGrantStore _grants;
     readonly TenantStore _tenants;
+    readonly CrossTenantReads _reads;
     readonly AccessContext _access;
 
     public AccessFilter(
@@ -31,6 +32,7 @@ internal sealed class AccessFilter : IEndpointFilter
         EventStore events,
         EventGrantStore grants,
         TenantStore tenants,
+        CrossTenantReads reads,
         AccessContext access
     )
     {
@@ -39,6 +41,7 @@ internal sealed class AccessFilter : IEndpointFilter
         _events = events;
         _grants = grants;
         _tenants = tenants;
+        _reads = reads;
         _access = access;
     }
 
@@ -50,7 +53,15 @@ internal sealed class AccessFilter : IEndpointFilter
             "Name the Event: filter=eventId eq <id>."
         );
 
-    static IResult NotInTheBody { get; } =
+    static IResult NotNamedInTheBody { get; } =
+        JsonApiResults.Error(
+            StatusCodes.Status400BadRequest,
+            "event-required",
+            "Name the Event the request is about.",
+            "The Event is the eventId attribute of the document."
+        );
+
+    static IResult NotAnIdInTheBody { get; } =
         JsonApiResults.Error(
             StatusCodes.Status400BadRequest,
             "invalid-event",
@@ -177,15 +188,27 @@ internal sealed class AccessFilter : IEndpointFilter
             case PlaceIn.Platform:
                 return FoundPlace.Platform;
             case PlaceIn.EventInBody:
+                return await EventNamedAsync(
+                    inputs.Select(x => x.NamedEvent).FirstOrDefault(x => x != null),
+                    NotNamedInTheBody,
+                    NotAnIdInTheBody,
+                    cancellationToken
+                );
             case PlaceIn.EventInFilter:
                 return await EventNamedAsync(
                     inputs.Select(x => x.NamedEvent).FirstOrDefault(x => x != null),
-                    place == PlaceIn.EventInFilter ? NotInTheFilter : NotInTheBody,
+                    NotInTheFilter,
+                    NotInTheFilter,
                     cancellationToken
                 );
             case PlaceIn.EventInDocument:
                 return inputs.Select(x => x.DocumentId).FirstOrDefault(x => x != null) is { } documentId
-                    ? await EventNamedAsync(documentId, NotInTheDocument(missing: false), cancellationToken)
+                    ? await EventNamedAsync(
+                        documentId,
+                        NotInTheDocument(missing: false),
+                        NotInTheDocument(missing: false),
+                        cancellationToken
+                    )
                     : FoundPlace.Refused(NotInTheDocument(missing: true));
             case PlaceIn.EventRoute:
             case PlaceIn.StartedEventRoute:
@@ -193,6 +216,8 @@ internal sealed class AccessFilter : IEndpointFilter
             case PlaceIn.EventOfGrant:
             case PlaceIn.EventOfConsoleOperator:
                 return await EventOfGrantAsync(place == PlaceIn.EventOfConsoleOperator, http, cancellationToken);
+            case PlaceIn.EventOfRow:
+                return await EventOfRowAsync(http, cancellationToken);
             case PlaceIn.TenantRoute:
                 return await TenantOfRouteAsync(http, cancellationToken);
             case PlaceIn.CurrentTenant:
@@ -206,9 +231,25 @@ internal sealed class AccessFilter : IEndpointFilter
         }
     }
 
-    async Task<FoundPlace> EventNamedAsync(string? text, IResult notNamed, CancellationToken cancellationToken)
+    /// <summary>The Event a request names by its id: none named, or the empty id, is one answer, a name that is not an id another, and an Event that is not there is 404.</summary>
+    async Task<FoundPlace> EventNamedAsync(
+        string? text,
+        IResult notNamed,
+        IResult notAnId,
+        CancellationToken cancellationToken
+    )
     {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return FoundPlace.Refused(notNamed);
+        }
+
         if (!Guid.TryParse(text, out var id))
+        {
+            return FoundPlace.Refused(notAnId);
+        }
+
+        if (id == Guid.Empty)
         {
             return FoundPlace.Refused(notNamed);
         }
@@ -249,6 +290,21 @@ internal sealed class AccessFilter : IEndpointFilter
 
         var facts = await _events.FindAsync(grant.EventId, cancellationToken);
         return facts is null ? FoundPlace.Refused(JsonApiResults.NotFound()) : FoundPlace.OfEvent(facts, grant);
+    }
+
+    /// <summary>The Event of a row of what an Event keeps is the Event the row says it belongs to, which is how a row is found when only its id is known.</summary>
+    async Task<FoundPlace> EventOfRowAsync(HttpContext http, CancellationToken cancellationToken)
+    {
+        var rows =
+            http.GetEndpoint()?.Metadata.GetMetadata<IEventRows>()
+            ?? throw new InvalidOperationException("The route is about a row and does not say which rows.");
+        var row = Guid.TryParse(http.GetRouteValue("id")?.ToString(), out var id)
+            ? await rows.FindAsync(_reads, id, cancellationToken)
+            : null;
+        var facts = row is null ? null : await _events.FindAsync(row.EventId, cancellationToken);
+        return row is null || facts is null
+            ? FoundPlace.Refused(JsonApiResults.NotFound())
+            : FoundPlace.OfRow(facts, row);
     }
 
     async Task<FoundPlace> TenantOfRouteAsync(HttpContext http, CancellationToken cancellationToken)

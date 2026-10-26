@@ -2,6 +2,7 @@ using Not.Identity;
 using NoTiming.Api.Features.Events;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Api.Features.Access;
 
@@ -15,6 +16,7 @@ internal sealed class AccessContext
     NIdentityUser? _user;
     EventFacts? _event;
     Tenant? _tenant;
+    IEventScoped? _row;
     bool _isOperational;
 
     /// <summary>The signed-in account that asks. A handler is reached by a caller who is not signed in only when the endpoint is public.</summary>
@@ -46,6 +48,14 @@ internal sealed class AccessContext
         _tenant = place.Tenant;
         _isOperational = place.IsOperational;
         Grant = place.Grant;
+        _row = place.Row;
+    }
+
+    /// <summary>The row the route names, found once, when the place of the request is the Event of one.</summary>
+    public TRow RowOf<TRow>()
+        where TRow : class, IEventScoped
+    {
+        return _row as TRow ?? throw new InvalidOperationException($"The request does not name a {typeof(TRow).Name}.");
     }
 }
 
@@ -62,6 +72,11 @@ internal sealed class FoundPlace
         return new FoundPlace { Event = facts, Grant = grant };
     }
 
+    public static FoundPlace OfRow(EventFacts facts, IEventScoped row)
+    {
+        return new FoundPlace { Event = facts, Row = row };
+    }
+
     public static FoundPlace OfTenant(Tenant tenant, bool isOperational)
     {
         return new FoundPlace { Tenant = tenant, IsOperational = isOperational };
@@ -74,6 +89,7 @@ internal sealed class FoundPlace
     public IResult? Refusal { get; private init; }
     public EventFacts? Event { get; private init; }
     public EventGrant? Grant { get; private init; }
+    public IEventScoped? Row { get; private init; }
     public Tenant? Tenant { get; private init; }
     public bool IsOperational { get; private init; }
 }

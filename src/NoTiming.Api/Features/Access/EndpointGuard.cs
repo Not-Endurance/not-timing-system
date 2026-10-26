@@ -26,7 +26,8 @@ internal static class EndpointGuard
             foreach (var method in MethodsOf(route))
             {
                 var described = Describe(method, route);
-                var guarded = route.Metadata.GetMetadata<RequiresAttribute>() != null;
+                var requires = route.Metadata.GetMetadata<RequiresAttribute>();
+                var guarded = requires != null;
                 var isPublic = PublicEndpoints.AccessOf(method, route.RoutePattern.RawText) != EndpointAccess.Protected;
                 var listed = notYet.Contains(described);
                 if (!guarded && !isPublic && !listed)
@@ -36,6 +37,11 @@ internal static class EndpointGuard
                 else if ((guarded || isPublic) && listed)
                 {
                     mistakes.Add($"{described} is guarded already and is still named as not yet guarded");
+                }
+
+                if (requires?.Place == PlaceIn.EventOfRow && route.Metadata.GetMetadata<IEventRows>() == null)
+                {
+                    mistakes.Add($"{described} is about a row of what an Event keeps and does not say which rows");
                 }
             }
         }

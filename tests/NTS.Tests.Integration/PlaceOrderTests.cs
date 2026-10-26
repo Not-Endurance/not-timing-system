@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using NTS.Tests.Integration.Infrastructure;
 using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 
@@ -8,9 +9,10 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// The order in which a request is answered (ADR-0012, #671), tried on the routes whose place is not in the body: an Event
-/// named by the route, an Event named by the id of the document, and the Tenant the caller acts in. The first thing wrong is
-/// the answer: the transport, then the place (400 when it is named wrongly, 404 when it is not there), then what the caller
-/// holds, then the stage, then the content. The expectations are written from that order and not from what a route does.
+/// named by the route, an Event named by the id of the document, the Tenant the caller acts in, the Event named in the filter
+/// of a list, the Event named in the body of a row that is made and the Event a row belongs to. The first thing wrong is the
+/// answer: the transport, then the place (400 when it is named wrongly, 404 when it is not there), then what the caller holds,
+/// then the stage, then the content. The expectations are written from that order and not from what a route does.
 /// </summary>
 public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
 {
@@ -150,6 +152,167 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.BadRequest, content.StatusCode);
         Assert.Equal("invalid-rules", await ErrorCodeAsync(content));
         Assert.Equal(HttpStatusCode.OK, changed.StatusCode);
+    }
+
+    [Fact]
+    public async Task A_row_of_what_an_Event_keeps_is_changed_and_removed_in_the_Event_of_the_row_which_is_looked_for_before_what_the_caller_holds_and_the_content_last()
+    {
+        await using var scene = await SceneAsync();
+        var live = EventDataRow.Of("officials", scene.Live);
+        var ended = EventDataRow.Of("officials", scene.Historic);
+        await live.SeedAsync(_mongo.ConnectionString, scene.Tenant);
+        await ended.SeedAsync(_mongo.ConnectionString, scene.Tenant);
+        var elsewhere = Guid.NewGuid();
+
+        var notJsonApi = await SendRawAsync(
+            scene.Member,
+            HttpMethod.Patch,
+            $"/api/officials/{elsewhere}",
+            "text/plain",
+            "{}"
+        );
+        var unknown = await ChangeRowAsync(scene.ConsoleOperator, elsewhere.ToString(), new { nameEnglish = "x" });
+        var notAnId = await ChangeRowAsync(scene.ConsoleOperator, "not-a-guid", new { nameEnglish = "x" });
+        var removedUnknown = await scene.ConsoleOperator.Page.DeleteAsync($"/api/officials/{elsewhere}");
+        var tooLittle = await ChangeRowAsync(
+            scene.Member,
+            live.Id.ToString(),
+            new { nothing = "else" },
+            id: Guid.NewGuid().ToString()
+        );
+        var removedTooLittle = await scene.Member.Page.DeleteAsync($"/api/officials/{live.Id}");
+        var tooLate = await ChangeRowAsync(
+            scene.ConsoleOperator,
+            ended.Id.ToString(),
+            new { nothing = "else" },
+            id: Guid.NewGuid().ToString()
+        );
+        var mismatched = await ChangeRowAsync(
+            scene.ConsoleOperator,
+            live.Id.ToString(),
+            new { nothing = "else" },
+            id: Guid.NewGuid().ToString()
+        );
+        var content = await ChangeRowAsync(scene.ConsoleOperator, live.Id.ToString(), new { nothing = "else" });
+        var changed = await ChangeRowAsync(scene.ConsoleOperator, live.Id.ToString(), live.Change);
+
+        Assert.Equal(HttpStatusCode.UnsupportedMediaType, notJsonApi.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, notAnId.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, removedUnknown.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, tooLittle.StatusCode); // the Level comes before the document that does not agree with the route
+        Assert.Equal("not-console-operator", await ErrorCodeAsync(tooLittle));
+        Assert.Equal("not-console-operator", await ErrorCodeAsync(removedTooLittle));
+        Assert.Equal(HttpStatusCode.Conflict, tooLate.StatusCode); // the stage comes before it too
+        Assert.Equal("event-ended", await ErrorCodeAsync(tooLate));
+        Assert.Equal(HttpStatusCode.Conflict, mismatched.StatusCode);
+        Assert.Equal("id-mismatch", await ErrorCodeAsync(mismatched));
+        Assert.Equal(HttpStatusCode.BadRequest, content.StatusCode); // the members are checked against the row, last
+        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(content));
+        Assert.Equal(HttpStatusCode.OK, changed.StatusCode);
+    }
+
+    [Fact]
+    public async Task A_row_is_made_in_the_Event_the_document_names_which_is_looked_for_before_what_the_caller_holds_and_the_content_last()
+    {
+        await using var scene = await SceneAsync();
+
+        var notJsonApi = await SendRawAsync(scene.Member, HttpMethod.Post, "/api/officials", "text/plain", "{}");
+        var unnamed = await MakeRowAsync(
+            scene.ConsoleOperator,
+            JsonApiAttributes.Without(EventDataRow.Of("officials", scene.Live).Attributes, "eventId")
+        );
+        var empty = await MakeRowAsync(scene.ConsoleOperator, NamingEvent(scene.Live, Guid.Empty.ToString()));
+        var notAnId = await MakeRowAsync(scene.ConsoleOperator, NamingEvent(scene.Live, "not-a-guid"));
+        var unknown = await MakeRowAsync(scene.ConsoleOperator, NamingEvent(scene.Live, Guid.NewGuid().ToString()));
+        var tooLittle = await MakeRowAsync(
+            scene.Member,
+            EventDataRow.Of("officials", scene.Live).Attributes,
+            id: "not-a-guid"
+        );
+        var tooLate = await MakeRowAsync(
+            scene.ConsoleOperator,
+            EventDataRow.Of("officials", scene.Historic).Attributes,
+            id: "not-a-guid"
+        );
+        var twice = EventDataRow.Of("officials", scene.Live).Attributes;
+        twice["EventId"] = JsonSerializer.SerializeToElement(scene.Unstarted);
+        var namedTwice = await MakeRowAsync(scene.ConsoleOperator, twice);
+        var badId = await MakeRowAsync(
+            scene.ConsoleOperator,
+            EventDataRow.Of("officials", scene.Live).Attributes,
+            id: "not-a-guid"
+        );
+        var content = EventDataRow.Of("officials", scene.Live).Attributes;
+        content["nothing"] = JsonSerializer.SerializeToElement("else");
+        var badContent = await MakeRowAsync(scene.ConsoleOperator, content, id: Guid.NewGuid().ToString());
+        var made = await MakeRowAsync(
+            scene.ConsoleOperator,
+            EventDataRow.Of("officials", scene.Live).Attributes,
+            id: Guid.NewGuid().ToString()
+        );
+
+        Assert.Equal(HttpStatusCode.UnsupportedMediaType, notJsonApi.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, unnamed.StatusCode);
+        Assert.Equal("event-required", await ErrorCodeAsync(unnamed));
+        Assert.Equal(HttpStatusCode.BadRequest, empty.StatusCode); // the empty id names no Event
+        Assert.Equal("event-required", await ErrorCodeAsync(empty));
+        Assert.Equal(HttpStatusCode.BadRequest, notAnId.StatusCode);
+        Assert.Equal("invalid-event", await ErrorCodeAsync(notAnId));
+        Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, tooLittle.StatusCode); // the Level comes before the id that is not an id
+        Assert.Equal("not-console-operator", await ErrorCodeAsync(tooLittle));
+        Assert.Equal(HttpStatusCode.Conflict, tooLate.StatusCode); // and the stage
+        Assert.Equal("event-ended", await ErrorCodeAsync(tooLate));
+        Assert.Equal(HttpStatusCode.BadRequest, namedTwice.StatusCode); // one Event lets the caller in, so the document names one
+        Assert.Equal("malformed-request", await ErrorCodeAsync(namedTwice));
+        Assert.Equal(HttpStatusCode.BadRequest, badId.StatusCode);
+        Assert.Equal("invalid-id", await ErrorCodeAsync(badId));
+        Assert.Equal(HttpStatusCode.BadRequest, badContent.StatusCode);
+        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(badContent));
+        Assert.Equal(HttpStatusCode.Created, made.StatusCode);
+    }
+
+    [Fact]
+    public async Task The_people_who_recorded_times_are_asked_for_in_the_Event_the_filter_names_after_the_query_is_found_whole_and_before_what_the_caller_holds()
+    {
+        await using var scene = await SceneAsync();
+
+        var badSort = await scene.Member.Page.GetAsync(
+            $"/api/time-event-actors?filter=eventId eq {Guid.NewGuid()}&sort=name"
+        );
+        var unnamed = await scene.Member.Page.GetAsync("/api/time-event-actors");
+        var unknown = await scene.Member.Page.GetAsync($"/api/time-event-actors?filter=eventId eq {Guid.NewGuid()}");
+        var tooLittle = await scene.Member.Page.GetAsync($"/api/time-event-actors?filter=eventId eq {scene.Live}");
+        var allowed = await scene.ConsoleOperator.Page.GetAsync(
+            $"/api/time-event-actors?filter=eventId eq {scene.Live}"
+        );
+
+        Assert.Equal(HttpStatusCode.BadRequest, badSort.StatusCode); // the query is whole before the Event is looked for
+        Assert.Equal("invalid-sort", await ErrorCodeAsync(badSort));
+        Assert.Equal(HttpStatusCode.BadRequest, unnamed.StatusCode);
+        Assert.Equal("invalid-filter", await ErrorCodeAsync(unnamed));
+        Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, tooLittle.StatusCode);
+        Assert.Equal("not-allowed", await ErrorCodeAsync(tooLittle));
+        Assert.Equal(HttpStatusCode.OK, allowed.StatusCode);
+    }
+
+    static Dictionary<string, JsonElement> NamingEvent(Guid eventId, string named)
+    {
+        var attributes = EventDataRow.Of("officials", eventId).Attributes;
+        attributes["eventId"] = JsonSerializer.SerializeToElement(named);
+        return attributes;
+    }
+
+    static Task<HttpResponseMessage> ChangeRowAsync(Person person, string route, object attributes, string? id = null)
+    {
+        return person.Page.WriteAsync(HttpMethod.Patch, $"/api/officials/{route}", "officials", attributes, id: id);
+    }
+
+    static Task<HttpResponseMessage> MakeRowAsync(Person person, object attributes, string? id = null)
+    {
+        return person.Page.WriteAsync(HttpMethod.Post, "/api/officials", "officials", attributes, id: id);
     }
 
     static Task<HttpResponseMessage> ChangeRulesAsync(
