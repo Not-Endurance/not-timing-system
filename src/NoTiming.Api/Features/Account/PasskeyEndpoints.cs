@@ -31,33 +31,6 @@ internal static class PasskeyEndpoints
         return app;
     }
 
-    /// <summary>Validates the antiforgery token of a ceremony request. Null when it is good.</summary>
-    public static async Task<IResult?> ValidateAntiforgeryAsync(HttpContext context, IAntiforgery antiforgery)
-    {
-        try
-        {
-            await antiforgery.ValidateRequestAsync(context);
-            return null;
-        }
-        catch (AntiforgeryValidationException)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "antiforgery-token-invalid",
-                "The request could not be verified. Reload the page and try again."
-            );
-        }
-    }
-
-    public static IResult NotConfigured()
-    {
-        return JsonApiResults.Error(
-            StatusCodes.Status503ServiceUnavailable,
-            "passkeys-not-configured",
-            "Passkeys are not available on this host."
-        );
-    }
-
     public static object Describe(UserPasskeyInfo passkey)
     {
         return new
@@ -77,14 +50,9 @@ internal static class PasskeyEndpoints
 
     static async Task<IResult> RequestOptions(HttpContext context, IAntiforgery antiforgery, PasskeyService passkeys)
     {
-        if (!passkeys.Availability.Enabled)
+        if (await PasskeyCeremony.RefuseAsync(context, passkeys, antiforgery) is { } refusal)
         {
-            return NotConfigured();
-        }
-
-        if (await ValidateAntiforgeryAsync(context, antiforgery) is { } forged)
-        {
-            return forged;
+            return refusal;
         }
 
         var options = await passkeys.RequestOptionsAsync();
@@ -97,7 +65,7 @@ internal static class PasskeyEndpoints
     }
 
     // The ceremony has an order of its own: the host supports passkeys, the token is good, and only then the document.
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    [Requires(Capability.SignedIn)]
     static async Task<IResult> CreationOptions(
         HttpContext context,
         IAntiforgery antiforgery,
@@ -105,14 +73,9 @@ internal static class PasskeyEndpoints
         AccessContext access
     )
     {
-        if (!passkeys.Availability.Enabled)
+        if (await PasskeyCeremony.RefuseAsync(context, passkeys, antiforgery) is { } refusal)
         {
-            return NotConfigured();
-        }
-
-        if (await ValidateAntiforgeryAsync(context, antiforgery) is { } forged)
-        {
-            return forged;
+            return refusal;
         }
 
         var options = await passkeys.CreationOptionsAsync(access.User);
@@ -124,7 +87,7 @@ internal static class PasskeyEndpoints
         );
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    [Requires(Capability.SignedIn)]
     static async Task<IResult> List(PasskeyService passkeys, AccessContext access)
     {
         var list = await passkeys.ListAsync(access.User);
@@ -143,7 +106,7 @@ internal static class PasskeyEndpoints
         );
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    [Requires(Capability.SignedIn)]
     static async Task<IResult> Create(
         HttpContext context,
         IAntiforgery antiforgery,
@@ -152,14 +115,9 @@ internal static class PasskeyEndpoints
         AccountText text
     )
     {
-        if (!passkeys.Availability.Enabled)
+        if (await PasskeyCeremony.RefuseAsync(context, passkeys, antiforgery) is { } refusal)
         {
-            return NotConfigured();
-        }
-
-        if (await ValidateAntiforgeryAsync(context, antiforgery) is { } forged)
-        {
-            return forged;
+            return refusal;
         }
 
         var read = await JsonApiRequests.ReadAsync<PasskeyAttributes>(context.Request, PASSKEYS);
@@ -208,7 +166,7 @@ internal static class PasskeyEndpoints
         );
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    [Requires(Capability.SignedIn)]
     static async Task<IResult> Rename(HttpContext context, string id, PasskeyService passkeys, AccessContext access)
     {
         var read = await JsonApiRequests.ReadAsync<PasskeyAttributes>(context.Request, PASSKEYS);
@@ -238,7 +196,7 @@ internal static class PasskeyEndpoints
         return JsonApiResults.Resource(StatusCodes.Status200OK, PASSKEYS, id, Describe(renamed));
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    [Requires(Capability.SignedIn)]
     static async Task<IResult> Remove(string id, PasskeyService passkeys, AccessContext access)
     {
         if (!TryDecode(id, out var credentialId))
@@ -293,12 +251,4 @@ internal static class PasskeyEndpoints
             return false;
         }
     }
-}
-
-internal sealed class PasskeyAttributes
-{
-    /// <summary>What the browser's WebAuthn API made, as its JSON form.</summary>
-    public JsonElement? Credential { get; set; }
-
-    public string? Name { get; set; }
 }

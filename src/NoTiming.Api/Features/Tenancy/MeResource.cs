@@ -24,7 +24,7 @@ internal static class MeResource
                 emailConfirmed = user.EmailConfirmed,
                 name = user.TextOf("Name"),
                 passkeys = user.Passkeys.Count,
-                profileComplete = ProfileEndpoints.IsComplete(user),
+                profileComplete = ProfileRules.IsComplete(user),
                 homeTenantId = AccountRoles.HomeTenantOf(user),
                 selectedTenantId = AccountRoles.SelectedTenantOf(user),
                 currentTenantId = AccountRoles.CurrentTenantOf(user),

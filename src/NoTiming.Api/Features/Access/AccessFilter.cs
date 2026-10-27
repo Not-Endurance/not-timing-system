@@ -109,6 +109,12 @@ internal sealed class AccessFilter : IEndpointFilter
         }
 
         _access.Fill(user, standing, place);
+        return await RunAsync(invocation, next);
+    }
+
+    /// <summary>Runs the handler, and answers what it throws that the Api has an answer for, once, for guarded and public routes alike.</summary>
+    static async ValueTask<object?> RunAsync(EndpointFilterInvocationContext invocation, EndpointFilterDelegate next)
+    {
         try
         {
             return await next(invocation);
@@ -131,7 +137,7 @@ internal sealed class AccessFilter : IEndpointFilter
             && PublicEndpoints.AccessOf(http.Request.Method, route.RoutePattern.RawText) != EndpointAccess.Protected
         )
         {
-            return await next(invocation);
+            return await RunAsync(invocation, next);
         }
 
         throw new InvalidOperationException(

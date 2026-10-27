@@ -47,7 +47,7 @@ internal static class AccountSearchEndpoints
         );
     }
 
-    [Requires(Capability.SetUpAcrossTenants, PlaceIn.Platform)]
+    [Requires(Capability.SetUpAcrossTenants)]
     static Task<IResult> SearchEveryTenant(
         SearchQuery query,
         HttpRequest request,
@@ -90,13 +90,15 @@ internal static class AccountSearchEndpoints
             tenantId == null && !acrossTenants
                 ? []
                 : await search.SearchAsync(NameSearch.Of(query), tenantId, cancellationToken);
-        return JsonApiResults.Collection(
+        return JsonApiResults.Page(
             ACCOUNT_MATCHES,
             found
                 .Take(query.Size)
                 .Select(x => (x.Id.ToString(), (object)new { displayName = x.DisplayName, email = x.MaskedEmail })),
-            links: JsonApiPaging.Links(request, query.Number, found.Count > query.Size),
-            meta: JsonApiPaging.Meta(query.Size, query.Number)
+            request,
+            query.Size,
+            query.Number,
+            found.Count > query.Size
         );
     }
 }

@@ -122,7 +122,7 @@ internal static partial class JsonApiQuery
     }
 
     /// <summary>The refusal of a request that has a parameter other than those the route takes; none when it has not.</summary>
-    static IResult? Unsupported(HttpRequest request, params string[] taken)
+    public static IResult? Unsupported(HttpRequest request, params string[] taken)
     {
         return request.Query.Keys.FirstOrDefault(x => !taken.Contains(x)) is { } parameter
             ? JsonApiResults.Error(
@@ -167,15 +167,7 @@ internal static partial class JsonApiQuery
             descending = sort.ToString().StartsWith('-');
         }
 
-        return
-            JsonApiPaging.TryRead(request, JsonApiPaging.PAGE_SIZE, maxSize, ref size)
-            && JsonApiPaging.TryRead(request, JsonApiPaging.PAGE_NUMBER, int.MaxValue / maxSize, ref number)
-            ? null
-            : JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-page",
-                $"A page is a number of at least 1 and a size of 1 to {maxSize}."
-            );
+        return JsonApiPaging.Read(request, defaultSize, maxSize, out size, out number);
     }
 
     static JsonApiFilter ReadFilter(HttpRequest request, string[] members)

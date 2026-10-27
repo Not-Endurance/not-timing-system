@@ -50,11 +50,13 @@ internal static class TimeEventActorsEndpoints
             query.Size,
             cancellationToken
         );
-        return JsonApiResults.Collection(
+        return JsonApiResults.Page(
             TYPE,
             actors.Select(x => (x.Id.ToString(), (object)new { displayName = x.DisplayName })),
-            links: JsonApiPaging.Links(request, query.Number, hasMore),
-            meta: JsonApiPaging.Meta(query.Size, query.Number)
+            request,
+            query.Size,
+            query.Number,
+            hasMore
         );
     }
 }

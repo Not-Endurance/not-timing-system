@@ -22,39 +22,23 @@ internal sealed partial class ReferenceQuery<T>
 {
     const string FILTER = "filter";
     const string SORT = "sort";
-    const string PAGE_SIZE = "page[size]";
-    const string PAGE_NUMBER = "page[number]";
     static readonly ConcurrentDictionary<string, IEdmModel> MODELS = new();
     public const int DEFAULT_PAGE_SIZE = 100;
     public const int MAX_PAGE_SIZE = 500;
 
     public static ReferenceQuery<T> Read(HttpRequest request, IReadOnlyCollection<string> hiddenMembers)
     {
-        foreach (var parameter in request.Query.Keys)
-        {
-            if (parameter is not (FILTER or SORT or PAGE_SIZE or PAGE_NUMBER))
-            {
-                return Refused(
-                    StatusCodes.Status400BadRequest,
-                    "unsupported-parameter",
-                    "The parameter is not supported.",
-                    parameter
-                );
-            }
-        }
-
-        var size = DEFAULT_PAGE_SIZE;
-        var number = 1;
         if (
-            !JsonApiPaging.TryRead(request, PAGE_SIZE, MAX_PAGE_SIZE, ref size)
-            || !JsonApiPaging.TryRead(request, PAGE_NUMBER, int.MaxValue / MAX_PAGE_SIZE, ref number)
+            JsonApiQuery.Unsupported(request, FILTER, SORT, JsonApiPaging.PAGE_SIZE, JsonApiPaging.PAGE_NUMBER)
+            is { } unsupported
         )
         {
-            return Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-page",
-                "A page is a number of at least 1 and a size of 1 to 500."
-            );
+            return Refused(unsupported);
+        }
+
+        if (JsonApiPaging.Read(request, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, out var size, out var number) is { } page)
+        {
+            return Refused(page);
         }
 
         var filter = request.Query.TryGetValue(FILTER, out var filterValues) ? filterValues.ToString().Trim() : null;
@@ -125,7 +109,12 @@ internal sealed partial class ReferenceQuery<T>
 
     static ReferenceQuery<T> Refused(int status, string code, string title, string? detail = null)
     {
-        return new ReferenceQuery<T>(null, DEFAULT_PAGE_SIZE, 1, JsonApiResults.Error(status, code, title, detail));
+        return Refused(JsonApiResults.Error(status, code, title, detail));
+    }
+
+    static ReferenceQuery<T> Refused(IResult refusal)
+    {
+        return new ReferenceQuery<T>(null, DEFAULT_PAGE_SIZE, 1, refusal);
     }
 
     /// <summary>

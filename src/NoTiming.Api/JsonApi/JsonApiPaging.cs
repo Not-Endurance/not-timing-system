@@ -11,23 +11,22 @@ internal static class JsonApiPaging
     public const string PAGE_NUMBER = "page[number]";
 
     /// <summary>
-    /// Reads a parameter of a page: true when the request does not name it, or names a whole number from 1 to the greatest that
-    /// the list takes, which is then the value.
+    /// Reads the page a request names, whatever the list is of: its size from 1 to the greatest that the list takes
+    /// (<paramref name="defaultSize"/> when it names none) and its number from 1. The answer that refuses it, 400
+    /// <c>invalid-page</c>, or none when it is a page.
     /// </summary>
-    public static bool TryRead(HttpRequest request, string parameter, int max, ref int value)
+    public static IResult? Read(HttpRequest request, int defaultSize, int maxSize, out int size, out int number)
     {
-        if (!request.Query.TryGetValue(parameter, out var values))
-        {
-            return true;
-        }
-
-        if (!int.TryParse(values.ToString(), out var parsed) || parsed < 1 || parsed > max)
-        {
-            return false;
-        }
-
-        value = parsed;
-        return true;
+        size = defaultSize;
+        number = 1;
+        return TryRead(request, PAGE_SIZE, maxSize, ref size)
+            && TryRead(request, PAGE_NUMBER, int.MaxValue / maxSize, ref number)
+            ? null
+            : JsonApiResults.Error(
+                StatusCodes.Status400BadRequest,
+                "invalid-page",
+                $"A page is a number of at least 1 and a size of 1 to {maxSize}."
+            );
     }
 
     /// <summary>Where the list is, and where its next page is when there is one.</summary>
@@ -41,6 +40,26 @@ internal static class JsonApiPaging
     public static object Meta(int size, int number)
     {
         return new { page = new { size, number } };
+    }
+
+    /// <summary>
+    /// Reads a parameter of a page: true when the request does not name it, or names a whole number from 1 to the greatest that
+    /// the list takes, which is then the value.
+    /// </summary>
+    static bool TryRead(HttpRequest request, string parameter, int max, ref int value)
+    {
+        if (!request.Query.TryGetValue(parameter, out var values))
+        {
+            return true;
+        }
+
+        if (!int.TryParse(values.ToString(), out var parsed) || parsed < 1 || parsed > max)
+        {
+            return false;
+        }
+
+        value = parsed;
+        return true;
     }
 
     /// <summary>The address of the request with another page: the rest of the query is kept.</summary>

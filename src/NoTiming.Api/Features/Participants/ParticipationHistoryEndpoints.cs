@@ -27,7 +27,7 @@ internal static class ParticipationHistoryEndpoints
         return app;
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    [Requires(Capability.SignedIn)]
     static async Task<IResult> ListAsync(
         HttpContext context,
         ParticipationHistoryReader reader,
@@ -53,32 +53,27 @@ internal static class ParticipationHistoryEndpoints
         }
 
         var culture = CultureInfo.GetCultureInfo(text.Resolve(context.Request));
-        var (page, refusal) = await ReferenceEndpoints.ReadPageAsync(
-            () =>
-                reader.ReadAsync(
-                    Standing.Account,
-                    subject.Kind,
-                    subject.Id,
-                    culture,
-                    time.GetUtcNow(),
-                    query.Options,
-                    query.Skip,
-                    query.Size,
-                    context.RequestAborted
-                )
+        var page = await reader.ReadAsync(
+            Standing.Account,
+            subject.Kind,
+            subject.Id,
+            culture,
+            time.GetUtcNow(),
+            query.Options,
+            query.Skip,
+            query.Size,
+            context.RequestAborted
         );
-        if (refusal != null)
-        {
-            return refusal;
-        }
 
         // The names are told in the language of the request.
         context.Response.Headers.Append(HeaderNames.Vary, HeaderNames.AcceptLanguage);
-        return JsonApiResults.Collection(
+        return JsonApiResults.Page(
             PARTICIPATION_HISTORIES,
-            page!.Lines.Select(x => (x.Id.ToString(), x.Attributes())),
-            links: ReferenceEndpoints.Links(context.Request, query, page.HasMore),
-            meta: JsonApiPaging.Meta(query.Size, query.Number),
+            page.Lines.Select(x => (x.Id.ToString(), x.Attributes())),
+            context.Request,
+            query.Size,
+            query.Number,
+            page.HasMore,
             itemLink: id => $"/api/participations/{id}"
         );
     }

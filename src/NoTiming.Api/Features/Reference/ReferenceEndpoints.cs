@@ -146,13 +146,13 @@ internal static class ReferenceEndpoints
         var writes = WritesOf(family.Writes);
         app.MapGet(
             path,
-            [Requires(Capability.SignedIn, PlaceIn.Platform)]
+            [Requires(Capability.SignedIn)]
             (HttpContext context, AccessContext access, ReferenceAccess data) =>
                 ListAsync(family, context, access, data)
         );
         app.MapGet(
             path + "/{id}",
-            [Requires(Capability.SignedIn, PlaceIn.Platform)]
+            [Requires(Capability.SignedIn)]
             (string id, AccessContext access, ReferenceAccess data, CancellationToken cancellationToken) =>
                 ReadAsync(family, id, access, data, cancellationToken)
         );
@@ -188,128 +188,11 @@ internal static class ReferenceEndpoints
         }
     }
 
-    /// <summary>
-    /// The refusal of a row the domain does not accept: it is made into the entity it stands for, which is where its rules
-    /// are, and the first one it breaks is 422 with the member it is about.
-    /// </summary>
-    public static IResult? Invalid<TModel, TEntity>(TModel row)
-        where TModel : class, IDocument, IKrudModel<TEntity>, new()
-        where TEntity : class, IEntity
-    {
-        try
-        {
-            row.MapToEntity();
-            return null;
-        }
-        catch (ValidationException ex)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status422UnprocessableEntity,
-                "invalid-attribute",
-                "A member of the resource is not valid.",
-                ex.Message
-            );
-        }
-        catch (Exception ex) when (ex is ArgumentException or NullReferenceException or InvalidOperationException)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status422UnprocessableEntity,
-                "invalid-attribute",
-                "A member of the resource is not valid.",
-                "The document is missing a member it needs."
-            );
-        }
-    }
-
-    /// <summary>
-    /// What a change of a row is, once the caller may make it, for every family and for the Setup: the members the document
-    /// names are put into the row, the row has to be one the domain accepts, and then the members that were named, and no
-    /// others, are written. Null when the row was changed, and the answer that refuses it when not.
-    /// </summary>
-    public static async Task<IResult?> ChangeRowAsync<TModel, TEntity>(
-        ReferenceMembers<TModel> members,
-        IReferenceCollection<TModel> collection,
-        TModel row,
-        IReadOnlyDictionary<string, JsonElement> attributes,
-        CancellationToken cancellationToken
-    )
-        where TModel : class, IDocument, IKrudModel<TEntity>, new()
-        where TEntity : class, IEntity
-    {
-        var named = new List<PropertyInfo>();
-        if (members.Apply(row, attributes, named) is { } malformed)
-        {
-            return malformed;
-        }
-
-        if (Invalid<TModel, TEntity>(row) is { } invalid)
-        {
-            return invalid;
-        }
-
-        var update = members.UpdateOf(row, named);
-        return update.ElementCount > 0 && !await collection.UpdateAsync(row.Id, update, cancellationToken)
-            ? JsonApiResults.NotFound()
-            : null;
-    }
-
-    /// <summary>
-    /// Reads a page of a list. An expression that is valid in the OData grammar and that the data cannot run, such as the
-    /// date parts of a date (<c>year(endDay)</c>), or that the database cannot run on a row, such as a division by zero or a
-    /// part of a text that starts past its end, is for the caller to correct: 400 <c>invalid-filter</c>, and not a server
-    /// error.
-    /// </summary>
-    public static async Task<(TPage? Page, IResult? Refusal)> ReadPageAsync<TPage>(Func<Task<TPage>> read)
-        where TPage : class
-    {
-        try
-        {
-            return (await read(), null);
-        }
-        catch (ExpressionNotSupportedException)
-        {
-            return (
-                null,
-                JsonApiResults.Error(
-                    StatusCodes.Status400BadRequest,
-                    "invalid-filter",
-                    "The filter cannot be applied.",
-                    "The expression is valid, but the data cannot run it: write the comparison on the member itself."
-                )
-            );
-        }
-        catch (UnrunnableExpressionException)
-        {
-            return (
-                null,
-                JsonApiResults.Error(
-                    StatusCodes.Status400BadRequest,
-                    "invalid-filter",
-                    "The filter cannot be applied.",
-                    "The expression is valid, but the database cannot run it on every row: look at what it divides by, or takes a part of."
-                )
-            );
-        }
-    }
-
-    public static object Links<T>(HttpRequest request, ReferenceQuery<T> query, bool hasNext)
-        where T : class
-    {
-        return JsonApiPaging.Links(request, query.Number, hasNext);
-    }
-
-    /// <summary>Gives a row the id its client made for it, which a document names as the id of the resource and never as an attribute.</summary>
-    public static void SetId<TModel>(TModel row, Guid id)
-        where TModel : class
-    {
-        typeof(TModel).GetProperty("Id")!.SetValue(row, id);
-    }
-
     /// <summary>What a family needs to be written: the registry of the Tenant the account acts in, or the platform's own data.</summary>
     static RequiresAttribute WritesOf(ReferenceWrites writes)
     {
         return writes == ReferenceWrites.Developer
-            ? new RequiresAttribute(Capability.EditCountries, PlaceIn.Platform)
+            ? new RequiresAttribute(Capability.EditCountries)
             : new RequiresAttribute(Capability.EditRegistry, PlaceIn.CurrentTenant);
     }
 
@@ -328,21 +211,15 @@ internal static class ReferenceEndpoints
             return query.Refusal;
         }
 
-        var (rows, unsupported) = await ReadPageAsync(
-            () =>
-                data.Open(family, access.User).ReadAsync(query.Options, query.Skip, query.Take, context.RequestAborted)
-        );
-        if (unsupported != null)
-        {
-            return unsupported;
-        }
-
-        var page = rows!.Take(query.Size).ToList();
-        return JsonApiResults.Collection(
+        var rows = await data.Open(family, access.User)
+            .ReadAsync(query.Options, query.Skip, query.Take, context.RequestAborted);
+        return JsonApiResults.Page(
             family.Route,
-            page.Select(x => (x.Id.ToString(), (object)family.Members.AttributesOf(x))),
-            links: Links(context.Request, query, rows!.Count > query.Size),
-            meta: new { page = new { size = query.Size, number = query.Number } }
+            rows.Take(query.Size).Select(x => (x.Id.ToString(), (object)family.Members.AttributesOf(x))),
+            context.Request,
+            query.Size,
+            query.Number,
+            rows.Count > query.Size
         );
     }
 
@@ -379,8 +256,8 @@ internal static class ReferenceEndpoints
             return malformed;
         }
 
-        SetId(row, id);
-        if (Invalid<TModel, TEntity>(row) is { } invalid)
+        ReferenceRows.SetId(row, id);
+        if (ReferenceRows.Invalid<TModel, TEntity>(row) is { } invalid)
         {
             return invalid;
         }
@@ -415,7 +292,7 @@ internal static class ReferenceEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var failed = await ChangeRowAsync<TModel, TEntity>(
+        var failed = await ReferenceRows.ChangeAsync<TModel, TEntity>(
             family.Members,
             collection,
             row,

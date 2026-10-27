@@ -94,12 +94,7 @@ internal static class AccountEndpoints
         var attributes = read.Attributes!;
         if (attributes.Credential is { ValueKind: JsonValueKind.Object } credential)
         {
-            if (!passkeys.Availability.Enabled)
-            {
-                return PasskeyEndpoints.NotConfigured();
-            }
-
-            if (await PasskeyEndpoints.ValidateAntiforgeryAsync(context, antiforgery) is { } forged)
+            if (await PasskeyCeremony.RefuseAsync(context, passkeys, antiforgery) is { } forged)
             {
                 return forged;
             }
@@ -164,7 +159,7 @@ internal static class AccountEndpoints
         return Results.NoContent();
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    [Requires(Capability.SignedIn)]
     static IResult GetMe(AccessContext access)
     {
         return MeResource.Of(access.User, StatusCodes.Status200OK);
@@ -199,18 +194,4 @@ internal static class AccountEndpoints
             "The code is wrong or has expired."
         );
     }
-}
-
-internal sealed class CodeChallengeAttributes
-{
-    public string? Email { get; set; }
-}
-
-internal sealed class SessionAttributes
-{
-    public string? Email { get; set; }
-    public string? Code { get; set; }
-
-    /// <summary>The assertion a passkey made, as the JSON of the browser's WebAuthn API: the other way to sign in.</summary>
-    public JsonElement? Credential { get; set; }
 }

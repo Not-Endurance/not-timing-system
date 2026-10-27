@@ -32,10 +32,9 @@ internal static class SetupEndpoints
         return app;
     }
 
-    /// <summary>The members the Setup is shown with: its own, and the Tenant, which only the server sets.</summary>
-    public static ReferenceMembers<ConfigureEventModel> Members { get; } = new([], []);
+    static ReferenceMembers<ConfigureEventModel> Members => SetupDocument.Members;
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    [Requires(Capability.SignedIn)]
     static async Task<IResult> ListAsync(
         HttpContext context,
         AccessContext access,
@@ -56,30 +55,22 @@ internal static class SetupEndpoints
         var roles = AccountRoles.RolesOf(user);
         var all = roles.IsDeveloper || (tenantId != null && roles.IsRootAt(tenantId));
         Guid[]? running = all ? null : [.. await grants.EventsRunByAsync(tenantId, user.Id, context.RequestAborted)];
-        var (rows, unsupported) = await ReferenceEndpoints.ReadPageAsync(
-            () =>
-                tenants
-                    .Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, tenantId)
-                    .ReadAsync(
-                        running == null ? null : x => running.Contains(x.Id),
-                        query.Options,
-                        query.Skip,
-                        query.Take,
-                        context.RequestAborted
-                    )
-        );
-        if (unsupported != null)
-        {
-            return unsupported;
-        }
-
-        var page = rows!.Take(query.Size).ToList();
-
-        return JsonApiResults.Collection(
+        var rows = await tenants
+            .Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, tenantId)
+            .ReadAsync(
+                running == null ? null : x => running.Contains(x.Id),
+                query.Options,
+                query.Skip,
+                query.Take,
+                context.RequestAborted
+            );
+        return JsonApiResults.Page(
             CONFIGURE_EVENTS,
-            page.Select(x => (x.Id.ToString(), (object)Members.AttributesOf(x))),
-            links: ReferenceEndpoints.Links(context.Request, query, rows!.Count > query.Size),
-            meta: new { page = new { size = query.Size, number = query.Number } }
+            rows.Take(query.Size).Select(x => (x.Id.ToString(), (object)Members.AttributesOf(x))),
+            context.Request,
+            query.Size,
+            query.Number,
+            rows.Count > query.Size
         );
     }
 
@@ -111,7 +102,7 @@ internal static class SetupEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var failed = await ReferenceEndpoints.ChangeRowAsync<ConfigureEventModel, ConfigureEvent>(
+        var failed = await ReferenceRows.ChangeAsync<ConfigureEventModel, ConfigureEvent>(
             Members,
             collection,
             setup,
@@ -153,12 +144,4 @@ internal static class SetupEndpoints
     {
         return JsonApiResults.Resource(status, CONFIGURE_EVENTS, setup.Id.ToString(), Members.AttributesOf(setup));
     }
-}
-
-/// <summary>The members a change of a Setup names. Its id, when the document gives one, is the one of the route.</summary>
-internal sealed class SetupChange : MemberAttributes, IResourceAttributes
-{
-    public static string? ResourceType => "configure-events";
-
-    public static DocumentIds Ids => DocumentIds.MatchesRoute;
 }

@@ -58,22 +58,14 @@ internal static class ProfileEndpoints
                 countryRegion = region,
                 club = user.TextOf("Club"),
                 feiId = user.TextOf("FeiId"),
-                complete = IsComplete(user),
+                complete = ProfileRules.IsComplete(user),
                 athlete = linked.Athlete,
                 horses = linked.Horses,
             }
         );
     }
 
-    /// <summary>The rule of the profile screen: a first name, a surname and a country that the profile names.</summary>
-    public static bool IsComplete(NIdentityUser user)
-    {
-        return user.TextOf("GivenName") != null
-            && user.TextOf("Surname") != null
-            && user.TextOf("CountryRegion") != null;
-    }
-
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    [Requires(Capability.SignedIn)]
     static async Task<IResult> Read(
         HttpContext context,
         AccessContext access,
@@ -85,7 +77,7 @@ internal static class ProfileEndpoints
         return await ResourceAsync(context, access.User, countries, linked, text);
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    [Requires(Capability.SignedIn)]
     static async Task<IResult> Edit(
         JsonApiBody<ProfileAttributes> body,
         HttpContext context,
@@ -303,23 +295,5 @@ internal static class ProfileEndpoints
 
         public UpdateUserProfilePayload? Profile { get; }
         public IResult? Refusal { get; }
-    }
-}
-
-/// <summary>
-/// The members of a profile that a PATCH names. They are kept as they were sent, because "not named" and "null" mean
-/// different things: the first leaves a member alone and the second clears it.
-/// </summary>
-internal sealed class ProfileAttributes : IResourceAttributes
-{
-    public static string? ResourceType => "profiles";
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Members { get; set; }
-
-    /// <summary>The members are checked against the account they are merged into, which only the handler has.</summary>
-    public JsonApiFailure? Invalid()
-    {
-        return null;
     }
 }

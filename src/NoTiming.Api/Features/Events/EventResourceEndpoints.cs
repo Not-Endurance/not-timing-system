@@ -83,20 +83,21 @@ internal static class EventResourceEndpoints
         }
 
         var now = time.GetUtcNow();
-        var (rows, unsupported) = await ReferenceEndpoints.ReadPageAsync(
-            () => reads.ReadPublicEventsAsync(stage, now, query.Options, query.Skip, query.Take, context.RequestAborted)
+        var rows = await reads.ReadPublicEventsAsync(
+            stage,
+            now,
+            query.Options,
+            query.Skip,
+            query.Take,
+            context.RequestAborted
         );
-        if (unsupported != null)
-        {
-            return unsupported;
-        }
-
-        var page = rows!.Take(query.Size).ToList();
-        return JsonApiResults.Collection(
+        return JsonApiResults.Page(
             EVENTS,
-            page.Select(x => (x.Id.ToString(), (object)AttributesOf(x, now))),
-            links: ReferenceEndpoints.Links(context.Request, query, rows!.Count > query.Size),
-            meta: new { page = new { size = query.Size, number = query.Number } },
+            rows.Take(query.Size).Select(x => (x.Id.ToString(), (object)AttributesOf(x, now))),
+            context.Request,
+            query.Size,
+            query.Number,
+            rows.Count > query.Size,
             itemLink: id => $"/api/{EVENTS}/{id}"
         );
     }
@@ -149,7 +150,7 @@ internal static class EventResourceEndpoints
             return JsonApiResults.NotFound();
         }
 
-        if (ReferenceEndpoints.Invalid<ConfigureEventModel, ConfigureEvent>(setup) is { } invalid)
+        if (ReferenceRows.Invalid<ConfigureEventModel, ConfigureEvent>(setup) is { } invalid)
         {
             return invalid;
         }
@@ -193,7 +194,7 @@ internal static class EventResourceEndpoints
             return malformed;
         }
 
-        if (ReferenceEndpoints.Invalid<EventInformationModel, EventInformation>(row) is { } invalid)
+        if (ReferenceRows.Invalid<EventInformationModel, EventInformation>(row) is { } invalid)
         {
             return invalid;
         }
@@ -274,30 +275,4 @@ internal static class EventResourceEndpoints
     {
         return JsonApiResults.Resource(status, EVENTS, model.Id.ToString(), AttributesOf(model, now), location);
     }
-}
-
-/// <summary>An Event is started from its Setup and takes nothing else: the document names the Setup by its id and carries no member.</summary>
-internal sealed class EventStart : MemberAttributes, IResourceAttributes
-{
-    public static string? ResourceType => "events";
-
-    public override JsonApiFailure? Invalid()
-    {
-        return Members is { Count: > 0 } named
-            ? new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "unsupported-attribute",
-                "An Event is started from its Setup and takes nothing else.",
-                string.Join(", ", named.Keys)
-            )
-            : null;
-    }
-}
-
-/// <summary>The members a change of an Event names. Its id, when the document gives one, is the one of the route.</summary>
-internal sealed class EventChange : MemberAttributes, IResourceAttributes
-{
-    public static string? ResourceType => "events";
-
-    public static DocumentIds Ids => DocumentIds.MatchesRoute;
 }

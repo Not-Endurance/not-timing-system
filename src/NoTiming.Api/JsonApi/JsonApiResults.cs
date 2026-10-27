@@ -63,15 +63,18 @@ internal static class JsonApiResults
     }
 
     /// <summary>
-    /// The members of a collection: each is a resource of the type, 200 with an empty list when there are none. A
-    /// collection that is paged says where it is and where the next page is in its <c>links</c>, and which page it is in
-    /// its <c>meta</c>. A named collection gives each item a <c>self</c> link to where the item is canonically.
+    /// A page of a list: each item is a resource of the type, 200 with an empty list when there are none. It says where the list
+    /// is and where the next page is in its <c>links</c>, and which page it is in its <c>meta</c>, whatever the list is of. A
+    /// named collection gives each item a <c>self</c> link to where the item is canonically, and a resource may have a
+    /// <c>meta</c> of its own.
     /// </summary>
-    public static IResult Collection(
+    public static IResult Page(
         string type,
         IEnumerable<(string Id, object Attributes)> items,
-        object? links = null,
-        object? meta = null,
+        HttpRequest request,
+        int size,
+        int number,
+        bool hasNext,
         Func<string, string>? itemLink = null,
         Func<string, object?>? itemMeta = null
     )
@@ -87,8 +90,8 @@ internal static class JsonApiResults
                     links = itemLink == null ? null : new { self = itemLink(item.Id) },
                     meta = itemMeta?.Invoke(item.Id),
                 }),
-                links,
-                meta,
+                links = JsonApiPaging.Links(request, number, hasNext),
+                meta = JsonApiPaging.Meta(size, number),
             },
             Options,
             MEDIA_TYPE,
