@@ -1,21 +1,13 @@
 using Microsoft.Extensions.Localization;
 using Not.Localization;
 using NoTiming.Api.Features.Access;
-using NoTiming.Api.Features.Account;
-using NoTiming.Api.Features.Branding;
-using NoTiming.Api.Features.EventData;
-using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
-using NoTiming.Api.Features.Participants;
-using NoTiming.Api.Features.Profile;
-using NoTiming.Api.Features.Reference;
-using NoTiming.Api.Features.Snapshots;
-using NoTiming.Api.Features.Tenancy;
-using NoTiming.Api.Features.UserSessions;
-using NTS.Contracts;
 
 namespace NoTiming.Api.Hosting;
 
+/// <summary>
+/// The middleware of the host, in the order it runs, and then its endpoints (<see cref="ApiEndpoints"/>).
+/// </summary>
 internal static class ApiPipeline
 {
     public static WebApplication UseNoTimingApi(this WebApplication app)
@@ -44,82 +36,7 @@ internal static class ApiPipeline
         app.UseMiddleware<AccessBaselineMiddleware>();
         app.UseAuthorization();
 
-        app.MapGet(
-            "/healthz",
-            () =>
-                Results.Ok(
-                    new
-                    {
-                        status = "ok",
-                        environment = app.Environment.EnvironmentName,
-                        instanceId = ConnectionDiagnostics.GetInstanceId(),
-                        hub = ConnectionDiagnostics.HubPath.Value,
-                    }
-                )
-        );
-        // The routes that declare what they need are mapped through the group the endpoint filter is on (ADR-0012, #671).
-        var guarded = app.MapGroup(string.Empty).AddEndpointFilter<AccessFilter>();
-        guarded.MapAccount();
-#if DEBUG
-        app.MapLocalSignIn();
-#endif
-        guarded.MapProfile();
-        guarded.MapTenancy();
-        guarded.MapBranding();
-        guarded.MapEvents();
-        guarded.MapEventResources();
-        app.MapHistoricEventRedirects();
-        guarded.MapSetups();
-        guarded.MapEventGrants();
-        guarded.MapConsoleOperators();
-        guarded.MapAccountSearch();
-        guarded.MapRegistrySearch();
-        guarded.MapParticipationHistory();
-        guarded.MapParticipantLinks();
-        guarded.MapReference();
-        guarded.MapEventData();
-        guarded.MapTimeEventActors();
-        guarded.MapSnapshots();
-        guarded.MapUserSessions();
-        app.MapHub<LiveHub>(ApplicationConstants.LIVE_HUB).RequireCors(ApiServices.CORS_POLICY_NAME);
-
-        // An unknown API route is a 404 in the error format of the rest-api skill, never the Ui's page.
-        app.Map(
-            "/api/{**rest}",
-            () =>
-                Results.Json(
-                    new
-                    {
-                        errors = new[]
-                        {
-                            new
-                            {
-                                status = "404",
-                                code = "not-found",
-                                title = "Not found",
-                            },
-                        },
-                    },
-                    statusCode: StatusCodes.Status404NotFound,
-                    contentType: "application/vnd.api+json"
-                )
-        );
-
-        // Deep links into the Ui. A path that looks like a file (it has an extension) that is missing stays a 404.
-        app.MapFallbackToFile("{**path:nonfile}", "index.html");
-
-        // Fail closed: a route of the Api that is neither public nor declares what it needs does not let the host start.
-#if DEBUG
-        var hostEntries = app.Services.GetService<HostPublicEndpoints>()?.Entries;
-#else
-        IEnumerable<PublicEndpoint>? hostEntries = null;
-#endif
-        EndpointGuard.ThrowWhenUnguarded(
-            ((IEndpointRouteBuilder)app).DataSources.SelectMany(x => x.Endpoints),
-            hostEntries
-        );
-
-        return app;
+        return app.MapNoTimingApi();
     }
 
     static void BindAzurePort(WebApplication app)
