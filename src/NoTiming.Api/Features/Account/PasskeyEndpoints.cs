@@ -20,14 +20,14 @@ internal static class PasskeyEndpoints
 
     public static IEndpointRouteBuilder MapPasskeys(this IEndpointRouteBuilder app)
     {
-        // Signing in with a passkey is a session created with a credential: see AccountEndpoints.
-        app.MapPost("/api/passkeys/actions/request-options", RequestOptions);
+        // Signing in with a passkey is a session created with a credential: see SessionEndpoints.
+        app.MapPost("/api/passkeys/actions/request-options", PostPasskeysActionsRequestOptions);
 
-        app.MapPost("/api/passkeys/actions/creation-options", CreationOptions);
-        app.MapGet("/api/passkeys", List);
-        app.MapPost("/api/passkeys", Create);
-        app.MapPatch("/api/passkeys/{id}", Rename);
-        app.MapDelete("/api/passkeys/{id}", Remove);
+        app.MapPost("/api/passkeys/actions/creation-options", PostPasskeysActionsCreationOptions);
+        app.MapGet("/api/passkeys", GetPasskeys);
+        app.MapPost("/api/passkeys", PostPasskeys);
+        app.MapPatch("/api/passkeys/{id}", PatchPasskeysById);
+        app.MapDelete("/api/passkeys/{id}", DeletePasskeysById);
         return app;
     }
 
@@ -48,7 +48,11 @@ internal static class PasskeyEndpoints
         return Base64Url.EncodeToString(passkey.CredentialId);
     }
 
-    static async Task<IResult> RequestOptions(HttpContext context, IAntiforgery antiforgery, PasskeyService passkeys)
+    static async Task<IResult> PostPasskeysActionsRequestOptions(
+        HttpContext context,
+        IAntiforgery antiforgery,
+        PasskeyService passkeys
+    )
     {
         if (await PasskeyCeremony.RefuseAsync(context, passkeys, antiforgery) is { } refusal)
         {
@@ -66,7 +70,7 @@ internal static class PasskeyEndpoints
 
     // The ceremony has an order of its own: the host supports passkeys, the token is good, and only then the document.
     [Requires(Capability.SignedIn)]
-    static async Task<IResult> CreationOptions(
+    static async Task<IResult> PostPasskeysActionsCreationOptions(
         HttpContext context,
         IAntiforgery antiforgery,
         PasskeyService passkeys,
@@ -88,7 +92,7 @@ internal static class PasskeyEndpoints
     }
 
     [Requires(Capability.SignedIn)]
-    static async Task<IResult> List(PasskeyService passkeys, AccessContext access)
+    static async Task<IResult> GetPasskeys(PasskeyService passkeys, AccessContext access)
     {
         var list = await passkeys.ListAsync(access.User);
         return Results.Json(
@@ -107,7 +111,7 @@ internal static class PasskeyEndpoints
     }
 
     [Requires(Capability.SignedIn)]
-    static async Task<IResult> Create(
+    static async Task<IResult> PostPasskeys(
         HttpContext context,
         IAntiforgery antiforgery,
         PasskeyService passkeys,
@@ -128,12 +132,7 @@ internal static class PasskeyEndpoints
 
         if (read.Attributes!.Credential is not { ValueKind: JsonValueKind.Object } credential)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "malformed-request",
-                "The request is malformed.",
-                "Send the credential the browser made."
-            );
+            return AccountFailures.PasskeyMalformedRequest.AsResult();
         }
 
         if (InvalidName(read.Attributes.Name) is { } invalidName)
@@ -149,11 +148,7 @@ internal static class PasskeyEndpoints
         );
         if (passkey is null)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-passkey",
-                "The passkey could not be verified."
-            );
+            return AccountFailures.PasskeyNotVerified.AsResult();
         }
 
         var id = IdOf(passkey);
@@ -167,7 +162,12 @@ internal static class PasskeyEndpoints
     }
 
     [Requires(Capability.SignedIn)]
-    static async Task<IResult> Rename(HttpContext context, string id, PasskeyService passkeys, AccessContext access)
+    static async Task<IResult> PatchPasskeysById(
+        HttpContext context,
+        string id,
+        PasskeyService passkeys,
+        AccessContext access
+    )
     {
         var read = await JsonApiRequests.ReadAsync<PasskeyAttributes>(context.Request, PASSKEYS);
         if (read.Error != null)
@@ -190,14 +190,14 @@ internal static class PasskeyEndpoints
         {
             return result.Errors.Any(x => x.Code == PasskeyService.NO_SUCH_PASSKEY)
                 ? JsonApiResults.NotFound()
-                : JsonApiResults.Error(StatusCodes.Status409Conflict, "conflict", "The passkey could not be renamed.");
+                : AccountFailures.PasskeyRenameConflict.AsResult();
         }
 
         return JsonApiResults.Resource(StatusCodes.Status200OK, PASSKEYS, id, Describe(renamed));
     }
 
     [Requires(Capability.SignedIn)]
-    static async Task<IResult> Remove(string id, PasskeyService passkeys, AccessContext access)
+    static async Task<IResult> DeletePasskeysById(string id, PasskeyService passkeys, AccessContext access)
     {
         if (!TryDecode(id, out var credentialId))
         {
@@ -212,29 +212,19 @@ internal static class PasskeyEndpoints
 
         if (result.Errors.Any(x => x.Code == PasskeyService.LAST_PASSKEY))
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status409Conflict,
-                "last-passkey",
-                "The last passkey cannot be removed.",
-                "Add another passkey first."
-            );
+            return AccountFailures.LastPasskey.AsResult();
         }
 
         return result.Errors.Any(x => x.Code == PasskeyService.NO_SUCH_PASSKEY)
             ? JsonApiResults.NotFound()
-            : JsonApiResults.Error(StatusCodes.Status409Conflict, "conflict", "The passkey could not be removed.");
+            : AccountFailures.PasskeyRemoveConflict.AsResult();
     }
 
     /// <summary>The page limits the name too, but a client need not use the page. Null when the name is good.</summary>
     static IResult? InvalidName(string? name)
     {
         return name is not null && name.Trim().Length > MAX_NAME_LENGTH
-            ? JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-name",
-                "The name is too long.",
-                $"Use at most {MAX_NAME_LENGTH} characters."
-            )
+            ? AccountFailures.InvalidPasskeyName(MAX_NAME_LENGTH).AsResult()
             : null;
     }
 

@@ -144,19 +144,19 @@ internal static class ReferenceEndpoints
     {
         var path = $"/api/{family.Route}";
         var writes = WritesOf(family.Writes);
-        app.MapGet(
+        app.MapNamedGet(
             path,
             [Requires(Capability.SignedIn)]
             (HttpContext context, AccessContext access, ReferenceAccess data) =>
                 ListAsync(family, context, access, data)
         );
-        app.MapGet(
+        app.MapNamedGet(
             path + "/{id}",
             [Requires(Capability.SignedIn)]
             (string id, AccessContext access, ReferenceAccess data, CancellationToken cancellationToken) =>
                 ReadAsync(family, id, access, data, cancellationToken)
         );
-        app.MapPost(
+        app.MapNamedPost(
                 path,
                 (
                     JsonApiBody<NewMembers> body,
@@ -166,7 +166,7 @@ internal static class ReferenceEndpoints
                 ) => CreateAsync(family, body, access, data, cancellationToken)
             )
             .WithMetadata(writes, new ResourceAttribute(family.Route));
-        app.MapPatch(
+        app.MapNamedPatch(
                 path + "/{id}",
                 (
                     string id,
@@ -179,7 +179,7 @@ internal static class ReferenceEndpoints
             .WithMetadata(writes, new ResourceAttribute(family.Route));
         if (family.CanDelete)
         {
-            app.MapDelete(
+            app.MapNamedDelete(
                     path + "/{id}",
                     (string id, AccessContext access, ReferenceAccess data, CancellationToken cancellationToken) =>
                         RemoveAsync(family, id, access, data, cancellationToken)

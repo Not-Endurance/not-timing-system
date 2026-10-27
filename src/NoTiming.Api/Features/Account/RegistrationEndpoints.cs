@@ -3,25 +3,22 @@ using NoTiming.Api.JsonApi;
 namespace NoTiming.Api.Features.Account;
 
 /// <summary>
-/// A new person registers themselves (#601, ADR-0002): a page that asks for their names, address and country, and a
-/// registration that is created with them. Registering mails a code and stores nothing; the account exists when the
-/// code comes back to the sessions route, which is also where an address that already has an account signs in.
+/// A new person registers themselves (#601, ADR-0002): a registration is created with their names, address and country (the
+/// page that asks for them is <see cref="AccountPages"/>). Registering mails a code and stores nothing; the account exists when
+/// the code comes back to the sessions route, which is also where an address that already has an account signs in.
 /// </summary>
 internal static class RegistrationEndpoints
 {
     const string REGISTRATIONS = "registrations";
 
-    public static IEndpointRouteBuilder MapRegistration(this IEndpointRouteBuilder app)
+    public static IEndpointRouteBuilder MapRegistrations(this IEndpointRouteBuilder app)
     {
-        // Like the sign-in page these are anonymous, and the list of public endpoints says so: they are how anyone gets
-        // an account.
-        app.MapGet("/register", AccountPages.Register);
-        app.MapGet("/privacy", AccountPages.Privacy);
-        app.MapPost("/api/registrations", Register);
+        // Like the sign-in page this is anonymous, and the list of public endpoints says so: it is how anyone gets an account.
+        app.MapPost("/api/registrations", PostRegistrations);
         return app;
     }
 
-    static async Task<IResult> Register(
+    static async Task<IResult> PostRegistrations(
         HttpContext context,
         CodeSignIn codeSignIn,
         SelectableCountries countries,
@@ -64,7 +61,7 @@ internal static class RegistrationEndpoints
 
         if (!CodeSignIn.IsValidEmail(attributes.Email))
         {
-            return Invalid("invalid-email", "Enter a valid email address.");
+            return AccountFailures.InvalidEmail.AsResult();
         }
 
         if (
@@ -72,7 +69,7 @@ internal static class RegistrationEndpoints
             || !RegistrationDetails.IsValidName(attributes.Surname)
         )
         {
-            return Invalid("invalid-name", "Enter your first name and your surname.");
+            return AccountFailures.RegistrationInvalidName.AsResult();
         }
 
         var country = Guid.TryParse(attributes.CountryId, out var countryId)
@@ -80,7 +77,7 @@ internal static class RegistrationEndpoints
             : null;
         if (country is null)
         {
-            return Invalid("invalid-country", "Choose a country from the list.");
+            return AccountFailures.RegistrationInvalidCountry.AsResult();
         }
 
         // A registration draws on the same budgets as a request for a code, and costs the same whether or not the
@@ -109,10 +106,5 @@ internal static class RegistrationEndpoints
     {
         context.Response.Cookies.Append(RegistrationTokens.COOKIE, token, RegistrationTokens.Options());
         return Results.Accepted();
-    }
-
-    static IResult Invalid(string code, string title)
-    {
-        return JsonApiResults.Error(StatusCodes.Status400BadRequest, code, title);
     }
 }

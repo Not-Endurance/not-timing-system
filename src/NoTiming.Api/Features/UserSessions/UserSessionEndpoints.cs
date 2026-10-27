@@ -20,16 +20,16 @@ internal static class UserSessionEndpoints
 
     public static IEndpointRouteBuilder MapUserSessions(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/user-sessions", List);
-        app.MapGet("/api/user-sessions/{id}", Read);
-        app.MapPost("/api/user-sessions", Make);
-        app.MapPatch("/api/user-sessions/{id}", Change);
-        app.MapDelete("/api/user-sessions/{id}", Remove);
+        app.MapGet("/api/user-sessions", GetUserSessions);
+        app.MapGet("/api/user-sessions/{id}", GetUserSessionsById);
+        app.MapPost("/api/user-sessions", PostUserSessions);
+        app.MapPatch("/api/user-sessions/{id}", PatchUserSessionsById);
+        app.MapDelete("/api/user-sessions/{id}", DeleteUserSessionsById);
         return app;
     }
 
     [Requires(Capability.SignedIn)]
-    static async Task<IResult> List(
+    static async Task<IResult> GetUserSessions(
         [ListOf(EVENT_ID, EVENT_ID)] ListQuery list,
         HttpRequest request,
         AccessContext access,
@@ -67,7 +67,7 @@ internal static class UserSessionEndpoints
     }
 
     [Requires(Capability.SignedIn)]
-    static async Task<IResult> Read(
+    static async Task<IResult> GetUserSessionsById(
         string id,
         AccessContext access,
         UserSessionStore store,
@@ -81,7 +81,7 @@ internal static class UserSessionEndpoints
     }
 
     [Requires(Capability.SignedIn)]
-    static async Task<IResult> Make(
+    static async Task<IResult> PostUserSessions(
         JsonApiBody<NewUserSession> body,
         AccessContext access,
         UserSessionStore store,
@@ -101,7 +101,7 @@ internal static class UserSessionEndpoints
     }
 
     [Requires(Capability.SignedIn)]
-    static async Task<IResult> Change(
+    static async Task<IResult> PatchUserSessionsById(
         string id,
         JsonApiBody<UserSessionChange> body,
         AccessContext access,
@@ -124,11 +124,7 @@ internal static class UserSessionEndpoints
             && !(Guid.TryParse(attributes.EventId, out var named) && named == session.EventId)
         )
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status409Conflict,
-                "event-immutable",
-                "The Event of a record does not change: make a record for the other Event."
-            );
+            return UserSessionFailures.EventImmutable.AsResult();
         }
 
         if (attributes.State != null)
@@ -144,7 +140,7 @@ internal static class UserSessionEndpoints
     }
 
     [Requires(Capability.SignedIn)]
-    static async Task<IResult> Remove(
+    static async Task<IResult> DeleteUserSessionsById(
         string id,
         AccessContext access,
         UserSessionStore store,
@@ -169,11 +165,6 @@ internal static class UserSessionEndpoints
 
     static IResult InvalidFilter()
     {
-        return JsonApiResults.Error(
-            StatusCodes.Status400BadRequest,
-            "invalid-filter",
-            "The filter is not valid.",
-            "Use eventId eq <the id of an Event>."
-        );
+        return UserSessionFailures.InvalidFilter.AsResult();
     }
 }

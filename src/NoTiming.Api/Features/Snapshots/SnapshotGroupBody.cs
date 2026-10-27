@@ -36,14 +36,7 @@ internal sealed class SnapshotGroupBody : IJsonApiInput
 
     public JsonApiFailure? Content()
     {
-        return Entries.Count > SnapshotEndpoints.MAX_IN_A_GROUP
-            ? new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "too-many-snapshots",
-                "A group has too many Snapshots.",
-                $"Send at most {SnapshotEndpoints.MAX_IN_A_GROUP} in one request."
-            )
-            : null;
+        return Entries.Count > SnapshotDocuments.MAX_IN_A_GROUP ? SnapshotFailures.TooManySnapshots : null;
     }
 
     static string? EventNamedBy(JsonElement entry)

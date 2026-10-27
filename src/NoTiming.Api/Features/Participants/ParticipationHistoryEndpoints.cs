@@ -23,12 +23,12 @@ internal static class ParticipationHistoryEndpoints
 
     public static IEndpointRouteBuilder MapParticipationHistory(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/participations/history", ListAsync);
+        app.MapGet("/api/participations/history", GetParticipationsHistory);
         return app;
     }
 
     [Requires(Capability.SignedIn)]
-    static async Task<IResult> ListAsync(
+    static async Task<IResult> GetParticipationsHistory(
         HttpContext context,
         ParticipationHistoryReader reader,
         AccountText text,
@@ -38,12 +38,7 @@ internal static class ParticipationHistoryEndpoints
         // The Participant says whose rides to read, before anything else is looked at.
         if (HistoryFilter.SubjectOf(context.Request.Query["filter"].ToString()) is not { } subject)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "subject-required",
-                "Name the Athlete or the Horse the rides are of.",
-                "Start the filter with the Athlete or the Horse and join anything else to it with and: filter=athleteId eq <id> and ..."
-            );
+            return ParticipantFailures.SubjectRequired.AsResult();
         }
 
         var query = ReferenceQuery<HistoryRide>.Read(context.Request, HistoryRide.Hidden);

@@ -26,14 +26,14 @@ internal static class ConsoleOperatorEndpoints
 
     public static IEndpointRouteBuilder MapConsoleOperators(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/console-operators", Assign);
-        app.MapGet("/api/console-operators", List);
-        app.MapDelete("/api/console-operators/{id}", Remove);
+        app.MapPost("/api/console-operators", PostConsoleOperators);
+        app.MapGet("/api/console-operators", GetConsoleOperators);
+        app.MapDelete("/api/console-operators/{id}", DeleteConsoleOperatorsById);
         return app;
     }
 
     [Requires(Capability.AssignConsoleOperators, PlaceIn.EventInBody)]
-    static async Task<IResult> Assign(
+    static async Task<IResult> PostConsoleOperators(
         JsonApiBody<ConsoleOperatorAttributes> body,
         AccessContext access,
         UserManager<NIdentityUser> users,
@@ -50,11 +50,7 @@ internal static class ConsoleOperatorEndpoints
             account = await users.FindByIdAsync(accountId.ToString());
             if (account?.Email is null)
             {
-                return JsonApiResults.Error(
-                    StatusCodes.Status422UnprocessableEntity,
-                    "account-not-found",
-                    "There is no such account."
-                );
+                return EventsFailures.AccountNotFound.AsResult();
             }
 
             email = account.Email;
@@ -87,7 +83,7 @@ internal static class ConsoleOperatorEndpoints
     }
 
     [Requires(Capability.ReadConfiguration, PlaceIn.EventInFilter)]
-    static async Task<IResult> List(
+    static async Task<IResult> GetConsoleOperators(
         [ListOf(EMAIL, EVENT_ID)] ListQuery query,
         HttpRequest request,
         AccessContext access,
@@ -121,7 +117,7 @@ internal static class ConsoleOperatorEndpoints
         PlaceIn.EventOfConsoleOperator,
         SeenWith = Capability.ReadConfiguration
     )]
-    static async Task<IResult> Remove(
+    static async Task<IResult> DeleteConsoleOperatorsById(
         AccessContext access,
         EventGrantStore grants,
         TenancyLog log,

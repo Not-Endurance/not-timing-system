@@ -45,29 +45,11 @@ internal sealed class AccessFilter : IEndpointFilter
         _access = access;
     }
 
-    static IResult NotInTheFilter { get; } =
-        JsonApiResults.Error(
-            StatusCodes.Status400BadRequest,
-            "invalid-filter",
-            "The filter is not valid.",
-            "Name the Event: filter=eventId eq <id>."
-        );
+    static IResult NotInTheFilter { get; } = AccessFailures.InvalidFilter.AsResult();
 
-    static IResult NotNamedInTheBody { get; } =
-        JsonApiResults.Error(
-            StatusCodes.Status400BadRequest,
-            "event-required",
-            "Name the Event the request is about.",
-            "The Event is the eventId attribute of the document."
-        );
+    static IResult NotNamedInTheBody { get; } = AccessFailures.EventRequired.AsResult();
 
-    static IResult NotAnIdInTheBody { get; } =
-        JsonApiResults.Error(
-            StatusCodes.Status400BadRequest,
-            "invalid-event",
-            "The Event is not named.",
-            "Name the Event by its id as eventId."
-        );
+    static IResult NotAnIdInTheBody { get; } = AccessFailures.InvalidEvent.AsResult();
 
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext invocation, EndpointFilterDelegate next)
     {
@@ -337,13 +319,7 @@ internal sealed class AccessFilter : IEndpointFilter
         {
             return orAskAtThePlatform
                 ? FoundPlace.WithoutATenant()
-                : FoundPlace.Refused(
-                    JsonApiResults.Error(
-                        StatusCodes.Status409Conflict,
-                        "no-current-tenant",
-                        "Choose a country on your profile before you do this: it is done in the Tenant of one."
-                    )
-                );
+                : FoundPlace.Refused(AccessFailures.NoCurrentTenant.AsResult());
         }
 
         return FoundPlace.OfTenant(tenant, await _tenants.IsOperationalAsync(tenant.Id, cancellationToken));
@@ -351,18 +327,6 @@ internal sealed class AccessFilter : IEndpointFilter
 
     static IResult NotInTheDocument(bool missing)
     {
-        return missing
-            ? JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "id-required",
-                "Name the Setup the Event starts from.",
-                "The id of the resource is the id of its Setup."
-            )
-            : JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-id",
-                "The Event is not named.",
-                "The id of the resource is the id of the Event, and it is a Guid."
-            );
+        return missing ? AccessFailures.SetupIdRequired.AsResult() : AccessFailures.EventIdInvalid.AsResult();
     }
 }

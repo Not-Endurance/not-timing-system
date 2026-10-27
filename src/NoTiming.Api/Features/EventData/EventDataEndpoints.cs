@@ -34,7 +34,7 @@ internal static class EventDataEndpoints
         where TEntity : class, IEntity
     {
         var path = $"/api/{family.Route}";
-        app.MapGet(
+        app.MapNamedGet(
             path,
             (
                 HttpContext context,
@@ -44,7 +44,7 @@ internal static class EventDataEndpoints
                 UserManager<NIdentityUser> users
             ) => ListAsync(family, context, events, tenants, viewers, users)
         );
-        app.MapGet(
+        app.MapNamedGet(
             path + "/{id}",
             (
                 string id,
@@ -55,7 +55,7 @@ internal static class EventDataEndpoints
                 UserManager<NIdentityUser> users
             ) => ReadAsync(family, id, context, reads, events, viewers, users)
         );
-        app.MapPost(
+        app.MapNamedPost(
                 path,
                 [Requires(Capability.RunEvent, PlaceIn.EventInBody)]
                 (
@@ -66,7 +66,7 @@ internal static class EventDataEndpoints
                 ) => CreateAsync(family, body, access, data, cancellationToken)
             )
             .WithMetadata(new ResourceAttribute(family.Route));
-        app.MapPatch(
+        app.MapNamedPatch(
                 path + "/{id}",
                 [Requires(Capability.RunEvent, PlaceIn.EventOfRow)]
                 (
@@ -77,7 +77,7 @@ internal static class EventDataEndpoints
                 ) => ChangeAsync(family, body, access, data, cancellationToken)
             )
             .WithMetadata(new ResourceAttribute(family.Route), new EventRowsOf<TModel>(family.Collection));
-        app.MapDelete(
+        app.MapNamedDelete(
                 path + "/{id}",
                 [Requires(Capability.RunEvent, PlaceIn.EventOfRow)]
                 (AccessContext access, EventDataAccess data, CancellationToken cancellationToken) =>
@@ -108,12 +108,7 @@ internal static class EventDataEndpoints
         var eventId = EventFilter.EventOf(filter);
         if (eventId is not { } id)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "event-required",
-                "Name the Event the rows are of.",
-                "Start the filter with the Event and join anything else to it with and: filter=eventId eq <id> and ..."
-            );
+            return EventDataFailures.EventRequired.AsResult();
         }
 
         var query = ReferenceQuery<TModel>.Read(context.Request, family.Made.Hidden);
@@ -335,45 +330,22 @@ internal static class EventDataEndpoints
             return (version, null);
         }
 
-        return (
-            0,
-            JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "malformed-request",
-                "The request is malformed.",
-                "The version is a whole number, from 0."
-            )
-        );
+        return (0, EventDataFailures.MalformedRequest.AsResult());
     }
 
     static IResult VersionRequired()
     {
-        return JsonApiResults.Error(
-            StatusCodes.Status400BadRequest,
-            "version-required",
-            "Say which version of the Participation the change is based on.",
-            "Send the version it was read at as the version of the meta of the document."
-        );
+        return EventDataFailures.VersionRequired.AsResult();
     }
 
     static IResult InUse()
     {
-        return JsonApiResults.Error(
-            StatusCodes.Status409Conflict,
-            "participation-in-use",
-            "A Ranking still counts the Participation, or a Handout is still of it.",
-            "Take it out of the Rankings that count it and remove the Handouts that are of it first: what they show could not be composed without it."
-        );
+        return EventDataFailures.ParticipationInUse.AsResult();
     }
 
     static IResult StaleParticipation()
     {
-        return JsonApiResults.Error(
-            StatusCodes.Status409Conflict,
-            "participation-changed",
-            "The Participation changed since it was read.",
-            "Read it again and make the change on what it is now."
-        );
+        return EventDataFailures.ParticipationChanged.AsResult();
     }
 
     /// <summary>A read that answers by the caller says so, so that nothing between the Api and the person keeps one caller's answer for another.</summary>

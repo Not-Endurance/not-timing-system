@@ -84,17 +84,17 @@ internal static class LocalSignIn
         }
 
         app.MapGet("/" + PAGE, (HttpContext context) => Page(context, configuration));
-        app.MapPost("/" + SESSIONS, SignInAsync);
+        app.MapPost("/" + SESSIONS, PostDevSessions);
         return app;
     }
 
     public static IReadOnlyList<PublicEndpoint> Endpoints { get; } =
-        [
-            new PublicEndpoint(EndpointAccess.SignIn, "GET,HEAD", PAGE),
-            new PublicEndpoint(EndpointAccess.SignIn, "POST", SESSIONS),
-        ];
+    [
+        new PublicEndpoint(EndpointAccess.SignIn, "GET,HEAD", PAGE),
+        new PublicEndpoint(EndpointAccess.SignIn, "POST", SESSIONS),
+    ];
 
-    static async Task<IResult> SignInAsync(
+    static async Task<IResult> PostDevSessions(
         HttpContext context,
         IConfiguration configuration,
         UserManager<NIdentityUser> users,

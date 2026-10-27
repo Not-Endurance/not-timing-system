@@ -26,6 +26,19 @@ internal static class AccountPages
         ["register.js"] = ("account/pages/register.js", "text/javascript; charset=utf-8"),
     };
 
+    public static IEndpointRouteBuilder MapAccountPages(this IEndpointRouteBuilder app)
+    {
+        // The pages are anonymous because they are how anyone becomes signed in or registered: public because the list of
+        // public endpoints names them. The passkeys page looks at the session itself and sends a visitor to sign in, so it
+        // is not an API route.
+        app.MapGet("/sign-in", SignIn);
+        app.MapGet("/account/assets/{name}", Asset);
+        app.MapGet("/account/passkeys", Passkeys);
+        app.MapGet("/register", Register);
+        app.MapGet("/privacy", Privacy);
+        return app;
+    }
+
     public static IResult SignIn(
         HttpContext context,
         AccountText text,

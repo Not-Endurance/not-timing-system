@@ -9,17 +9,11 @@ namespace NoTiming.Api.Features.Snapshots;
 /// <summary>What a device says about a Snapshot it sends: where it was captured and when. A member that is not one of these is kept, to be refused.</summary>
 internal sealed class SnapshotAttributes : IResourceAttributes, INamesEvent
 {
-    public static string? ResourceType => SnapshotEndpoints.TYPE;
+    public static string? ResourceType => SnapshotDocuments.TYPE;
 
     public static DocumentIds Ids => DocumentIds.RequiredGuid;
 
-    public static JsonApiFailure IdRequired { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "id-required",
-            "A Snapshot has the id its device made for it.",
-            "Send a Guid as the id of the resource: it is how a Snapshot sent again is told from a new one."
-        );
+    public static JsonApiFailure IdRequired => SnapshotFailures.IdRequired;
 
     public string? EventId { get; set; }
     public int? Number { get; set; }
@@ -38,7 +32,7 @@ internal sealed class SnapshotAttributes : IResourceAttributes, INamesEvent
 /// <summary>What an Official says in an Update of a Snapshot they sent: the time it should have had. A member that is not that is kept, to be refused.</summary>
 internal sealed class SnapshotUpdateAttributes : IResourceAttributes
 {
-    public static string? ResourceType => SnapshotEndpoints.TYPE;
+    public static string? ResourceType => SnapshotDocuments.TYPE;
 
     public static DocumentIds Ids => DocumentIds.MatchesRoute;
 
@@ -107,12 +101,7 @@ internal sealed class SnapshotRequest
 
         if (!Guid.TryParse(attributes.EventId, out var eventId) || eventId == Guid.Empty)
         {
-            return new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "event-required",
-                "Name the Event the Snapshot is of.",
-                "The Event is the eventId attribute of the document."
-            );
+            return SnapshotFailures.EventRequired;
         }
 
         if (attributes.Number is not { } number || number < 1)
@@ -134,23 +123,13 @@ internal sealed class SnapshotRequest
     public static JsonApiFailure? Unsupported(Dictionary<string, JsonElement>? others)
     {
         return others is { Count: > 0 }
-            ? new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "unsupported-attribute",
-                "The document names a member that is not one of the resource's, or one that the server alone sets.",
-                string.Join(", ", others.Keys)
-            )
+            ? SnapshotFailures.UnsupportedAttribute.With(string.Join(", ", others.Keys))
             : null;
     }
 
     public static JsonApiFailure Invalid(string detail)
     {
-        return new JsonApiFailure(
-            StatusCodes.Status400BadRequest,
-            "invalid-snapshot",
-            "The document is not a Snapshot.",
-            detail
-        );
+        return SnapshotFailures.InvalidSnapshot.With(detail);
     }
 
     SnapshotRequest(Guid id, Guid eventId, int number, SnapshotType kind, DateTimeOffset time)

@@ -20,74 +20,19 @@ namespace NoTiming.Api.Features.Branding;
 internal static class BrandingEndpoints
 {
     const string BRANDINGS = "brandings";
-    const string LEFT = "left";
-    const string RIGHT = "right";
 
     public static IEndpointRouteBuilder MapBranding(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/tenants/{id}/branding", ReadOfTenant);
-        app.MapPatch("/api/tenants/{id}/branding", EditOfTenant);
-        app.MapGet("/api/events/{id}/branding", ReadOfEvent);
-        app.MapPatch("/api/events/{id}/branding", EditOfEvent);
+        app.MapGet("/api/tenants/{id}/branding", GetTenantsByIdBranding);
+        app.MapPatch("/api/tenants/{id}/branding", PatchTenantsByIdBranding);
+        app.MapGet("/api/events/{id}/branding", GetEventsByIdBranding);
+        app.MapPatch("/api/events/{id}/branding", PatchEventsByIdBranding);
         return app;
-    }
-
-    /// <summary>The positions a document names, each with the logo it is given or none to clear it; the failure that refuses the document when anything in it is not valid.</summary>
-    public static (Dictionary<LogoPosition, Logo?> Changes, JsonApiFailure? Failure) Changes(
-        IReadOnlyDictionary<string, JsonElement> members
-    )
-    {
-        var changes = new Dictionary<LogoPosition, Logo?>();
-        foreach (var (name, value) in members)
-        {
-            var position = PositionOf(name);
-            if (position is null)
-            {
-                return (
-                    changes,
-                    new JsonApiFailure(
-                        StatusCodes.Status400BadRequest,
-                        "unsupported-attribute",
-                        "Only the left and the right logo can be changed.",
-                        $"{LEFT}, {RIGHT}"
-                    )
-                );
-            }
-
-            if (changes.ContainsKey(position.Value))
-            {
-                return (
-                    changes,
-                    new JsonApiFailure(
-                        StatusCodes.Status400BadRequest,
-                        "malformed-request",
-                        "A logo is named once.",
-                        name
-                    )
-                );
-            }
-
-            if (value.ValueKind == JsonValueKind.Null)
-            {
-                changes[position.Value] = null;
-                continue;
-            }
-
-            var logo = Logo.Read(value);
-            if (logo.Logo is null)
-            {
-                return (changes, new JsonApiFailure(logo.Status, logo.Code!, "The logo cannot be kept.", logo.Detail));
-            }
-
-            changes[position.Value] = logo.Logo;
-        }
-
-        return (changes, null);
     }
 
     // The logos of a Tenant are Root's to see and to edit.
     [Requires(Capability.EditTenant, PlaceIn.TenantRoute)]
-    static async Task<IResult> ReadOfTenant(
+    static async Task<IResult> GetTenantsByIdBranding(
         AccessContext access,
         BrandingStore branding,
         CancellationToken cancellationToken
@@ -97,7 +42,7 @@ internal static class BrandingEndpoints
     }
 
     [Requires(Capability.EditTenant, PlaceIn.TenantRoute)]
-    static async Task<IResult> EditOfTenant(
+    static async Task<IResult> PatchTenantsByIdBranding(
         JsonApiBody<BrandingChange> body,
         AccessContext access,
         BrandingStore branding,
@@ -114,7 +59,7 @@ internal static class BrandingEndpoints
 
     // What an Event is printed with is read by every signed-in account.
     [Requires(Capability.SignedIn, PlaceIn.EventRoute)]
-    static async Task<IResult> ReadOfEvent(
+    static async Task<IResult> GetEventsByIdBranding(
         AccessContext access,
         BrandingStore branding,
         CancellationToken cancellationToken
@@ -124,7 +69,7 @@ internal static class BrandingEndpoints
     }
 
     [Requires(Capability.ConfigureEvent, PlaceIn.EventRoute)]
-    static async Task<IResult> EditOfEvent(
+    static async Task<IResult> PatchEventsByIdBranding(
         JsonApiBody<BrandingChange> body,
         AccessContext access,
         BrandingStore branding,
@@ -137,16 +82,6 @@ internal static class BrandingEndpoints
         await branding.SetAsync(facts.TenantId, BrandingStore.KeyOfEvent(facts.Id), changes, cancellationToken);
         log.EventBrandingEdited(access.User.Id, facts.Id, facts.TenantId, [.. changes.Keys.Select(x => x.ToString())]);
         return await EventResource(facts, branding, cancellationToken);
-    }
-
-    static LogoPosition? PositionOf(string name)
-    {
-        if (string.Equals(name, LEFT, StringComparison.OrdinalIgnoreCase))
-        {
-            return LogoPosition.Left;
-        }
-
-        return string.Equals(name, RIGHT, StringComparison.OrdinalIgnoreCase) ? LogoPosition.Right : null;
     }
 
     static async Task<IResult> TenantResource(

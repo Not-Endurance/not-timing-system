@@ -74,6 +74,12 @@ public sealed class RepositoryArchitectureTests
         Holds(ArchitectureRules.OnlyTheFilterAndThePlacesThatTellAskThePolicy(SourcesOfTheApi()));
     }
 
+    [Fact]
+    public void No_endpoint_class_is_called_by_another()
+    {
+        Holds(ArchitectureRules.NoEndpointClassIsCalledByAnother(SourcesOfTheApi()));
+    }
+
     static List<(string Path, string Text)> SourcesOfTheApi()
     {
         var root = RepositoryPaths.Discover().Root;

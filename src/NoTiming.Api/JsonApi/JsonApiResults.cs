@@ -159,12 +159,6 @@ internal static class JsonApiResults
         return Error(StatusCodes.Status401Unauthorized, "not-signed-in", "Sign in to do this.");
     }
 
-    /// <summary>Writes the error without an endpoint, for the events of the authentication handlers.</summary>
-    public static async Task WriteErrorAsync(HttpContext context, int status, string code, string title)
-    {
-        await Error(status, code, title).ExecuteAsync(context);
-    }
-
     public static JsonSerializerOptions Options { get; } = CreateOptions();
 
     /// <summary>camelCase members, no member that is null, and enums as their names: a name says what a number cannot.</summary>

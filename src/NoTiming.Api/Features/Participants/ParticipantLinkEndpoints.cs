@@ -33,7 +33,7 @@ internal static class ParticipantLinkEndpoints
     static void Map(IEndpointRouteBuilder app, ParticipantKind kind)
     {
         var path = $"/api/{RouteOf(kind)}/{{id}}/link";
-        app.MapGet(
+        app.MapNamedGet(
             path,
             [Requires(Capability.SignedIn)]
             (
@@ -45,7 +45,7 @@ internal static class ParticipantLinkEndpoints
                 AccountText text
             ) => ReadAsync(kind, id, context, access, store, reads, text)
         );
-        app.MapPost(
+        app.MapNamedPost(
             path,
             [Requires(Capability.SignedIn)]
             (
@@ -57,7 +57,7 @@ internal static class ParticipantLinkEndpoints
                 AccountText text
             ) => LinkAsync(kind, id, context, access, store, reads, text)
         );
-        app.MapDelete(
+        app.MapNamedDelete(
             path,
             [Requires(Capability.SignedIn)]
             (string id, AccessContext access, ParticipantLinkStore store, CancellationToken cancellationToken) =>
@@ -117,11 +117,7 @@ internal static class ParticipantLinkEndpoints
             var linking = await store.LinkHorseAsync(access.User.Id, participantId, MAX_HORSES, context.RequestAborted);
             if (linking == HorseLinking.LimitReached)
             {
-                return JsonApiResults.Error(
-                    StatusCodes.Status422UnprocessableEntity,
-                    "horse-limit-reached",
-                    $"A person links at most {MAX_HORSES} Horses."
-                );
+                return ParticipantFailures.HorseLimitReached(MAX_HORSES).AsResult();
             }
 
             created = linking == HorseLinking.Linked;

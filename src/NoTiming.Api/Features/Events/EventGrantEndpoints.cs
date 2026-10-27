@@ -29,14 +29,14 @@ internal static class EventGrantEndpoints
 
     public static IEndpointRouteBuilder MapEventGrants(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/event-grants", Link);
-        app.MapGet("/api/event-grants", List);
-        app.MapDelete("/api/event-grants/{id}", Remove);
+        app.MapPost("/api/event-grants", PostEventGrants);
+        app.MapGet("/api/event-grants", GetEventGrants);
+        app.MapDelete("/api/event-grants/{id}", DeleteEventGrantsById);
         return app;
     }
 
     [Requires(Capability.ConfigureEvent, PlaceIn.EventInBody)]
-    static async Task<IResult> Link(
+    static async Task<IResult> PostEventGrants(
         JsonApiBody<GrantAttributes> body,
         AccessContext access,
         UserManager<NIdentityUser> users,
@@ -53,11 +53,7 @@ internal static class EventGrantEndpoints
             account = await users.FindByIdAsync(accountId.ToString());
             if (account?.Email is null)
             {
-                return JsonApiResults.Error(
-                    StatusCodes.Status422UnprocessableEntity,
-                    "account-not-found",
-                    "There is no such account."
-                );
+                return EventsFailures.AccountNotFound.AsResult();
             }
 
             email = account.Email;
@@ -86,7 +82,7 @@ internal static class EventGrantEndpoints
 
     // Seeing who has access is a Console Operator's and Root's, however far on the Event is.
     [Requires(Capability.ReadConfiguration, PlaceIn.EventInFilter)]
-    static async Task<IResult> List(
+    static async Task<IResult> GetEventGrants(
         [ListOf(EMAIL, EVENT_ID)] ListQuery query,
         HttpRequest request,
         AccessContext access,
@@ -115,7 +111,7 @@ internal static class EventGrantEndpoints
 
     // A grant is a Console Operator's to see: to anybody else it is not there, as it is not for a missing one.
     [Requires(Capability.ConfigureEvent, PlaceIn.EventOfGrant, SeenWith = Capability.ReadConfiguration)]
-    static async Task<IResult> Remove(
+    static async Task<IResult> DeleteEventGrantsById(
         AccessContext access,
         EventGrantStore grants,
         TenancyLog log,

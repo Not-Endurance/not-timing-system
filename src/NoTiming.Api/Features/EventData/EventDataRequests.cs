@@ -43,12 +43,7 @@ internal sealed class NewRow : NewMembers, INamesEvent
         return
             (Members ?? []).Keys.Count(x => string.Equals(x, EVENT_ID, StringComparison.OrdinalIgnoreCase)) > 1
             || (named != null && !Guid.TryParseExact(named, "D", out _))
-            ? new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "malformed-request",
-                "The request is malformed.",
-                "The Event is named once, as an id."
-            )
+            ? EventDataFailures.EventDataMalformedRequest
             : null;
     }
 }

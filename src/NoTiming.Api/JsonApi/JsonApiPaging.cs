@@ -19,14 +19,11 @@ internal static class JsonApiPaging
     {
         size = defaultSize;
         number = 1;
-        return TryRead(request, PAGE_SIZE, maxSize, ref size)
+        return
+            TryRead(request, PAGE_SIZE, maxSize, ref size)
             && TryRead(request, PAGE_NUMBER, int.MaxValue / maxSize, ref number)
             ? null
-            : JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-page",
-                $"A page is a number of at least 1 and a size of 1 to {maxSize}."
-            );
+            : JsonApiFailures.InvalidPage(maxSize).AsResult();
     }
 
     /// <summary>Where the list is, and where its next page is when there is one.</summary>

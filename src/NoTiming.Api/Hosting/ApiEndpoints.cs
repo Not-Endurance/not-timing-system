@@ -27,15 +27,19 @@ internal static class ApiEndpoints
 
         // The routes that declare what they need are mapped through the group the endpoint filter is on (ADR-0012, #671).
         var guarded = app.MapGroup(string.Empty).AddEndpointFilter<AccessFilter>();
-        guarded.MapAccount();
+        guarded.MapAccountPages();
+        guarded.MapCodeChallenges();
+        guarded.MapSessions();
+        guarded.MapRegistrations();
+        guarded.MapPasskeys();
+        guarded.MapMe();
 #if DEBUG
         app.MapLocalSignIn();
 #endif
         guarded.MapProfile();
-        guarded.MapTenancy();
+        guarded.MapTenants();
         guarded.MapBranding();
         guarded.MapEvents();
-        guarded.MapEventResources();
         app.MapHistoricEventRedirects();
         guarded.MapSetups();
         guarded.MapEventGrants();

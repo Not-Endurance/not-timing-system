@@ -1,3 +1,4 @@
+using System.Text.Json;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Tenancy;
@@ -12,6 +13,9 @@ namespace NoTiming.Api.Features.Branding;
 /// </summary>
 internal sealed class BrandingChange : MemberAttributes, IResourceAttributes
 {
+    const string LEFT = "left";
+    const string RIGHT = "right";
+
     Dictionary<LogoPosition, Logo?>? _logos;
 
     public static string? ResourceType => "brandings";
@@ -23,8 +27,55 @@ internal sealed class BrandingChange : MemberAttributes, IResourceAttributes
 
     public override JsonApiFailure? Invalid()
     {
-        var (changes, failure) = BrandingEndpoints.Changes(Members ?? []);
+        var (changes, failure) = Changes(Members ?? []);
         _logos = changes;
         return failure;
+    }
+
+    /// <summary>The positions a document names, each with the logo it is given or none to clear it; the failure that refuses the document when anything in it is not valid.</summary>
+    static (Dictionary<LogoPosition, Logo?> Changes, JsonApiFailure? Failure) Changes(
+        IReadOnlyDictionary<string, JsonElement> members
+    )
+    {
+        var changes = new Dictionary<LogoPosition, Logo?>();
+        foreach (var (name, value) in members)
+        {
+            var position = PositionOf(name);
+            if (position is null)
+            {
+                return (changes, BrandingFailures.UnsupportedAttribute.With($"{LEFT}, {RIGHT}"));
+            }
+
+            if (changes.ContainsKey(position.Value))
+            {
+                return (changes, BrandingFailures.LogoNamedTwice.With(name));
+            }
+
+            if (value.ValueKind == JsonValueKind.Null)
+            {
+                changes[position.Value] = null;
+                continue;
+            }
+
+            var logo = Logo.Read(value);
+            if (logo.Logo is null)
+            {
+                return (changes, new JsonApiFailure(logo.Status, logo.Code!, "The logo cannot be kept.", logo.Detail));
+            }
+
+            changes[position.Value] = logo.Logo;
+        }
+
+        return (changes, null);
+    }
+
+    static LogoPosition? PositionOf(string name)
+    {
+        if (string.Equals(name, LEFT, StringComparison.OrdinalIgnoreCase))
+        {
+            return LogoPosition.Left;
+        }
+
+        return string.Equals(name, RIGHT, StringComparison.OrdinalIgnoreCase) ? LogoPosition.Right : null;
     }
 }

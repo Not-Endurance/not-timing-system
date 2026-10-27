@@ -23,25 +23,14 @@ internal sealed class ConsoleOperatorAttributes : IResourceAttributes, INamesEve
     {
         if (Others is { Count: > 0 })
         {
-            return new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "unsupported-attribute",
-                "A Console Operator names an Event and a person by an email or an account.",
-                string.Join(", ", Others.Keys)
-            );
+            return EventsFailures.ConsoleOperatorUnsupportedAttribute.With(string.Join(", ", Others.Keys));
         }
 
         if ((Email == null) == (AccountId == null))
         {
-            return new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "malformed-request",
-                "Name the person by an email or by an account, and by one of them."
-            );
+            return EventsFailures.MalformedRequest;
         }
 
-        return Email != null && !CodeSignIn.IsValidEmail(Email)
-            ? new JsonApiFailure(StatusCodes.Status400BadRequest, "invalid-email", "Enter a valid email address.")
-            : null;
+        return Email != null && !CodeSignIn.IsValidEmail(Email) ? EventsFailures.InvalidEmail : null;
     }
 }

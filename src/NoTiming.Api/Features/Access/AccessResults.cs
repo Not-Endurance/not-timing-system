@@ -25,51 +25,15 @@ internal static class AccessResults
     {
         return reason switch
         {
-            Refusal.NotSignedIn => new JsonApiFailure(
-                StatusCodes.Status401Unauthorized,
-                "not-signed-in",
-                "Sign in to do this."
-            ),
-            Refusal.NotAllowed => new JsonApiFailure(
-                StatusCodes.Status403Forbidden,
-                "not-allowed",
-                "You may not do this."
-            ),
-            Refusal.NotRoot => new JsonApiFailure(
-                StatusCodes.Status403Forbidden,
-                "not-root",
-                "Only Root may do this: a Tenant Root of the Tenant, or the Developer."
-            ),
-            Refusal.NotConsoleOperator => new JsonApiFailure(
-                StatusCodes.Status403Forbidden,
-                "not-console-operator",
-                "Only a Console Operator of the Event, or Root, may do this."
-            ),
-            Refusal.NotDeveloper => new JsonApiFailure(
-                StatusCodes.Status403Forbidden,
-                "not-developer",
-                "Only the Developer may do this."
-            ),
-            Refusal.TenantNotOperational => new JsonApiFailure(
-                StatusCodes.Status409Conflict,
-                "tenant-not-operational",
-                "The Tenant has no Tenant Root yet, so it cannot hold Events."
-            ),
-            Refusal.EventNotStarted => new JsonApiFailure(
-                StatusCodes.Status409Conflict,
-                "event-not-started",
-                "The Event has not started."
-            ),
-            Refusal.EventStarted => new JsonApiFailure(
-                StatusCodes.Status409Conflict,
-                "event-started",
-                "The Event has started: this can only be done before it does."
-            ),
-            Refusal.EventEnded => new JsonApiFailure(
-                StatusCodes.Status409Conflict,
-                "event-ended",
-                "The Event has ended, and nothing about it can be changed."
-            ),
+            Refusal.NotSignedIn => AccessFailures.NotSignedIn,
+            Refusal.NotAllowed => AccessFailures.NotAllowed,
+            Refusal.NotRoot => AccessFailures.NotRoot,
+            Refusal.NotConsoleOperator => AccessFailures.NotConsoleOperator,
+            Refusal.NotDeveloper => AccessFailures.NotDeveloper,
+            Refusal.TenantNotOperational => AccessFailures.TenantNotOperational,
+            Refusal.EventNotStarted => AccessFailures.EventNotStarted,
+            Refusal.EventStarted => AccessFailures.EventStarted,
+            Refusal.EventEnded => AccessFailures.EventEnded,
             _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, "A refusal the Api has no answer for."),
         };
     }

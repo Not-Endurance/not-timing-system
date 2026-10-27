@@ -39,18 +39,13 @@ internal sealed class GrantAttributes : IResourceAttributes, INamesEvent
     {
         if (Others is { Count: > 0 })
         {
-            return new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "unsupported-attribute",
-                "A grant names an Event, a kind, a role for an Official, and a person by an email or an account.",
-                string.Join(", ", Others.Keys)
-            );
+            return EventsFailures.EventGrantUnsupportedAttribute.With(string.Join(", ", Others.Keys));
         }
 
         var kind = Kind?.Trim().ToLowerInvariant();
         if (kind is not ("operator" or "official"))
         {
-            return Failure("invalid-kind", "A grant is for an operator or an official.");
+            return EventsFailures.InvalidKind;
         }
 
         if (kind == "official")
@@ -59,26 +54,19 @@ internal sealed class GrantAttributes : IResourceAttributes, INamesEvent
                 !Enum.TryParse<OfficialRole>(OfficialRole, ignoreCase: false, out var parsed) || !Enum.IsDefined(parsed)
             )
             {
-                return Failure("invalid-role", "An official has a role of the domain, such as Steward.");
+                return EventsFailures.InvalidOfficialRole;
             }
         }
         else if (OfficialRole != null)
         {
-            return Failure("invalid-role", "An operator has no role.");
+            return EventsFailures.OperatorHasNoRole;
         }
 
         if ((Email == null) == (AccountId == null))
         {
-            return Failure("malformed-request", "Name the person by an email or by an account, and by one of them.");
+            return EventsFailures.MalformedRequest;
         }
 
-        return Email != null && !CodeSignIn.IsValidEmail(Email)
-            ? Failure("invalid-email", "Enter a valid email address.")
-            : null;
-    }
-
-    static JsonApiFailure Failure(string code, string title)
-    {
-        return new JsonApiFailure(StatusCodes.Status400BadRequest, code, title);
+        return Email != null && !CodeSignIn.IsValidEmail(Email) ? EventsFailures.InvalidEmail : null;
     }
 }

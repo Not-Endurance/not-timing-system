@@ -31,21 +31,11 @@ internal static class ReferenceRows
         }
         catch (ValidationException ex)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status422UnprocessableEntity,
-                "invalid-attribute",
-                "A member of the resource is not valid.",
-                ex.Message
-            );
+            return ReferenceFailures.InvalidAttribute.With(ex.Message).AsResult();
         }
         catch (Exception ex) when (ex is ArgumentException or NullReferenceException or InvalidOperationException)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status422UnprocessableEntity,
-                "invalid-attribute",
-                "A member of the resource is not valid.",
-                "The document is missing a member it needs."
-            );
+            return ReferenceFailures.MissingMember.AsResult();
         }
     }
 

@@ -82,13 +82,7 @@ internal sealed class SnapshotRecorder
             ).FirstOrDefault();
             if (model is null)
             {
-                return SnapshotAnswer.Failed(
-                    new JsonApiFailure(
-                        StatusCodes.Status404NotFound,
-                        "participation-not-found",
-                        "The Event has no Participation with that start number."
-                    )
-                );
+                return SnapshotAnswer.Failed(SnapshotFailures.ParticipationNotFound);
             }
 
             var participation = model.MapToEntity();
@@ -233,28 +227,17 @@ internal sealed class SnapshotRecorder
 
     static JsonApiFailure IdTaken()
     {
-        return new JsonApiFailure(
-            StatusCodes.Status409Conflict,
-            "id-taken",
-            "An event with that id was recorded for another Participation, or is not a Snapshot."
-        );
+        return SnapshotFailures.IdTaken;
     }
 
     static JsonApiFailure NotFound()
     {
-        return new JsonApiFailure(StatusCodes.Status404NotFound, "not-found", "Not found");
+        return SnapshotFailures.NotFound;
     }
 
     static SnapshotAnswer Busy()
     {
-        return SnapshotAnswer.Failed(
-            new JsonApiFailure(
-                StatusCodes.Status409Conflict,
-                "participation-busy",
-                "The Participation was being changed by too many at once.",
-                "Send it again: a Snapshot is recorded once whatever the number of times it is sent."
-            )
-        );
+        return SnapshotAnswer.Failed(SnapshotFailures.ParticipationBusy);
     }
 
     /// <summary>The write of what a time changed, against the version the Participation was read at: false when it was written since.</summary>

@@ -29,8 +29,8 @@ internal sealed partial class ReferenceQuery<T>
     public static ReferenceQuery<T> Read(HttpRequest request, IReadOnlyCollection<string> hiddenMembers)
     {
         if (
-            JsonApiQuery.Unsupported(request, FILTER, SORT, JsonApiPaging.PAGE_SIZE, JsonApiPaging.PAGE_NUMBER)
-            is { } unsupported
+            JsonApiQuery.Unsupported(request, FILTER, SORT, JsonApiPaging.PAGE_SIZE, JsonApiPaging.PAGE_NUMBER) is
+            { } unsupported
         )
         {
             return Refused(unsupported);
@@ -45,37 +45,23 @@ internal sealed partial class ReferenceQuery<T>
         var orderBy = ToOrderBy(request.Query.TryGetValue(SORT, out var sortValues) ? sortValues.ToString() : null);
         if (orderBy == "")
         {
-            return Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-sort",
-                "Sort by members, with a - for descending: sort=-name,id."
-            );
+            return Refused(ReferenceFailures.InvalidSortList);
         }
 
         var model = ModelOf(hiddenMembers);
         if (filter == "")
         {
-            return Refused(StatusCodes.Status400BadRequest, "invalid-filter", "The filter is empty.");
+            return Refused(ReferenceFailures.EmptyFilter);
         }
 
         if (filter != null && !TryBuild(request, model, "$filter", filter, out _))
         {
-            return Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-filter",
-                "The filter is not valid.",
-                "Use an expression of the OData filter grammar over the members of the resource."
-            );
+            return Refused(ReferenceFailures.InvalidFilter);
         }
 
         if (orderBy != null && !TryBuild(request, model, "$orderby", orderBy, out _))
         {
-            return Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-sort",
-                "The sort is not valid.",
-                "Sort by the members of the resource, with a - for descending: sort=-name,id."
-            );
+            return Refused(ReferenceFailures.InvalidSort);
         }
 
         ODataQueryOptions<T>? options = null;
@@ -107,9 +93,9 @@ internal sealed partial class ReferenceQuery<T>
 
     public int Take => Size + 1;
 
-    static ReferenceQuery<T> Refused(int status, string code, string title, string? detail = null)
+    static ReferenceQuery<T> Refused(JsonApiFailure failure)
     {
-        return Refused(JsonApiResults.Error(status, code, title, detail));
+        return Refused(failure.AsResult());
     }
 
     static ReferenceQuery<T> Refused(IResult refusal)

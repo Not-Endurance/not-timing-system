@@ -16,14 +16,7 @@ internal class UserSessionAttributes : IResourceAttributes
 
     public virtual JsonApiFailure? Invalid()
     {
-        return State != null && !IsWhole(State)
-            ? new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "invalid-state",
-                "The state is not valid.",
-                "Send both lists, and no null in them or in the entries of a group."
-            )
-            : null;
+        return State != null && !IsWhole(State) ? UserSessionFailures.InvalidState : null;
     }
 
     /// <summary>A state has both its lists, and no list and no entry in one is null: JSON can say that, the model cannot.</summary>
@@ -44,11 +37,7 @@ internal sealed class NewUserSession : UserSessionAttributes, IResourceAttribute
     public override JsonApiFailure? Invalid()
     {
         return !Guid.TryParse(EventId, out var eventId) || eventId == Guid.Empty
-            ? new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "invalid-event",
-                "Name the Event the state is for by its id."
-            )
+            ? UserSessionFailures.InvalidEvent
             : base.Invalid();
     }
 }

@@ -18,19 +18,16 @@ namespace NoTiming.Api.Features.Snapshots;
 /// </summary>
 internal static class SnapshotEndpoints
 {
-    public const string TYPE = "snapshots";
-    public const int MAX_IN_A_GROUP = 100;
-
     public static IEndpointRouteBuilder MapSnapshots(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/snapshots", Send);
-        app.MapPost("/api/snapshots/actions/send-group", SendGroup);
-        app.MapPatch("/api/snapshots/{id}", Update).WithMetadata(new SnapshotRows());
+        app.MapPost("/api/snapshots", PostSnapshots);
+        app.MapPost("/api/snapshots/actions/send-group", PostSnapshotsActionsSendGroup);
+        app.MapPatch("/api/snapshots/{id}", PatchSnapshotsById).WithMetadata(new SnapshotRows());
         return app;
     }
 
     [Requires(Capability.SendSnapshot, PlaceIn.EventInBody)]
-    static async Task<IResult> Send(
+    static async Task<IResult> PostSnapshots(
         JsonApiBody<SnapshotAttributes> body,
         AccessContext access,
         SnapshotRecorder recorder,
@@ -42,7 +39,7 @@ internal static class SnapshotEndpoints
     }
 
     [Requires(Capability.SendSnapshot, PlaceIn.EventInBody)]
-    static async Task<IResult> SendGroup(
+    static async Task<IResult> PostSnapshotsActionsSendGroup(
         SnapshotGroupBody group,
         AccessContext access,
         SnapshotRecorder recorder,
@@ -65,7 +62,7 @@ internal static class SnapshotEndpoints
 
     // The Snapshot is found by its id, which says which Participation holds it and so which Event it is of.
     [Requires(Capability.SendSnapshot, PlaceIn.EventOfRow)]
-    static async Task<IResult> Update(
+    static async Task<IResult> PatchSnapshotsById(
         string id,
         JsonApiBody<SnapshotUpdateAttributes> body,
         AccessContext access,
@@ -103,16 +100,9 @@ internal static class SnapshotEndpoints
             resource = null;
         }
 
-        if (resource is not { Attributes: { } attributes } || resource.Type != TYPE)
+        if (resource is not { Attributes: { } attributes } || resource.Type != SnapshotDocuments.TYPE)
         {
-            return SnapshotAnswer.Failed(
-                new JsonApiFailure(
-                    StatusCodes.Status400BadRequest,
-                    "malformed-request",
-                    "The request is malformed.",
-                    $"Send each Snapshot as a resource of type '{TYPE}' with attributes."
-                )
-            );
+            return SnapshotAnswer.Failed(SnapshotFailures.MalformedRequest);
         }
 
         var (request, failure) = SnapshotRequest.From(resource.Id, attributes);
@@ -124,14 +114,7 @@ internal static class SnapshotEndpoints
         // The caller was let in to the Event of the group: a Snapshot of another is not theirs to send in it.
         return request!.EventId == access.Event.Id
             ? await recorder.RecordAsync(access.User, request, access.Event, cancellationToken)
-            : SnapshotAnswer.Failed(
-                new JsonApiFailure(
-                    StatusCodes.Status409Conflict,
-                    "event-mismatch",
-                    "The Snapshot is of another Event than the group.",
-                    "A group is sent to one Event: send the Snapshots of another in a group of their own."
-                )
-            );
+            : SnapshotAnswer.Failed(SnapshotFailures.EventMismatch);
     }
 
     static IResult AsResult(SnapshotAnswer answer)
@@ -144,10 +127,10 @@ internal static class SnapshotEndpoints
         var resource = answer.Resource!;
         return JsonApiResults.Resource(
             answer.Status,
-            TYPE,
+            SnapshotDocuments.TYPE,
             resource.Id.ToString(),
             resource,
-            answer.Status == StatusCodes.Status201Created ? $"/api/{TYPE}/{resource.Id}" : null
+            answer.Status == StatusCodes.Status201Created ? $"/api/{SnapshotDocuments.TYPE}/{resource.Id}" : null
         );
     }
 
@@ -161,7 +144,7 @@ internal static class SnapshotEndpoints
                 status = answer.Status,
                 data = new
                 {
-                    type = TYPE,
+                    type = SnapshotDocuments.TYPE,
                     id = answer.Resource!.Id.ToString(),
                     attributes = answer.Resource,
                 },

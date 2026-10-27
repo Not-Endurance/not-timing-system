@@ -19,11 +19,7 @@ internal static class PasskeyCeremony
     {
         if (!passkeys.Availability.Enabled)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status503ServiceUnavailable,
-                "passkeys-not-configured",
-                "Passkeys are not available on this host."
-            );
+            return AccountFailures.PasskeysNotConfigured.AsResult();
         }
 
         try
@@ -33,11 +29,7 @@ internal static class PasskeyCeremony
         }
         catch (AntiforgeryValidationException)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "antiforgery-token-invalid",
-                "The request could not be verified. Reload the page and try again."
-            );
+            return AccountFailures.AntiforgeryTokenInvalid.AsResult();
         }
     }
 }

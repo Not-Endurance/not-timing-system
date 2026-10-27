@@ -181,7 +181,9 @@ Overall average: **60-90% token reduction** on common development operations.
 
 ## Endpoints
 1. Authorization and validation are never written in a handler. A route declares what it needs with `[Requires(Capability, PlaceIn)]`; the one endpoint filter (`AccessFilter`) finds the caller and the place, asks `AccessPolicy` and validates the request (`JsonApiBody<T>`, `ListQuery`, `SearchQuery`), and the handler takes the `AccessContext` and a request that is valid. A route that is neither in `PublicEndpoints` nor declares a requirement stops the host (`EndpointGuard`), and an architecture test fails a handler that asks the policy or reads the session itself.
-2. The shape of a route, the order of its answers and its codes are in `.claude/skills/rest-api/SKILL.md` and ADR-0012.
+2. The shape of a route, its documents, status codes and query are in `.claude/skills/rest-api/SKILL.md` and ADR-0008, the order of its answers in ADR-0012. The routes are listed by `ApiEndpoints`, one `<Resource>Endpoints` class to a resource; there is no other catalogue.
+3. A handler is named from its method and route (`GET /api/me/profile` is `GetMeProfile`, a parameter is `By<Param>`, no `Async`), so a route that is not plain CRUD says what it is in its URL. Only PATCH changes a resource. A lambda route is made with `MapNamedGet` and the like, which name it. `EndpointNamesTests` fails a handler that is named otherwise; ADR-0015 has the rule.
+4. A request type is in `<Resource>Requests.cs`, and the status, code and title of an answer are a property of the feature's `<Feature>Failures` (`.With(detail)` for what is wrong this time): a handler holds no code string. No class names a member of an endpoint class, which `RepositoryArchitectureTests` checks.
 
 ## Agent skills
 

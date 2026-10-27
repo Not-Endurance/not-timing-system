@@ -25,12 +25,12 @@ internal static class TimeEventActorsEndpoints
 
     public static IEndpointRouteBuilder MapTimeEventActors(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/" + TYPE, ReadAsync);
+        app.MapGet("/api/" + TYPE, GetTimeEventActors);
         return app;
     }
 
     [Requires(Capability.SeeTimeEvents, PlaceIn.EventInFilter)]
-    static async Task<IResult> ReadAsync(
+    static async Task<IResult> GetTimeEventActors(
         [ListOf(DISPLAY_NAME, EVENT_ID)] ListQuery query,
         HttpRequest request,
         AccessContext access,
