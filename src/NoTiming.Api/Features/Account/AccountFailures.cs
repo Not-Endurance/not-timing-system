@@ -56,14 +56,6 @@ internal static class AccountFailures
             "The selected Tenant is the id of a Tenant, or null to go back to the home Tenant."
         );
 
-    public static JsonApiFailure PasskeyMalformedRequest { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "malformed-request",
-            "The request is malformed.",
-            "Send the credential the browser made."
-        );
-
     public static JsonApiFailure PasskeyNotVerified { get; } =
         new(StatusCodes.Status400BadRequest, "invalid-passkey", "The passkey could not be verified.");
 

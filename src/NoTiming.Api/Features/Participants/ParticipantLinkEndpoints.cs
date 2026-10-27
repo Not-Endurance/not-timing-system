@@ -33,7 +33,7 @@ internal static class ParticipantLinkEndpoints
     static void Map(IEndpointRouteBuilder app, ParticipantKind kind)
     {
         var path = $"/api/{RouteOf(kind)}/{{id}}/link";
-        app.MapNamedGet(
+        app.MapGet(
             path,
             [Requires(Capability.SignedIn)]
             (
@@ -45,7 +45,7 @@ internal static class ParticipantLinkEndpoints
                 AccountText text
             ) => ReadAsync(kind, id, context, access, store, reads, text)
         );
-        app.MapNamedPost(
+        app.MapPost(
             path,
             [Requires(Capability.SignedIn)]
             (
@@ -57,7 +57,7 @@ internal static class ParticipantLinkEndpoints
                 AccountText text
             ) => LinkAsync(kind, id, context, access, store, reads, text)
         );
-        app.MapNamedDelete(
+        app.MapDelete(
             path,
             [Requires(Capability.SignedIn)]
             (string id, AccessContext access, ParticipantLinkStore store, CancellationToken cancellationToken) =>

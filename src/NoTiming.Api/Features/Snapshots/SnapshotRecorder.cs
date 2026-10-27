@@ -232,7 +232,7 @@ internal sealed class SnapshotRecorder
 
     static JsonApiFailure NotFound()
     {
-        return SnapshotFailures.NotFound;
+        return JsonApiFailures.NotFound;
     }
 
     static SnapshotAnswer Busy()

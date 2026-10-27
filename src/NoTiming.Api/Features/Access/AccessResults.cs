@@ -25,7 +25,7 @@ internal static class AccessResults
     {
         return reason switch
         {
-            Refusal.NotSignedIn => AccessFailures.NotSignedIn,
+            Refusal.NotSignedIn => JsonApiFailures.NotSignedIn,
             Refusal.NotAllowed => AccessFailures.NotAllowed,
             Refusal.NotRoot => AccessFailures.NotRoot,
             Refusal.NotConsoleOperator => AccessFailures.NotConsoleOperator,

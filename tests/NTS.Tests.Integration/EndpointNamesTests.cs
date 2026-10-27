@@ -73,24 +73,11 @@ public sealed class EndpointNamesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public void A_lambda_has_to_be_given_the_name_the_route_gives()
+    public void A_lambda_serves_the_routes_of_a_family_and_has_no_name_to_hold_to_the_rule()
     {
-        var routes = new[]
-        {
-            Route("GET", "/api/things", () => Results.Ok()),
-            Route("POST", "/api/things", () => Results.Ok(), name: "PostThings"),
-            Route("DELETE", "/api/things/{id}", () => Results.Ok(), name: "Remove"),
-        };
+        var routes = new[] { Route("GET", "/api/things", () => Results.Ok()) };
 
-        var mistakes = EndpointNames.Mistakes(routes);
-
-        Assert.Equal(
-            [
-                "GET api/things is handled by a lambda with no name: give it .WithName(EndpointNames.Of(...)), GetThings",
-                "DELETE api/things/{id} is handled by Remove: it should be DeleteThingsById",
-            ],
-            mistakes
-        );
+        Assert.Empty(EndpointNames.Mistakes(routes));
     }
 
     [Fact]
@@ -134,14 +121,9 @@ public sealed class EndpointNamesTests : IClassFixture<MongoFixture>
 
     static IResult List() => Results.Ok();
 
-    static RouteEndpoint Route(string method, string pattern, Delegate handler, string? name = null)
+    static RouteEndpoint Route(string method, string pattern, Delegate handler)
     {
         var metadata = new List<object> { new HttpMethodMetadata([method]), handler.Method };
-        if (name != null)
-        {
-            metadata.Add(new EndpointNameMetadata(name));
-        }
-
         return new RouteEndpoint(
             _ => Task.CompletedTask,
             RoutePatternFactory.Parse(pattern),

@@ -65,7 +65,7 @@ internal sealed class ReferenceMembers<TModel>
         var unknown = members.Keys.Where(x => !_writable.ContainsKey(x)).ToList();
         if (unknown.Count > 0)
         {
-            return ReferenceFailures.UnsupportedAttribute.With(string.Join(", ", unknown)).AsResult();
+            return JsonApiFailures.UnsupportedAttribute.With(string.Join(", ", unknown)).AsResult();
         }
 
         foreach (var (name, value) in members)
@@ -77,7 +77,7 @@ internal sealed class ReferenceMembers<TModel>
             }
             catch (JsonException)
             {
-                return ReferenceFailures
+                return JsonApiFailures
                     .MalformedRequest.With($"The member '{name}' is not of the type it has.")
                     .AsResult();
             }

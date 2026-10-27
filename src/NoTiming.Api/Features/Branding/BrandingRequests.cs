@@ -60,7 +60,7 @@ internal sealed class BrandingChange : MemberAttributes, IResourceAttributes
             var logo = Logo.Read(value);
             if (logo.Logo is null)
             {
-                return (changes, new JsonApiFailure(logo.Status, logo.Code!, "The logo cannot be kept.", logo.Detail));
+                return (changes, logo.Failure);
             }
 
             changes[position.Value] = logo.Logo;

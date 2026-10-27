@@ -18,7 +18,7 @@ internal sealed class EventStart : MemberAttributes, IResourceAttributes
     public override JsonApiFailure? Invalid()
     {
         return Members is { Count: > 0 } named
-            ? EventsFailures.EventUnsupportedAttribute.With(string.Join(", ", named.Keys))
+            ? EventsFailures.EventStartUnsupportedAttribute.With(string.Join(", ", named.Keys))
             : null;
     }
 }

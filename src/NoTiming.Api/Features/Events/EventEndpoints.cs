@@ -35,16 +35,16 @@ internal static class EventEndpoints
 
     public static IEndpointRouteBuilder MapEvents(this IEndpointRouteBuilder app)
     {
-        app.MapNamedGet(
+        app.MapGet(
             "/api/events",
             (HttpContext context, CrossTenantReads reads, TimeProvider time) => ListAsync(null, context, reads, time)
         );
-        app.MapNamedGet(
+        app.MapGet(
             "/api/events/live",
             (HttpContext context, CrossTenantReads reads, TimeProvider time) =>
                 ListAsync(EventStage.Live, context, reads, time)
         );
-        app.MapNamedGet(
+        app.MapGet(
             "/api/events/historic",
             (HttpContext context, CrossTenantReads reads, TimeProvider time) =>
                 ListAsync(EventStage.Historic, context, reads, time)
@@ -205,12 +205,12 @@ internal static class EventEndpoints
             var span = new EventSpan(row.StartDay, row.EndDay);
             if (EventStageRule.Of(true, span.EndDay, now) != EventStage.Live)
             {
-                return EventsFailures.InvalidAttribute.AsResult();
+                return EventsFailures.EventNotEndedByItsDays.AsResult();
             }
 
             if (span.StartDay > span.EndDay)
             {
-                return EventsFailures.EventInvalidAttribute.AsResult();
+                return EventsFailures.EventStartsAfterItsEnd.AsResult();
             }
 
             if (named.Any(x => x.Name == nameof(EventInformationModel.StartDay)))

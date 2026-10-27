@@ -45,7 +45,7 @@ internal sealed partial class ReferenceQuery<T>
         var orderBy = ToOrderBy(request.Query.TryGetValue(SORT, out var sortValues) ? sortValues.ToString() : null);
         if (orderBy == "")
         {
-            return Refused(ReferenceFailures.InvalidSortList);
+            return Refused(ReferenceFailures.InvalidSortMembers);
         }
 
         var model = ModelOf(hiddenMembers);
@@ -56,12 +56,20 @@ internal sealed partial class ReferenceQuery<T>
 
         if (filter != null && !TryBuild(request, model, "$filter", filter, out _))
         {
-            return Refused(ReferenceFailures.InvalidFilter);
+            return Refused(
+                JsonApiFailures.InvalidFilter.With(
+                    "Use an expression of the OData filter grammar over the members of the resource."
+                )
+            );
         }
 
         if (orderBy != null && !TryBuild(request, model, "$orderby", orderBy, out _))
         {
-            return Refused(ReferenceFailures.InvalidSort);
+            return Refused(
+                JsonApiFailures.InvalidSort.With(
+                    "Sort by the members of the resource, with a - for descending: sort=-name,id."
+                )
+            );
         }
 
         ODataQueryOptions<T>? options = null;

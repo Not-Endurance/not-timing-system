@@ -41,7 +41,7 @@ internal static class RegistrySearchEndpoints
     /// <summary>The named view <c>/api/{type}/all-tenants</c> of a registry, over the search of that registry.</summary>
     static void MapSearch(IEndpointRouteBuilder app, string type, Func<CrossTenantReads, RegistrySearch> searchOf)
     {
-        app.MapNamedGet(
+        app.MapGet(
             $"/api/{type}/all-tenants",
             [Requires(Capability.SignedIn)]
             (

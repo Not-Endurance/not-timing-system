@@ -102,7 +102,11 @@ internal static class SnapshotEndpoints
 
         if (resource is not { Attributes: { } attributes } || resource.Type != SnapshotDocuments.TYPE)
         {
-            return SnapshotAnswer.Failed(SnapshotFailures.MalformedRequest);
+            return SnapshotAnswer.Failed(
+                JsonApiFailures.MalformedRequest.With(
+                    $"Send each Snapshot as a resource of type '{SnapshotDocuments.TYPE}' with attributes."
+                )
+            );
         }
 
         var (request, failure) = SnapshotRequest.From(resource.Id, attributes);

@@ -64,7 +64,7 @@ internal sealed class GrantAttributes : IResourceAttributes, INamesEvent
 
         if ((Email == null) == (AccountId == null))
         {
-            return EventsFailures.MalformedRequest;
+            return EventsFailures.PersonNotNamedOnce;
         }
 
         return Email != null && !CodeSignIn.IsValidEmail(Email) ? EventsFailures.InvalidEmail : null;

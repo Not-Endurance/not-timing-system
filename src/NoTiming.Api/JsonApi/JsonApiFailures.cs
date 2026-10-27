@@ -73,4 +73,16 @@ internal static class JsonApiFailures
             "The filter cannot be applied.",
             "The expression is valid, but the database cannot run it on every row: look at what it divides by, or takes a part of."
         );
+
+    public static JsonApiFailure UnsupportedAttribute { get; } =
+        new(
+            StatusCodes.Status400BadRequest,
+            "unsupported-attribute",
+            "The document names a member that is not one of the resource's, or one that the server alone sets."
+        );
+
+    public static JsonApiFailure NotFound { get; } = new(StatusCodes.Status404NotFound, "not-found", "Not found");
+
+    public static JsonApiFailure NotSignedIn { get; } =
+        new(StatusCodes.Status401Unauthorized, "not-signed-in", "Sign in to do this.");
 }

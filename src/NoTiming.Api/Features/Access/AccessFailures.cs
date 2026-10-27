@@ -16,14 +16,6 @@ internal static class AccessFailures
             $"{AccessBaseline.WRITE_HEADER}: {AccessBaseline.WRITE_HEADER_VALUE}"
         );
 
-    public static JsonApiFailure InvalidFilter { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "invalid-filter",
-            "The filter is not valid.",
-            "Name the Event: filter=eventId eq <id>."
-        );
-
     public static JsonApiFailure EventRequired { get; } =
         new(
             StatusCodes.Status400BadRequest,
@@ -62,9 +54,6 @@ internal static class AccessFailures
             "The Event is not named.",
             "The id of the resource is the id of the Event, and it is a Guid."
         );
-
-    public static JsonApiFailure NotSignedIn { get; } =
-        new(StatusCodes.Status401Unauthorized, "not-signed-in", "Sign in to do this.");
 
     public static JsonApiFailure NotAllowed { get; } =
         new(StatusCodes.Status403Forbidden, "not-allowed", "You may not do this.");

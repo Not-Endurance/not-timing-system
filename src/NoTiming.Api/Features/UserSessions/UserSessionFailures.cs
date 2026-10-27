@@ -15,14 +15,6 @@ internal static class UserSessionFailures
             "The Event of a record does not change: make a record for the other Event."
         );
 
-    public static JsonApiFailure InvalidFilter { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "invalid-filter",
-            "The filter is not valid.",
-            "Use eventId eq <the id of an Event>."
-        );
-
     public static JsonApiFailure InvalidState { get; } =
         new(
             StatusCodes.Status400BadRequest,

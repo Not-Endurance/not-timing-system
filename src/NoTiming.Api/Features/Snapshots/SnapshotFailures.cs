@@ -8,14 +8,6 @@ namespace NoTiming.Api.Features.Snapshots;
 /// </summary>
 internal static class SnapshotFailures
 {
-    public static JsonApiFailure MalformedRequest { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "malformed-request",
-            "The request is malformed.",
-            $"Send each Snapshot as a resource of type '{SnapshotDocuments.TYPE}' with attributes."
-        );
-
     public static JsonApiFailure EventMismatch { get; } =
         new(
             StatusCodes.Status409Conflict,
@@ -46,8 +38,6 @@ internal static class SnapshotFailures
             "An event with that id was recorded for another Participation, or is not a Snapshot."
         );
 
-    public static JsonApiFailure NotFound { get; } = new(StatusCodes.Status404NotFound, "not-found", "Not found");
-
     public static JsonApiFailure ParticipationBusy { get; } =
         new(
             StatusCodes.Status409Conflict,
@@ -62,13 +52,6 @@ internal static class SnapshotFailures
             "event-required",
             "Name the Event the Snapshot is of.",
             "The Event is the eventId attribute of the document."
-        );
-
-    public static JsonApiFailure UnsupportedAttribute { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "unsupported-attribute",
-            "The document names a member that is not one of the resource's, or one that the server alone sets."
         );
 
     public static JsonApiFailure InvalidSnapshot { get; } =

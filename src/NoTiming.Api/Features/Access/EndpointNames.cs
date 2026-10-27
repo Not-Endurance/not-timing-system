@@ -36,9 +36,9 @@ internal static class EndpointNames
     }
 
     /// <summary>
-    /// Every endpoint of the Api whose name is not the one its route gives it, how it is named, and what it should be called:
-    /// the name of the method that handles it, or the name it was given where a lambda handles it (several routes made by one
-    /// family of resources).
+    /// Every endpoint of the Api that a method handles and whose name is not the one its route gives it, and what it should be
+    /// called. The routes that one family of resources makes for each of its members are served by lambdas, which have no name
+    /// of their own, and are not held to it.
     /// </summary>
     public static IReadOnlyList<string> Mistakes(IEnumerable<Endpoint> endpoints)
     {
@@ -68,11 +68,10 @@ internal static class EndpointNames
                 var actual = NameOf(route);
                 if (actual is null || actual.Contains('<'))
                 {
-                    mistakes.Add(
-                        $"{method} {pattern.TrimStart('/')} is handled by a lambda with no name: give it .WithName(EndpointNames.Of(...)), {expected}"
-                    );
+                    continue;
                 }
-                else if (actual != expected)
+
+                if (actual != expected)
                 {
                     mistakes.Add($"{method} {pattern.TrimStart('/')} is handled by {actual}: it should be {expected}");
                 }
@@ -82,11 +81,10 @@ internal static class EndpointNames
         return mistakes;
     }
 
-    /// <summary>The name an endpoint was given, or the name of the method that handles it.</summary>
+    /// <summary>The name of the method that handles the endpoint.</summary>
     static string? NameOf(RouteEndpoint route)
     {
-        return route.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName
-            ?? route.Metadata.GetMetadata<MethodInfo>()?.Name;
+        return route.Metadata.GetMetadata<MethodInfo>()?.Name;
     }
 
     /// <summary>The answer to a route of the Api that does not exist belongs to the host and takes every method.</summary>

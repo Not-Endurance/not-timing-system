@@ -132,7 +132,7 @@ internal static class PasskeyEndpoints
 
         if (read.Attributes!.Credential is not { ValueKind: JsonValueKind.Object } credential)
         {
-            return AccountFailures.PasskeyMalformedRequest.AsResult();
+            return JsonApiFailures.MalformedRequest.With("Send the credential the browser made.").AsResult();
         }
 
         if (InvalidName(read.Attributes.Name) is { } invalidName)

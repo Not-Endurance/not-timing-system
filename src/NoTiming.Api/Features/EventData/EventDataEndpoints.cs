@@ -34,7 +34,7 @@ internal static class EventDataEndpoints
         where TEntity : class, IEntity
     {
         var path = $"/api/{family.Route}";
-        app.MapNamedGet(
+        app.MapGet(
             path,
             (
                 HttpContext context,
@@ -44,7 +44,7 @@ internal static class EventDataEndpoints
                 UserManager<NIdentityUser> users
             ) => ListAsync(family, context, events, tenants, viewers, users)
         );
-        app.MapNamedGet(
+        app.MapGet(
             path + "/{id}",
             (
                 string id,
@@ -55,7 +55,7 @@ internal static class EventDataEndpoints
                 UserManager<NIdentityUser> users
             ) => ReadAsync(family, id, context, reads, events, viewers, users)
         );
-        app.MapNamedPost(
+        app.MapPost(
                 path,
                 [Requires(Capability.RunEvent, PlaceIn.EventInBody)]
                 (
@@ -66,7 +66,7 @@ internal static class EventDataEndpoints
                 ) => CreateAsync(family, body, access, data, cancellationToken)
             )
             .WithMetadata(new ResourceAttribute(family.Route));
-        app.MapNamedPatch(
+        app.MapPatch(
                 path + "/{id}",
                 [Requires(Capability.RunEvent, PlaceIn.EventOfRow)]
                 (
@@ -77,7 +77,7 @@ internal static class EventDataEndpoints
                 ) => ChangeAsync(family, body, access, data, cancellationToken)
             )
             .WithMetadata(new ResourceAttribute(family.Route), new EventRowsOf<TModel>(family.Collection));
-        app.MapNamedDelete(
+        app.MapDelete(
                 path + "/{id}",
                 [Requires(Capability.RunEvent, PlaceIn.EventOfRow)]
                 (AccessContext access, EventDataAccess data, CancellationToken cancellationToken) =>
@@ -330,7 +330,7 @@ internal static class EventDataEndpoints
             return (version, null);
         }
 
-        return (0, EventDataFailures.MalformedRequest.AsResult());
+        return (0, JsonApiFailures.MalformedRequest.With("The version is a whole number, from 0.").AsResult());
     }
 
     static IResult VersionRequired()

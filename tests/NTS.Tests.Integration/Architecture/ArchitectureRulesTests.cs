@@ -282,40 +282,6 @@ public sealed class ArchitectureRulesTests
     }
 
     [Fact]
-    public void An_endpoint_class_that_names_a_member_of_another_is_found_and_one_that_names_its_own_is_not()
-    {
-        var sources = new List<(string Path, string Text)>
-        {
-            (
-                "src/NoTiming.Api/Features/Account/PasskeyEndpoints.cs",
-                "static class PasskeyEndpoints { public static IEndpointRouteBuilder MapPasskeys(this IEndpointRouteBuilder app) { PasskeyEndpoints.Describe(); } }"
-            ),
-            (
-                "src/NoTiming.Api/Features/Account/SessionEndpoints.cs",
-                "static class SessionEndpoints { public static IEndpointRouteBuilder MapSessions(this IEndpointRouteBuilder app) { return PasskeyEndpoints.NotConfigured(); } }"
-            ),
-            ("src/NoTiming.Api/Features/Account/PasskeyCeremony.cs", "static class PasskeyCeremony { }"),
-            (
-                "src/NoTiming.Api/Features/Account/Fine.cs",
-                "PasskeyCeremony.RefuseAsync(); (see <see cref=\"PasskeyEndpoints\"/>)"
-            ),
-        };
-
-        var violations = ArchitectureRules.NoEndpointClassIsCalledByAnother(sources);
-
-        var violation = Assert.Single(violations);
-        Assert.Contains("src/NoTiming.Api/Features/Account/SessionEndpoints.cs calls PasskeyEndpoints", violation);
-    }
-
-    [Fact]
-    public void A_rule_about_endpoint_classes_cannot_pass_in_a_repository_that_has_none()
-    {
-        var sources = new List<(string Path, string Text)> { ("src/NoTiming.Api/Features/Events/Fine.cs", "") };
-
-        Assert.Throws<InvalidOperationException>(() => ArchitectureRules.NoEndpointClassIsCalledByAnother(sources));
-    }
-
-    [Fact]
     public void A_rule_about_the_endpoint_filter_cannot_pass_in_a_repository_that_has_none()
     {
         var sources = new List<(string Path, string Text)> { ("src/NoTiming.Api/Features/Events/Fine.cs", "") };

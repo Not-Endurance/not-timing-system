@@ -123,7 +123,7 @@ internal sealed class SnapshotRequest
     public static JsonApiFailure? Unsupported(Dictionary<string, JsonElement>? others)
     {
         return others is { Count: > 0 }
-            ? SnapshotFailures.UnsupportedAttribute.With(string.Join(", ", others.Keys))
+            ? JsonApiFailures.UnsupportedAttribute.With(string.Join(", ", others.Keys))
             : null;
     }
 

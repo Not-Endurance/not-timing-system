@@ -17,4 +17,11 @@ internal static class BrandingFailures
 
     public static JsonApiFailure LogoNamedTwice { get; } =
         new(StatusCodes.Status400BadRequest, "malformed-request", "A logo is named once.");
+
+    /// <summary>The detail says what is wrong with the logo.</summary>
+    public static JsonApiFailure InvalidLogo { get; } =
+        new(StatusCodes.Status400BadRequest, "invalid-logo", "The logo cannot be kept.");
+
+    public static JsonApiFailure LogoTooLarge { get; } =
+        new(StatusCodes.Status422UnprocessableEntity, "logo-too-large", "The logo cannot be kept.");
 }

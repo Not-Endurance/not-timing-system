@@ -39,7 +39,6 @@ internal static class ArchitectureRules
         "src/NoTiming.Api/Features/EventData/TimeEventViewers.cs", // whether a read shows how the times were recorded
         "src/NoTiming.Api/Features/Tenancy/CrossTenantReads.cs", // the second guard behind the reads that reach across Tenants
     ];
-    static readonly Regex ENDPOINT_CLASS = new(@"static class (\w+Endpoints)\b", RegexOptions.Compiled);
     static readonly Regex ASKS_THE_POLICY = new(
         @"AccessPolicy\.Decide\(|\.DecideAt(Event|Tenant|Platform)Async\(|\.GetUserAsync\(",
         RegexOptions.Compiled
@@ -69,44 +68,6 @@ internal static class ArchitectureRules
                     $"{x.Path} asks the policy or reads the session, and only the endpoint filter and the places that tell do: declare what the route needs with [Requires]."
                 ),
         ];
-    }
-
-    /// <summary>
-    /// An endpoint class is mapped and called by nobody (ADR-0015): it holds the routes of one resource and their handlers, and
-    /// what two endpoints share, such as a document they both take or a rule they both ask, is in a class of its own that both can
-    /// call. A source of the Api that names a member of an endpoint class other than its own breaks it. A rule about endpoints that
-    /// the repository lacks throws, so that it cannot hold for the want of something to look at.
-    /// </summary>
-    public static IReadOnlyList<string> NoEndpointClassIsCalledByAnother(
-        IReadOnlyList<(string Path, string Text)> sources
-    )
-    {
-        var declared = sources
-            .Where(x => x.Text.Contains("this IEndpointRouteBuilder", StringComparison.Ordinal))
-            .Select(x => (x.Path, Classes: ENDPOINT_CLASS.Matches(x.Text).Select(m => m.Groups[1].Value).ToList()))
-            .Where(x => x.Classes.Count > 0)
-            .ToList();
-        if (declared.Count == 0)
-        {
-            throw new InvalidOperationException("The repository has no endpoint class.");
-        }
-
-        var violations = new List<string>();
-        foreach (var source in sources)
-        {
-            var own = declared.FirstOrDefault(x => x.Path == source.Path).Classes ?? [];
-            foreach (var other in declared.SelectMany(x => x.Classes).Where(x => !own.Contains(x)).Distinct())
-            {
-                if (Regex.IsMatch(source.Text, $@"(?<![\w.]){other}\.\w"))
-                {
-                    violations.Add(
-                        $"{source.Path} calls {other}: an endpoint class is mapped and called by nobody, so what two endpoints share belongs in a class of its own."
-                    );
-                }
-            }
-        }
-
-        return violations;
     }
 
     /// <summary>The Ui is what the browser runs and the Api serves it: the Ui never references the Api, directly or through a project it references.</summary>

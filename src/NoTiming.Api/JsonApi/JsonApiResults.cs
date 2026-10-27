@@ -105,13 +105,13 @@ internal static class JsonApiResults
     /// </summary>
     public static IResult NotFound()
     {
-        return Error(StatusCodes.Status404NotFound, "not-found", "Not found");
+        return JsonApiFailures.NotFound.AsResult();
     }
 
     /// <summary>400 <c>invalid-id</c>: the id of a resource that a client makes is a Guid (ADR-0009).</summary>
     public static IResult InvalidId()
     {
-        return Error(StatusCodes.Status400BadRequest, "invalid-id", "The id of a resource is a Guid.");
+        return JsonApiFailures.InvalidId.AsResult();
     }
 
     /// <summary>409 <c>id-taken</c>: the id a client made is another Tenant's, which is not told about.</summary>
@@ -156,7 +156,7 @@ internal static class JsonApiResults
     /// <summary>The answer of every route that needs a caller when there is none: 401, never a redirect.</summary>
     public static IResult NotSignedIn()
     {
-        return Error(StatusCodes.Status401Unauthorized, "not-signed-in", "Sign in to do this.");
+        return JsonApiFailures.NotSignedIn.AsResult();
     }
 
     public static JsonSerializerOptions Options { get; } = CreateOptions();

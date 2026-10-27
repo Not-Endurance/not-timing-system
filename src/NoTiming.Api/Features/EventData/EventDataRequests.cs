@@ -43,7 +43,7 @@ internal sealed class NewRow : NewMembers, INamesEvent
         return
             (Members ?? []).Keys.Count(x => string.Equals(x, EVENT_ID, StringComparison.OrdinalIgnoreCase)) > 1
             || (named != null && !Guid.TryParseExact(named, "D", out _))
-            ? EventDataFailures.EventDataMalformedRequest
+            ? JsonApiFailures.MalformedRequest.With("The Event is named once, as an id.")
             : null;
     }
 }

@@ -55,7 +55,7 @@ internal sealed class NewEventAttributes : IResourceAttributes
     {
         if (Others is { Count: > 0 })
         {
-            return EventsFailures.UnsupportedAttribute.With(string.Join(", ", Others.Keys));
+            return EventsFailures.NewEventUnsupportedAttribute.With(string.Join(", ", Others.Keys));
         }
 
         if (string.IsNullOrEmpty(Name?.Trim()) || !OneLineText.IsValid(NameText, MAX_NAME_LENGTH))

@@ -45,7 +45,8 @@ internal sealed class AccessFilter : IEndpointFilter
         _access = access;
     }
 
-    static IResult NotInTheFilter { get; } = AccessFailures.InvalidFilter.AsResult();
+    static IResult NotInTheFilter { get; } =
+        JsonApiFailures.InvalidFilter.With("Name the Event: filter=eventId eq <id>.").AsResult();
 
     static IResult NotNamedInTheBody { get; } = AccessFailures.EventRequired.AsResult();
 

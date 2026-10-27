@@ -165,6 +165,6 @@ internal static class UserSessionEndpoints
 
     static IResult InvalidFilter()
     {
-        return UserSessionFailures.InvalidFilter.AsResult();
+        return JsonApiFailures.InvalidFilter.With("Use eventId eq <the id of an Event>.").AsResult();
     }
 }

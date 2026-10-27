@@ -16,14 +16,6 @@ internal static class EventDataFailures
             "Start the filter with the Event and join anything else to it with and: filter=eventId eq <id> and ..."
         );
 
-    public static JsonApiFailure MalformedRequest { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "malformed-request",
-            "The request is malformed.",
-            "The version is a whole number, from 0."
-        );
-
     public static JsonApiFailure VersionRequired { get; } =
         new(
             StatusCodes.Status400BadRequest,
@@ -46,13 +38,5 @@ internal static class EventDataFailures
             "participation-changed",
             "The Participation changed since it was read.",
             "Read it again and make the change on what it is now."
-        );
-
-    public static JsonApiFailure EventDataMalformedRequest { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "malformed-request",
-            "The request is malformed.",
-            "The Event is named once, as an id."
         );
 }

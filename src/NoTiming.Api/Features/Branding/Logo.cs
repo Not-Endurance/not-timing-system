@@ -1,4 +1,5 @@
 using System.Text.Json;
+using NoTiming.Api.JsonApi;
 using NTS.Contracts.Branding;
 
 namespace NoTiming.Api.Features.Branding;
@@ -28,9 +29,9 @@ internal sealed class Logo
         if (document.ValueKind != JsonValueKind.Object)
         {
             return LogoRead.Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-logo",
-                "A logo is an object with the contentType and the content of an image."
+                BrandingFailures.InvalidLogo.With(
+                    "A logo is an object with the contentType and the content of an image."
+                )
             );
         }
 
@@ -56,9 +57,9 @@ internal sealed class Logo
             else
             {
                 return LogoRead.Refused(
-                    StatusCodes.Status400BadRequest,
-                    "invalid-logo",
-                    "A logo is an object with the contentType and the content of an image and nothing else (the size and the source are the Api's, and are ignored)."
+                    BrandingFailures.InvalidLogo.With(
+                        "A logo is an object with the contentType and the content of an image and nothing else (the size and the source are the Api's, and are ignored)."
+                    )
                 );
             }
         }
@@ -66,18 +67,16 @@ internal sealed class Logo
         if (contentType is null || !KINDS.TryGetValue(contentType.Trim(), out var isOfKind))
         {
             return LogoRead.Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-logo",
-                $"The contentType of a logo is one of {string.Join(", ", KINDS.Keys)}."
+                BrandingFailures.InvalidLogo.With(
+                    $"The contentType of a logo is one of {string.Join(", ", KINDS.Keys)}."
+                )
             );
         }
 
         if (string.IsNullOrEmpty(content))
         {
             return LogoRead.Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-logo",
-                "The content of a logo is the image, as base64."
+                BrandingFailures.InvalidLogo.With("The content of a logo is the image, as base64.")
             );
         }
 
@@ -95,9 +94,7 @@ internal sealed class Logo
         catch (FormatException)
         {
             return LogoRead.Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-logo",
-                "The content of a logo is the image, as base64."
+                BrandingFailures.InvalidLogo.With("The content of a logo is the image, as base64.")
             );
         }
 
@@ -109,9 +106,7 @@ internal sealed class Logo
         return bytes.Length > 0 && isOfKind(bytes)
             ? LogoRead.Taken(new Logo(contentType.Trim().ToLowerInvariant(), bytes))
             : LogoRead.Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-logo",
-                "The content is not an image of the contentType it names."
+                BrandingFailures.InvalidLogo.With("The content is not an image of the contentType it names.")
             );
     }
 
@@ -126,11 +121,7 @@ internal sealed class Logo
 
     static LogoRead TooLarge()
     {
-        return LogoRead.Refused(
-            StatusCodes.Status422UnprocessableEntity,
-            "logo-too-large",
-            $"A logo weighs at most {MAX_BYTES / 1024} KiB."
-        );
+        return LogoRead.Refused(BrandingFailures.LogoTooLarge.With($"A logo weighs at most {MAX_BYTES / 1024} KiB."));
     }
 
     static bool StartsWith(byte[] bytes, params byte[] start)
@@ -144,24 +135,20 @@ internal sealed class LogoRead
 {
     public static LogoRead Taken(Logo logo)
     {
-        return new LogoRead(logo, 0, null, null);
+        return new LogoRead(logo, null);
     }
 
-    public static LogoRead Refused(int status, string code, string detail)
+    public static LogoRead Refused(JsonApiFailure failure)
     {
-        return new LogoRead(null, status, code, detail);
+        return new LogoRead(null, failure);
     }
 
-    LogoRead(Logo? logo, int status, string? code, string? detail)
+    LogoRead(Logo? logo, JsonApiFailure? failure)
     {
         Logo = logo;
-        Status = status;
-        Code = code;
-        Detail = detail;
+        Failure = failure;
     }
 
     public Logo? Logo { get; }
-    public int Status { get; }
-    public string? Code { get; }
-    public string? Detail { get; }
+    public JsonApiFailure? Failure { get; }
 }

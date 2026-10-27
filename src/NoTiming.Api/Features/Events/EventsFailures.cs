@@ -17,7 +17,7 @@ internal static class EventsFailures
     public static JsonApiFailure TenantNotFound { get; } =
         new(StatusCodes.Status409Conflict, "tenant-not-found", "The Event belongs to no Tenant that can start it.");
 
-    public static JsonApiFailure InvalidAttribute { get; } =
+    public static JsonApiFailure EventNotEndedByItsDays { get; } =
         new(
             StatusCodes.Status422UnprocessableEntity,
             "invalid-attribute",
@@ -25,7 +25,7 @@ internal static class EventsFailures
             "An Event is over when its last day is, and is not ended by changing its days."
         );
 
-    public static JsonApiFailure EventInvalidAttribute { get; } =
+    public static JsonApiFailure EventStartsAfterItsEnd { get; } =
         new(
             StatusCodes.Status422UnprocessableEntity,
             "invalid-attribute",
@@ -33,7 +33,7 @@ internal static class EventsFailures
             "An Event does not start after its last day."
         );
 
-    public static JsonApiFailure UnsupportedAttribute { get; } =
+    public static JsonApiFailure NewEventUnsupportedAttribute { get; } =
         new(
             StatusCodes.Status400BadRequest,
             "unsupported-attribute",
@@ -61,7 +61,7 @@ internal static class EventsFailures
             "An FEI show ID is at most 20 characters of one line."
         );
 
-    public static JsonApiFailure EventUnsupportedAttribute { get; } =
+    public static JsonApiFailure EventStartUnsupportedAttribute { get; } =
         new(
             StatusCodes.Status400BadRequest,
             "unsupported-attribute",
@@ -85,7 +85,7 @@ internal static class EventsFailures
             "A Console Operator names an Event and a person by an email or an account."
         );
 
-    public static JsonApiFailure MalformedRequest { get; } =
+    public static JsonApiFailure PersonNotNamedOnce { get; } =
         new(
             StatusCodes.Status400BadRequest,
             "malformed-request",
