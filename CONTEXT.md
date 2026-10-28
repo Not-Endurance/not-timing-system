@@ -169,15 +169,24 @@ _Avoid_: Fast test, mock test
 A test of a whole feature through its real entry points (HTTP, the live connection, the browser) against a real database. It doubles only what lies at the border of the system.
 _Avoid_: End-to-end test
 
+**Feature**:
+One capability of the product, and the folder that holds its integration tests.
+_Avoid_: Feature slice
+
+**Journey**:
+The path a feature takes from its entry point to its outcome, written as numbered stages. A feature has one or more journeys.
+_Avoid_: Flow, workflow
+
+**Stage**:
+One numbered, named step of a journey, such as "3 Enter code". A failure names the stage it stopped at.
+_Avoid_: Step
+
 **Scenario**:
-One circumstance of a feature and the outcome it leads to. A feature is split into scenarios, and a failure names the scenario it came from and the circumstance of it.
+One case of how a journey goes: every stage succeeds, or it stops at one stage, or it runs under different rules, such as the FEI or the Regional ruleset. A journey has one or more scenarios.
 _Avoid_: Case, example
 
 **Border**:
 The edge of the system an integration test runs. What the product does not own, such as the clock and outbound email, is replaced by a double there; everything inside it is real.
-
-**Feature slice**:
-The part of an integration test project for one feature of the Api. It holds that feature's scenarios and no harness code.
 
 **Harness**:
 Code that tests use but that is not itself a test: fixtures, drivers, seeds, fakes and the rules that architecture tests check. It is kept apart from the tests that use it.
