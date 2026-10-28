@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\nugets\Not.Blazor\Not.Blazor.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Identity\Not.Identity.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Krud\Not.Krud.csproj" />
+    <ProjectReference Include="..\..\nugets\Not.Test\Not.Test.csproj" />
     <ProjectReference Include="..\..\src\NoTiming.Api\NoTiming.Api.csproj" />
     <ProjectReference Include="..\..\src\NoTiming.Ui\NoTiming.Ui.csproj" />
     <ProjectReference Include="..\..\src\NTS.Contracts\NTS.Contracts.csproj" />
@@ -44,6 +45,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="Not.Test" />
   </ItemGroup>
 
 </Project>

@@ -1,9 +1,9 @@
 using System.Xml.Linq;
 
-namespace NTS.Tests.Integration.Architecture;
+namespace Not.Test;
 
-/// <summary>One project of the repository as its project file says it: what it targets, what it references, and the packages it takes.</summary>
-internal sealed class ProjectFile
+/// <summary>One project of a repository as its project file says it: what it targets, what it references, and the packages it takes.</summary>
+public sealed class ProjectFile
 {
     public ProjectFile(
         string name,
@@ -42,19 +42,17 @@ internal sealed class ProjectFile
 }
 
 /// <summary>
-/// The projects of the repository and what references what, read from the project files and not from a build, so that the layering
-/// can be checked by anyone who can read the repository. The assemblies that once enforced it (NTS.Application, NTS.Storage) are
-/// folders of the hosts now (ADR-0011), and this and the rules over it (<see cref="ArchitectureRules"/>) are what keeps it true.
+/// The projects of a repository and what references what, read from the project files and not from a build, so that a layering can be
+/// checked by anyone who can read the repository. The rules over it belong to the repository that reads it.
 /// </summary>
-internal sealed class ProjectGraph
+public sealed class ProjectGraph
 {
-    static readonly string[] FOLDERS = ["src", "nugets", "tests", "tools"];
     static readonly string[] BUILD_OUTPUT = ["bin", "obj", "node_modules"];
 
-    /// <summary>The projects of the repository at the root.</summary>
-    public static ProjectGraph Load(string root)
+    /// <summary>The projects of the repository in the folders given, below its root. A folder the repository lacks is left out.</summary>
+    public static ProjectGraph Load(string root, params string[] folders)
     {
-        var files = FOLDERS
+        var files = folders
             .Select(x => Path.Combine(root, x))
             .Where(Directory.Exists)
             .SelectMany(ProjectFilesUnder)

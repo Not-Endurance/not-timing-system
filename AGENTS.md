@@ -174,7 +174,7 @@ Overall average: **60-90% token reduction** on common development operations.
 
 ## Context
 - Primary sln file is src/not-timing-system.sln
-- One host serves everything: `src/NoTiming.Api` serves `src/NoTiming.Ui` (Blazor WebAssembly). The Api references the Ui, never the other way round; the domain references no infrastructure; nothing references Azure Functions; every project is .NET 10. `tests/NTS.Tests.Integration/Architecture` checks it from the project files. README.md has the layout.
+- One host serves everything: `src/NoTiming.Api` serves `src/NoTiming.Ui` (Blazor WebAssembly). The Api references the Ui, never the other way round; the domain references no infrastructure; nothing references Azure Functions; every project is .NET 10. `tests/NTS.Tests.Unit/Architecture` checks it from the project files. README.md has the layout.
 
 ## WSL
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker

@@ -1,10 +1,12 @@
 using System.Text;
 
-namespace NTS.Tests.Integration.Architecture;
+namespace Not.Test.Tests;
 
 /// <summary>What the rules are given (#647): the projects as their files say them, found where the product keeps them and nowhere else.</summary>
 public sealed class ProjectGraphTests : IDisposable
 {
+    static readonly string[] FOLDERS = ["src", "nugets", "tests", "tools"];
+
     readonly string _folder = Path.Combine(AppContext.BaseDirectory, "projects-" + Guid.NewGuid().ToString("N"));
 
     public void Dispose()
@@ -36,7 +38,7 @@ public sealed class ProjectGraphTests : IDisposable
             Write(path, "<Project />");
         }
 
-        Assert.Equal(["A", "B", "C", "D"], ProjectGraph.Load(_folder).Projects.Select(x => x.Name).Order());
+        Assert.Equal(["A", "B", "C", "D"], ProjectGraph.Load(_folder, FOLDERS).Projects.Select(x => x.Name).Order());
     }
 
     [Fact]
@@ -44,7 +46,7 @@ public sealed class ProjectGraphTests : IDisposable
     {
         Write("src/A/A.csproj", "<Project />");
 
-        Assert.Equal(["A"], ProjectGraph.Load(_folder).Projects.Select(x => x.Name));
+        Assert.Equal(["A"], ProjectGraph.Load(_folder, FOLDERS).Projects.Select(x => x.Name));
     }
 
     [Fact]
@@ -52,7 +54,7 @@ public sealed class ProjectGraphTests : IDisposable
     {
         Write("src/Domain/A/A.csproj", "<Project />");
 
-        Assert.Equal("src/Domain/A/A.csproj", ProjectGraph.Load(_folder).Get("A").Path);
+        Assert.Equal("src/Domain/A/A.csproj", ProjectGraph.Load(_folder, FOLDERS).Get("A").Path);
     }
 
     [Fact]
@@ -66,7 +68,7 @@ public sealed class ProjectGraphTests : IDisposable
             ]
         );
 
-        Assert.Equal(["net10.0"], ProjectGraph.Load(_folder).Get("A").Targets);
+        Assert.Equal(["net10.0"], ProjectGraph.Load(_folder, FOLDERS).Get("A").Targets);
     }
 
     [Fact]

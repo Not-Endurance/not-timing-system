@@ -97,7 +97,7 @@ Use these default homes:
 - Storage and direct infrastructure implementations: `src/NoTiming.Api` (the MongoDB wiring), and the generic ones in `nugets/Not.Storage`.
 - Blazor components, hubs, endpoints, and app entrypoints: `src/NoTiming.Api`, `src/NoTiming.Ui`, `src/NoTiming.Console` and `src/NTS.Blazor`.
 
-The project graph keeps the layering: the Api references the Ui, the Ui never references the Api, and the domain references no infrastructure (`tests/NTS.Tests.Integration/Architecture`).
+The project graph keeps the layering: the Api references the Ui, the Ui never references the Api, and the domain references no infrastructure (`tests/NTS.Tests.Unit/Architecture`).
 
 Services live in the `Features` folder of the host that owns them, and are Application services all the same: inject them, keep adapters thin, keep domain state changes inside domain objects, and keep infrastructure behind ports.
 
