@@ -159,6 +159,30 @@ The Console's dialog for one Participation: every time event of every Phase, in 
 The signal sent to everyone viewing an Event when a Participation has been changed and saved. It names the Participation, never describes it: receivers read the Participation again.
 _Avoid_: Event (that is the show), Update (that is a correction of times)
 
+### Testing
+
+**Unit test**:
+A test of domain logic, and of application logic where it is judged necessary, that needs no host, database, network, browser or real clock.
+_Avoid_: Fast test, mock test
+
+**Integration test**:
+A test of a whole feature through its real entry points (HTTP, the live connection, the browser) against a real database. It doubles only what lies at the border of the system.
+_Avoid_: End-to-end test
+
+**Scenario**:
+One circumstance of a feature and the outcome it leads to. A feature is split into scenarios, and a failure names the scenario it came from and the circumstance of it.
+_Avoid_: Case, example
+
+**Border**:
+The edge of the system an integration test runs. What the product does not own, such as the clock and outbound email, is replaced by a double there; everything inside it is real.
+
+**Feature slice**:
+The part of an integration test project for one feature of the Api. It holds that feature's scenarios and no support code.
+
+**Test support**:
+Code that tests use but that is not itself a test: fixtures, drivers, seeds, fakes and the rules that architecture tests check. It is kept apart from the tests that use it.
+_Avoid_: Helpers
+
 ## Not* projects
 They are separated by function - Blazor, Storage, Application. etcs. *Not* is shared amongs them. These are intended to packaged up and used in other projects to bootsrap functionality, ensure consistent behavior and allow for easier maintenance. Elements of Not should be completely stripped of business logic and should provide a streamlined, generic API striving for a ballance between strict, conssitent behavior and enough configurability to be multi-purposed.
 Notes:
