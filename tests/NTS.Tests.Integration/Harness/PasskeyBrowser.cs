@@ -12,8 +12,12 @@ namespace NTS.Tests.Integration.Harness;
 /// </summary>
 public sealed class PasskeyBrowserFixture : IAsyncLifetime
 {
+    /// <summary>Chromium runs at most two at a time (ADR-0016): a class holds one of the two places for the life of its browser.</summary>
+    static readonly SemaphoreSlim BROWSER_PLACES = new(2, 2);
+
     IPlaywright? _playwright;
     IBrowser? _browser;
+    bool _holdsPlace;
 
     /// <summary>
     /// A fresh browser profile and a device with its own authenticator. The address must be <c>localhost</c>: a passkey
@@ -53,19 +57,45 @@ public sealed class PasskeyBrowserFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        PlaywrightBrowserEnvironment.ConfigureCurrentProcess(RepositoryPaths.Discover());
-        _playwright = await Playwright.CreateAsync();
-        _browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Headless = true });
+        await BROWSER_PLACES.WaitAsync();
+        _holdsPlace = true;
+        try
+        {
+            PlaywrightBrowserEnvironment.ConfigureCurrentProcess(RepositoryPaths.Discover());
+            _playwright = await Playwright.CreateAsync();
+            _browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Headless = true });
+        }
+        catch
+        {
+            ReleasePlace();
+            throw;
+        }
     }
 
     public async Task DisposeAsync()
     {
-        if (_browser != null)
+        try
         {
-            await _browser.CloseAsync();
-        }
+            if (_browser != null)
+            {
+                await _browser.CloseAsync();
+            }
 
-        _playwright?.Dispose();
+            _playwright?.Dispose();
+        }
+        finally
+        {
+            ReleasePlace();
+        }
+    }
+
+    void ReleasePlace()
+    {
+        if (_holdsPlace)
+        {
+            _holdsPlace = false;
+            BROWSER_PLACES.Release();
+        }
     }
 }
 
