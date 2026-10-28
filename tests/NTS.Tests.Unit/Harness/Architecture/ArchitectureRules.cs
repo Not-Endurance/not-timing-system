@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace NTS.Tests.Integration.Architecture;
+namespace NTS.Tests.Unit.Harness.Architecture;
 
 /// <summary>
 /// What the layering of the repository allows (ADR-0011, #647). A rule reads the project files and answers with a line for each place

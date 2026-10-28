@@ -1,4 +1,6 @@
-namespace NTS.Tests.Integration.Architecture;
+using NTS.Tests.Unit.Harness.Architecture;
+
+namespace NTS.Tests.Unit.Architecture;
 
 /// <summary>
 /// The rules of the layering (ADR-0011, #647) against project files made up for the purpose: each rule finds the project that breaks it,

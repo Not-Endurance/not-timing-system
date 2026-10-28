@@ -1,4 +1,4 @@
-namespace NTS.Tests.Integration;
+namespace Not.Test;
 
 /// <summary>
 /// Readable, stable Guids for fixtures: <c>TestId.Of(7)</c> is always <c>00000007-0000-0000-0000-000000000000</c>.

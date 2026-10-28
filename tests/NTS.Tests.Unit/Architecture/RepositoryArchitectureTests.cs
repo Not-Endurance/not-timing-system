@@ -1,6 +1,6 @@
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Unit.Harness.Architecture;
 
-namespace NTS.Tests.Integration.Architecture;
+namespace NTS.Tests.Unit.Architecture;
 
 /// <summary>
 /// The layering of the repository as the project files say it (ADR-0011, #647): the one web app is the Api, which serves the Ui, and the
@@ -8,7 +8,8 @@ namespace NTS.Tests.Integration.Architecture;
 /// </summary>
 public sealed class RepositoryArchitectureTests
 {
-    static readonly ProjectGraph GRAPH = ProjectGraph.Load(RepositoryPaths.Discover().Root);
+    static readonly string ROOT = RepositoryRoot.Find(AppContext.BaseDirectory, "AGENTS.md", "src");
+    static readonly ProjectGraph GRAPH = ProjectGraph.Load(ROOT, "src", "nugets", "tests", "tools");
 
     [Fact]
     public void The_graph_is_the_one_of_the_product()
@@ -76,12 +77,11 @@ public sealed class RepositoryArchitectureTests
 
     static List<(string Path, string Text)> SourcesOfTheApi()
     {
-        var root = RepositoryPaths.Discover().Root;
         return
         [
             .. Directory
-                .EnumerateFiles(Path.Combine(root, "src", "NoTiming.Api"), "*.cs", SearchOption.AllDirectories)
-                .Select(x => (Path.GetRelativePath(root, x).Replace('\\', '/'), File.ReadAllText(x)))
+                .EnumerateFiles(Path.Combine(ROOT, "src", "NoTiming.Api"), "*.cs", SearchOption.AllDirectories)
+                .Select(x => (Path.GetRelativePath(ROOT, x).Replace('\\', '/'), File.ReadAllText(x)))
                 .Where(x => !x.Item1.Contains("/obj/") && !x.Item1.Contains("/bin/")),
         ];
     }

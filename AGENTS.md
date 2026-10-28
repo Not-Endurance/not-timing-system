@@ -4,10 +4,10 @@
 - docker commands which would modify containers, volumes, images or similar
 2. Always dotnet `build`, `restore` with silent output `-v:q` unless instructed otherwise. Don't modify worklfows to use queit mode. This applies only for localhost verification
 3. Run dotnet `test` with minimal output `-v:m`. 
-4. Verify each feature with successful NTS.Test.Integration run. If the indegration tests fail, don't change them directly. Instead report why they are failing.
-5. Changes and features should be represented in the Integration tests if reasonably possible.
+4. Tests follow docs/adr/0016-two-test-projects-and-integration-tests-walk-features-through-stages.md. Verify each feature with a successful run of its integration tests in `tests/NTS.Tests.Integration`. If an integration test fails, don't change it directly: report why it is failing.
+5. Changes and features are represented in the integration tests as a journey with a scenario for each outcome, where reasonably possible.
 6. Domain logic should be tested in the NTS.Tests.Unit.Domain namespace.
-7. If unit tests would be a useful task evaluation step, create those tests in NTS.Tests.Unit.Temporary. Expect those tests to be deleted regularly.
+7. Test support (fixtures, fakes, drivers, seeds, and the rules that architecture tests check) lives in a `Harness` folder, apart from the tests that use it. Throwaway checks are not committed: keep them in `.tmp/`, or delete them before the change is committed.
 8. Always use RTK
 9. Multi-line strings must match the shell you are actually in. `@'...'@` is a **PowerShell** here-string; in Bash it is not special syntax and silently becomes a literal `@` on the first and last lines. Passed to `git commit -m`, that makes `@` the commit subject and demotes the real subject into the body. In Bash use a heredoc; reserve `@'...'@` for the PowerShell tool.
 
@@ -174,7 +174,7 @@ Overall average: **60-90% token reduction** on common development operations.
 
 ## Context
 - Primary sln file is src/not-timing-system.sln
-- One host serves everything: `src/NoTiming.Api` serves `src/NoTiming.Ui` (Blazor WebAssembly). The Api references the Ui, never the other way round; the domain references no infrastructure; nothing references Azure Functions; every project is .NET 10. `tests/NTS.Tests.Integration/Architecture` checks it from the project files. README.md has the layout.
+- One host serves everything: `src/NoTiming.Api` serves `src/NoTiming.Ui` (Blazor WebAssembly). The Api references the Ui, never the other way round; the domain references no infrastructure; nothing references Azure Functions; every project is .NET 10. `tests/NTS.Tests.Unit/Architecture` checks it from the project files. README.md has the layout.
 
 ## WSL
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker

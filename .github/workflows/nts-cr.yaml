@@ -78,6 +78,10 @@ jobs:
     - name: Build
       run: dotnet build ${{ env.SOURCE_DIR }}/${{ env.SOLUTION_FILE }} -c ${{ env.CONFIGURATION }} --no-restore
 
-    # The layering of ADR-0011, read from the project files: no Docker and no browser, a few seconds on the build above.
-    - name: Architecture tests
-      run: dotnet test tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -c ${{ env.CONFIGURATION }} --no-build --filter "FullyQualifiedName~NTS.Tests.Integration.Architecture"
+    # The unit tests, which include the architecture of ADR-0011 read from the project files: no Docker and no browser, a few seconds on the build above.
+    - name: Unit tests
+      run: dotnet test tests/NTS.Tests.Unit/NTS.Tests.Unit.csproj -c ${{ env.CONFIGURATION }} --no-build
+
+    # The shared library of the tests (ADR-0016): generic, no Docker and no browser.
+    - name: Shared test library tests
+      run: dotnet test nugets/Not.Test.Tests/Not.Test.Tests.csproj -c ${{ env.CONFIGURATION }} --no-build
