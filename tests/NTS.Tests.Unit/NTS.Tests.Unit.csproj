@@ -25,6 +25,7 @@
   <ItemGroup>
     <Using Include="Xunit" />
     <Using Include="Not.Test" />
+    <Using Include="NTS.Tests.Unit.Harness" />
   </ItemGroup>
 
 </Project>
