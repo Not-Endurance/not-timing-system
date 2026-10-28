@@ -6,8 +6,8 @@ using Not.Domain.Exceptions;
 using NoTiming.Ui.Storage.Core.Repositories;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
-using NTS.Tests.Integration.Infrastructure;
-using static NTS.Tests.Integration.Infrastructure.TenancySeed;
+using NTS.Tests.Integration.Harness;
+using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
 

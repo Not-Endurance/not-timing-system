@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.DependencyInjection;
 using NoTiming.Api.Features.Access;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 
 namespace NTS.Tests.Integration;
 

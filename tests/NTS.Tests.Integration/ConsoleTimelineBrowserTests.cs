@@ -3,9 +3,9 @@ using Microsoft.Playwright;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NTS.Domain.Objects;
-using NTS.Tests.Integration.Drivers;
-using NTS.Tests.Integration.Infrastructure;
-using static NTS.Tests.Integration.Infrastructure.UiBrowser;
+using NTS.Tests.Integration.Harness.Drivers;
+using NTS.Tests.Integration.Harness;
+using static NTS.Tests.Integration.Harness.UiBrowser;
 
 namespace NTS.Tests.Integration;
 

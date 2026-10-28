@@ -7,8 +7,8 @@ using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Tests.Integration.Drivers;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness.Drivers;
+using NTS.Tests.Integration.Harness;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Objects.Competition;
 using SystemTextJson = System.Text.Json.JsonSerializer;
 

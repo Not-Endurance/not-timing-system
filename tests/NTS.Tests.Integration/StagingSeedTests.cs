@@ -4,7 +4,7 @@ using Not.Storage.Mongo;
 using NoTiming.Api.Features.Events;
 using NTS.Domain.Access;
 using NTS.Domain.Enums;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 using NTS.Tools.Staging;
 
 namespace NTS.Tests.Integration;

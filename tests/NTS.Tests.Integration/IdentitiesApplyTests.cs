@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using NoTiming.Api.Features.Reference;
 using NTS.Domain.Setup.Services.Identities;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 using NTS.Tools.IdentityMigration;
 
 namespace NTS.Tests.Integration;

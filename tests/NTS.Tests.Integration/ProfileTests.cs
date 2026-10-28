@@ -2,7 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using MongoDB.Bson;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 
 namespace NTS.Tests.Integration;
 

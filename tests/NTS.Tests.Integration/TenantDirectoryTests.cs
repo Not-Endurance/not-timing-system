@@ -1,5 +1,5 @@
 using NoTiming.Ui.Features.Account;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 
 namespace NTS.Tests.Integration;
 

@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Not.Identity;
-using NTS.Tests.Integration.Infrastructure;
-using static NTS.Tests.Integration.Infrastructure.IdentityStoreHarness;
+using NTS.Tests.Integration.Harness;
+using static NTS.Tests.Integration.Harness.IdentityStoreHarness;
 
 namespace NTS.Tests.Integration;
 

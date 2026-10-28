@@ -6,7 +6,7 @@ using MongoDB.Driver;
 using Not.Identity;
 using NoTiming.Api.Features.Tenancy;
 using NTS.Domain.Objects;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 using NTS.Tools.Developer;
 
 namespace NTS.Tests.Integration;

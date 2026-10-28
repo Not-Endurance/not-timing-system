@@ -8,8 +8,8 @@ using MongoDB.Driver;
 using Not.Identity;
 using Not.Identity.Email;
 using Not.Identity.Mongo;
-using NTS.Tests.Integration.Infrastructure;
-using static NTS.Tests.Integration.Infrastructure.IdentityStoreHarness;
+using NTS.Tests.Integration.Harness;
+using static NTS.Tests.Integration.Harness.IdentityStoreHarness;
 
 namespace NTS.Tests.Integration;
 

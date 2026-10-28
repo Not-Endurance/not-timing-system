@@ -5,7 +5,7 @@ using NoTiming.Ui.Features.Account;
 using NoTiming.Ui.Features.Profile;
 using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Participants;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 
 namespace NTS.Tests.Integration;
 

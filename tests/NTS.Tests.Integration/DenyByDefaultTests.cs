@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using NoTiming.Api.Features.Access;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 
 namespace NTS.Tests.Integration;
 

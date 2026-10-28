@@ -5,10 +5,10 @@ using NoTiming.Ui.Features.Console;
 using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain.Access;
 using NTS.Domain.Enums;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 using static NoTiming.Ui.Features.Console.ApiAnswers;
 using static NTS.Localization.NtsStrings;
-using static NTS.Tests.Integration.Infrastructure.TenancySeed;
+using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
 

@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NoTiming.Api.Features.Tenancy;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 using NTS.Tools.EventLiveness;
 
 namespace NTS.Tests.Integration;

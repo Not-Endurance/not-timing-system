@@ -7,9 +7,9 @@ using MongoDB.Driver;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Reference;
 using NTS.Domain.Objects;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 using static NTS.Localization.NtsStrings;
-using static NTS.Tests.Integration.Infrastructure.TenancySeed;
+using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
 

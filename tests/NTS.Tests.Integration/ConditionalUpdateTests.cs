@@ -8,7 +8,7 @@ using NoTiming.Api.Features.Tenancy;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 
 namespace NTS.Tests.Integration;
 

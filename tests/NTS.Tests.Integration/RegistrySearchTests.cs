@@ -2,8 +2,8 @@ using System.Net;
 using System.Text.Json;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using NTS.Tests.Integration.Infrastructure;
-using static NTS.Tests.Integration.Infrastructure.TenancySeed;
+using NTS.Tests.Integration.Harness;
+using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
 

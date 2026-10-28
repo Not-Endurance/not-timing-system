@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.Playwright;
-using NTS.Tests.Integration.Infrastructure;
-using static NTS.Tests.Integration.Infrastructure.UiBrowser;
+using NTS.Tests.Integration.Harness;
+using static NTS.Tests.Integration.Harness.UiBrowser;
 
 namespace NTS.Tests.Integration;
 

@@ -6,7 +6,7 @@ using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NTS.Contracts.Setup.Models;
 using NTS.Contracts.Shared.Models;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 
 namespace NTS.Tests.Integration;
 

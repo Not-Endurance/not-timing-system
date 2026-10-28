@@ -7,9 +7,9 @@ using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Access;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Tests.Integration.Drivers;
-using NTS.Tests.Integration.Infrastructure;
-using static NTS.Tests.Integration.Infrastructure.TenancySeed;
+using NTS.Tests.Integration.Harness.Drivers;
+using NTS.Tests.Integration.Harness;
+using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
 

@@ -9,7 +9,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Not.Identity.Email;
 using NoTiming.Api.Features.Account;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 using Xunit.Abstractions;
 
 namespace NTS.Tests.Integration;

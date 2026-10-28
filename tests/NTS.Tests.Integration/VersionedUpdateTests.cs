@@ -4,8 +4,8 @@ using MongoDB.Driver;
 using Not.Identity;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
-using NTS.Tests.Integration.Drivers;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness.Drivers;
+using NTS.Tests.Integration.Harness;
 
 namespace NTS.Tests.Integration;
 

@@ -2,7 +2,7 @@ using System.Diagnostics;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 
 namespace NTS.Tests.Integration;
 

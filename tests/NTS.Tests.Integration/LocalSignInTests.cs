@@ -5,7 +5,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 using static NTS.Tests.Integration.LocalSignInHarness;
 
 namespace NTS.Tests.Integration;

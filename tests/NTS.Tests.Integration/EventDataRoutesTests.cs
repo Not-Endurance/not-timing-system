@@ -2,9 +2,9 @@ using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using NoTiming.Api.Features.Tenancy;
 using NTS.Contracts.Core.Models;
-using NTS.Tests.Integration.Drivers;
-using NTS.Tests.Integration.Infrastructure;
-using static NTS.Tests.Integration.Infrastructure.TenancySeed;
+using NTS.Tests.Integration.Harness.Drivers;
+using NTS.Tests.Integration.Harness;
+using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
 

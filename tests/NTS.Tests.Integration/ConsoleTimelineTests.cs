@@ -14,10 +14,10 @@ using NTS.Contracts.Features.Console;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Objects;
-using NTS.Tests.Integration.Drivers;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness.Drivers;
+using NTS.Tests.Integration.Harness;
 using static NTS.Localization.NtsStrings;
-using static NTS.Tests.Integration.Infrastructure.TenancySeed;
+using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
 

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text.Json.Nodes;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 using NTS.Tools.IdentityMigration;
 
 namespace NTS.Tests.Integration;

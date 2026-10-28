@@ -5,8 +5,8 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Tests.Integration.Drivers;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness.Drivers;
+using NTS.Tests.Integration.Harness;
 using SystemTextJson = System.Text.Json.JsonSerializer;
 
 namespace NTS.Tests.Integration;

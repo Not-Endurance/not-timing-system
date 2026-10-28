@@ -1,6 +1,6 @@
 #if !DEBUG
 using System.Net;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 using static NTS.Tests.Integration.LocalSignInHarness;
 
 namespace NTS.Tests.Integration;

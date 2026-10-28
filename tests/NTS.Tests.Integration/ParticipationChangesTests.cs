@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NoTiming.Api.Features.Live;
 using NTS.Contracts;
 using NTS.Contracts.Live;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 
 namespace NTS.Tests.Integration;
 

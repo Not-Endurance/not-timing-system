@@ -3,7 +3,7 @@ using System.Text.Json;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NTS.Domain.Enums;
-using NTS.Tests.Integration.Infrastructure;
+using NTS.Tests.Integration.Harness;
 using NTS.Tools.Staging;
 
 namespace NTS.Tests.Integration;

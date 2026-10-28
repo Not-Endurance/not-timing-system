@@ -3,8 +3,8 @@ using System.Text.Json;
 using Microsoft.Extensions.Time.Testing;
 using NTS.Domain.Access;
 using NTS.Domain.Enums;
-using NTS.Tests.Integration.Infrastructure;
-using static NTS.Tests.Integration.Infrastructure.TenancySeed;
+using NTS.Tests.Integration.Harness;
+using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
 

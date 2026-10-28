@@ -31,16 +31,12 @@
   </ItemGroup>
 
   <!--
-    Parked scenarios. Each of these needs a connected Judge or the hub write path (Receive), which the platform no
-    longer has (#598, ADR-0011, ADR-0013). They are kept as they were written and are not compiled. Their assertions
-    are edited only with the owner's approval per test (AGENTS.md rule 4, #642). See README.md, "Parked scenarios".
+    Parked scenarios, all in Parked\. Each of these needs a connected Judge or the hub write path (Receive), which the
+    platform no longer has (#598, ADR-0011, ADR-0013). They are kept as they were written and are not compiled. Their
+    assertions are edited only with the owner's approval per test (AGENTS.md rule 4, #642). See README.md, "Parked scenarios".
   -->
   <ItemGroup>
-    <Compile Remove="Drivers\ConsoleDriver.cs" />
-    <Compile Remove="EndToEndEventTests\**" />
-    <Compile Remove="FeiExportTests.cs" />
-    <Compile Remove="IntegrationHarnessCheckTest.Parked.cs" />
-    <Compile Remove="ConsoleDependencyInjectionTests.cs" />
+    <Compile Remove="Parked\**" />
   </ItemGroup>
 
   <ItemGroup>
