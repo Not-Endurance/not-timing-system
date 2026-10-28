@@ -275,27 +275,4 @@ public sealed class ParticipationReevaluationTests
         );
     }
 
-    sealed class Form : IPhaseState
-    {
-        public Form(
-            Guid id,
-            DateTimeOffset? startTime,
-            DateTimeOffset? arriveTime,
-            DateTimeOffset? presentTime,
-            DateTimeOffset? representTime
-        )
-        {
-            Id = id;
-            StartTime = startTime;
-            ArriveTime = arriveTime;
-            PresentTime = presentTime;
-            RepresentTime = representTime;
-        }
-
-        public Guid Id { get; }
-        public DateTimeOffset? StartTime { get; }
-        public DateTimeOffset? ArriveTime { get; }
-        public DateTimeOffset? PresentTime { get; }
-        public DateTimeOffset? RepresentTime { get; }
-    }
 }

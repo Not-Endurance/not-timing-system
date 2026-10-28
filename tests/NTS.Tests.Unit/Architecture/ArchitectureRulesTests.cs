@@ -322,4 +322,85 @@ public sealed class ArchitectureRulesTests
             """;
         return ($"{folder}/{name}/{name}.csproj", xml);
     }
+
+    [Fact]
+    public void A_test_in_the_folder_of_its_product_with_the_namespace_of_that_folder_is_right()
+    {
+        var files = new[]
+        {
+            (
+                "NoTiming.Api/Features/Events/EventStartTests.cs",
+                "namespace NTS.Tests.Unit.NoTiming.Api.Features.Events;\n\npublic sealed class EventStartTests { }"
+            ),
+        };
+
+        Assert.Empty(ArchitectureRules.TestsMirrorTheProduct(files, ["NoTiming.Api/Features/Events"]));
+    }
+
+    [Fact]
+    public void A_test_in_a_folder_that_the_product_lacks_is_a_violation()
+    {
+        var files = new[]
+        {
+            (
+                "NoTiming.Api/Missing/MissingTests.cs",
+                "namespace NTS.Tests.Unit.NoTiming.Api.Missing;\n\npublic sealed class MissingTests { }"
+            ),
+        };
+
+        var violation = Assert.Single(ArchitectureRules.TestsMirrorTheProduct(files, ["NoTiming.Api/Features/Events"]));
+        Assert.Equal("NoTiming.Api/Missing/MissingTests.cs is in a folder that the product does not have.", violation);
+    }
+
+    [Fact]
+    public void A_test_whose_namespace_does_not_follow_its_folder_is_a_violation()
+    {
+        var files = new[]
+        {
+            (
+                "NoTiming.Api/Features/Events/EventStartTests.cs",
+                "namespace NTS.Tests.Unit.Application;\n\npublic sealed class EventStartTests { }"
+            ),
+        };
+
+        var violation = Assert.Single(ArchitectureRules.TestsMirrorTheProduct(files, ["NoTiming.Api/Features/Events"]));
+        Assert.Equal(
+            "NoTiming.Api/Features/Events/EventStartTests.cs declares the namespace NTS.Tests.Unit.Application, not NTS.Tests.Unit.NoTiming.Api.Features.Events.",
+            violation
+        );
+    }
+
+    [Fact]
+    public void The_harness_is_not_checked_against_the_product()
+    {
+        var files = new[] { ("Harness/Clock.cs", "namespace NTS.Tests.Unit.Harness;\n\ninternal sealed class Clock { }") };
+
+        Assert.Empty(ArchitectureRules.TestsMirrorTheProduct(files, []));
+    }
+
+    [Fact]
+    public void A_test_file_that_declares_a_helper_is_a_violation()
+    {
+        var files = new[] { ("Domain/SomeTests.cs", "public sealed class SomeTests\n{\n    sealed class Clock { }\n}") };
+
+        var violation = Assert.Single(ArchitectureRules.TestFilesDeclareOnlyTests(files));
+        Assert.Equal("Domain/SomeTests.cs declares Clock, which is not a test: move it to the harness.", violation);
+    }
+
+    [Fact]
+    public void A_test_file_that_declares_only_tests_is_right()
+    {
+        var files = new[] { ("Domain/SomeTests.cs", "public sealed class SomeTests\n{\n    [Fact]\n    public void Holds() { }\n}") };
+
+        Assert.Empty(ArchitectureRules.TestFilesDeclareOnlyTests(files));
+    }
+
+    [Fact]
+    public void The_harness_that_holds_a_test_is_a_violation()
+    {
+        var files = new[] { ("Clock.cs", "public sealed class Clock\n{\n    [Fact]\n    public void Ticks() { }\n}") };
+
+        var violation = Assert.Single(ArchitectureRules.HarnessHoldsNoTests(files));
+        Assert.Equal("Clock.cs holds a test, and the harness holds none.", violation);
+    }
 }

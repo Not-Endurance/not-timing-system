@@ -335,13 +335,4 @@ public sealed class AccessPolicyTests
         };
     }
 
-    public enum Who
-    {
-        Anonymous,
-        Account,
-        StaffWhoMayNotRecord,
-        StaffWhoMayRecord,
-        ConsoleOperator,
-        Root,
-    }
 }

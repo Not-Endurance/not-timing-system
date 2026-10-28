@@ -269,13 +269,4 @@ public sealed class ParticipantSearchMemoryTests
         return new FoundParticipant(ParticipantKind.Horse, Guid.NewGuid(), name, null, null);
     }
 
-    sealed class Clock : TimeProvider
-    {
-        public DateTimeOffset Now { get; set; }
-
-        public override DateTimeOffset GetUtcNow()
-        {
-            return Now;
-        }
-    }
 }

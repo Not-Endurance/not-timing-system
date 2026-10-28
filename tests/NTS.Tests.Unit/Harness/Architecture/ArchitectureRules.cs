@@ -29,6 +29,12 @@ internal static class ArchitectureRules
         "Microsoft.NET.Sdk.Functions",
     ];
     static readonly string[] RETIRED_PROJECTS = ["NTS.Application", "NTS.Storage", "NTS.Client", "Not.Server"];
+    static readonly Regex NAMESPACE_DECLARATION = new(@"^namespace\s+([\w.]+)\s*;", RegexOptions.Multiline);
+    static readonly Regex TYPE_DECLARATION = new(
+        @"^\s*(?:(?:public|internal|private|protected|sealed|static|readonly|abstract|partial)\s+)*(?:class|record|enum|struct|interface)\s+(\w+)",
+        RegexOptions.Multiline
+    );
+    static readonly Regex TEST_ATTRIBUTE = new(@"^\s*\[(?:Fact|Theory)\]", RegexOptions.Multiline);
     static readonly string FILTER = "src/NoTiming.Api/Features/Access/AccessFilter.cs";
     static readonly string[] MAY_ASK_THE_POLICY =
     [
@@ -179,6 +185,84 @@ internal static class ArchitectureRules
                         .Select(y => $"{x.Path} takes the package {y}, and printing is the browser's.")
                 ),
         ];
+    }
+
+    /// <summary>
+    /// A unit test sits in the folder of the product code it covers, and declares the namespace of that folder (ADR-0016): a test in a
+    /// folder that the product does not have tests nothing that is there. The harness and the architecture tests are not tests of a
+    /// folder of the product, and are left out.
+    /// </summary>
+    public static IReadOnlyList<string> TestsMirrorTheProduct(
+        IReadOnlyList<(string Path, string Text)> testFiles,
+        IReadOnlyCollection<string> productFolders
+    )
+    {
+        var violations = new List<string>();
+        foreach (var (path, text) in testFiles)
+        {
+            var folder = Path.GetDirectoryName(path)?.Replace('\\', '/') ?? string.Empty;
+            if (IsOutsideTheMirror(folder))
+            {
+                continue;
+            }
+
+            if (folder.Length == 0 || !productFolders.Contains(folder))
+            {
+                violations.Add($"{path} is in a folder that the product does not have.");
+                continue;
+            }
+
+            var expected = "NTS.Tests.Unit." + folder.Replace('/', '.');
+            var declared = NAMESPACE_DECLARATION.Match(text).Groups[1].Value;
+            if (declared != expected)
+            {
+                violations.Add($"{path} declares the namespace {declared}, not {expected}.");
+            }
+        }
+
+        return violations;
+    }
+
+    /// <summary>A test file declares tests and nothing else: a double, a fixture or a model that a test uses belongs in the harness.</summary>
+    public static IReadOnlyList<string> TestFilesDeclareOnlyTests(IReadOnlyList<(string Path, string Text)> testFiles)
+    {
+        var violations = new List<string>();
+        foreach (var (path, text) in testFiles)
+        {
+            foreach (Match declaration in TYPE_DECLARATION.Matches(text))
+            {
+                var name = declaration.Groups[1].Value;
+                if (!name.EndsWith("Tests", StringComparison.Ordinal))
+                {
+                    violations.Add($"{path} declares {name}, which is not a test: move it to the harness.");
+                }
+            }
+        }
+
+        return violations;
+    }
+
+    /// <summary>The harness is support for the tests, and holds no test of its own.</summary>
+    public static IReadOnlyList<string> HarnessHoldsNoTests(IReadOnlyList<(string Path, string Text)> harnessFiles)
+    {
+        var violations = new List<string>();
+        foreach (var (path, text) in harnessFiles)
+        {
+            if (TEST_ATTRIBUTE.IsMatch(text))
+            {
+                violations.Add($"{path} holds a test, and the harness holds none.");
+            }
+        }
+
+        return violations;
+    }
+
+    static bool IsOutsideTheMirror(string folder)
+    {
+        return folder == "Harness"
+            || folder.StartsWith("Harness/", StringComparison.Ordinal)
+            || folder == "Architecture"
+            || folder.StartsWith("Architecture/", StringComparison.Ordinal);
     }
 
     static bool IsDomain(ProjectFile project)

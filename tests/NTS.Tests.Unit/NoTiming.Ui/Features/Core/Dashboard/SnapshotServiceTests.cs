@@ -149,7 +149,7 @@ public sealed class SnapshotServiceTests
                     "participation-busy",
                     "The Participation was being changed by too many at once."
                 )
-                : SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.Accepted));
+                : SnapshotReceipt.Recorded(id, 201, SnapshotDoubles.Recorded(TimeEventOutcome.Accepted));
         foreach (var participation in service.Participations.ToArray())
         {
             service.SelectForSnapshot(participation);
@@ -175,7 +175,7 @@ public sealed class SnapshotServiceTests
     {
         var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
         publisher.Answer = (_, id) =>
-            SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.RejectedDuplicateArrive));
+            SnapshotReceipt.Recorded(id, 201, SnapshotDoubles.Recorded(TimeEventOutcome.RejectedDuplicateArrive));
         service.SelectForSnapshot(service.Participations[0]);
         service.Capture(service.Snapshots[0]);
         using var view = await LiveView(store, canSendSnapshots: true);
@@ -234,7 +234,7 @@ public sealed class SnapshotServiceTests
         using var view = await LiveView(store, canSendSnapshots: true);
         publisher.Answer = (_, id) => SnapshotReceipt.Failed(id, 503, null, "The server could not answer.");
         await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
-        publisher.Answer = (_, id) => SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.Accepted));
+        publisher.Answer = (_, id) => SnapshotReceipt.Recorded(id, 201, SnapshotDoubles.Recorded(TimeEventOutcome.Accepted));
 
         await service.Publish(view, SnapshotType.Arrive);
 
@@ -367,9 +367,9 @@ public sealed class SnapshotServiceTests
         publisher.Answer = (number, id) =>
             number == 2
                 ? SnapshotReceipt.Failed(id, 409, "participation-busy", "Too many at once.")
-                : SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.Accepted));
+                : SnapshotReceipt.Recorded(id, 201, SnapshotDoubles.Recorded(TimeEventOutcome.Accepted));
         await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
-        publisher.Answer = (_, id) => SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.Accepted));
+        publisher.Answer = (_, id) => SnapshotReceipt.Recorded(id, 201, SnapshotDoubles.Recorded(TimeEventOutcome.Accepted));
 
         await service.Publish(view, SnapshotType.Arrive);
 
@@ -635,7 +635,7 @@ public sealed class SnapshotServiceTests
         var entry = group.Entries.Single();
         var before = entry.Timestamp;
         publisher.UpdateAnswer = id =>
-            SnapshotReceipt.Recorded(id, 200, Recorded(TimeEventOutcome.RejectedInvalidTime));
+            SnapshotReceipt.Recorded(id, 200, SnapshotDoubles.Recorded(TimeEventOutcome.RejectedInvalidTime));
 
         await Assert.ThrowsAsync<DomainException>(
             () => service.UpdateTime(view, group, entry, new Timestamp(DateTimeOffset.Now.AddHours(-5)))
@@ -798,123 +798,4 @@ public sealed class SnapshotServiceTests
         return (service, store, repository, publisher);
     }
 
-    static RecordedSnapshot Recorded(TimeEventOutcome outcome)
-    {
-        return new RecordedSnapshot
-        {
-            EventId = LIVE_EVENT_ID,
-            ParticipationId = TestId.Of(1),
-            Number = 1,
-            Slot = TimeSlot.Arrive,
-            Time = DateTimeOffset.Now,
-            Outcome = outcome,
-        };
-    }
-
-    sealed class SessionOf : IWitnessUserSession
-    {
-        readonly NtsUserSessionStateModel? _session;
-
-        public SessionOf(NtsUserSessionStateModel? session)
-        {
-            _session = session;
-        }
-
-        /// <summary>What keeping a sent group fails with when a test says so: the host failed or the session ended.</summary>
-        public Exception? AppendFails { get; set; }
-
-        /// <summary>What correcting a kept entry fails with when a test says so.</summary>
-        public Exception? UpdateFails { get; set; }
-
-        /// <summary>The corrections the service asked to be kept: the id of the group, the start number and the time.</summary>
-        public List<(Guid GroupId, int Number, Timestamp Time)> Updated { get; } = [];
-
-        public Task<NtsUserSessionStateModel?> GetCurrent()
-        {
-            return Task.FromResult(_session);
-        }
-
-        public Task SetEventId(Guid? eventId)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task AppendSnapshot(SnapshotGroup snapshot)
-        {
-            return AppendFails == null ? Task.CompletedTask : Task.FromException(AppendFails);
-        }
-
-        public Task UpdateSnapshotInHistory(Guid groupId, int number, Timestamp time)
-        {
-            Updated.Add((groupId, number, time));
-            return UpdateFails == null ? Task.CompletedTask : Task.FromException(UpdateFails);
-        }
-
-        public Task ReplaceSnapshotSelections(IReadOnlyCollection<Snapshot> snapshots)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task DeleteCurrent()
-        {
-            return Task.CompletedTask;
-        }
-    }
-
-    sealed class RecordingPublisher : ISnapshotPublisher
-    {
-        public List<SnapshotGroup> Published { get; } = [];
-        public List<Guid> Events { get; } = [];
-
-        /// <summary>What the request fails with when a test says so: the group is taken by the server or not, and the answer is lost.</summary>
-        public Exception? Fail { get; set; }
-
-        /// <summary>What the server says of the Snapshot of a start number with the id it was sent under: recorded and accepted, unless a test says otherwise.</summary>
-        public Func<int, Guid, SnapshotReceipt> Answer { get; set; } =
-            (_, id) => SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.Accepted));
-
-        /// <summary>The Updates the server was asked for: the id of the Snapshot and the instant it was to have.</summary>
-        public List<(Guid Id, DateTimeOffset Time)> Updates { get; } = [];
-
-        /// <summary>What the Update fails with when a test says so: the answer is lost.</summary>
-        public Exception? UpdateFails { get; set; }
-
-        /// <summary>What the server says of an Update, when a test says something other than what it says of a Snapshot.</summary>
-        public Func<Guid, SnapshotReceipt>? UpdateAnswer { get; set; }
-
-        public Task<IReadOnlyList<SnapshotReceipt>> PublishSnapshotsAsync(
-            Guid eventId,
-            SnapshotGroup snapshotGroup,
-            CancellationToken cancellationToken = default
-        )
-        {
-            Events.Add(eventId);
-            Published.Add(snapshotGroup);
-            if (Fail != null)
-            {
-                throw Fail;
-            }
-
-            IReadOnlyList<SnapshotReceipt> receipts =
-            [
-                .. snapshotGroup.Entries.Select(x => Answer(x.Number, snapshotGroup.IdOf(x))),
-            ];
-            return Task.FromResult(receipts);
-        }
-
-        public Task<SnapshotReceipt> UpdateSnapshotAsync(
-            Guid snapshotId,
-            DateTimeOffset time,
-            CancellationToken cancellationToken = default
-        )
-        {
-            Updates.Add((snapshotId, time));
-            if (UpdateFails != null)
-            {
-                throw UpdateFails;
-            }
-
-            return Task.FromResult(UpdateAnswer?.Invoke(snapshotId) ?? Answer(0, snapshotId));
-        }
-    }
 }

@@ -344,16 +344,4 @@ public sealed class RegionalRulesTests
     }
 
     /// <summary>A regional ranker for a test: the highest start number first. The FEI ranker puts the earliest arrival first.</summary>
-    sealed class LastNumberFirstRanker : Ranker
-    {
-        public LastNumberFirstRanker(string code)
-        {
-            CountryIsoCode = code;
-        }
-
-        public override List<ParticipationResult> Rank(IEnumerable<ParticipationResult> entries)
-        {
-            return [.. entries.OrderByDescending(x => x.Participation.Combination.Number)];
-        }
-    }
 }

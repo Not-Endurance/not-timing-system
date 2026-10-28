@@ -606,7 +606,7 @@ public sealed class ParticipationTimelineTests
             CreatePhase(null, isFinal: true, id: TestId.Of(2))
         );
 
-        participation.Update(new Form(TestId.Of(1), START, ARRIVE, null), ACTOR, RECORDED);
+        participation.Update(new ParticipationTimelineForm(TestId.Of(1), START, ARRIVE, null), ACTOR, RECORDED);
         var edit = participation.Phases[0].Events.OfType<PhaseUpdated>().Single();
 
         Assert.Null(participation.Phases[0].PresentTime);
@@ -687,20 +687,4 @@ public sealed class ParticipationTimelineTests
         );
     }
 
-    sealed class Form : IPhaseState
-    {
-        public Form(Guid id, DateTimeOffset? startTime, DateTimeOffset? arriveTime, DateTimeOffset? presentTime)
-        {
-            Id = id;
-            StartTime = startTime;
-            ArriveTime = arriveTime;
-            PresentTime = presentTime;
-        }
-
-        public Guid Id { get; }
-        public DateTimeOffset? StartTime { get; }
-        public DateTimeOffset? ArriveTime { get; }
-        public DateTimeOffset? PresentTime { get; }
-        public DateTimeOffset? RepresentTime => null;
-    }
 }

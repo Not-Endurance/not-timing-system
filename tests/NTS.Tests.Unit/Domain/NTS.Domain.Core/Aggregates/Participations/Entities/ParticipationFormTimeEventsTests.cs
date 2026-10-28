@@ -32,7 +32,7 @@ public sealed class ParticipationFormTimeEventsTests
         var participation = Ride();
         var arrive = ARRIVE.AddMinutes(2);
 
-        participation.Update(new Form(TestId.Of(1), START, arrive, PRESENT, null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, arrive, PRESENT, null), ACTOR, RECORDED);
 
         var events = participation.Phases[0].Events;
         Assert.Equal(3, events.Count);
@@ -57,7 +57,7 @@ public sealed class ParticipationFormTimeEventsTests
         var present = PRESENT.AddMinutes(3);
         var represent = PRESENT.AddMinutes(30);
 
-        participation.Update(new Form(TestId.Of(1), START, arrive, present, represent), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, arrive, present, represent), ACTOR, RECORDED);
 
         var phase = participation.Phases[0];
         var updated = Assert.IsType<PhaseUpdated>(Assert.Single(phase.Events.Skip(2)));
@@ -75,7 +75,7 @@ public sealed class ParticipationFormTimeEventsTests
     {
         var participation = Ride();
 
-        var isChanged = participation.Update(new Form(TestId.Of(1), START, ARRIVE, PRESENT, null), ACTOR, RECORDED);
+        var isChanged = participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, PRESENT, null), ACTOR, RECORDED);
 
         Assert.False(isChanged);
         Assert.Equal(2, participation.Phases[0].Events.Count);
@@ -88,11 +88,11 @@ public sealed class ParticipationFormTimeEventsTests
         var participation = Ride();
 
         Assert.True(
-            participation.Update(new Form(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT, null), ACTOR, RECORDED)
+            participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT, null), ACTOR, RECORDED)
         );
         Assert.True(
             participation.Update(
-                new Form(TestId.Of(1), START.AddMinutes(-1), ARRIVE.AddMinutes(2), PRESENT, null),
+                new ParticipationFormTimeEventsForm(TestId.Of(1), START.AddMinutes(-1), ARRIVE.AddMinutes(2), PRESENT, null),
                 ACTOR,
                 RECORDED
             )
@@ -105,7 +105,7 @@ public sealed class ParticipationFormTimeEventsTests
         var arrive = ARRIVE.AddMilliseconds(437); // sent by the device of an Official, shown as 09:00:00
         var participation = Ride(arrive: arrive);
 
-        var isChanged = participation.Update(new Form(TestId.Of(1), START, ARRIVE, PRESENT, null), ACTOR, RECORDED);
+        var isChanged = participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, PRESENT, null), ACTOR, RECORDED);
 
         Assert.False(isChanged);
         Assert.Equal(2, participation.Phases[0].Events.Count);
@@ -118,7 +118,7 @@ public sealed class ParticipationFormTimeEventsTests
         var arrive = ARRIVE.AddMilliseconds(437);
         var participation = Ride(arrive: arrive);
 
-        participation.Update(new Form(TestId.Of(1), START, ARRIVE, PRESENT.AddMinutes(1), null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, PRESENT.AddMinutes(1), null), ACTOR, RECORDED);
 
         var updated = Assert.IsType<PhaseUpdated>(Assert.Single(participation.Phases[0].Events.Skip(2)));
         Assert.Equal(TimeSlot.Present, Assert.Single(updated.Times).Slot);
@@ -130,7 +130,7 @@ public sealed class ParticipationFormTimeEventsTests
     {
         var participation = Ride(arrive: ARRIVE.AddDays(-1));
 
-        var isChanged = participation.Update(new Form(TestId.Of(1), START, ARRIVE, PRESENT, null), ACTOR, RECORDED);
+        var isChanged = participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, PRESENT, null), ACTOR, RECORDED);
 
         Assert.False(isChanged);
         Assert.Equal(2, participation.Phases[0].Events.Count);
@@ -142,7 +142,7 @@ public sealed class ParticipationFormTimeEventsTests
         var participation = Ride(arrive: ARRIVE.AddMilliseconds(437));
 
         var isChanged = participation.Update(
-            new Form(TestId.Of(1), START, ARRIVE.AddSeconds(1), PRESENT, null),
+            new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE.AddSeconds(1), PRESENT, null),
             ACTOR,
             RECORDED
         );
@@ -157,7 +157,7 @@ public sealed class ParticipationFormTimeEventsTests
     {
         var participation = Ride(start: START.AddMilliseconds(250));
 
-        participation.Update(new Form(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT, null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT, null), ACTOR, RECORDED);
 
         Assert.Equal(START.AddMilliseconds(250), participation.Phases[0].StartTime!.ToDateTimeOffset());
         Assert.Equal(ARRIVE.AddMinutes(2), participation.Phases[0].ArriveTime!.ToDateTimeOffset());
@@ -169,7 +169,7 @@ public sealed class ParticipationFormTimeEventsTests
         var participation = Ride();
         var before = START.AddMinutes(30); // after the Start, and before the arrival that the form clears
 
-        participation.Update(new Form(TestId.Of(1), START, null, before, null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, null, before, null), ACTOR, RECORDED);
 
         Assert.Null(participation.Phases[0].ArriveTime);
         Assert.Equal(before, participation.Phases[0].PresentTime!.ToDateTimeOffset());
@@ -180,7 +180,7 @@ public sealed class ParticipationFormTimeEventsTests
     {
         var participation = Ride(start: START.AddMilliseconds(250));
 
-        var isChanged = participation.Update(new Form(TestId.Of(1), START, ARRIVE, PRESENT, null), ACTOR, RECORDED);
+        var isChanged = participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, PRESENT, null), ACTOR, RECORDED);
 
         Assert.False(isChanged);
         Assert.Equal(START.AddMilliseconds(250), participation.Phases[0].StartTime!.ToDateTimeOffset());
@@ -192,7 +192,7 @@ public sealed class ParticipationFormTimeEventsTests
         var participation = Ride();
         var arrive = ARRIVE.AddMinutes(2);
 
-        participation.Update(new Form(TestId.Of(1), START, arrive, PRESENT, null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, arrive, PRESENT, null), ACTOR, RECORDED);
 
         var updated = Assert.IsType<PhaseUpdated>(participation.Phases[0].Events[2]);
         Assert.DoesNotContain(updated.Times, x => x.Slot == TimeSlot.Represent);
@@ -204,7 +204,7 @@ public sealed class ParticipationFormTimeEventsTests
     {
         var participation = Ride();
 
-        participation.Update(new Form(TestId.Of(1), START, ARRIVE, null, null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, null, null), ACTOR, RECORDED);
 
         var phase = participation.Phases[0];
         Assert.Null(phase.PresentTime);
@@ -222,7 +222,7 @@ public sealed class ParticipationFormTimeEventsTests
         var participation = Ride(isRepresentRequested: true);
         var arrive = ARRIVE.AddMinutes(2);
         var represent = PRESENT.AddMinutes(30);
-        participation.Update(new Form(TestId.Of(1), START, arrive, null, represent), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, arrive, null, represent), ACTOR, RECORDED);
         var edit = participation.Phases[0].Events[^1];
         var phase = participation.Phases[0];
         Assert.Null(phase.PresentTime);
@@ -244,10 +244,10 @@ public sealed class ParticipationFormTimeEventsTests
     public void A_later_edit_lists_what_it_changed_over_what_an_earlier_one_set()
     {
         var participation = Ride();
-        participation.Update(new Form(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT, null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT, null), ACTOR, RECORDED);
 
         participation.Update(
-            new Form(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT.AddMinutes(4), null),
+            new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT.AddMinutes(4), null),
             ACTOR,
             RECORDED.AddMinutes(1)
         );
@@ -266,7 +266,7 @@ public sealed class ParticipationFormTimeEventsTests
         var participation = Ride();
         var moved = START.AddMinutes(-10);
 
-        participation.Update(new Form(TestId.Of(1), moved, ARRIVE, PRESENT, null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), moved, ARRIVE, PRESENT, null), ACTOR, RECORDED);
 
         Assert.Equal(moved, participation.Phases[0].StartTime!.ToDateTimeOffset());
         Assert.Equal(2, participation.Phases[0].Events.Count);
@@ -279,7 +279,7 @@ public sealed class ParticipationFormTimeEventsTests
         var moved = START.AddMinutes(-10);
         var arrive = ARRIVE.AddMinutes(2);
 
-        participation.Update(new Form(TestId.Of(1), moved, arrive, PRESENT, null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), moved, arrive, PRESENT, null), ACTOR, RECORDED);
 
         Assert.Equal(moved, participation.Phases[0].StartTime!.ToDateTimeOffset());
         var updated = Assert.IsType<PhaseUpdated>(Assert.Single(participation.Phases[0].Events.Skip(2)));
@@ -298,11 +298,11 @@ public sealed class ParticipationFormTimeEventsTests
         var moved = START.AddMinutes(-10);
         var form = mistake switch
         {
-            "arrive before start" => new Form(TestId.Of(1), moved, moved.AddMinutes(-1), PRESENT, null),
-            "present before arrive" => new Form(TestId.Of(1), moved, ARRIVE, ARRIVE.AddMinutes(-1), null),
-            "present at arrive" => new Form(TestId.Of(1), moved, ARRIVE, ARRIVE, null),
-            "represent before present" => new Form(TestId.Of(1), moved, ARRIVE, PRESENT, PRESENT.AddMinutes(-1)),
-            _ => new Form(TestId.Of(1), moved, ARRIVE, PRESENT, PRESENT),
+            "arrive before start" => new ParticipationFormTimeEventsForm(TestId.Of(1), moved, moved.AddMinutes(-1), PRESENT, null),
+            "present before arrive" => new ParticipationFormTimeEventsForm(TestId.Of(1), moved, ARRIVE, ARRIVE.AddMinutes(-1), null),
+            "present at arrive" => new ParticipationFormTimeEventsForm(TestId.Of(1), moved, ARRIVE, ARRIVE, null),
+            "represent before present" => new ParticipationFormTimeEventsForm(TestId.Of(1), moved, ARRIVE, PRESENT, PRESENT.AddMinutes(-1)),
+            _ => new ParticipationFormTimeEventsForm(TestId.Of(1), moved, ARRIVE, PRESENT, PRESENT),
         };
 
         var refused = Assert.Throws<DomainPropertyException>(() => participation.Update(form, ACTOR, RECORDED));
@@ -321,7 +321,7 @@ public sealed class ParticipationFormTimeEventsTests
     {
         var participation = Ride();
 
-        participation.Update(new Form(TestId.Of(1), START, null, PRESENT, null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, null, PRESENT, null), ACTOR, RECORDED);
 
         Assert.Null(participation.Phases[0].ArriveTime);
         Assert.Equal(PRESENT, participation.Phases[0].PresentTime!.ToDateTimeOffset());
@@ -332,7 +332,7 @@ public sealed class ParticipationFormTimeEventsTests
     {
         var participation = Ride(isRepresentRequested: true);
         var represent = PRESENT.AddMinutes(30);
-        participation.Update(new Form(TestId.Of(1), START, ARRIVE, PRESENT, represent), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, PRESENT, represent), ACTOR, RECORDED);
         var presented = participation.Phases[0].Events[1];
 
         var update = participation.UpdateSnapshot(
@@ -352,9 +352,9 @@ public sealed class ParticipationFormTimeEventsTests
     {
         var participation = Ride(isRepresentRequested: true);
         var represent = PRESENT.AddMinutes(30);
-        participation.Update(new Form(TestId.Of(1), START, ARRIVE, PRESENT, represent), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, PRESENT, represent), ACTOR, RECORDED);
         participation.Update(
-            new Form(TestId.Of(1), START, ARRIVE, PRESENT.AddMinutes(2), represent),
+            new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, PRESENT.AddMinutes(2), represent),
             ACTOR,
             RECORDED.AddMinutes(1)
         ); // the edit that follows lists the Present time alone
@@ -377,8 +377,8 @@ public sealed class ParticipationFormTimeEventsTests
     {
         var participation = Ride(isRepresentRequested: true);
         var represent = PRESENT.AddMinutes(30);
-        participation.Update(new Form(TestId.Of(1), START, ARRIVE, PRESENT, represent), ACTOR, RECORDED);
-        participation.Update(new Form(TestId.Of(1), START, ARRIVE, PRESENT, null), ACTOR, RECORDED.AddMinutes(1));
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, PRESENT, represent), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, PRESENT, null), ACTOR, RECORDED.AddMinutes(1));
         var presented = participation.Phases[0].Events[1];
 
         var update = participation.UpdateSnapshot(
@@ -397,7 +397,7 @@ public sealed class ParticipationFormTimeEventsTests
     public void The_id_of_an_edit_of_the_form_is_not_the_id_of_a_Snapshot_to_update()
     {
         var participation = Ride();
-        participation.Update(new Form(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT, null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT, null), ACTOR, RECORDED);
         var edit = participation.Phases[0].Events[^1];
 
         Assert.Throws<GuardException>(
@@ -410,7 +410,7 @@ public sealed class ParticipationFormTimeEventsTests
     {
         var participation = Ride();
         participation.Update(
-            new Form(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT.AddMinutes(1), null),
+            new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE.AddMinutes(2), PRESENT.AddMinutes(1), null),
             ACTOR,
             RECORDED
         );
@@ -419,14 +419,14 @@ public sealed class ParticipationFormTimeEventsTests
         Assert.True(phase.Shows(first));
 
         participation.Update(
-            new Form(TestId.Of(1), START, ARRIVE.AddMinutes(4), PRESENT.AddMinutes(1), null),
+            new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE.AddMinutes(4), PRESENT.AddMinutes(1), null),
             ACTOR,
             RECORDED.AddMinutes(1)
         );
 
         Assert.True(phase.Shows(first)); // it still gives the Present time
         participation.Update(
-            new Form(TestId.Of(1), START, ARRIVE.AddMinutes(4), PRESENT.AddMinutes(5), null),
+            new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE.AddMinutes(4), PRESENT.AddMinutes(5), null),
             ACTOR,
             RECORDED.AddMinutes(2)
         );
@@ -445,7 +445,7 @@ public sealed class ParticipationFormTimeEventsTests
         var participation = Ride(isFinal: false, compulsoryThreshold: TimeSpan.FromMinutes(15));
 
         participation.Update(
-            new Form(TestId.Of(1), START, ARRIVE, ARRIVE.AddMinutes(recoveryMinutes), null),
+            new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, ARRIVE.AddMinutes(recoveryMinutes), null),
             ACTOR,
             RECORDED
         );
@@ -458,7 +458,7 @@ public sealed class ParticipationFormTimeEventsTests
     {
         var participation = Ride(isFinal: false);
 
-        participation.Update(new Form(TestId.Of(1), START, ARRIVE, ARRIVE.AddMinutes(50), null), ACTOR, RECORDED);
+        participation.Update(new ParticipationFormTimeEventsForm(TestId.Of(1), START, ARRIVE, ARRIVE.AddMinutes(50), null), ACTOR, RECORDED);
 
         Assert.IsType<FailedToQualify>(participation.Eliminated);
 
@@ -508,27 +508,4 @@ public sealed class ParticipationFormTimeEventsTests
         );
     }
 
-    sealed class Form : IPhaseState
-    {
-        public Form(
-            Guid id,
-            DateTimeOffset? startTime,
-            DateTimeOffset? arriveTime,
-            DateTimeOffset? presentTime,
-            DateTimeOffset? representTime
-        )
-        {
-            Id = id;
-            StartTime = startTime;
-            ArriveTime = arriveTime;
-            PresentTime = presentTime;
-            RepresentTime = representTime;
-        }
-
-        public Guid Id { get; }
-        public DateTimeOffset? StartTime { get; }
-        public DateTimeOffset? ArriveTime { get; }
-        public DateTimeOffset? PresentTime { get; }
-        public DateTimeOffset? RepresentTime { get; }
-    }
 }

@@ -86,6 +86,59 @@ public sealed class RepositoryArchitectureTests
         ];
     }
 
+    [Fact]
+    public void The_unit_tests_mirror_the_product()
+    {
+        Holds(ArchitectureRules.TestsMirrorTheProduct(UnitTestFiles(), ProductFolders()));
+    }
+
+    [Fact]
+    public void A_test_file_declares_tests_and_nothing_else()
+    {
+        Holds(
+            ArchitectureRules.TestFilesDeclareOnlyTests(
+                UnitTestFiles().Where(x => !x.Path.StartsWith("Harness/", StringComparison.Ordinal)).ToList()
+            )
+        );
+    }
+
+    [Fact]
+    public void The_harness_holds_no_tests()
+    {
+        Holds(
+            ArchitectureRules.HarnessHoldsNoTests(
+                UnitTestFiles().Where(x => x.Path.StartsWith("Harness/", StringComparison.Ordinal)).ToList()
+            )
+        );
+    }
+
+    static List<(string Path, string Text)> UnitTestFiles()
+    {
+        var folder = Path.Combine(ROOT, "tests", "NTS.Tests.Unit");
+        return
+        [
+            .. Directory
+                .EnumerateFiles(folder, "*.cs", SearchOption.AllDirectories)
+                .Select(x => (Path.GetRelativePath(folder, x).Replace('\\', '/'), File.ReadAllText(x)))
+                .Where(x => !x.Item1.StartsWith("obj/", StringComparison.Ordinal))
+                .Where(x => !x.Item1.StartsWith("bin/", StringComparison.Ordinal)),
+        ];
+    }
+
+    static List<string> ProductFolders()
+    {
+        return
+        [
+            .. new[] { "src", "nugets", "tools" }
+                .SelectMany(x =>
+                    Directory
+                        .EnumerateDirectories(Path.Combine(ROOT, x), "*", SearchOption.AllDirectories)
+                        .Select(folder => Path.GetRelativePath(Path.Combine(ROOT, x), folder).Replace('\\', '/'))
+                )
+                .Where(x => !x.Split('/').Any(part => part is "bin" or "obj" or "node_modules")),
+        ];
+    }
+
     static void Holds(IReadOnlyList<string> violations)
     {
         Assert.True(violations.Count == 0, string.Join(Environment.NewLine, violations));

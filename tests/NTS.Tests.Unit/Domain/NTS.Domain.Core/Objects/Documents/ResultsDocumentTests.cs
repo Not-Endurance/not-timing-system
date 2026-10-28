@@ -242,20 +242,4 @@ public sealed class ResultsDocumentTests
         return new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
     }
 
-    sealed class CorrectedPhase : IPhaseState
-    {
-        public CorrectedPhase(Guid id, DateTimeOffset startTime, DateTimeOffset arriveTime, DateTimeOffset presentTime)
-        {
-            Id = id;
-            StartTime = startTime;
-            ArriveTime = arriveTime;
-            PresentTime = presentTime;
-        }
-
-        public Guid Id { get; }
-        public DateTimeOffset? StartTime { get; }
-        public DateTimeOffset? ArriveTime { get; }
-        public DateTimeOffset? PresentTime { get; }
-        public DateTimeOffset? RepresentTime => null;
-    }
 }

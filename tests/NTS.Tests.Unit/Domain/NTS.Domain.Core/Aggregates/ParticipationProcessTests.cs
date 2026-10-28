@@ -242,27 +242,4 @@ public sealed class ParticipationProcessTests
         return timestamp == null ? null : new Timestamp(timestamp.Value);
     }
 
-    sealed class PhaseState : IPhaseState
-    {
-        public PhaseState(
-            Guid id,
-            DateTimeOffset? startTime,
-            DateTimeOffset? arriveTime,
-            DateTimeOffset? presentTime,
-            DateTimeOffset? representTime
-        )
-        {
-            Id = id;
-            StartTime = startTime;
-            ArriveTime = arriveTime;
-            PresentTime = presentTime;
-            RepresentTime = representTime;
-        }
-
-        public Guid Id { get; }
-        public DateTimeOffset? StartTime { get; }
-        public DateTimeOffset? ArriveTime { get; }
-        public DateTimeOffset? PresentTime { get; }
-        public DateTimeOffset? RepresentTime { get; }
-    }
 }

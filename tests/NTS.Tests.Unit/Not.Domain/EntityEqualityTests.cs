@@ -116,36 +116,4 @@ public class EntityEqualityTests
         Assert.NotEqual(Guid.Empty, new NUserModel("ana@example.test").Id);
     }
 
-    class Rider : Entity
-    {
-        public Rider(Guid? id = null)
-            : base(id) { }
-
-        public override string ToString()
-        {
-            return nameof(Rider);
-        }
-    }
-
-    sealed class Mount : Entity
-    {
-        public Mount(Guid? id = null)
-            : base(id) { }
-
-        public override string ToString()
-        {
-            return nameof(Mount);
-        }
-    }
-
-    sealed class ChampionRider : Rider
-    {
-        public ChampionRider(Guid? id = null)
-            : base(id) { }
-
-        public override string ToString()
-        {
-            return nameof(ChampionRider);
-        }
-    }
 }
