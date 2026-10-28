@@ -428,4 +428,54 @@ public sealed class ArchitectureRulesTests
 
         Assert.Empty(ArchitectureRules.OnlyTestsTakePlaywright(graph));
     }
+
+    [Fact]
+    public void An_integration_test_in_the_folder_of_a_feature_is_right()
+    {
+        var files = new[] { ("Console/ConsoleSmokeTests.cs", "") };
+
+        Assert.Empty(ArchitectureRules.IntegrationTestsLiveInFeatures(files, ["Console"]));
+    }
+
+    [Fact]
+    public void An_integration_test_at_the_root_is_a_violation()
+    {
+        var files = new[] { ("ConsoleSmokeTests.cs", "") };
+
+        var violation = Assert.Single(ArchitectureRules.IntegrationTestsLiveInFeatures(files, ["Console"]));
+        Assert.Equal("ConsoleSmokeTests.cs sits at the root of the integration tests: move it into the folder of the feature it covers.", violation);
+    }
+
+    [Fact]
+    public void An_integration_test_in_a_folder_that_is_no_feature_is_a_violation()
+    {
+        var files = new[] { ("Clocks/ClockTests.cs", "") };
+
+        var violation = Assert.Single(ArchitectureRules.IntegrationTestsLiveInFeatures(files, ["Console"]));
+        Assert.Equal("Clocks/ClockTests.cs is in Clocks, which is not a feature of the product or one of the host's own.", violation);
+    }
+
+    [Fact]
+    public void The_harness_and_the_parked_scenarios_are_not_features()
+    {
+        var files = new[] { ("Harness/Seeds.cs", ""), ("Parked/FeiExportTests.cs", "") };
+
+        Assert.Empty(ArchitectureRules.IntegrationTestsLiveInFeatures(files, []));
+    }
+
+    [Fact]
+    public void A_project_file_that_keeps_Parked_out_of_the_build_is_right()
+    {
+        var projectFile = "<ItemGroup>\n    <Compile Remove=\"Parked\\**\" />\n  </ItemGroup>";
+
+        Assert.Empty(ArchitectureRules.ParkedScenariosStayOutOfTheBuild(projectFile));
+    }
+
+    [Fact]
+    public void A_project_file_that_lets_Parked_into_the_build_is_a_violation()
+    {
+        var violation = Assert.Single(ArchitectureRules.ParkedScenariosStayOutOfTheBuild("<Project />"));
+
+        Assert.Equal("The integration project does not remove Parked from the build: add <Compile Remove=\"Parked\\**\" />.", violation);
+    }
 }

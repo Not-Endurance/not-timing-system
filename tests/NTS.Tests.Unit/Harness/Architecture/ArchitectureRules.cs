@@ -270,6 +270,49 @@ internal static class ArchitectureRules
         ];
     }
 
+    /// <summary>
+    /// The integration tests sit in the folder of the feature they cover (ADR-0016): a file at the root of the project covers
+    /// no feature, and a folder that is not a feature of the product, or one of the host's own, names none. The harness and
+    /// the parked scenarios are not features, and are left out.
+    /// </summary>
+    public static IReadOnlyList<string> IntegrationTestsLiveInFeatures(
+        IReadOnlyList<(string Path, string Text)> testFiles,
+        IReadOnlyCollection<string> features
+    )
+    {
+        var violations = new List<string>();
+        foreach (var (path, _) in testFiles)
+        {
+            var parts = path.Split('/');
+            if (parts[0] is "Harness" or "Parked")
+            {
+                continue;
+            }
+
+            if (parts.Length == 1)
+            {
+                violations.Add($"{path} sits at the root of the integration tests: move it into the folder of the feature it covers.");
+            }
+            else if (!features.Contains(parts[0]))
+            {
+                violations.Add($"{path} is in {parts[0]}, which is not a feature of the product or one of the host's own.");
+            }
+        }
+
+        return violations;
+    }
+
+    /// <summary>
+    /// The parked scenarios stay out of the build (ADR-0016, the README of the integration tests): the project file removes
+    /// everything in <c>Parked</c> from the compilation, and a project file that does not is a violation.
+    /// </summary>
+    public static IReadOnlyList<string> ParkedScenariosStayOutOfTheBuild(string projectFile)
+    {
+        return projectFile.Contains("<Compile Remove=\"Parked\\**\" />", StringComparison.Ordinal)
+            ? []
+            : ["The integration project does not remove Parked from the build: add <Compile Remove=\"Parked\\**\" />."];
+    }
+
     static bool IsOutsideTheMirror(string folder)
     {
         return folder == "Harness"

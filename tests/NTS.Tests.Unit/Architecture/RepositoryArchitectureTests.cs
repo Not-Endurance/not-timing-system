@@ -118,9 +118,53 @@ public sealed class RepositoryArchitectureTests
         Holds(ArchitectureRules.NotTestReferencesNoProduct(GRAPH));
     }
 
+    [Fact]
+    public void The_integration_tests_live_in_the_folders_of_the_features_of_the_product()
+    {
+        Holds(ArchitectureRules.IntegrationTestsLiveInFeatures(IntegrationTestFiles(), IntegrationFeatures()));
+    }
+
+    [Fact]
+    public void The_integration_harness_holds_no_tests()
+    {
+        var harness = IntegrationTestFiles().Where(x => x.Path.StartsWith("Harness/", StringComparison.Ordinal)).ToList();
+
+        Holds(ArchitectureRules.HarnessHoldsNoTests(harness));
+    }
+
+    [Fact]
+    public void The_parked_scenarios_stay_out_of_the_build()
+    {
+        var project = Path.Combine(ROOT, "tests", "NTS.Tests.Integration", "NTS.Tests.Integration.csproj");
+
+        Holds(ArchitectureRules.ParkedScenariosStayOutOfTheBuild(File.ReadAllText(project)));
+    }
+
+    static List<(string Path, string Text)> IntegrationTestFiles()
+    {
+        return FilesUnder(Path.Combine(ROOT, "tests", "NTS.Tests.Integration"));
+    }
+
+    static List<string> IntegrationFeatures()
+    {
+        return
+        [
+            .. new[] { "NoTiming.Api", "NoTiming.Ui" }
+                .SelectMany(x => Directory.EnumerateDirectories(Path.Combine(ROOT, "src", x, "Features")))
+                .Select(x => new DirectoryInfo(x).Name),
+            "Platform",
+            "Tools",
+            "Ui",
+        ];
+    }
+
     static List<(string Path, string Text)> UnitTestFiles()
     {
-        var folder = Path.Combine(ROOT, "tests", "NTS.Tests.Unit");
+        return FilesUnder(Path.Combine(ROOT, "tests", "NTS.Tests.Unit"));
+    }
+
+    static List<(string Path, string Text)> FilesUnder(string folder)
+    {
         return
         [
             .. Directory
