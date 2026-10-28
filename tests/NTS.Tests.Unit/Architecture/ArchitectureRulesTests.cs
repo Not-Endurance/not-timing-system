@@ -403,4 +403,29 @@ public sealed class ArchitectureRulesTests
         var violation = Assert.Single(ArchitectureRules.HarnessHoldsNoTests(files));
         Assert.Equal("Clock.cs holds a test, and the harness holds none.", violation);
     }
+
+    [Fact]
+    public void The_shared_test_library_references_no_project_of_the_product()
+    {
+        var graph = ProjectGraph.Of(Project("Not.Test", "nugets", references: ["NTS.Domain"]), Project("NTS.Domain"));
+
+        var violation = Assert.Single(ArchitectureRules.NotTestReferencesNoProduct(graph));
+        Assert.Equal("nugets/Not.Test/Not.Test.csproj references NTS.Domain, a project of the product.", violation);
+    }
+
+    [Fact]
+    public void The_shared_test_library_may_reference_the_libraries_it_is_made_of()
+    {
+        var graph = ProjectGraph.Of(Project("Not.Test", "nugets", references: ["Not"]), Project("Not", "nugets"));
+
+        Assert.Empty(ArchitectureRules.NotTestReferencesNoProduct(graph));
+    }
+
+    [Fact]
+    public void The_shared_test_library_may_take_Playwright()
+    {
+        var graph = ProjectGraph.Of(Project("Not.Test", "nugets", packages: ["Microsoft.Playwright"]));
+
+        Assert.Empty(ArchitectureRules.OnlyTestsTakePlaywright(graph));
+    }
 }

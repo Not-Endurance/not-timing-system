@@ -112,6 +112,12 @@ public sealed class RepositoryArchitectureTests
         );
     }
 
+    [Fact]
+    public void The_shared_test_library_references_no_project_of_the_product()
+    {
+        Holds(ArchitectureRules.NotTestReferencesNoProduct(GRAPH));
+    }
+
     static List<(string Path, string Text)> UnitTestFiles()
     {
         var folder = Path.Combine(ROOT, "tests", "NTS.Tests.Unit");

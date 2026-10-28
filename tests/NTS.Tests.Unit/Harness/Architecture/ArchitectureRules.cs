@@ -35,6 +35,7 @@ internal static class ArchitectureRules
         RegexOptions.Multiline
     );
     static readonly Regex TEST_ATTRIBUTE = new(@"^\s*\[(?:Fact|Theory)\]", RegexOptions.Multiline);
+    static readonly string[] TEST_LIBRARIES = ["Not.Test", "Not.Test.Tests"];
     static readonly string FILTER = "src/NoTiming.Api/Features/Access/AccessFilter.cs";
     static readonly string[] MAY_ASK_THE_POLICY =
     [
@@ -179,7 +180,7 @@ internal static class ArchitectureRules
         return
         [
             .. graph
-                .Projects.Where(x => !x.Path.StartsWith("tests/", StringComparison.Ordinal))
+                .Projects.Where(x => !x.Path.StartsWith("tests/", StringComparison.Ordinal) && !TEST_LIBRARIES.Contains(x.Name))
                 .SelectMany(x =>
                     x.Packages.Where(y => y.StartsWith("Microsoft.Playwright", StringComparison.OrdinalIgnoreCase))
                         .Select(y => $"{x.Path} takes the package {y}, and printing is the browser's.")
@@ -255,6 +256,18 @@ internal static class ArchitectureRules
         }
 
         return violations;
+    }
+
+    /// <summary>The shared library of the tests is generic (ADR-0016): it references no project of the product.</summary>
+    public static IReadOnlyList<string> NotTestReferencesNoProduct(ProjectGraph graph)
+    {
+        var library = graph.Get("Not.Test");
+        return
+        [
+            .. library
+                .Projects.Where(x => x.StartsWith("NTS", StringComparison.Ordinal) || x.StartsWith("NoTiming", StringComparison.Ordinal))
+                .Select(x => $"{library.Path} references {x}, a project of the product."),
+        ];
     }
 
     static bool IsOutsideTheMirror(string folder)
