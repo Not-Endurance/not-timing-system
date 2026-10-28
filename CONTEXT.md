@@ -177,11 +177,11 @@ _Avoid_: Case, example
 The edge of the system an integration test runs. What the product does not own, such as the clock and outbound email, is replaced by a double there; everything inside it is real.
 
 **Feature slice**:
-The part of an integration test project for one feature of the Api. It holds that feature's scenarios and no support code.
+The part of an integration test project for one feature of the Api. It holds that feature's scenarios and no harness code.
 
-**Test support**:
+**Harness**:
 Code that tests use but that is not itself a test: fixtures, drivers, seeds, fakes and the rules that architecture tests check. It is kept apart from the tests that use it.
-_Avoid_: Helpers
+_Avoid_: Helpers, test support
 
 ## Not* projects
 They are separated by function - Blazor, Storage, Application. etcs. *Not* is shared amongs them. These are intended to packaged up and used in other projects to bootsrap functionality, ensure consistent behavior and allow for easier maintenance. Elements of Not should be completely stripped of business logic and should provide a streamlined, generic API striving for a ballance between strict, conssitent behavior and enough configurability to be multi-purposed.
