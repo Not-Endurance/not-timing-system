@@ -8,6 +8,12 @@ These tests start real local infrastructure and the real hosts. They live in a s
 dotnet test .\tests\NTS.Tests.Integration\NTS.Tests.Integration.csproj -c Debug
 ```
 
+## Layout
+
+- Each feature of the product has a folder of its tests, named after the feature: `Access`, `Account`, `Branding`, `Console`, `EventData`, `Events`, `Live`, `Participants`, `Profile`, `Reference`, `Snapshots`, `Tenancy` and `UserSessions` are the features of the Api and the Ui, and `Platform` (the routes, JSON:API, the environment and the hosting), `Tools` (the commands of `tools/NTS.Tools`) and `Ui` (the shell of the browser app) are the host's own. A test file keeps the namespace `NTS.Tests.Integration`.
+- `Harness` holds the support the tests use (fixtures, seeds, drivers, the browser helpers) and no test (AGENTS.md rule 7). Its namespace is `NTS.Tests.Integration.Harness`. The generic helpers are in `nugets/Not.Test`: the deadline wait, the journey runner, `TestId`, and the reader of the project graph.
+- `Parked` holds the parked scenarios, which are not compiled (see Parked scenarios).
+
 Four kinds of test run in the project:
 
 - The Api tests (`ApiHostTests`, `SignInTests`, `RegistrationTests`, `RegistrationAllowListTests`, `HomeTenantTests`, `AuthRateLimitTests`, `AuthEventLogTests`, `BrevoEmailSenderTests`, `AccessBaselineTests`, `DenyByDefaultTests`, `ProfileTests`, `UserSessionTests`, `TenantRolesTests`, `TenantScopedStoreTests`, `CrossTenantReadsTests`, `EventAccessTests`, `EventGrantTests`, `EventCapabilitiesTests`, `AccountSearchTests`, `RegistrySearchTests`, `RoutesOfTheApiTests`, `ClubRoutesTests`, `HorseRoutesTests`, `AthleteRoutesTests`, `CountryRoutesTests`, `ConfigureEventRoutesTests`, `IdentityFieldsNeverLeaveTests`, `JsonApiRepositoryTests`, `TypedTenantCollectionTests`, `EventRoutesTests`, `EventStartTests`, `EventResetTests`, `EventChangeTests`, `EventInformationRepositoryTests`, `HistoricEventRedirectTests`, `TenancyEventLogTests`, `DeveloperCommandTests`, `EventLivenessMigrationTests`, `EnvironmentMarkerTests`, `TenantsMigrationTests`, `TenantsMigrationEventsTests`, `TenantsMigrationToolTests`, `StagingSeedTests`, `StagingSeedApiTests`, `EnvironmentToolsTests`, `ToolsProcessTests`, `EventStartDocumentsTests`, `LocalSignInTests`, `LocalSignInBuildTests`, `LocalSignInReleaseTests`, `TestHostIsolationTests`, `IdentityStoreTests`, `PasskeyStoreTests`, `PasskeyServiceTests`, `PasskeyEndpointTests`) host `NoTiming.Api`, or its identity stores, in this process on a MongoDB in a container. They need Docker and nothing else.
@@ -72,13 +78,13 @@ The harness uses `NTS_INTEGRATION_PLAYWRIGHT_BROWSERS_PATH` when set, otherwise 
 
 ## Parked scenarios
 
-The Judge app is gone (#598, ADR-0011), and with it the connected Judge that these scenarios were written around. The hub no longer accepts Snapshots either (ADR-0013). They stay in the repository, unchanged and not compiled (`Compile Remove` in `NTS.Tests.Integration.csproj`), until the owner approves what each becomes (AGENTS.md rule 4, #642):
+The Judge app is gone (#598, ADR-0011), and with it the connected Judge that these scenarios were written around. The hub no longer accepts Snapshots either (ADR-0013). They stay in the repository, unchanged and not compiled (in `Parked/`, excluded from the build by `Compile Remove` in `NTS.Tests.Integration.csproj`), until the owner approves what each becomes (AGENTS.md rule 4, #642):
 
-- `IntegrationHarnessCheckTest.Parked.cs`: `Judge_snapshot_flow_updates_connected_witness_applications`, `Judge_handouts_follow_phase_completion_rules_and_snapshot_keeps_selection`, `Presentlist_updates_from_judge_events_on_every_connected_witness` (a connected Judge), `Witness_snapshot_selections_restore_from_user_session_until_published`, `Operators_are_projected_and_gate_witness_write_access` (they publish through the hub write path)
-- `ConsoleDependencyInjectionTests.cs`
-- `FeiExportTests.cs` (the FEI export lived in the Judge app)
-- `EndToEndEventTests/` (the event replays and the compulsory-inspection setup test, driven through the Judge)
-- `Drivers/ConsoleDriver.cs`
+- `Parked/IntegrationHarnessCheckTest.Parked.cs`: `Judge_snapshot_flow_updates_connected_witness_applications`, `Judge_handouts_follow_phase_completion_rules_and_snapshot_keeps_selection`, `Presentlist_updates_from_judge_events_on_every_connected_witness` (a connected Judge), `Witness_snapshot_selections_restore_from_user_session_until_published`, `Operators_are_projected_and_gate_witness_write_access` (they publish through the hub write path)
+- `Parked/ConsoleDependencyInjectionTests.cs`
+- `Parked/FeiExportTests.cs` (the FEI export lived in the Judge app)
+- `Parked/EndToEndEventTests/` (the event replays and the compulsory-inspection setup test, driven through the Judge)
+- `Parked/Drivers/ConsoleDriver.cs`
 
 Since #623 the five events of arrival, elimination, restoration, required inspection and required representation, their base and `IWitnessClientProcedures` are gone: a viewer is told only that a Participation changed (`ParticipationChanged`), and `PhaseCompleted` carries ids and a final flag and stays on the server. A scenario that waits for one of the old events waits for something that no longer exists; `ConsoleDriver` and `EndToEndEventTests` are built around them.
 
