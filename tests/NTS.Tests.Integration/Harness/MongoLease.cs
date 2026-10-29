@@ -4,13 +4,12 @@ namespace NTS.Tests.Integration.Harness;
 
 /// <summary>
 /// A database of a class in the MongoDB of the test run (ADR-0016). One container serves every class of the run, and each
-/// class has a database of its own, which the lease drops when the class ends. A lease holds one of four places, so four
-/// classes run at a time: that is what the localhost can start at once, and it is the limit here because the Visual Studio
-/// adapter does not apply the thread limit of xUnit.
+/// class has a database of its own, which the lease drops when the class ends. A lease holds one of the places of
+/// <see cref="ClassPlaces"/>, which limit how many classes run at once: the Visual Studio adapter does not apply the thread
+/// limit of xUnit, so the places are the limit here.
 /// </summary>
 internal sealed class MongoLease : IAsyncDisposable
 {
-    static readonly SemaphoreSlim PLACES = new(4, 4);
     static readonly Lazy<Task<MongoContainer>> RUN = new(() => MongoContainer.StartAsync());
 
     static MongoLease()
@@ -41,7 +40,7 @@ internal sealed class MongoLease : IAsyncDisposable
     /// <summary>Takes a place and a database of the run's MongoDB for the class. The class gives both back by disposing it.</summary>
     public static async Task<MongoLease> StartAsync()
     {
-        await PLACES.WaitAsync();
+        await ClassPlaces.WaitAsync();
         try
         {
             var run = await RUN.Value;
@@ -49,7 +48,7 @@ internal sealed class MongoLease : IAsyncDisposable
         }
         catch
         {
-            PLACES.Release();
+            ClassPlaces.Release();
             throw;
         }
     }
@@ -69,7 +68,7 @@ internal sealed class MongoLease : IAsyncDisposable
         }
         finally
         {
-            PLACES.Release();
+            ClassPlaces.Release();
         }
     }
 
