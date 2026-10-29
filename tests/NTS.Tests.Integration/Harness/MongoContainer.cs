@@ -1,5 +1,6 @@
 using System.Net;
 using Docker.DotNet;
+using DotNet.Testcontainers.Containers;
 using Testcontainers.MongoDb;
 
 namespace NTS.Tests.Integration.Harness;
@@ -12,20 +13,37 @@ namespace NTS.Tests.Integration.Harness;
 /// </summary>
 internal sealed class MongoContainer : IAsyncDisposable
 {
+    const int STARTS = 3;
+
+    /// <summary>
+    /// Starts the container of the run. The image's entrypoint starts a temporary mongod on the port before the real one, and
+    /// the real one can find the port still taken and exit with code 48: that happened once in about 150 starts. The start
+    /// is made again in that case, at most <see cref="STARTS"/> times. This repeats the container's start and not a test, which
+    /// ADR-0016 allows no retry of.
+    /// </summary>
     public static async Task<MongoContainer> StartAsync()
     {
-        var container = new MongoDbBuilder().WithImage("mongo:6.0").Build();
-        try
+        for (var attempt = 1; ; attempt++)
         {
-            await container.StartAsync();
+            var container = new MongoDbBuilder().WithImage("mongo:6.0").Build();
+            try
+            {
+                await container.StartAsync();
+                return new MongoContainer(container);
+            }
+            catch (ContainerNotRunningException) when (attempt < STARTS)
+            {
+                await ReleaseAsync(container);
+                Console.Error.WriteLine(
+                    $"The MongoDB container exited while it started (attempt {attempt} of {STARTS}); starting it again."
+                );
+            }
+            catch
+            {
+                await ReleaseAsync(container);
+                throw;
+            }
         }
-        catch
-        {
-            await ReleaseAsync(container);
-            throw;
-        }
-
-        return new MongoContainer(container);
     }
 
     readonly MongoDbContainer _container;

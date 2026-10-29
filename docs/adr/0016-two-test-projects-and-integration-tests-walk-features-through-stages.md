@@ -16,7 +16,7 @@ The unit tests run in no workflow, the integration tests run only when someone s
 
 **Determinism.** No sleeps. A wait polls a condition until a deadline and names what it waited for. Ids come from `TestId`. The fake clock starts at the real instant, which is the one real-clock read a test may make. The banned APIs (clock reads, `Guid.NewGuid`, `Random`, `Thread.Sleep` and `Task.Delay`) fail the build in both test projects, through a rule in the analyzers repository.
 
-**Robustness.** No automatic retries and no quarantine. A flaky test is made deterministic in the change that finds it. A change lands only after three consecutive full runs of the integration project pass on one machine.
+**Robustness.** No automatic retries of a test and no quarantine. A flaky test is made deterministic in the change that finds it. The one exception is the start of the run's MongoDB container: the image's entrypoint can lose the port to its own temporary server and exit, so a start that exits is made again, at most three times, and a batch whose container did not start is run once more. A change lands only after three consecutive full runs of the integration project pass on one machine.
 
 **Containers.** One MongoDB container per test run (`MongoContainer`), shared by every class, with each class in a database of its own (`MongoLease`), which the class drops when it ends. Four classes run at a time, each holding a place of `MongoLease`, because the Visual Studio adapter does not apply the xUnit thread limit. Chromium runs at most two at a time (`PasskeyBrowserFixture`).
 

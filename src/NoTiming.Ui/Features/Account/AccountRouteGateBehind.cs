@@ -13,6 +13,8 @@ namespace NoTiming.Ui.Features.Account;
 /// </summary>
 public class AccountRouteGateBehind : NComponent
 {
+    bool _leaving;
+
     [Inject]
     IAccountSession Account { get; set; } = default!;
 
@@ -42,7 +44,14 @@ public class AccountRouteGateBehind : NComponent
             switch (access)
             {
                 case RouteAccess.SignIn:
-                    Navigator.NavigateTo(AccountSession.SignInUrl($"/{relativePath}"), forceLoad: true);
+                    // The gate can be asked again while the navigation to sign-in is in flight, and a second navigation would
+                    // cancel the first. The check and the flag come straight before the navigation, after the wait above.
+                    if (!_leaving)
+                    {
+                        _leaving = true;
+                        Navigator.NavigateTo(AccountSession.SignInUrl($"/{relativePath}"), forceLoad: true);
+                    }
+
                     break;
                 case RouteAccess.Profile:
                     Navigator.NavigateTo(Routes.PROFILE_PAGE, replace: true);
