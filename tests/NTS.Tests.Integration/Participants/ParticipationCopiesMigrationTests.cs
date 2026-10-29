@@ -267,8 +267,8 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<MongoFixtu
             RepositoryPaths.Discover().Root,
             "tests",
             "NTS.Tests.Integration",
-            "EndToEndEventTests",
-            "Snapshots",
+            "Harness",
+            "Golden",
             "2026-03-Asenovgrad"
         );
         var participations = await ReadGolden(directory, "nts.event_participations.json");
