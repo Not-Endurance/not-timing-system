@@ -1,6 +1,5 @@
 using Not.Blazor.Components.Abstractions;
 using NTS.Contracts.Core;
-using NTS.Contracts.Socket;
 using NTS.Domain.Access;
 
 namespace NoTiming.Ui.Components.EventViews;
@@ -8,21 +7,18 @@ namespace NoTiming.Ui.Components.EventViews;
 /// <summary>
 /// The Event of a route for everything under it (#630, ADR-0007): it opens the Event through the provider, cascades it as
 /// the viewed Event, and shows in its place what there is to say when there is none or when the Event does not show the
-/// Core view the page is. The Event is the route's, or, when the address names none, the Live Event the app follows, and
-/// it is opened again when either changes. The view it opened is disposed when it is replaced and when the page leaves.
+/// Core view the page is. The Event is the route's, and it is opened again when that changes. The view it opened is
+/// disposed when it is replaced and when the page leaves.
 /// </summary>
 public class ViewedEventScopeBehind : NStatefulComponent
 {
     readonly SemaphoreSlim _opening = new(1, 1);
     bool _disposed;
     bool _opened;
-    Guid? _openedFor;
+    Guid _openedFor;
 
     [Inject]
     IViewedEventProvider Provider { get; set; } = default!;
-
-    [Inject]
-    INtsSocketService SocketService { get; set; } = default!;
 
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
@@ -33,23 +29,13 @@ public class ViewedEventScopeBehind : NStatefulComponent
     protected bool IsHidden => View != null && Shows is { } view && !View.Shows(view);
 
     [Parameter]
-    public Guid? EventId { get; set; }
+    public Guid EventId { get; set; }
 
     /// <summary>The Core view the page is: an Event that does not show it is not reachable through the page.</summary>
     [Parameter]
     public CoreView? Shows { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(SocketService);
-    }
-
     protected override async Task OnParametersSetAsync()
-    {
-        await Open();
-    }
-
-    protected override async Task OnBeforeRenderAsync()
     {
         await Open();
     }
@@ -78,10 +64,10 @@ public class ViewedEventScopeBehind : NStatefulComponent
         base.Dispose();
     }
 
-    /// <summary>Opens the Event the route names, or the one the app follows, unless it is the one that is open.</summary>
+    /// <summary>Opens the Event the route names, unless it is the one that is open.</summary>
     async Task Open()
     {
-        if (_opened && TargetEvent() == _openedFor)
+        if (_opened && EventId == _openedFor)
         {
             return;
         }
@@ -89,22 +75,17 @@ public class ViewedEventScopeBehind : NStatefulComponent
         await _opening.WaitAsync();
         try
         {
-            var target = TargetEvent();
-            if (_disposed || (_opened && target == _openedFor))
+            var eventId = EventId;
+            if (_disposed || (_opened && eventId == _openedFor))
             {
                 return;
             }
 
             _opened = true;
-            _openedFor = target;
+            _openedFor = eventId;
             IsNotFound = false;
             View?.Dispose();
             View = null;
-            if (target is not { } eventId)
-            {
-                return;
-            }
-
             IsOpening = true;
             var view = await Provider.Open(eventId);
             if (_disposed)
@@ -125,10 +106,5 @@ public class ViewedEventScopeBehind : NStatefulComponent
             IsOpening = false;
             _opening.Release();
         }
-    }
-
-    Guid? TargetEvent()
-    {
-        return EventId ?? SocketService.Event?.Id;
     }
 }

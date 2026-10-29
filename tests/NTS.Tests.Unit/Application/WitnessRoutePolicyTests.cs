@@ -21,12 +21,10 @@ public sealed class WitnessRoutePolicyTests
     [Theory]
     [InlineData("")]
     [InlineData("/")]
-    [InlineData("startlist")]
-    [InlineData("arrivelist")]
-    [InlineData("presentlist")]
-    [InlineData("performance")]
     [InlineData("historic-events")]
     [InlineData("events/{event}/startlist")]
+    [InlineData("events/{event}/arrivelist")]
+    [InlineData("events/{event}/presentlist")]
     [InlineData("events/{event}/performance")]
     [InlineData("historic-events/{event}")]
     public void A_visitor_has_every_page_that_only_shows(string path)
@@ -35,7 +33,6 @@ public sealed class WitnessRoutePolicyTests
     }
 
     [Theory]
-    [InlineData("snapshot")]
     [InlineData("events/{event}/snapshot")]
     [InlineData("profile")]
     public void A_visitor_is_taken_to_sign_in_for_the_pages_that_send_Snapshots_and_the_profile(string path)
@@ -44,11 +41,11 @@ public sealed class WitnessRoutePolicyTests
     }
 
     [Theory]
-    [InlineData("snapshot/")]
-    [InlineData("/snapshot")]
-    [InlineData("SNAPSHOT")]
-    [InlineData("snapshot?sort=number")]
-    [InlineData("snapshot#history")]
+    [InlineData("events/{event}/snapshot/")]
+    [InlineData("/events/{event}/snapshot")]
+    [InlineData("EVENTS/{event}/SNAPSHOT")]
+    [InlineData("events/{event}/snapshot?sort=number")]
+    [InlineData("events/{event}/snapshot#history")]
     [InlineData("Events/{event}/Snapshot/?x=1#top")]
     [InlineData("/Profile")]
     public void The_page_is_known_by_its_path_whatever_the_case_the_slashes_the_query_or_the_fragment(string path)
@@ -57,6 +54,7 @@ public sealed class WitnessRoutePolicyTests
     }
 
     [Theory]
+    [InlineData("snapshot")]
     [InlineData("snapshots")]
     [InlineData("snapshot/history")]
     [InlineData("events/snapshot")]
@@ -72,10 +70,9 @@ public sealed class WitnessRoutePolicyTests
     }
 
     [Theory]
-    [InlineData("snapshot")]
     [InlineData("events/{event}/snapshot")]
     [InlineData("profile")]
-    [InlineData("startlist")]
+    [InlineData("events/{event}/startlist")]
     [InlineData("")]
     public void A_person_with_a_complete_profile_has_every_page(string path)
     {
@@ -83,9 +80,8 @@ public sealed class WitnessRoutePolicyTests
     }
 
     [Theory]
-    [InlineData("snapshot")]
     [InlineData("events/{event}/snapshot")]
-    [InlineData("/Snapshot/?x=1")]
+    [InlineData("/Events/{event}/Snapshot/?x=1")]
     public void A_person_without_a_complete_profile_is_taken_to_complete_it_before_sending_Snapshots(string path)
     {
         Assert.Equal(RouteAccess.Profile, WitnessRoutePolicy.AccessTo(Account(profileComplete: false), Of(path)));
@@ -93,8 +89,8 @@ public sealed class WitnessRoutePolicyTests
 
     [Theory]
     [InlineData("profile")]
-    [InlineData("startlist")]
-    [InlineData("arrivelist")]
+    [InlineData("events/{event}/startlist")]
+    [InlineData("events/{event}/arrivelist")]
     [InlineData("events/{event}/performance")]
     [InlineData("historic-events")]
     [InlineData("")]
