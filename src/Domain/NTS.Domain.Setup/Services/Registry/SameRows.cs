@@ -1,8 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
-using NTS.Contracts.Features.Console.Setup;
 
-namespace NoTiming.Ui.Features.Console.Registry;
+namespace NTS.Domain.Setup.Services.Registry;
 
 /// <summary>
 /// What makes two rows of the registry the same Athlete or Horse as far as a form can tell (#646, ADR-0010): the same FEI ID, or
@@ -12,9 +11,12 @@ namespace NoTiming.Ui.Features.Console.Registry;
 /// </summary>
 public static partial class SameRows
 {
-    /// <summary>The rows of those given that the one being registered is a second copy of, by its FEI ID first, with the reason that decided; none is the row itself.</summary>
-    public static IReadOnlyList<SameRow> Among(
-        IEnumerable<SameRow> candidates,
+    /// <summary>
+    /// The rows of those given that the one being registered is a second copy of, the FEI ID matches first, with the reason that
+    /// decided; none is the row itself. The matches of one reason keep the order of the candidates they came in.
+    /// </summary>
+    public static IReadOnlyList<SameMatch> Among(
+        IEnumerable<RegistryRow> candidates,
         Guid? itself,
         string? name,
         string? nameEnglish,
@@ -24,20 +26,20 @@ public static partial class SameRows
     {
         var names = Names(name, nameEnglish);
         var wanted = FeiIdOf(feiId, feiIdIsNumber);
-        var found = new List<SameRow>();
+        var found = new List<SameMatch>();
         foreach (var row in candidates.Where(x => x.Id != itself))
         {
             if (wanted != null && FeiIdOf(row.FeiId, feiIdIsNumber) == wanted)
             {
-                found.Add(Of(row, SameRowReason.FeiId));
+                found.Add(new SameMatch(row, SameReason.FeiId));
             }
             else if (names.Count > 0 && Names(row.Name, row.NameEnglish).Overlaps(names))
             {
-                found.Add(Of(row, SameRowReason.Name));
+                found.Add(new SameMatch(row, SameReason.Name));
             }
         }
 
-        return [.. found.OrderByDescending(x => x.Reason).ThenByDescending(x => x.IsOwn)];
+        return [.. found.OrderByDescending(x => x.Reason)];
     }
 
     /// <summary>The names a row is known by, each trimmed, with runs of spaces made one and its case folded; none for a name that is empty.</summary>
@@ -71,11 +73,6 @@ public static partial class SameRows
 
         var folded = text.ToUpper(CultureInfo.InvariantCulture);
         return folded.Distinct().Count() == 1 && !char.IsAsciiLetterOrDigit(folded[0]) ? null : folded;
-    }
-
-    static SameRow Of(SameRow row, SameRowReason reason)
-    {
-        return new SameRow(row.Id, row.Name, row.NameEnglish, row.FeiId, row.IsOwn, reason);
     }
 
     [GeneratedRegex(@"\s+")]

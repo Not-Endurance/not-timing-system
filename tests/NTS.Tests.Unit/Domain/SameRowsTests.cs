@@ -1,7 +1,6 @@
-using NoTiming.Ui.Features.Console.Registry;
-using NTS.Contracts.Features.Console.Setup;
+using NTS.Domain.Setup.Services.Registry;
 
-namespace NTS.Tests.Unit.Application;
+namespace NTS.Tests.Unit.Domain;
 
 /// <summary>
 /// What makes a registry row the same as the one being registered (#646, ADR-0010): the same FEI ID, or the same name once
@@ -24,9 +23,9 @@ public sealed class SameRowsTests
         var found = SameRows.Among(rows, null, "  иван петров ", null, null, true);
         var byEnglish = SameRows.Among(rows, null, "Иван Друг", "IVAN  PETROV", null, true);
 
-        Assert.Equal([TestId.Of(2)], found.Select(x => x.Id));
-        Assert.Equal([TestId.Of(2)], byEnglish.Select(x => x.Id));
-        Assert.All(found.Concat(byEnglish), x => Assert.Equal(SameRowReason.Name, x.Reason));
+        Assert.Equal([TestId.Of(2)], found.Select(x => x.Row.Id));
+        Assert.Equal([TestId.Of(2)], byEnglish.Select(x => x.Row.Id));
+        Assert.All(found.Concat(byEnglish), x => Assert.Equal(SameReason.Name, x.Reason));
         Assert.Empty(SameRows.Among(rows, null, "Мария", null, null, true)); // a name that has another in it is not the same
     }
 
@@ -40,9 +39,9 @@ public sealed class SameRowsTests
         var horse = SameRows.Among(horses, null, "New Name", null, "ABC-12", false);
         var notAHorse = SameRows.Among(horses, null, "New Name", null, "12", false);
 
-        Assert.Equal([TestId.Of(2)], athlete.Select(x => x.Id));
-        Assert.Equal(SameRowReason.FeiId, Assert.Single(athlete).Reason);
-        Assert.Equal([TestId.Of(2)], horse.Select(x => x.Id));
+        Assert.Equal([TestId.Of(2)], athlete.Select(x => x.Row.Id));
+        Assert.Equal(SameReason.FeiId, Assert.Single(athlete).Reason);
+        Assert.Equal([TestId.Of(2)], horse.Select(x => x.Row.Id));
         Assert.Empty(notAHorse);
     }
 
@@ -78,8 +77,8 @@ public sealed class SameRowsTests
         var horses = new[] { Row(2, "Other Name", null, "0012"), Row(3, "Another", null, "aaaa") };
 
         Assert.Empty(SameRows.Among(horses, null, "New Name", null, "12", false));
-        Assert.Equal([TestId.Of(2)], SameRows.Among(horses, null, "New Name", null, " 0012", false).Select(x => x.Id));
-        Assert.Equal([TestId.Of(3)], SameRows.Among(horses, null, "New Name", null, "AAAA ", false).Select(x => x.Id));
+        Assert.Equal([TestId.Of(2)], SameRows.Among(horses, null, "New Name", null, " 0012", false).Select(x => x.Row.Id));
+        Assert.Equal([TestId.Of(3)], SameRows.Among(horses, null, "New Name", null, "AAAA ", false).Select(x => x.Row.Id));
     }
 
     [Fact]
@@ -94,28 +93,28 @@ public sealed class SameRowsTests
 
         var found = SameRows.Among(rows, SELF, "Ivan Petrov", null, "12", true);
 
-        Assert.Equal([TestId.Of(3), TestId.Of(2)], found.Select(x => x.Id));
-        Assert.Equal([SameRowReason.FeiId, SameRowReason.Name], found.Select(x => x.Reason));
+        Assert.Equal([TestId.Of(3), TestId.Of(2)], found.Select(x => x.Row.Id));
+        Assert.Equal([SameReason.FeiId, SameReason.Name], found.Select(x => x.Reason));
     }
 
     [Fact]
-    public void A_name_and_a_FEI_ID_that_are_both_empty_find_nothing_and_the_Tenants_own_rows_come_before_the_others()
+    public void An_empty_name_finds_nothing_and_the_matches_of_one_reason_keep_the_order_they_are_given()
     {
         var rows = new[]
         {
-            Row(2, "Ivan Petrov", null, null, isOwn: false),
-            Row(3, "ivan petrov", null, null, isOwn: true),
+            Row(3, "ivan petrov"),
+            Row(2, "Ivan Petrov"),
         };
 
         Assert.Empty(SameRows.Among(rows, null, " ", null, null, true));
         Assert.Equal(
             [TestId.Of(3), TestId.Of(2)],
-            SameRows.Among(rows, null, "Ivan Petrov", null, null, true).Select(x => x.Id)
+            SameRows.Among(rows, null, "Ivan Petrov", null, null, true).Select(x => x.Row.Id)
         );
     }
 
-    static SameRow Row(int id, string name, string? nameEnglish, string? feiId = null, bool isOwn = true)
+    static RegistryRow Row(int id, string name, string? nameEnglish, string? feiId = null)
     {
-        return new SameRow(TestId.Of(id), name, nameEnglish, feiId, isOwn, SameRowReason.Name);
+        return new RegistryRow(TestId.Of(id), name, nameEnglish, feiId);
     }
 }
