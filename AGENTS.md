@@ -2,10 +2,10 @@
 1. Don't execute commands that would create, delete or modify files outside of this working directory. Exceptions of this rule are commands which could cause side effects scoped to the utility that owns the command:
 - dotnet msbuild/nugget/workload or similar caches and or build artifacts
 - docker commands which would modify containers, volumes, images or similar
-2. Always dotnet `build`, `restore` with silent output `-v:q` unless instructed otherwise. Don't modify worklfows to use queit mode. This applies only for localhost verification
+2. Run dotnet `build` and `restore` with silent output `-v:q` unless instructed otherwise. Don't change the workflows to quiet mode: this is for local verification only.
 3. Run dotnet `test` with minimal output `-v:m`. 
-4. Tests follow docs/adr/0016-two-test-projects-and-integration-tests-walk-features-through-stages.md. Verify each feature with a successful run of its integration tests in `tests/NTS.Tests.Integration`. If an integration test fails, don't change it directly: report why it is failing.
-5. Changes and features are represented in the integration tests as a journey with a scenario for each outcome, where reasonably possible.
+4. Verify a change with the unit tests, which include the architecture tests (`tests/NTS.Tests.Unit`, whose architecture checks are in its `Architecture` folder). Build with `-v:q`, then run `dotnet test tests/NTS.Tests.Unit/NTS.Tests.Unit.csproj --no-build -v:m`. When a package under `nugets/` changes, also run `nugets/Not.Test.Tests/Not.Test.Tests.csproj` the same way. The integration tests (`tests/NTS.Tests.Integration`, ADR-0016) are not part of the default verification: they need Docker and a browser, so they run only when the user asks for them, or by hand. When one fails, report the test and why it fails, and change it only when the user asks.
+5. A change that needs integration coverage is written in the integration tests as a journey with a scenario for each outcome, where reasonably possible. Writing it does not make those tests part of the default verification (rule 4).
 6. Domain logic should be tested in the NTS.Tests.Unit.Domain namespace.
 7. Test support (fixtures, fakes, drivers, seeds, and the rules that architecture tests check) lives in a `Harness` folder, apart from the tests that use it. Throwaway checks are not committed: keep them in `.tmp/`, or delete them before the change is committed.
 8. Always use RTK
