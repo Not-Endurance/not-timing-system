@@ -102,8 +102,8 @@ public sealed class SameRowsTests
     {
         var rows = new[]
         {
-            Row(3, "ivan petrov"),
-            Row(2, "Ivan Petrov"),
+            Row(3, "ivan petrov", null),
+            Row(2, "Ivan Petrov", null),
         };
 
         Assert.Empty(SameRows.Among(rows, null, " ", null, null, true));
