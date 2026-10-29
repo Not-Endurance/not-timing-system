@@ -55,7 +55,6 @@ internal sealed class AuthRateLimitOptions
 /// </summary>
 internal sealed class AuthRateLimiter
 {
-
     readonly RateLedger _ledger;
     readonly AuthRateLimitOptions _options;
     readonly ILookupNormalizer _normalizer;

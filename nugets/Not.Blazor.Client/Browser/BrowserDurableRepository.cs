@@ -164,6 +164,7 @@ public sealed class BrowserDurableRepository<T> : IDurableRepository<T>
 
     IRepository<T> Remote()
     {
-        return _remote ?? throw new NotImplementedException("This item has no remote repository: only its backup is kept.");
+        return _remote
+            ?? throw new NotImplementedException("This item has no remote repository: only its backup is kept.");
     }
 }

@@ -49,7 +49,9 @@ public sealed class SnapshotGroupRulesTests
     public void Answers_are_final_when_none_of_them_is_only_for_now()
     {
         Assert.True(
-            SnapshotGroupRules.IsFinal([new SnapshotAnswer(false, 403, null), new SnapshotAnswer(false, 409, "event-ended")])
+            SnapshotGroupRules.IsFinal(
+                [new SnapshotAnswer(false, 403, null), new SnapshotAnswer(false, 409, "event-ended")]
+            )
         );
     }
 

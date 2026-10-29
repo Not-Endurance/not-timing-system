@@ -13,7 +13,10 @@ public sealed class NameBasedGuidTests
     [Fact]
     public void It_is_the_Guid_the_standard_gives_for_a_namespace_and_a_name()
     {
-        Assert.Equal(new Guid("886313e1-3b8a-5372-9b90-0c9aee199e5d"), NameBasedGuid.Create(NAMESPACE_DNS, "python.org"));
+        Assert.Equal(
+            new Guid("886313e1-3b8a-5372-9b90-0c9aee199e5d"),
+            NameBasedGuid.Create(NAMESPACE_DNS, "python.org")
+        );
     }
 
     [Fact]

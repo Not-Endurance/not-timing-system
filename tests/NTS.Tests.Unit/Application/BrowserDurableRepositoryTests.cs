@@ -70,8 +70,13 @@ public sealed class BrowserDurableRepositoryTests
         var browser = new FakeLocalStorage();
         var repository = Repository(browser, new RemoteNotes());
 
-        await Assert.ThrowsAsync<HttpRequestException>(() =>
-            repository.StoreDurably(ID, new Note { Id = ID, Text = "Ana" }, _ => throw new HttpRequestException("The Api did not answer."))
+        await Assert.ThrowsAsync<HttpRequestException>(
+            () =>
+                repository.StoreDurably(
+                    ID,
+                    new Note { Id = ID, Text = "Ana" },
+                    _ => throw new HttpRequestException("The Api did not answer.")
+                )
         );
 
         Assert.Contains("Ana", browser.Items[KeyOf()]);
@@ -84,16 +89,17 @@ public sealed class BrowserDurableRepositoryTests
         var repository = Repository(browser, new RemoteNotes());
         var asked = false;
 
-        await Assert.ThrowsAsync<JSException>(() =>
-            repository.StoreDurably(
-                ID,
-                new Note { Id = ID, Text = "Ana" },
-                _ =>
-                {
-                    asked = true;
-                    return Task.FromResult(true);
-                }
-            )
+        await Assert.ThrowsAsync<JSException>(
+            () =>
+                repository.StoreDurably(
+                    ID,
+                    new Note { Id = ID, Text = "Ana" },
+                    _ =>
+                    {
+                        asked = true;
+                        return Task.FromResult(true);
+                    }
+                )
         );
 
         Assert.False(asked);

@@ -11,7 +11,9 @@ public sealed class LocalhostSignInBuildTests
     public void The_local_sign_in_is_in_the_Api_of_a_Debug_build_and_in_no_other()
     {
         var type = typeof(Program).Assembly.GetType("NoTiming.Api.Features.Localhost.LocalhostSignIn");
-        var publicEndpoints = typeof(Program).Assembly.GetType("NoTiming.Api.Features.Localhost.LocalhostPublicEndpoints");
+        var publicEndpoints = typeof(Program).Assembly.GetType(
+            "NoTiming.Api.Features.Localhost.LocalhostPublicEndpoints"
+        );
 
 #if DEBUG
         Assert.NotNull(type);

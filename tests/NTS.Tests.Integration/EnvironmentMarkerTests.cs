@@ -122,7 +122,9 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     {
         var database = NewDatabase();
 
-        await Assert.ThrowsAsync<ArgumentException>(() => new MongoStorageEnvironment(database).WriteAsync("Prod", NOW));
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => new MongoStorageEnvironment(database).WriteAsync("Prod", NOW)
+        );
 
         Assert.Null(await new MongoStorageEnvironment(database).ReadAsync());
     }
@@ -190,7 +192,9 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
         var database = NewDatabase();
 
         var results = await Task.WhenAll(
-            Enumerable.Range(0, 6).Select(_ => Task.Run(() => new MongoStorageEnvironment(database).WriteAsync("Staging", NOW)))
+            Enumerable
+                .Range(0, 6)
+                .Select(_ => Task.Run(() => new MongoStorageEnvironment(database).WriteAsync("Staging", NOW)))
         );
 
         Assert.Equal(1, results.Count(x => x)); // one wrote it

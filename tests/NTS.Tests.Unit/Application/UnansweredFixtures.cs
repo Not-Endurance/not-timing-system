@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Async;
 using Not.Events;
@@ -7,7 +8,6 @@ using NoTiming.Ui.Storage.Browser;
 using NTS.Contracts.Features.Account;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Objects;
-using System.Linq.Expressions;
 
 namespace NTS.Tests.Unit.Application;
 
@@ -31,7 +31,11 @@ internal sealed class InMemoryDurableSnapshotGroups : IDurableRepository<Durable
         return _kept.Values.FirstOrDefault(x => x.AccountId == accountId && x.EventId == eventId)?.ToGroup();
     }
 
-    public async Task<bool> StoreDurably(Guid id, DurableSnapshotGroup item, Func<DurableSnapshotGroup, Task<bool>> send)
+    public async Task<bool> StoreDurably(
+        Guid id,
+        DurableSnapshotGroup item,
+        Func<DurableSnapshotGroup, Task<bool>> send
+    )
     {
         if (CannotKeep)
         {
