@@ -1,5 +1,3 @@
-using Testcontainers.MongoDb;
-
 namespace NTS.Tests.Integration.Harness;
 
 /// <summary>
@@ -8,7 +6,7 @@ namespace NTS.Tests.Integration.Harness;
 /// </summary>
 public sealed class NtsIntegrationFixture : IAsyncLifetime
 {
-    MongoDbContainer? _mongo;
+    MongoContainer? _mongo;
     ApiFactory? _api;
 
     /// <summary>The Api, for a test that signs a person in at it.</summary>
@@ -21,15 +19,14 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
     public OffsetTimeProvider Clock { get; } = new();
 
     public string MongoConnectionString =>
-        _mongo?.GetConnectionString() ?? throw new InvalidOperationException("MongoDB is not started.");
+        _mongo?.ConnectionString ?? throw new InvalidOperationException("MongoDB is not started.");
     public Uri ApiBaseUrl => _api?.BaseAddress ?? throw new InvalidOperationException("The Api is not started.");
 
     public async Task InitializeAsync()
     {
-        _mongo = new MongoDbBuilder().WithImage("mongo:6.0").Build();
-        await _mongo.StartAsync();
+        _mongo = await MongoContainer.StartAsync();
 
-        _api = new ApiFactory(_mongo.GetConnectionString(), kestrel: true, time: Clock);
+        _api = new ApiFactory(_mongo.ConnectionString, kestrel: true, time: Clock);
         _ = _api.BaseAddress; // starts the host
     }
 

@@ -11,7 +11,7 @@ dotnet test .\tests\NTS.Tests.Integration\NTS.Tests.Integration.csproj -c Debug
 ## Layout
 
 - Each feature of the product has a folder of its tests, named after the feature: `Access`, `Account`, `Branding`, `Console`, `EventData`, `Events`, `Live`, `Participants`, `Profile`, `Reference`, `Snapshots`, `Tenancy` and `UserSessions` are the features of the Api and the Ui, and `Platform` (the routes, JSON:API, the environment and the hosting), `Tools` (the commands of `tools/NTS.Tools`) and `Ui` (the shell of the browser app) are the host's own. A test file keeps the namespace `NTS.Tests.Integration`.
-- `Harness` holds the support the tests use (fixtures, seeds, drivers, the browser helpers) and no test (AGENTS.md rule 7). Its namespace is `NTS.Tests.Integration.Harness`. The generic helpers are in `nugets/Not.Test`: the deadline wait, the journey runner, `TestId`, and the reader of the project graph.
+- `Harness` holds the support the tests use (fixtures, seeds, drivers, the browser helpers) and no test (AGENTS.md rule 7). Its namespace is `NTS.Tests.Integration.Harness`. The generic helpers are in `nugets/Not.Test`: the deadline wait, the journey runner, `TestId`, and the reader of the project graph. A MongoDB container (`Harness/MongoContainer.cs`) removes its volumes when its fixture is disposed, as well as the container: MongoDB keeps its data in a volume that the image declares, and that volume otherwise stays on the disk after the run.
 - `Parked` holds the parked scenarios, which are not compiled (see Parked scenarios).
 - A run stays within what the localhost can start at once (ADR-0016): four test threads (`Harness/RunLimits.cs`) and two browsers at a time (`PasskeyBrowserFixture`).
 

@@ -1,5 +1,3 @@
-using Testcontainers.MongoDb;
-
 namespace NTS.Tests.Integration.Harness;
 
 /// <summary>
@@ -8,20 +6,19 @@ namespace NTS.Tests.Integration.Harness;
 /// </summary>
 public sealed class ApiHostFixture : IAsyncLifetime
 {
-    MongoDbContainer? _mongo;
+    MongoContainer? _mongo;
     ApiFactory? _api;
 
     internal ApiFactory Api => _api ?? throw new InvalidOperationException("The Api is not started.");
     public string MongoConnectionString =>
-        _mongo?.GetConnectionString() ?? throw new InvalidOperationException("MongoDB is not started.");
+        _mongo?.ConnectionString ?? throw new InvalidOperationException("MongoDB is not started.");
     public Uri BaseAddress => Api.BaseAddress;
 
     public async Task InitializeAsync()
     {
-        _mongo = new MongoDbBuilder().WithImage("mongo:6.0").Build();
-        await _mongo.StartAsync();
+        _mongo = await MongoContainer.StartAsync();
 
-        _api = new ApiFactory(_mongo.GetConnectionString(), kestrel: true);
+        _api = new ApiFactory(_mongo.ConnectionString, kestrel: true);
         _ = _api.BaseAddress; // starts the host
     }
 
