@@ -6,6 +6,7 @@ using MongoDB.Driver;
 using Not.Identity;
 using Not.Identity.Codes;
 using Not.Identity.Email;
+using NoTiming.Api.Features.Events;
 using NTS.Domain.Aggregates;
 
 namespace NoTiming.Api.Features.Account;
@@ -34,6 +35,7 @@ internal sealed class CodeSignIn
     readonly IEmailSender _email;
     readonly SelectableCountries _countries;
     readonly TenantPlacement _tenants;
+    readonly GrantInvitations _invitations;
     readonly RegistrationPolicy _policy;
     readonly EventThrottle _throttle;
     readonly AccountText _text;
@@ -47,6 +49,7 @@ internal sealed class CodeSignIn
         IEmailSender email,
         SelectableCountries countries,
         TenantPlacement tenants,
+        GrantInvitations invitations,
         RegistrationPolicy policy,
         EventThrottle throttle,
         AccountText text,
@@ -60,6 +63,7 @@ internal sealed class CodeSignIn
         _email = email;
         _countries = countries;
         _tenants = tenants;
+        _invitations = invitations;
         _policy = policy;
         _throttle = throttle;
         _text = text;
@@ -154,6 +158,9 @@ internal sealed class CodeSignIn
 
         _logger.LogInformation(AuthEvents.CODE_VERIFIED, "A sign-in code was verified for user {UserId}.", user.Id);
         await _tenants.EnsureHomeTenantAsync(user, cancellationToken);
+
+        // The address has just been proved, so the invitations that were waiting for it are the person's now.
+        await _invitations.AttachAsync(normalized, user.Id, cancellationToken);
 
         // The stamp exists before the session does: rotating it is what ends the sessions of the user.
         await _signIn.SignInAsync(user, isPersistent: true);

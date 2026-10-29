@@ -17,10 +17,8 @@ public class PhaseModel
             Ruleset = phase.Ruleset,
             IsFinal = phase.IsFinal,
             StartTime = phase.StartTime,
-            ArriveTime = phase.ArriveTime,
-            PresentTime = phase.PresentTime,
-            RepresentTime = phase.RepresentTime,
-            IsReinspectionRequested = phase.IsReinspectionRequested,
+            Events = phase.Events.Select(TimeEventModel.MapFrom).ToArray(),
+            IsRepresentRequested = phase.IsRepresentRequested,
             IsRequiredInspectionRequested = phase.IsRequiredInspectionRequested || phase.IsRequiredInspectionCompulsory, // TODO: probably remove compulsory altogether
             IsRequiredInspectionCompulsory = phase.IsRequiredInspectionCompulsory,
             CompulsoryThresholdInterval = phase.CompulsoryThresholdSpan,
@@ -35,10 +33,10 @@ public class PhaseModel
     public CompetitionRuleset Ruleset { get; init; }
     public bool IsFinal { get; init; }
     public DateTimeOffset? StartTime { get; init; }
-    public DateTimeOffset? ArriveTime { get; init; }
-    public DateTimeOffset? PresentTime { get; init; }
-    public DateTimeOffset? RepresentTime { get; init; }
-    public bool IsReinspectionRequested { get; init; }
+
+    /// <summary>The times of the Phase are projected from its events, so they are not stored.</summary>
+    public TimeEventModel[] Events { get; init; } = [];
+    public bool IsRepresentRequested { get; init; }
     public bool IsRequiredInspectionRequested { get; init; }
     public bool IsRequiredInspectionCompulsory { get; init; }
     public TimeSpan? CompulsoryThresholdInterval { get; init; }
@@ -54,10 +52,8 @@ public class PhaseModel
             IsFinal,
             CompulsoryThresholdInterval,
             StartTime,
-            ArriveTime,
-            PresentTime,
-            RepresentTime,
-            IsReinspectionRequested,
+            Events.Select(x => x.MapToEntity()),
+            IsRepresentRequested,
             IsRequiredInspectionRequested,
             IsRequiredInspectionCompulsory,
             Id

@@ -23,12 +23,12 @@ public sealed class GuidStorageTests : IClassFixture<NtsIntegrationFixture>
     [Fact]
     public async Task A_Guid_id_and_a_Guid_reference_are_stored_as_standard_UUIDs_and_read_back()
     {
-        using var nexus = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
         var participationId = Guid.NewGuid();
-        await nexus.Create(IntegrationPayloadFactory.EventInformation(eventId));
+        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
         var participation = IntegrationPayloadFactory.ActiveParticipation(eventId, 1, participationId);
-        await nexus.Create(participation);
+        await functionsApi.Create(participation);
 
         var stored = await ReadStored(MongoConstants.PARTICIPATIONS_COLLECTION, participationId);
 
@@ -54,7 +54,7 @@ public sealed class GuidStorageTests : IClassFixture<NtsIntegrationFixture>
                 .Select(x => x.Path)
         );
 
-        var readBack = await nexus.ReadParticipation(eventId, participationId);
+        var readBack = await functionsApi.ReadParticipation(eventId, participationId);
         Assert.Equal(participationId, readBack.Id);
         Assert.Equal(eventId, readBack.EventId);
         Assert.Equal(participation.Combination.Id, readBack.Combination.Id);
@@ -66,19 +66,19 @@ public sealed class GuidStorageTests : IClassFixture<NtsIntegrationFixture>
     [Fact]
     public async Task A_filter_on_a_Guid_foreign_key_returns_the_documents_of_that_Event_only()
     {
-        using var nexus = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
         var otherEventId = Guid.NewGuid();
         var participationId = Guid.NewGuid();
         var otherParticipationId = Guid.NewGuid();
-        await nexus.Create(IntegrationPayloadFactory.EventInformation(eventId));
-        await nexus.Create(IntegrationPayloadFactory.EventInformation(otherEventId));
-        await nexus.Create(IntegrationPayloadFactory.ActiveParticipation(eventId, 1, participationId));
-        await nexus.Create(IntegrationPayloadFactory.ActiveParticipation(otherEventId, 2, otherParticipationId));
+        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
+        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(otherEventId));
+        await functionsApi.Create(IntegrationPayloadFactory.ActiveParticipation(eventId, 1, participationId));
+        await functionsApi.Create(IntegrationPayloadFactory.ActiveParticipation(otherEventId, 2, otherParticipationId));
 
-        Assert.Equal(participationId, Assert.Single(await nexus.ReadParticipations(eventId)).Id);
-        Assert.Equal(otherParticipationId, Assert.Single(await nexus.ReadParticipations(otherEventId)).Id);
-        Assert.Empty(await nexus.ReadParticipations(Guid.NewGuid()));
+        Assert.Equal(participationId, Assert.Single(await functionsApi.ReadParticipations(eventId)).Id);
+        Assert.Equal(otherParticipationId, Assert.Single(await functionsApi.ReadParticipations(otherEventId)).Id);
+        Assert.Empty(await functionsApi.ReadParticipations(Guid.NewGuid()));
     }
 
     async Task<BsonDocument> ReadStored(string collection, Guid id)

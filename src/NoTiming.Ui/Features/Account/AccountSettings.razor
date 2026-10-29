@@ -1,0 +1,34 @@
+@using Not.Blazor.Components.Buttons
+@using Not.Blazor.Components.Input
+@inherits AccountSettingsBehind
+
+@if (Email != null)
+{
+    <MudStack Spacing="3" data-testid="account-settings">
+
+        <MudText Typo="Typo.subtitle2">@Account_string</MudText>
+        <MudText Typo="Typo.body2" data-testid="account-email">@Email</MudText>
+
+        <NSelect T="string"
+                 Label="@Language_string"
+                 Items="@LanguageItems"
+                 Value="@CurrentLanguage"
+                 ValueChanged="ChooseLanguage" />
+
+        @if (ShowTenants)
+        {
+            <NSelect T="string"
+                     Label="@Federation_string"
+                     Items="@TenantItems"
+                     Value="@CurrentTenant"
+                     ValueChanged="ChooseTenant" />
+        }
+
+        <MudStack Row Justify="Justify.FlexEnd">
+            <NButtonSecondary Text="@Passkeys_string"
+                              StartIcon="@Icons.Material.Filled.Key"
+                              OnClick="OpenPasskeys" />
+        </MudStack>
+
+    </MudStack>
+}

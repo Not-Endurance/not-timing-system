@@ -1,7 +1,6 @@
 using Not.Application.DomainEvents;
 using Not.Application.HTTP;
 using Not.Storage.REST;
-using Not.Structures;
 using NTS.Contracts.Setup;
 using NTS.Contracts.Setup.Models;
 using NTS.Domain.Setup.Aggregates;
@@ -9,21 +8,30 @@ using NTS.Domain.Setup.Events;
 
 namespace NoTiming.Ui.Storage.REST;
 
-public class ConfigureEventApiRepository : ApiRepository<ConfigureEvent, ConfigureEventModel>
+/// <summary>
+/// The Setup of an Event as the Api serves it (#603): JSON:API documents at <c>/api/configure-events</c> (ADR-0008, ADR-0012).
+/// A Setup is made with everything it holds in one request. The Tenant and the Main Operator are the Api's to set and are
+/// not sent. An update announces itself only when the Api took it.
+/// </summary>
+public class ConfigureEventApiRepository : JsonApiRepository<ConfigureEvent, ConfigureEventModel>
 {
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
-    public ConfigureEventApiRepository(NHttpClient httpClient, IDomainEventDispatcher domainEventDispatcher)
-        : base("configure-event", httpClient)
+    public ConfigureEventApiRepository(JsonApiClient client, IDomainEventDispatcher domainEventDispatcher)
+        : base("configure-events", client, "mainOperatorId")
     {
         _domainEventDispatcher = domainEventDispatcher;
     }
 
-    protected override async Task<Result<ConfigureEventModel>> UpdateCore(ConfigureEvent item)
+    protected override async Task<bool> UpdateCore(ConfigureEvent item)
     {
-        var result = await base.UpdateCore(item);
-        await DispatchUpdated(item);
-        return result;
+        var updated = await base.UpdateCore(item);
+        if (updated)
+        {
+            await DispatchUpdated(item);
+        }
+
+        return updated;
     }
 
     Task DispatchUpdated(ConfigureEvent item)

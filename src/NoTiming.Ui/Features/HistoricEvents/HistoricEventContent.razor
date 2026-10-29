@@ -1,0 +1,19 @@
+﻿@using Not.Blazor.Components.Layout
+@using Not.Krud.Blazor.Components
+@using NoTiming.Ui.Components.HistoricEvents
+@using NTS.Domain.Core.Aggregates
+
+@attribute [Route(HISTORIC_EVENTS_PAGE)]
+@inherits HistoricEventContentBehind
+
+<NContent Title="@Historic_events_string">
+    <Main>
+        <KrudList T="EventInformation"
+                  TModel="HistoricEventModel"
+                  TShell="HistoricEventShell"
+                  Name="@Historic_events_string"
+                  ViewRouteFactory="CreateHistoricEventRoute"
+                  AllowView
+                  NoScroll />
+    </Main>
+</NContent>

@@ -1,14 +1,13 @@
 using Not.Application.HTTP;
 using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Core;
-using NTS.Contracts.Core.Models;
-using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Ui.Storage.Core.Repositories;
 
-public class HandoutEventScopedApiRepository : EventScopedApiRepository<Handout, HandoutModel>
+/// <summary>The Handouts of the Event the Ui has selected: every list names it.</summary>
+public class HandoutEventScopedApiRepository : HandoutApiRepository, IEventScopedRepository<Handout>
 {
-    public HandoutEventScopedApiRepository(NHttpClient client, EventScopeFactory<Handout> eventScopeFactory)
-        : base("handouts", client, eventScopeFactory) { }
+    public HandoutEventScopedApiRepository(JsonApiClient client, EventScopeFactory<Handout> eventScopeFactory)
+        : base(client, eventScopeFactory) { }
 }

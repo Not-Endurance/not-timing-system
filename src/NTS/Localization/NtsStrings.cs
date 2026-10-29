@@ -124,9 +124,6 @@ namespace NTS.Localization
         public static string Confirmation_code_string => LocalizeString(nameof(Confirmation_code_string));
         public static string Setup_configuration_will_not_be_deleted_string =>
             LocalizeString(nameof(Setup_configuration_will_not_be_deleted_string));
-        public static string Deactivate_Event_string => LocalizeString(nameof(Deactivate_Event_string));
-        public static string Deactivate_event_instructions_string =>
-            LocalizeString(nameof(Deactivate_event_instructions_string));
         public static string Type_1338_to_enable_confirmation_string =>
             LocalizeString(nameof(Type_1338_to_enable_confirmation_string));
         public static string Configure_Event_string => LocalizeString(nameof(Configure_Event_string));
@@ -152,7 +149,7 @@ namespace NTS.Localization
         public static string Handouts_list_empty_message_string =>
             LocalizeString(nameof(Handouts_list_empty_message_string));
         public static string History_string => LocalizeString(nameof(History_string));
-        public static string Past_events_string => LocalizeString(nameof(Past_events_string));
+        public static string Historic_events_string => LocalizeString(nameof(Historic_events_string));
         public static string Required_inspection_is_compulsory_string =>
             LocalizeString(nameof(Required_inspection_is_compulsory_string));
         public static string Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string =>
@@ -249,26 +246,18 @@ namespace NTS.Localization
             LocalizeString(nameof(Component_missing_required_value_string));
         public static string Sorry_we_seem_to_have_fallen_off_the_horseback_string =>
             LocalizeString(nameof(Sorry_we_seem_to_have_fallen_off_the_horseback_string));
-        public static string Login_string => LocalizeString(nameof(Login_string));
-        public static string Login_page_string => LocalizeString(nameof(Login_page_string));
         public static string Snapshot_string => LocalizeString(nameof(Snapshot_string));
         public static string Snapshot_page_string => LocalizeString(nameof(Snapshot_page_string));
         public static string Performance_string => LocalizeString(nameof(Performance_string));
         public static string Resend_string => LocalizeString(nameof(Resend_string));
         public static string Vetin_string => LocalizeString(nameof(Vetin_string));
         public static string Participant_string => LocalizeString(nameof(Participant_string));
-        public static string Username_string => LocalizeString(nameof(Username_string));
-        public static string Password_string => LocalizeString(nameof(Password_string));
         public static string Send_snapshot_string => LocalizeString(nameof(Send_snapshot_string));
         public static string Select_participants_to_snapshot_string =>
             LocalizeString(nameof(Select_participants_to_snapshot_string));
         public static string Edit_timestamp_string => LocalizeString(nameof(Edit_timestamp_string));
         public static string Timestamp_string => LocalizeString(nameof(Timestamp_string));
         public static string Save_string => LocalizeString(nameof(Save_string));
-        public static string Profile_page_string => LocalizeString(nameof(Profile_page_string));
-        public static string Access_denied_string => LocalizeString(nameof(Access_denied_string));
-        public static string Access_denied_next_steps => LocalizeString(nameof(Access_denied_next_steps));
-        public static string Try_another_account_string => LocalizeString(nameof(Try_another_account_string));
         public static string Connect_string => LocalizeString(nameof(Connect_string));
         public static string Disconnect_string => LocalizeString(nameof(Disconnect_string));
         public static string Connected_to__string => LocalizeString(nameof(Connected_to__string));
@@ -302,13 +291,8 @@ namespace NTS.Localization
         public static string Restore_string => LocalizeString(nameof(Restore_string));
         public static string Sorry_theres_nothing_at_this_address_string =>
             LocalizeString(nameof(Sorry_theres_nothing_at_this_address_string));
-        public static string This_page_redirects_to_Signin_string =>
-            LocalizeString(nameof(This_page_redirects_to_Signin_string));
-        public static string Signed_in_as__string => LocalizeString(nameof(Signed_in_as__string));
-        public static string You_have___privileges_string => LocalizeString(nameof(You_have___privileges_string));
         public static string Sign_In_string => LocalizeString(nameof(Sign_In_string));
         public static string Sign_Out_string => LocalizeString(nameof(Sign_Out_string));
-        public static string No_roles_assigned_string => LocalizeString(nameof(No_roles_assigned_string));
         public static string An_error_occurred_while_sending_snapshots_Please_try_again_string =>
             LocalizeString(nameof(An_error_occurred_while_sending_snapshots_Please_try_again_string));
         public static string Snapshots_sent_as__string => LocalizeString(nameof(Snapshots_sent_as__string));
@@ -329,6 +313,19 @@ namespace NTS.Localization
         public static string File_not_found_string => LocalizeString(nameof(File_not_found_string));
         public static string Configure_events_cannot_be_deleted_string =>
             LocalizeString(nameof(Configure_events_cannot_be_deleted_string));
+        public static string This_event_has_ended_string => LocalizeString(nameof(This_event_has_ended_string));
+        public static string You_may_not_change_this_event_string =>
+            LocalizeString(nameof(You_may_not_change_this_event_string));
+        public static string Event_not_found_string => LocalizeString(nameof(Event_not_found_string));
+        public static string Not_available_for_historic_event_string =>
+            LocalizeString(nameof(Not_available_for_historic_event_string));
+        public static string Snapshots_kept_to_be_sent_again_string =>
+            LocalizeString(nameof(Snapshots_kept_to_be_sent_again_string));
+        public static string Snapshots_waiting_to_be_sent_string =>
+            LocalizeString(nameof(Snapshots_waiting_to_be_sent_string));
+        public static string Account_string => LocalizeString(nameof(Account_string));
+        public static string Federation_string => LocalizeString(nameof(Federation_string));
+        public static string Passkeys_string => LocalizeString(nameof(Passkeys_string));
         public static string Is_on_time_for_Presentation_Inspection_string =>
             LocalizeString(nameof(Is_on_time_for_Presentation_Inspection_string));
         public static string Estimates_string => LocalizeString(nameof(Estimates_string));

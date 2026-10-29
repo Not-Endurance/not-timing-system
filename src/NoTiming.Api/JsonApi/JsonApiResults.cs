@@ -35,7 +35,14 @@ internal static class JsonApiResults
         );
     }
 
-    public static IResult Resource(int status, string type, string id, object attributes, string? location = null)
+    public static IResult Resource(
+        int status,
+        string type,
+        string id,
+        object attributes,
+        string? location = null,
+        object? meta = null
+    )
     {
         var document = Results.Json(
             new
@@ -45,6 +52,7 @@ internal static class JsonApiResults
                     type,
                     id,
                     attributes,
+                    meta,
                 },
             },
             Options,
@@ -54,8 +62,19 @@ internal static class JsonApiResults
         return location == null ? document : new HeaderResult(document, HeaderNames.Location, location);
     }
 
-    /// <summary>The members of a collection: each is a resource of the type, 200 with an empty list when there are none.</summary>
-    public static IResult Collection(string type, IEnumerable<(string Id, object Attributes)> items)
+    /// <summary>
+    /// The members of a collection: each is a resource of the type, 200 with an empty list when there are none. A
+    /// collection that is paged says where it is and where the next page is in its <c>links</c>, and which page it is in
+    /// its <c>meta</c>. A named collection gives each item a <c>self</c> link to where the item is canonically.
+    /// </summary>
+    public static IResult Collection(
+        string type,
+        IEnumerable<(string Id, object Attributes)> items,
+        object? links = null,
+        object? meta = null,
+        Func<string, string>? itemLink = null,
+        Func<string, object?>? itemMeta = null
+    )
     {
         return Results.Json(
             new
@@ -65,7 +84,11 @@ internal static class JsonApiResults
                     type,
                     id = item.Id,
                     attributes = item.Attributes,
+                    links = itemLink == null ? null : new { self = itemLink(item.Id) },
+                    meta = itemMeta?.Invoke(item.Id),
                 }),
+                links,
+                meta,
             },
             Options,
             MEDIA_TYPE,
@@ -80,6 +103,32 @@ internal static class JsonApiResults
     public static IResult NotFound()
     {
         return Error(StatusCodes.Status404NotFound, "not-found", "Not found");
+    }
+
+    /// <summary>400 <c>invalid-id</c>: the id of a resource that a client makes is a Guid (ADR-0009).</summary>
+    public static IResult InvalidId()
+    {
+        return Error(StatusCodes.Status400BadRequest, "invalid-id", "The id of a resource is a Guid.");
+    }
+
+    /// <summary>409 <c>id-taken</c>: the id a client made is another Tenant's, which is not told about.</summary>
+    public static IResult IdTaken()
+    {
+        return Error(
+            StatusCodes.Status409Conflict,
+            "id-taken",
+            "A resource with that id exists and is not yours to see."
+        );
+    }
+
+    /// <summary>409 <c>id-mismatch</c>: the document of a change is of another resource than the one of the route.</summary>
+    public static IResult IdMismatch()
+    {
+        return Error(
+            StatusCodes.Status409Conflict,
+            "id-mismatch",
+            "The id of the resource is not the one of the route."
+        );
     }
 
     /// <summary>

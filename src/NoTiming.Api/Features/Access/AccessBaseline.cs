@@ -1,3 +1,5 @@
+using NTS.Contracts;
+
 namespace NoTiming.Api.Features.Access;
 
 /// <summary>
@@ -39,8 +41,8 @@ internal enum EndpointAccess
 /// </summary>
 internal static class AccessBaseline
 {
-    public const string WRITE_HEADER = "X-Requested-With";
-    public const string WRITE_HEADER_VALUE = "NoTiming";
+    public const string WRITE_HEADER = ApplicationConstants.WRITE_HEADER;
+    public const string WRITE_HEADER_VALUE = ApplicationConstants.WRITE_HEADER_VALUE;
 
     public static AccessDecision Decide(string method, EndpointAccess access, bool signedIn, string? writeHeader)
     {

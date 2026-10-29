@@ -134,7 +134,9 @@ public sealed class ResultsDocumentTests
         var shownBefore = ArriveTimeShownBy(new Result(handout, participation));
 
         participation.Update(
-            new CorrectedPhase(participation.Phases.Single().Id, start, arrive.AddMinutes(7), arrive.AddMinutes(12))
+            new CorrectedPhase(participation.Phases.Single().Id, start, arrive.AddMinutes(7), arrive.AddMinutes(12)),
+            TestId.Of(9),
+            DateTimeOffset.Now
         );
         var shownAfter = ArriveTimeShownBy(new Result(handout, participation));
 

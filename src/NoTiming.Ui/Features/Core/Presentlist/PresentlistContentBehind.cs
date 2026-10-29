@@ -1,18 +1,5 @@
-using Not.Blazor.Components.Abstractions;
-using NoTiming.Ui.Features.Socket;
+using NoTiming.Ui.Features.Core.EventViews;
 
 namespace NoTiming.Ui.Features.Core.Presentlist;
 
-public class PresentlistContentBehind : NComponent
-{
-    [Inject]
-    BlazorSocketService BlazorSocketService { get; set; } = default!;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await BlazorSocketService.EnsureConnected();
-        }
-    }
-}
+public class PresentlistContentBehind : EventPageBehind { }

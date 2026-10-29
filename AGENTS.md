@@ -29,6 +29,8 @@ rtk git commit -F .tmp/msg.txt
 After committing, check `rtk git log --oneline -1` and confirm the subject is the real subject.
 
 10. Temporary files (drafts, fetched issue bodies, commit message files, backups, intermediate output) go in `.tmp/` at the repository root, which is gitignored. Do not use the system temp directory, AppData, `/tmp` or any scratchpad a tool suggests: they are outside the working directory (rule 1). Create the folder if it is missing and keep what you create in a subfolder named for the task. Delete it as the last step of that task; when the task produces a spec, delete the drafts once the spec is published. Never delete anything in `.tmp/` that you did not create.
+11. Solve a problem at its root cause. A workaround is delivered only when the user asks for one by name; when the cause is out of scope or its fix is large, report the cause and the options for the user to choose from.
+12. Push back on bespoke behaviour that has no practical reason. When a request, issue, spec, ADR or an earlier change in the code asks for a special case, restriction or compensating step that the general behaviour would already cover, don't build it or build on it. Examples: a create that accepts only part of what an update accepts, a client that splits one write into two requests, an override that exists only to work around a narrowed contract. Say what the general version is, ask the user for the explicit reason the special case is wanted, and wait for the answer. If a reason is given, record it next to the special case (the ADR or a comment) so the next reader does not have to ask again.
 
 <!-- rtk-instructions v2 -->
 # RTK (Rust Token Killer) - Token-Optimized Commands
@@ -174,6 +176,27 @@ Overall average: **60-90% token reduction** on common development operations.
 
 ## Context
 - Primary sln file is src/not-timing-system.sln
+
+## MongoDB times
+- A time the server filters, sorts or expires on is a `DateTime` named `…Utc` with `[BsonDateTimeOptions(Kind = DateTimeKind.Utc)]`, converted with `DateTimeOffset.UtcDateTime`.
+- Every other time is a `DateTimeOffset` with `[BsonRepresentation(BsonType.Document)]`, which keeps the offset.
+- ADR-0014 has the reasons, and `DateTimeShapeTests` fails on a deviation.
+
+## Concurrency
+- Repeated triggers that must collapse into one run use `Not.Async.CoalesceInvoker` (one action; a later caller returns at once) or `CoalesceInvoker<TKey>` (one run per key; every caller awaits the run that covers it).
+- A new resolver of this kind (debounce, throttle, latest-wins) is a small class in `Not.Async` with unit tests of its races, named in this section, so that callers never carry in-flight flags of their own.
+
+## Localhost
+- Whatever lets a developer past authentication on their own machine lives in `src/NoTiming.Api/Features/Localhost`, is named `Localhost…` and is compiled out of a Release build.
+- It is registered in `LocalhostServices` (`AddLocalhost`, `MapLocalhost`) and nowhere else, behind the Development check made there; a new bypass is added there, and what it makes public goes through `LocalhostPublicEndpoints`, never onto `PublicEndpoints`.
+- A bypass that belongs to a package (`LocalhostEmailSender` in Not.Identity) carries the prefix, refuses Production itself, and is selected by a setting of the host.
+
+## Naming
+- The generic version of a type that already exists keeps its name. Its file takes the type parameters in braces, as the Microsoft repositories do: `CoalesceInvoker<TKey>` lives in `CoalesceInvoker{TKey}.cs` beside `CoalesceInvoker.cs`, and two parameters read `{TKey,TValue}`.
+- A base class that only shares identity or behaviour, cannot be instantiated and has no identity of its own ends in `Base`. Its children are named for what they are and do not repeat it: `Arrived` and `Presented` derive from `ParticipationEventBase`, never `ArrivedParticipationEvent`.
+- An abstraction that decouples callers from its implementations is named for its role (`IEmailSender`). Each implementation keeps the role in its name and puts what sets it apart in front: `BrevoEmailSender`, `LocalhostEmailSender`.
+- To choose between the two: children that are different things sharing code take their own names (`Arrived`); implementations that callers swap for one another keep the role (`BrevoEmailSender`).
+- A boolean property poses a question: `IsEmailConfirmed`, not `EmailConfirmed`. Start it with `Is`, `Has`, `Can` or `Should`, whichever reads as a yes/no question.
 
 ## WSL
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker

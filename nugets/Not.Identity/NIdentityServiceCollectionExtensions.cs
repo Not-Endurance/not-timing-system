@@ -9,6 +9,7 @@ using Not.Identity.Codes;
 using Not.Identity.Email;
 using Not.Identity.Mongo;
 using Not.Identity.Sessions;
+using Not.Storage.Mongo;
 
 namespace Not.Identity;
 
@@ -25,7 +26,7 @@ public static class NIdentityServiceCollectionExtensions
         Action<CookieAuthenticationOptions>? configureCookie = null
     )
     {
-        MongoSerialization.Register();
+        GuidSerialization.Register();
 
         services.AddOptions<NIdentityOptions>().Configure(options => configure?.Invoke(options));
         services.TryAddSingleton(TimeProvider.System);
@@ -40,7 +41,6 @@ public static class NIdentityServiceCollectionExtensions
         services.AddSingleton<ISessionRevoker>(provider => provider.GetRequiredService<MongoTicketStore>());
         services.AddSingleton<ICodeChallengeStore, MongoCodeChallengeStore>();
         services.AddHostedService<IdentityIndexInitializer>();
-        services.AddHostedService<EmailSenderGuard>();
 
         var builder = services
             .AddIdentityCore<NIdentityUser>(options =>

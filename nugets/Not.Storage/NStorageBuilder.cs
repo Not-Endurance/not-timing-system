@@ -13,6 +13,35 @@ namespace Not.Storage;
 
 public class NStorageBuilder
 {
+    /// <summary>
+    /// The driver keeps one serializer per type for the whole process and refuses a second registration,
+    /// so this runs once however many hosts are built, and accepts one that another part of the process
+    /// registered first as long as it is the one wanted. Every Guid, an <c>_id</c> included, is written as a
+    /// standard-representation BSON UUID (ADR-0009) and every date as a BSON date: nothing relies on the
+    /// driver's default.
+    /// </summary>
+    public static void RegisterSerializers()
+    {
+        if (Interlocked.Exchange(ref _serializersRegistered, 1) == 1)
+        {
+            return;
+        }
+
+        BsonSerializer.TryRegisterSerializer(typeof(DateTimeOffset), new DateTimeOffsetSerializer(BsonType.DateTime));
+        BsonSerializer.TryRegisterSerializer(typeof(Guid), new GuidSerializer(GuidRepresentation.Standard));
+        if (
+            BsonSerializer.LookupSerializer<Guid>()
+                is not GuidSerializer { GuidRepresentation: GuidRepresentation.Standard }
+            || BsonSerializer.LookupSerializer<DateTimeOffset>()
+                is not DateTimeOffsetSerializer { Representation: BsonType.DateTime }
+        )
+        {
+            throw new InvalidOperationException(
+                "The Guid or the date serializer of the MongoDB driver is not the one the application needs. Register them before the first Guid or date is serialized."
+            );
+        }
+    }
+
     readonly IServiceCollection _services;
     readonly NApplicationBuilder _nApplicationBuilder;
     static int _serializersRegistered;
@@ -42,21 +71,5 @@ public class NStorageBuilder
     {
         _nApplicationBuilder.AddHttp();
         return this;
-    }
-
-    /// <summary>
-    /// The driver keeps one serializer per type for the whole process and refuses a second registration,
-    /// so this runs once however many hosts are built. Every Guid, an <c>_id</c> included, is written as a
-    /// standard-representation BSON UUID (ADR-0009): nothing relies on the driver's default.
-    /// </summary>
-    static void RegisterSerializers()
-    {
-        if (Interlocked.Exchange(ref _serializersRegistered, 1) == 1)
-        {
-            return;
-        }
-
-        BsonSerializer.RegisterSerializer(typeof(DateTimeOffset), new DateTimeOffsetSerializer(BsonType.DateTime));
-        BsonSerializer.RegisterSerializer(typeof(Guid), new GuidSerializer(GuidRepresentation.Standard));
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Routing;
+using NoTiming.Api.Features.Localhost;
 using NoTiming.Api.JsonApi;
 
 namespace NoTiming.Api.Features.Access;
@@ -25,7 +26,11 @@ internal sealed class AccessBaselineMiddleware
             var method = context.Request.Method;
             var decision = AccessBaseline.Decide(
                 method,
-                PublicEndpoints.AccessOf(method, endpoint.RoutePattern.RawText),
+                PublicEndpoints.AccessOf(
+                    method,
+                    endpoint.RoutePattern.RawText,
+                    LocalhostServices.PublicEndpointsOf(context)
+                ),
                 context.User.Identity?.IsAuthenticated == true,
                 context.Request.Headers[AccessBaseline.WRITE_HEADER].ToString()
             );

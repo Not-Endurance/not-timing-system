@@ -56,16 +56,30 @@ A role within one Tenant, held by one or more accounts and created by the Develo
 _Avoid_: Admin, owner
 
 **Developer**:
-A platform-level role reserved for the platform owner, with full rights across every Tenant. It is not granted through a Tenant.
+A platform-level role reserved for the platform owner, with full rights across every Tenant, except acting as the Main Operator of a Live Event: what the Main Operator does there is the Main Operator's alone, and a Live Event whose Main Operator is locked out is a database fix, not an action of the product. It is not granted through a Tenant, and only by command: no route gives it, or a Tenant Root.
 _Avoid_: Admin, superuser
+
+**Grant**:
+The access the Main Operator gives to a person for one Event: as an Operator, or as an Official of a role. A grant names the person by their exact email. When the email has an Account the grant is that Account's at once; when it has none it is a pending invitation, which gives nothing until the person registers with that email and then attaches to the new Account. A grant belongs to the Tenant of its Event and ends the moment it is removed. The Main Operator is not a grant: the Event names it.
+_Avoid_: Permission, role assignment, invite
+
+**Regional rules**:
+How a Tenant's Regional competitions are judged: whether the speed of a loop is judged on the average only, and which ranker applies. A Tenant Root sets them on the Tenant, and an Event copies them when it starts, so what an Event was judged by never changes when the Tenant edits them. An Event that started without any is judged by the FEI's rules.
+
+**Capabilities**:
+What the caller may do about an Event, or in a Tenant, told by the same access policy that refuses the action: `canSnapshot`, `isMainOperator`, `canHandOver`, `canAssignMainOperator`, `canCreateEvents` for an Event. A screen shows controls from these and never works them out for itself.
 
 ### Data
 
 **Setup**:
-The reference data and Event configuration prepared before an Event, such as its Athletes, Horses and Clubs. An Athlete or Horse is registered in Setup once.
+The reference data and Event configuration prepared before an Event, such as its Athletes, Horses and Clubs. An Athlete or Horse is registered in Setup once. The Setup of an Event is changed by its Main Operator until the Event starts and by nobody from then on, because the Console works on the copies Core made of it; the registries and the countries it is made from go on changing.
 
 **Core**:
 What an Event produces while it runs and afterwards: its Participations, Rankings, Handouts and Officials. Core holds copies of Setup data as entered when the Event started, so a later Setup change does not rewrite a finished Event.
+
+**Environment marker**:
+The one document of a database that says which environment it is, Production, Staging or Development, which nothing else in it does: they hold the same collections. The commands that prepare a database write it and it is never changed to another name. What must not touch a production database, the staging seed and the local sign in as, works only on one that says it is Staging or Development, and refuses one that says Production, one that says nothing and one that says anything else.
+_Avoid_: Environment flag, database tag
 
 ### Competing
 
@@ -78,7 +92,7 @@ An Event that is still running: its Console and its viewers see changes as they 
 _Avoid_: Active event, current event
 
 **Historic Event**:
-An Event that has ended, viewed as a record: nothing about it can be changed, and its Results, Startlist and other produced documents can still be printed. Opening one never affects a Live Event.
+An Event that has ended, viewed as a record: nothing about it can be changed, and its Results and other produced documents can still be printed. It has no Startlist, which is about who starts next. Opening one never affects a Live Event.
 _Avoid_: Past event, archived event
 
 **Console**:
@@ -105,20 +119,20 @@ The printable sheet of one Combination's times, produced for it after each Phase
 ### Timing
 
 **Phase**:
-One leg of a Participation: the loop ridden from Start to Arrival, then the vet gate where the Combination is Presented (again, if re-inspection is requested), then a Rest that ends at the Out time, which is the next Phase's Start.
+One leg of a Participation: the loop ridden from Start to Arrival, then the vet gate where the Combination is Presented (again, if re-inspection is requested), then a Rest that ends at the Out time, which is the next Phase's Start. A Snapshot is placed in a Phase by its own time, and a Representation or Inspection request by the time it is made, with one comparison: at or after the next Phase's Start it belongs to the next Phase and that Phase becomes the current one, otherwise it belongs to the current Phase. The time of a request is the clock of the server, which should agree with the clocks of the devices to within about a minute around the Out time; times are compared by the time of the day, so a ride that crosses midnight is not supported.
 
 **Presentation**:
 A Combination presenting at the vet gate, captured as a time. Presenting again after re-inspection is requested is a Represent: the same kind of time, marked as a re-presentation.
 
 **Snapshot**:
-A time an Official captures for a Combination, by start number, and sends in for the Event as an Arrival or a Presentation. It is an input, not part of the Participation: every Snapshot is recorded as a time event on a Phase, accepted or rejected.
+A time an Official captures for a Combination, by start number, and sends in for the Event as an Arrival or a Presentation. It is an input, not part of the Participation: the server records every Snapshot as a time event on a Phase, accepted or rejected, and answers with it. The device makes its id, which is the id of the event, so that a Snapshot sent again is the same Snapshot and is recorded once.
 
 **Time event**:
-A past-tense fact recorded on a Phase — Arrived or Presented, or an Update of one — with an outcome: accepted, or rejected with a reason (including a manual reject by the Main Operator). A Phase's times are the latest accepted time event of each kind; rejected ones stay in its history.
+A past-tense fact recorded on a Phase — Arrived or Presented, or an Update of one — with an outcome: accepted, or rejected with a reason (including a manual reject by the Main Operator). A Phase's times are the latest accepted time event of each kind; rejected ones stay in its history. A time that breaks the order Start, Arrival, Presentation, Representation, compared among the times that exist, is rejected as an invalid time and never thrown at; a Presentation without an Arrival is legal, because a delayed Arrival looks exactly like that.
 _Avoid_: Event (that is the show), phase event, snapshot event
 
 **Update**:
-Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, or the Main Operator editing the Phase in the Console. It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history.
+Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, named by the Snapshot's id, or the Main Operator editing the Phase in the Console. It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history. It sets an absolute value, so the last one wins.
 
 **Disable**:
 The Main Operator negating a time event: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again. The event stays in the history and can be enabled again.

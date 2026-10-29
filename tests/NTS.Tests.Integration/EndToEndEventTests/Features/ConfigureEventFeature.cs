@@ -22,13 +22,13 @@ namespace NTS.Tests.Integration.EndToEndEventTests.Features;
 
 internal class ConfigureEventFeature
 {
-    readonly JudgeDriver _judge;
-    readonly NexusApiDriver _nexusApi;
+    readonly ConsoleDriver _console;
+    readonly FunctionsApiDriver _functionsApi;
 
-    public ConfigureEventFeature(JudgeDriver judge, NexusApiDriver nexusApi)
+    public ConfigureEventFeature(ConsoleDriver console, FunctionsApiDriver functionsApi)
     {
-        _judge = judge;
-        _nexusApi = nexusApi;
+        _console = console;
+        _functionsApi = functionsApi;
     }
 
     public async Task<SetupFeatureResult> Execute(EndToEndEventSnapshot eventSnapshot)
@@ -48,7 +48,7 @@ internal class ConfigureEventFeature
 
         foreach (var user in snapshot.Users)
         {
-            var registered = await _nexusApi.RegisterUser(
+            var registered = await _functionsApi.RegisterUser(
                 new IntegrationUser(
                     user.Email,
                     $"setup-user-{user.Id}",
@@ -79,7 +79,7 @@ internal class ConfigureEventFeature
             createdUsers.Add(user.Id, created);
         }
 
-        var clubService = _judge.GetRequiredService<IKrudFormService<ClubFormModel>>();
+        var clubService = _console.GetRequiredService<IKrudFormService<ClubFormModel>>();
         foreach (var club in snapshot.Clubs)
         {
             var form = new ClubFormModel { Name = club.Name };
@@ -89,11 +89,11 @@ internal class ConfigureEventFeature
             Remember(idMap, club.Id, created.Id);
             createdClubs.Add(club.Id, created);
 
-            var persisted = await _nexusApi.ReadSetupClubs();
+            var persisted = await _functionsApi.ReadSetupClubs();
             Assert.Contains(persisted, x => x.Id == created.Id && x.Name == club.Name);
         }
 
-        var horseService = _judge.GetRequiredService<IKrudFormService<HorseFormModel>>();
+        var horseService = _console.GetRequiredService<IKrudFormService<HorseFormModel>>();
         foreach (var horse in snapshot.Horses)
         {
             var form = new HorseFormModel
@@ -108,7 +108,7 @@ internal class ConfigureEventFeature
             Remember(idMap, horse.Id, created.Id);
             createdHorses.Add(horse.Id, created);
 
-            var persisted = await _nexusApi.ReadSetupHorses();
+            var persisted = await _functionsApi.ReadSetupHorses();
             Assert.Contains(
                 persisted,
                 x =>
@@ -119,7 +119,7 @@ internal class ConfigureEventFeature
             );
         }
 
-        var athleteService = _judge.GetRequiredService<IKrudFormService<AthleteFormModel>>();
+        var athleteService = _console.GetRequiredService<IKrudFormService<AthleteFormModel>>();
         foreach (var athlete in snapshot.Athletes)
         {
             var form = new AthleteFormModel
@@ -145,7 +145,7 @@ internal class ConfigureEventFeature
             Remember(idMap, athlete.Id, created.Id);
             createdAthletes.Add(athlete.Id, created);
 
-            var persisted = await _nexusApi.ReadSetupAthletes();
+            var persisted = await _functionsApi.ReadSetupAthletes();
             Assert.Contains(
                 persisted,
                 x =>
@@ -157,7 +157,7 @@ internal class ConfigureEventFeature
             );
         }
 
-        var eventService = _judge.GetRequiredService<IKrudFormService<ConfigureEventFormModel>>();
+        var eventService = _console.GetRequiredService<IKrudFormService<ConfigureEventFormModel>>();
         var eventForm = new ConfigureEventFormModel
         {
             Name = snapshot.ConfigureEvent.Name,
@@ -169,22 +169,22 @@ internal class ConfigureEventFeature
         var setupEventId = RequiredId(eventForm);
         Remember(idMap, snapshot.ConfigureEvent.Id, setupEventId);
 
-        var currentEvent = await _nexusApi.ReadSetupConfigureEvent(setupEventId);
+        var currentEvent = await _functionsApi.ReadSetupConfigureEvent(setupEventId);
         Assert.Equal(snapshot.ConfigureEvent.Name, currentEvent.Name);
         Assert.Empty(currentEvent.Loops);
         Assert.Empty(currentEvent.Combinations);
         Assert.Empty(currentEvent.Officials);
         Assert.Empty(currentEvent.Competitions);
-        _judge.SelectSetupParent(currentEvent);
+        _console.SelectSetupParent(currentEvent);
 
-        var loopService = _judge.GetRequiredService<IKrudFormService<LoopFormModel>>();
+        var loopService = _console.GetRequiredService<IKrudFormService<LoopFormModel>>();
         foreach (var loop in snapshot.ConfigureEvent.Loops)
         {
             var form = new LoopFormModel { Distance = loop.Distance };
             await loopService.Create(form);
 
             currentEvent = await WaitForSetupEvent(
-                _nexusApi,
+                _functionsApi,
                 setupEventId,
                 setupEvent => setupEvent.Loops.Any(x => x.Distance == loop.Distance),
                 $"loop {loop.Distance}"
@@ -194,10 +194,10 @@ internal class ConfigureEventFeature
             createdLoops.Add(loop.Id, created);
 
             Assert.Contains(currentEvent.Loops, x => x.Id == created.Id && x.Distance == loop.Distance);
-            _judge.SelectSetupParent(currentEvent);
+            _console.SelectSetupParent(currentEvent);
         }
 
-        var combinationService = _judge.GetRequiredService<IKrudFormService<CombinationFormModel>>();
+        var combinationService = _console.GetRequiredService<IKrudFormService<CombinationFormModel>>();
         foreach (var combination in snapshot.ConfigureEvent.Combinations)
         {
             var form = new CombinationFormModel
@@ -218,7 +218,7 @@ internal class ConfigureEventFeature
             createdCombinations.Add(combination.Id, created);
 
             currentEvent = await WaitForSetupEvent(
-                _nexusApi,
+                _functionsApi,
                 setupEventId,
                 setupEvent => setupEvent.Combinations.Any(x => x.Id == created.Id),
                 $"combination {combination.Number}"
@@ -231,10 +231,10 @@ internal class ConfigureEventFeature
                     && x.Athlete.Id == created.Athlete.Id
                     && x.Horse.Id == created.Horse.Id
             );
-            _judge.SelectSetupParent(currentEvent);
+            _console.SelectSetupParent(currentEvent);
         }
 
-        var officialService = _judge.GetRequiredService<IKrudFormService<OfficialFormModel>>();
+        var officialService = _console.GetRequiredService<IKrudFormService<OfficialFormModel>>();
         foreach (var official in snapshot.ConfigureEvent.Officials)
         {
             var form = new OfficialFormModel
@@ -249,7 +249,7 @@ internal class ConfigureEventFeature
             Remember(idMap, official.Id, officialId);
 
             currentEvent = await WaitForSetupEvent(
-                _nexusApi,
+                _functionsApi,
                 setupEventId,
                 setupEvent => setupEvent.Officials.Any(x => x.Id == officialId),
                 $"official {official.Name}"
@@ -262,10 +262,10 @@ internal class ConfigureEventFeature
                     && x.NameEnglish == official.NameEnglish
                     && x.Role == official.Role
             );
-            _judge.SelectSetupParent(currentEvent);
+            _console.SelectSetupParent(currentEvent);
         }
 
-        var operatorService = _judge.GetRequiredService<IKrudFormService<OperatorFormModel>>();
+        var operatorService = _console.GetRequiredService<IKrudFormService<OperatorFormModel>>();
         foreach (var @operator in snapshot.ConfigureEvent.Operators)
         {
             var form = new OperatorFormModel { User = createdUsers[@operator.User.Id] };
@@ -274,7 +274,7 @@ internal class ConfigureEventFeature
             Remember(idMap, @operator.Id, operatorId);
 
             currentEvent = await WaitForSetupEvent(
-                _nexusApi,
+                _functionsApi,
                 setupEventId,
                 setupEvent => setupEvent.Operators.Any(x => x.Id == operatorId),
                 $"operator {@operator.User.Email}"
@@ -283,12 +283,12 @@ internal class ConfigureEventFeature
                 currentEvent.Operators,
                 x => x.Id == operatorId && x.User.Id == createdUsers[@operator.User.Id].Id && x.Role == @operator.Role
             );
-            _judge.SelectSetupParent(currentEvent);
+            _console.SelectSetupParent(currentEvent);
         }
 
-        var competitionService = _judge.GetRequiredService<IKrudFormService<CompetitionFormModel>>();
-        var phaseService = _judge.GetRequiredService<IKrudFormService<PhaseFormModel>>();
-        var participationService = _judge.GetRequiredService<IKrudFormService<ParticipationFormModel>>();
+        var competitionService = _console.GetRequiredService<IKrudFormService<CompetitionFormModel>>();
+        var phaseService = _console.GetRequiredService<IKrudFormService<PhaseFormModel>>();
+        var participationService = _console.GetRequiredService<IKrudFormService<ParticipationFormModel>>();
 
         foreach (var competition in snapshot.ConfigureEvent.Competitions)
         {
@@ -298,7 +298,7 @@ internal class ConfigureEventFeature
             Remember(idMap, competition.Id, competitionId);
 
             currentEvent = await WaitForSetupEvent(
-                _nexusApi,
+                _functionsApi,
                 setupEventId,
                 setupEvent => setupEvent.Competitions.Any(x => x.Id == competitionId),
                 $"competition {competition.Name}"
@@ -308,7 +308,7 @@ internal class ConfigureEventFeature
                 x => x.Id == competitionId && x.Name == competition.Name && x.Ruleset == competition.Ruleset
             );
 
-            SelectCompetition(_judge, currentEvent, competitionId);
+            SelectCompetition(_console, currentEvent, competitionId);
 
             foreach (var phase in competition.Phases)
             {
@@ -324,7 +324,7 @@ internal class ConfigureEventFeature
                 Remember(idMap, phase.Id, phaseId);
 
                 currentEvent = await WaitForSetupEvent(
-                    _nexusApi,
+                    _functionsApi,
                     setupEventId,
                     setupEvent =>
                         setupEvent.Competitions.Any(x => x.Id == competitionId && x.Phases.Any(y => y.Id == phaseId)),
@@ -339,7 +339,7 @@ internal class ConfigureEventFeature
                         && x.Rest == phase.Rest
                         && x.Loop.Id == idMap[phase.Loop.Id]
                 );
-                SelectCompetition(_judge, currentEvent, competitionId);
+                SelectCompetition(_console, currentEvent, competitionId);
             }
 
             foreach (var participation in competition.Participations)
@@ -350,7 +350,7 @@ internal class ConfigureEventFeature
                 Remember(idMap, participation.Id, participationId);
 
                 currentEvent = await WaitForSetupEvent(
-                    _nexusApi,
+                    _functionsApi,
                     setupEventId,
                     setupEvent =>
                         setupEvent.Competitions.Any(x =>
@@ -366,11 +366,11 @@ internal class ConfigureEventFeature
                         && x.Category == participation.Category
                         && x.Combination.Id == createdCombinations[participation.Combination.Id].Id
                 );
-                SelectCompetition(_judge, currentEvent, competitionId);
+                SelectCompetition(_console, currentEvent, competitionId);
             }
         }
 
-        currentEvent = await _nexusApi.ReadSetupConfigureEvent(setupEventId);
+        currentEvent = await _functionsApi.ReadSetupConfigureEvent(setupEventId);
         var expected = snapshot.ExpectedConfigureEventWith(idMap);
         var actual = SnapshotJson.Canonicalize(ConfigureEventModel.From(currentEvent));
 
@@ -428,7 +428,7 @@ internal class ConfigureEventFeature
     }
 
     static async Task<ConfigureEvent> WaitForSetupEvent(
-        NexusApiDriver api,
+        FunctionsApiDriver api,
         int setupEventId,
         Func<ConfigureEvent, bool> predicate,
         string expectedState
@@ -500,10 +500,10 @@ internal class ConfigureEventFeature
         };
     }
 
-    static void SelectCompetition(JudgeDriver judge, ConfigureEvent setupEvent, int competitionId)
+    static void SelectCompetition(ConsoleDriver console, ConfigureEvent setupEvent, int competitionId)
     {
-        judge.SelectSetupParent(setupEvent);
-        judge.SelectSetupParent(FindCompetition(setupEvent, competitionId));
+        console.SelectSetupParent(setupEvent);
+        console.SelectSetupParent(FindCompetition(setupEvent, competitionId));
     }
 
     static Competition FindCompetition(ConfigureEvent setupEvent, int competitionId)

@@ -71,7 +71,7 @@ public record Presentlist : ValueObject
 
     static PresentlistEntry? CreateRepresentationEntry(Participation participation, Phase phase)
     {
-        if (!phase.IsReinspectionRequested || phase.RepresentTime != null || phase.ArriveTime == null)
+        if (!phase.IsRepresentRequested || phase.RepresentTime != null || phase.ArriveTime == null)
         {
             return null;
         }

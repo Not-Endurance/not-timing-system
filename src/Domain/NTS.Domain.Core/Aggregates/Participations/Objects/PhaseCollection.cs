@@ -23,47 +23,33 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
     public Phase Current { get; private set; }
     public double Distance => this.Sum(x => x.Length);
 
-    internal SnapshotResult Process(Snapshot snapshot, Guid eventId)
+    /// <summary>The Phase a time belongs to, by the rule and with the limits that <see cref="Participation.PhaseAt"/> describes.</summary>
+    internal Phase PhaseAt(Timestamp time)
     {
-        var isComplete = Current.IsComplete();
-        if (isComplete && Current.IsFinal)
+        if (IsLast())
         {
-            return SnapshotResult.NotApplied(
-                eventId,
-                snapshot,
-                SnapshotResultType.NotAppliedDueToParticipationComplete
-            );
+            return Current;
         }
-        var notProcessingWindow = TimeSpan.FromMinutes(30); // TODO settings: use settings?
-        if (isComplete && snapshot.Timestamp > Current.GetOutTime() + notProcessingWindow)
-        {
-            return SnapshotResult.ActivePhaseComplete(eventId, snapshot);
-        }
-        return Current.Process(snapshot, eventId);
+
+        var next = GetNext();
+        return next.StartTime != null && time >= next.StartTime ? next : Current;
     }
 
-    internal void StartIfNext()
+    /// <summary>Makes the Phase the current one: the Participation is in it once a Snapshot or a request was placed there.</summary>
+    internal void Select(Phase phase)
     {
-        if (!Current.IsComplete())
-        {
-            throw GuardHelper.Exception("Cannot start next phase while current is active");
-        }
-        if (IsLast())
+        Current = phase;
+    }
+
+    /// <summary>The Phase after a complete one starts when it is out.</summary>
+    internal void StartNextAfter(Phase phase)
+    {
+        var index = IndexOf(phase);
+        if (index == Count - 1)
         {
             return;
         }
-        var next = GetNext();
-        next.StartTime = Current.GetOutTime();
-    }
-
-    internal bool SelectNext()
-    {
-        if (Current == this.Last())
-        {
-            return false;
-        }
-        Current = GetNext();
-        return true;
+        this[index + 1].StartTime = phase.GetOutTime();
     }
 
     public override string ToString()

@@ -4,8 +4,11 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Not.Identity.Email;
 
 namespace NTS.Tests.Integration.Infrastructure;
 
@@ -21,6 +24,7 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     /// connection to read it from: this stands in for the address a proxy would forward.
     /// </summary>
     public const string CLIENT_ADDRESS_HEADER = "X-Test-Client";
+    public const string USER_SECRETS_FILE = "secrets.json";
 
     public static string NewDataProtectionKeys()
     {
@@ -30,9 +34,11 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     readonly string _mongoConnectionString;
     readonly string _environment;
     readonly string? _emailSender;
+    readonly bool _outbox;
     readonly string _dataProtectionKeys;
     readonly TimeProvider? _time;
     readonly bool _productionRateLimits;
+    readonly bool _finaliseRankings;
     readonly Action<IServiceCollection>? _configureServices;
     readonly Action<IWebHostBuilder>? _configureHost;
 
@@ -40,8 +46,9 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     /// <param name="kestrel">Listen on a real loopback port instead of being reached in memory.</param>
     /// <param name="environment">The hosting environment: Production behaves as it does in production.</param>
     /// <param name="emailSender">
-    /// <c>Outbox</c> by default, so a test reads the codes it asks for. Production refuses the outbox, and a host in
-    /// Production has no sender at all unless a test adds one.
+    /// The <c>Email:Sender</c> setting of the host (<c>Brevo</c> or <c>Console</c>). By default a host sends to the
+    /// <see cref="OutboxEmailSender"/>, so a test reads the codes it asks for. A host in Production has no sender at
+    /// all unless a test adds one.
     /// </param>
     /// <param name="dataProtectionKeys">
     /// The folder of the key ring. A host that must read what another protected shares it. By default each host has
@@ -52,6 +59,10 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     /// The limits of authentication as they are in production, which the tests of the limits run with. By default they
     /// are lifted far above anything a test does, so that a test that asks for many codes is not stopped by them.
     /// </param>
+    /// <param name="finaliseRankings">
+    /// The host is given no word on the finalisation of Rankings, as in production, where the sweep runs at start and every
+    /// hour. By default it is told not to: a test that seeds Events must not find them finalised by a host it did not ask to.
+    /// </param>
     public ApiFactory(
         string mongoConnectionString,
         bool kestrel = false,
@@ -61,7 +72,8 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
         TimeProvider? time = null,
         Action<IServiceCollection>? configureServices = null,
         Action<IWebHostBuilder>? configureHost = null,
-        bool productionRateLimits = false
+        bool productionRateLimits = false,
+        bool finaliseRankings = false
     )
     {
         // Azure supplies PORT to the deployed host. A developer's own PORT must not bind a second listener here.
@@ -69,10 +81,12 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
 
         _mongoConnectionString = mongoConnectionString;
         _environment = environment;
-        _emailSender = emailSender ?? (environment == "Production" ? null : "Outbox");
+        _emailSender = emailSender;
+        _outbox = emailSender == null && environment != "Production";
         _dataProtectionKeys = dataProtectionKeys ?? NewDataProtectionKeys();
         _time = time;
         _productionRateLimits = productionRateLimits;
+        _finaliseRankings = finaliseRankings;
         _configureServices = configureServices;
         _configureHost = configureHost;
         if (kestrel)
@@ -95,10 +109,32 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment(_environment);
+        builder.ConfigureAppConfiguration(
+            (_, configuration) =>
+            {
+                // The user-secrets of a developer hold what they run the platform with on their machine (the local sign in
+                // as and a connection string, #607). Development reads them, so a test host that is in Development would
+                // read them as well and depend on whose machine it runs on. The source names the file, not its path.
+                foreach (
+                    var secrets in configuration
+                        .Sources.OfType<JsonConfigurationSource>()
+                        .Where(x => x.Path == USER_SECRETS_FILE)
+                        .ToList()
+                )
+                {
+                    configuration.Sources.Remove(secrets);
+                }
+            }
+        );
         builder.UseSetting("MONGO_CONNECTION_STRING", _mongoConnectionString);
         if (_emailSender != null)
         {
             builder.UseSetting("Email:Sender", _emailSender);
+        }
+
+        if (!_finaliseRankings)
+        {
+            builder.UseSetting("RankingFinalisation:Enabled", "false");
         }
 
         if (!_productionRateLimits)
@@ -107,6 +143,11 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
             {
                 builder.UseSetting($"Auth:RateLimits:{limit}", "1000000");
             }
+
+            foreach (var limit in new[] { "PerAccount", "Overall" })
+            {
+                builder.UseSetting($"Search:RateLimits:{limit}", "1000000");
+            }
         }
 
         _configureHost?.Invoke(builder);
@@ -114,6 +155,17 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
         {
             services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(_dataProtectionKeys));
             services.AddSingleton<IStartupFilter, ClientAddressFromHeader>();
+            if (_outbox)
+            {
+                services.RemoveAll<IEmailSender>();
+                services.AddSingleton<IEmailSender, OutboxEmailSender>();
+            }
+
+            // A test that swaps the sender for one that keeps its mail reads it from the same place.
+            services.AddSingleton<IEmailOutbox>(provider =>
+                provider.GetRequiredService<IEmailSender>() as IEmailOutbox
+                ?? throw new InvalidOperationException("The email sender keeps no outbox.")
+            );
             if (_time != null)
             {
                 services.RemoveAll<TimeProvider>();

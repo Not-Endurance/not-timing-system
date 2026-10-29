@@ -46,21 +46,6 @@ internal sealed class AuthRateLimitOptions
     public TimeSpan Window { get; set; } = TimeSpan.FromHours(1);
 }
 
-/// <summary>What stood in the way of a request, and how long until it would not.</summary>
-internal sealed class RateLimitRefusal
-{
-    public RateLimitRefusal(string scope, TimeSpan retryAfter)
-    {
-        Scope = scope;
-        RetryAfter = retryAfter;
-    }
-
-    /// <summary>The budget that was spent, such as <c>send/address</c>. It names no address and no client.</summary>
-    public string Scope { get; }
-
-    public TimeSpan RetryAfter { get; }
-}
-
 /// <summary>
 /// Counts what each request costs against the budgets it draws on and refuses it when one is spent. A refused request
 /// costs nothing, so a window ends when it was due to. What a request draws on does not depend on whether its address
@@ -70,16 +55,11 @@ internal sealed class RateLimitRefusal
 /// </summary>
 internal sealed class AuthRateLimiter
 {
-    static readonly TimeSpan SWEEP_EVERY = TimeSpan.FromMinutes(1);
-
-    readonly object _lock = new();
-    readonly Dictionary<string, Window> _windows = new();
+    readonly RateLedger _ledger;
     readonly AuthRateLimitOptions _options;
     readonly ILookupNormalizer _normalizer;
-    readonly TimeProvider _time;
     readonly EventThrottle _throttle;
     readonly ILogger<AuthRateLimiter> _logger;
-    DateTimeOffset _nextSweep;
 
     public AuthRateLimiter(
         IOptions<AuthRateLimitOptions> options,
@@ -91,7 +71,7 @@ internal sealed class AuthRateLimiter
     {
         _options = options.Value;
         _normalizer = normalizer;
-        _time = time;
+        _ledger = new RateLedger(time);
         _throttle = throttle;
         _logger = logger;
     }
@@ -102,9 +82,9 @@ internal sealed class AuthRateLimiter
         var address = AddressOf(email);
         return Take(
             [
-                new Budget("send/address", $"send|address|{address}", _options.SendsPerAddress),
-                new Budget("send/client", $"send|client|{client}", _options.SendsPerClient),
-                new Budget("send/overall", "send|overall", _options.SendsOverall),
+                new RateBudget("send/address", $"send|address|{address}", _options.SendsPerAddress),
+                new RateBudget("send/client", $"send|client|{client}", _options.SendsPerClient),
+                new RateBudget("send/overall", "send|overall", _options.SendsOverall),
             ]
         );
     }
@@ -118,124 +98,43 @@ internal sealed class AuthRateLimiter
     /// <summary>Gives back what <see cref="TryVerify"/> took, for a code that was right.</summary>
     public void Succeeded(string email, string client)
     {
-        lock (_lock)
-        {
-            var now = _time.GetUtcNow();
-            foreach (var budget in VerificationBudgets(email, client))
-            {
-                if (_windows.TryGetValue(budget.Key, out var window) && window.ResetsAt > now && window.Count > 0)
-                {
-                    window.Count--;
-                }
-            }
-        }
+        _ledger.Give(VerificationBudgets(email, client));
     }
 
-    Budget[] VerificationBudgets(string email, string client)
+    RateBudget[] VerificationBudgets(string email, string client)
     {
         var address = AddressOf(email);
         return
         [
-            new Budget("verify/address", $"verify|address|{address}|{client}", _options.FailedVerificationsPerAddress),
-            new Budget("verify/client", $"verify|client|{client}", _options.FailedVerificationsPerClient),
-            new Budget("verify/overall", "verify|overall", _options.FailedVerificationsOverall),
+            new RateBudget(
+                "verify/address",
+                $"verify|address|{address}|{client}",
+                _options.FailedVerificationsPerAddress
+            ),
+            new RateBudget("verify/client", $"verify|client|{client}", _options.FailedVerificationsPerClient),
+            new RateBudget("verify/overall", "verify|overall", _options.FailedVerificationsOverall),
         ];
     }
 
-    RateLimitRefusal? Take(Budget[] budgets)
+    RateLimitRefusal? Take(RateBudget[] budgets)
     {
-        lock (_lock)
+        var refusal = _ledger.TryTake(budgets, _options.Window);
+        if (refusal != null && _throttle.ShouldLog($"{AuthEvents.RATE_LIMITED.Name}/{refusal.Scope}", out var leftOut))
         {
-            var now = _time.GetUtcNow();
-            Sweep(now);
-
-            RateLimitRefusal? refusal = null;
-            foreach (var budget in budgets)
-            {
-                if (!_windows.TryGetValue(budget.Key, out var window) || window.ResetsAt <= now)
-                {
-                    continue;
-                }
-
-                if (window.Count >= budget.Limit && (refusal is null || window.ResetsAt - now > refusal.RetryAfter))
-                {
-                    refusal = new RateLimitRefusal(budget.Scope, window.ResetsAt - now);
-                }
-            }
-
-            if (refusal != null)
-            {
-                if (_throttle.ShouldLog($"{AuthEvents.RATE_LIMITED.Name}/{refusal.Scope}", out var leftOut))
-                {
-                    _logger.LogWarning(
-                        AuthEvents.RATE_LIMITED,
-                        "A request was refused: the {Scope} limit is spent, for another {RetryAfter} s. {LeftOut} refused since the last report.",
-                        refusal.Scope,
-                        (int)refusal.RetryAfter.TotalSeconds,
-                        leftOut
-                    );
-                }
-
-                return refusal;
-            }
-
-            foreach (var budget in budgets)
-            {
-                if (!_windows.TryGetValue(budget.Key, out var window) || window.ResetsAt <= now)
-                {
-                    window = new Window(now + _options.Window);
-                    _windows[budget.Key] = window;
-                }
-
-                window.Count++;
-            }
-
-            return null;
-        }
-    }
-
-    /// <summary>A window that is over is of no use to anyone: they are dropped now and then, so a flood of addresses cannot fill the memory.</summary>
-    void Sweep(DateTimeOffset now)
-    {
-        if (now < _nextSweep)
-        {
-            return;
+            _logger.LogWarning(
+                AuthEvents.RATE_LIMITED,
+                "A request was refused: the {Scope} limit is spent, for another {RetryAfter} s. {LeftOut} refused since the last report.",
+                refusal.Scope,
+                (int)refusal.RetryAfter.TotalSeconds,
+                leftOut
+            );
         }
 
-        _nextSweep = now + SWEEP_EVERY;
-        foreach (var expired in _windows.Where(x => x.Value.ResetsAt <= now).Select(x => x.Key).ToList())
-        {
-            _windows.Remove(expired);
-        }
+        return refusal;
     }
 
     string AddressOf(string email)
     {
         return _normalizer.NormalizeEmail(email) ?? string.Empty;
-    }
-
-    sealed class Window
-    {
-        public Window(DateTimeOffset resetsAt)
-        {
-            ResetsAt = resetsAt;
-        }
-
-        public DateTimeOffset ResetsAt { get; }
-        public int Count { get; set; }
-    }
-
-    sealed class Budget
-    {
-        public Budget(string scope, string key, int limit)
-        {
-            Scope = scope;
-            Key = key;
-            Limit = limit;
-        }
-
-        public string Scope { get; }
-        public string Key { get; }
-        public int Limit { get; }
     }
 }

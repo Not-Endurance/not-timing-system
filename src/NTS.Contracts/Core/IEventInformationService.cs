@@ -4,6 +4,6 @@ namespace NTS.Contracts.Core;
 
 public interface IEventInformationService
 {
-    Task<IEnumerable<EventInformation>> GetActive();
-    Task<IEnumerable<EventInformation>> GetPast();
+    Task<IEnumerable<EventInformation>> GetLive();
+    Task<IEnumerable<EventInformation>> GetHistoric();
 }

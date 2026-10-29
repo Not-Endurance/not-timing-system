@@ -22,7 +22,7 @@
                             Style="align-self:center;">
 
                         <NNavLink Endpoint="@PROFILE_PAGE" MenuItem="true">
-                            <MudText Typo="Typo.body2" Color="Color.Primary">@Profile_page_string</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Primary">@Account_string</MudText>
                         </NNavLink>
 
                         <MudMenuItem OnClick="Signout">
@@ -47,29 +47,29 @@
     
     <MudDivider Class="my-2" />
 
-    @if (HasActiveEvent)
+    @if (HasLiveEvent)
     {
-        <MudNavGroup Title="@ActiveEventTitle" Expanded="true">
+        <MudNavGroup Title="@LiveEventTitle" Expanded="true">
             @if (ShowSnapshots)
             {
-                <NNavLink Endpoint="@SNAPSHOT_PAGE">
+                <NNavLink Endpoint="@LiveEventRoute(EVENT_SNAPSHOT_PAGE)">
                     <strong>@Snapshot_page_string</strong>
                 </NNavLink>
             }
 
-            <NNavLink Endpoint="@STARTLIST_PAGE">
+            <NNavLink Endpoint="@LiveEventRoute(EVENT_STARTLIST_PAGE)">
                 <strong>@Startlist_string</strong>
             </NNavLink>
 
-            <NNavLink Endpoint="@ARRIVELIST_PAGE">
+            <NNavLink Endpoint="@LiveEventRoute(EVENT_ARRIVELIST_PAGE)">
                 <strong>@Arrivelist_string</strong>
             </NNavLink>
 
-            <NNavLink Endpoint="@PRESENTLIST_PAGE">
+            <NNavLink Endpoint="@LiveEventRoute(EVENT_PRESENTLIST_PAGE)">
                 <strong>@Presentlist_string</strong>
             </NNavLink>
 
-            <NNavLink Endpoint="@PERFORMANCE_PAGE">
+            <NNavLink Endpoint="@LiveEventRoute(EVENT_PERFORMANCE_PAGE)">
                 <strong>@Performance_string</strong>
             </NNavLink>
         </MudNavGroup>
@@ -78,8 +78,8 @@
     <MudNavLink OnClick="OpenSelectEventDialog">@Select_event_string</MudNavLink>
 
     <MudNavGroup Title="@History_string" Expanded="true">
-        <NNavLink Endpoint="@PAST_EVENTS_PAGE">
-            <strong>@Past_events_string</strong>
+        <NNavLink Endpoint="@HISTORIC_EVENTS_PAGE">
+            <strong>@Historic_events_string</strong>
         </NNavLink>
     </MudNavGroup>
 

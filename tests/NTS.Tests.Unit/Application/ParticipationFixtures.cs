@@ -1,6 +1,7 @@
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Enums;
@@ -30,9 +31,20 @@ internal static class ParticipationFixtures
     /// <summary>Every Phase has arrived and presented.</summary>
     public static Participation Completed(int number)
     {
+        return CompletedIn(TestId.Of(1), number);
+    }
+
+    /// <summary>Every Phase has arrived and presented, in the Event.</summary>
+    public static Participation CompletedIn(Guid eventId, int number)
+    {
         var start = DateTimeOffset.Now.AddHours(-2);
         var arrive = start.AddHours(1);
-        return Create(number, CreatePhase(start, arrive, arrive.AddMinutes(5), isFinal: true), eliminated: null);
+        return Create(
+            number,
+            CreatePhase(start, arrive, arrive.AddMinutes(5), isFinal: true),
+            eliminated: null,
+            eventId: eventId
+        );
     }
 
     /// <summary>Every Phase has arrived (at that time) and presented.</summary>
@@ -57,7 +69,7 @@ internal static class ParticipationFixtures
         return Create(number, CreatePhase(DateTimeOffset.Now.AddMinutes(-10), isFinal: true), new Withdrawn());
     }
 
-    static Participation Create(int number, Phase phase, Eliminated? eliminated)
+    static Participation Create(int number, Phase phase, Eliminated? eliminated, Guid? eventId = null)
     {
         var country = new Country(TestId.Of(number), "Bulgaria", "BG", "BUL", "bg-BG");
         var athlete = new Athlete($"Athlete {number}", null, country, null, null, TestId.Of(number));
@@ -79,7 +91,7 @@ internal static class ParticipationFixtures
             combination,
             new PhaseCollection([phase]),
             eliminated,
-            eventId: TestId.Of(1),
+            eventId: eventId ?? TestId.Of(1),
             id: TestId.Of(number)
         );
     }

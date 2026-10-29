@@ -11,7 +11,4 @@ public class StartlistHistoryViewBehind : NComponent
     [Parameter]
     public IReadOnlyDictionary<int, IReadOnlyList<Starter>> HistoryByStage { get; set; } =
         new Dictionary<int, IReadOnlyList<Starter>>();
-
-    [Parameter]
-    public bool ShowTitle { get; set; } = true;
 }

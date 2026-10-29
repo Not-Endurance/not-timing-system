@@ -70,7 +70,7 @@ public sealed class AccessBaselineTests
     [Fact]
     public void An_endpoint_the_list_does_not_name_is_protected()
     {
-        Assert.Equal(EndpointAccess.Protected, PublicEndpoints.AccessOf("GET", "api/events/{id}"));
+        Assert.Equal(EndpointAccess.Protected, PublicEndpoints.AccessOf("GET", "api/clubs/{id}"));
         Assert.Equal(EndpointAccess.Protected, PublicEndpoints.AccessOf("POST", "api/me/profile"));
         Assert.Equal(EndpointAccess.Protected, PublicEndpoints.AccessOf("GET", null));
     }
@@ -83,6 +83,11 @@ public sealed class AccessBaselineTests
     [InlineData("GET", "api/sessions", "protected")]
     [InlineData("DELETE", "api/sessions/current", "sign-in")]
     [InlineData("get", "sign-in", "sign-in")]
+    [InlineData("GET", "api/events/live", "public-read")]
+    [InlineData("GET", "api/events/{id}", "public-read")]
+    [InlineData("POST", "api/events", "protected")] // anybody reads an Event, and starting one needs a caller
+    [InlineData("PATCH", "api/events/{id}", "protected")]
+    [InlineData("DELETE", "api/events/{id}", "protected")]
     public void The_list_names_a_method_and_a_path_together(string method, string pattern, string expected)
     {
         Assert.Equal(Parse(expected), PublicEndpoints.AccessOf(method, pattern));

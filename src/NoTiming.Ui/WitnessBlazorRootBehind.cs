@@ -1,13 +1,31 @@
 using System.Reflection;
-using Not.Blazor.Client.Authentication;
+using Microsoft.AspNetCore.Components.Routing;
+using Not.Blazor.Client.Lazy;
 using Not.Blazor.Components.Abstractions;
 
 namespace NoTiming.Ui;
 
 public class WitnessBlazorRootBehind : NComponent
 {
-    protected IEnumerable<Assembly> RouteAssemblies { get; } = [typeof(AuthenticationContents).Assembly];
+    [Inject]
+    protected ILazyAssemblies LazyAssemblies { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public Assembly Assembly { get; set; } = default!;
+
+    /// <summary>
+    /// Fetches the assemblies a path needs before the router looks for its page (<see cref="LazyRoutes"/>): the pages of the
+    /// Console are not part of what is downloaded to open the app.
+    /// </summary>
+    protected async Task LoadAssembliesFor(NavigationContext context)
+    {
+        try
+        {
+            await LazyAssemblies.LoadFor(context.Path);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
 }

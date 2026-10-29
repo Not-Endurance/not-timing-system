@@ -1,31 +1,26 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Components.Buttons;
-using Not.Notify;
-using NTS.Contracts.Features.Snapshots;
+using NTS.Contracts.Core;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 
 namespace NoTiming.Ui.Features.Core.Snapshots.Components;
 
-public class SnapshotHistoryBehind : NStatefulComponent
+public class SnapshotHistoryBehind : SnapshotBehindBase
 {
     int? _expandedIndex;
     int _historyCount = -1;
     bool _isResending;
 
-    [Inject]
-    protected INotifier Notifier { get; set; } = default!;
+    [CascadingParameter]
+    IViewedEvent View { get; set; } = default!;
 
     [Inject]
     protected INtsSocketContext SocketContext { get; set; } = default!;
 
-    [Inject]
-    protected ISnapshotService SnapshotService { get; set; } = default!;
-
     protected IReadOnlyList<SnapshotGroup> History => [.. SnapshotService.History.Reverse()];
-    protected bool CanResend => SocketContext.IsConnected && SocketContext.Event != null;
+    protected bool CanResend => View.CanWrite && SocketContext.IsConnected && SocketContext.Event != null;
     protected bool IsResending => _isResending;
 
     protected override async Task OnInitializedAsync()
@@ -79,36 +74,22 @@ public class SnapshotHistoryBehind : NStatefulComponent
 
     protected async Task ResendGroup(SnapshotGroup group, SnapshotType snapshotType)
     {
-        try
+        if (_isResending || !CanResend)
         {
-            if (_isResending || !CanResend)
+            return;
+        }
+
+        _isResending = true;
+        await SendAsync(
+            async () =>
             {
-                return;
-            }
-
-            _isResending = true;
-            await SnapshotService.RePublish(group, snapshotType);
-            Notifier.Success(string.Format(Snapshots_sent_as__string, GetSnapshotTypeText(snapshotType)));
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
-        finally
-        {
-            _isResending = false;
-            StateHasChanged();
-        }
-    }
-
-    protected string GetSnapshotTypeText(SnapshotType snapshotType)
-    {
-        return snapshotType switch
-        {
-            SnapshotType.Arrive => Arrive_string,
-            SnapshotType.Present => Presentation_string,
-            _ => snapshotType.ToString(),
-        };
+                await SnapshotService.RePublish(View, group, snapshotType);
+                return true;
+            },
+            snapshotType
+        );
+        _isResending = false;
+        StateHasChanged();
     }
 
     protected override void OnBeforeRender()

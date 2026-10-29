@@ -6,10 +6,10 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Application.Core;
 
-public class EventInformationService : NStatefulService, IActiveEventsContext, IEventInformationService
+public class EventInformationService : NStatefulService, ILiveEventsContext, IEventInformationService
 {
     readonly IEventInformationRepository _eventInformation;
-    List<EventInformation> _activeEvents = [];
+    List<EventInformation> _liveEvents = [];
 
     public EventInformationService(IEventInformationRepository eventInformation)
     {
@@ -18,23 +18,23 @@ public class EventInformationService : NStatefulService, IActiveEventsContext, I
 
     protected override async Task<bool> InitializeState()
     {
-        _activeEvents = await _eventInformation.ReadActive().ToList();
+        _liveEvents = await _eventInformation.ReadLive().ToList();
         return true;
     }
 
-    public Task<IEnumerable<EventInformation>> GetActive()
+    public Task<IEnumerable<EventInformation>> GetLive()
     {
-        return _eventInformation.ReadActive();
+        return _eventInformation.ReadLive();
     }
 
-    public Task<IEnumerable<EventInformation>> GetPast()
+    public Task<IEnumerable<EventInformation>> GetHistoric()
     {
-        return _eventInformation.ReadPast();
+        return _eventInformation.ReadHistoric();
     }
 
-    public bool IsActive(ConfigureEvent configureEvent)
+    public bool IsLive(ConfigureEvent configureEvent)
     {
-        return _activeEvents.Any(x => x.Id == configureEvent.Id);
+        return _liveEvents.Any(x => x.Id == configureEvent.Id);
     }
 
     // TODO: Create and consume ICache<EventInformation> with TTL and invalidate method.
@@ -43,14 +43,14 @@ public class EventInformationService : NStatefulService, IActiveEventsContext, I
     // When values are manipulated. Consumers shouldn't care or know how the cache is repopulated.
     public void Add(EventInformation eventInformation)
     {
-        _activeEvents.RemoveAll(x => x.Id == eventInformation.Id);
-        _activeEvents.Add(eventInformation);
+        _liveEvents.RemoveAll(x => x.Id == eventInformation.Id);
+        _liveEvents.Add(eventInformation);
         EmitChanged();
     }
 
     public void Remove(Guid eventId)
     {
-        _activeEvents.RemoveAll(x => x.Id == eventId);
+        _liveEvents.RemoveAll(x => x.Id == eventId);
         EmitChanged();
     }
 }

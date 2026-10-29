@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
 using Not.Identity;
 using NoTiming.Api.Features.Profile;
+using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
 
 namespace NoTiming.Api.Features.Account;
@@ -164,25 +165,7 @@ internal static class AccountEndpoints
     static async Task<IResult> GetMe(HttpContext context, UserManager<NIdentityUser> users)
     {
         var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        return JsonApiResults.Resource(
-            StatusCodes.Status200OK,
-            ACCOUNTS,
-            user.Id.ToString(),
-            new
-            {
-                email = user.Email,
-                emailConfirmed = user.EmailConfirmed,
-                name = user.TextOf("Name"),
-                passkeys = user.Passkeys.Count,
-                profileComplete = ProfileEndpoints.IsComplete(user),
-                homeTenantId = user.TextOf("HomeTenantId"),
-            }
-        );
+        return user is null ? JsonApiResults.NotSignedIn() : MeResource.Of(user, StatusCodes.Status200OK);
     }
 
     /// <summary>

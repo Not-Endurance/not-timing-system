@@ -1,13 +1,16 @@
 using Not.Application.HTTP;
 using NoTiming.Ui.Storage.REST;
-using NTS.Contracts.Core.Models;
-using NTS.Contracts.Socket;
+using NTS.Contracts.Core;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Ui.Storage.Core.Repositories;
 
-public class ParticipationEventScopedApiRepository : EventScopedApiRepository<Participation, ParticipationModel>
+/// <summary>The Participations of the Event the Ui has selected: every list names it.</summary>
+public class ParticipationEventScopedApiRepository : ParticipationApiRepository, IEventScopedRepository<Participation>
 {
-    public ParticipationEventScopedApiRepository(NHttpClient client, EventScopeFactory<Participation> eventScopeFactory)
-        : base("participations", client, eventScopeFactory) { }
+    public ParticipationEventScopedApiRepository(
+        JsonApiClient client,
+        EventScopeFactory<Participation> eventScopeFactory
+    )
+        : base(client, eventScopeFactory) { }
 }

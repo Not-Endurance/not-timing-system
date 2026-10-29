@@ -6,7 +6,6 @@ using Microsoft.Extensions.Time.Testing;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Not.Identity;
-using Not.Identity.Email;
 using NTS.Tests.Integration.Infrastructure;
 
 namespace NTS.Tests.Integration;
@@ -425,16 +424,25 @@ public sealed class SignInTests : IClassFixture<MongoFixture>
         Assert.True(after.Contains("ConcurrencyStamp"));
     }
 
-    [Theory]
-    [InlineData("Outbox")]
-    [InlineData("Console")]
-    public async Task Production_refuses_to_start_with_an_email_sender_that_exposes_the_codes(string sender)
+    [Fact]
+    public async Task Production_with_the_console_sender_fails_loudly_instead_of_printing_a_code()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString, environment: "Production", emailSender: sender);
+        await using var api = new ApiFactory(
+            _mongo.ConnectionString,
+            environment: "Production",
+            emailSender: "Console"
+        );
+        using var client = api.CreateClient(
+            new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") }
+        );
+        var email = await SeedUser();
 
-        var refused = Assert.ThrowsAny<Exception>(() => api.CreateClient());
+        // A real host answers 500; the in-memory test host hands the exception to the caller.
+        var refused = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => ApiSessions.RequestCodeAsync(client, email)
+        );
 
-        Assert.Contains("Production refuses", refused.ToString());
+        Assert.Contains("Production refuses", refused.Message);
     }
 
     [Fact]
@@ -512,7 +520,7 @@ public sealed class SignInTests : IClassFixture<MongoFixture>
 
     [Theory]
     [InlineData("/startlist", "/startlist")]
-    [InlineData("/past-events/7?tab=results", "/past-events/7?tab=results")]
+    [InlineData("/historic-events/7?tab=results", "/historic-events/7?tab=results")]
     [InlineData("//evil.example/path", "/")]
     [InlineData("/\\evil.example", "/")]
     [InlineData("https://evil.example/", "/")]

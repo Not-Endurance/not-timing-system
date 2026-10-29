@@ -1,7 +1,15 @@
+using Microsoft.Extensions.Localization;
+using Not.Localization;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
+using NoTiming.Api.Features.EventData;
+using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
+using NoTiming.Api.Features.Localhost;
 using NoTiming.Api.Features.Profile;
+using NoTiming.Api.Features.Reference;
+using NoTiming.Api.Features.Snapshots;
+using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.Features.UserSessions;
 using NTS.Contracts;
 
@@ -12,6 +20,7 @@ internal static class ApiPipeline
     public static WebApplication UseNoTimingApi(this WebApplication app)
     {
         BindAzurePort(app);
+        LocalizationHelper.Configure(app.Services.GetRequiredService<IStringLocalizer>());
 
         if (!app.Environment.IsDevelopment())
         {
@@ -48,7 +57,19 @@ internal static class ApiPipeline
                 )
         );
         app.MapAccount();
+        app.MapLocalhost();
         app.MapProfile();
+        app.MapTenancy();
+        app.MapEvents();
+        app.MapEventResources();
+        app.MapHistoricEventRedirects();
+        app.MapSetups();
+        app.MapEventGrants();
+        app.MapAccountSearch();
+        app.MapRegistrySearch();
+        app.MapReference();
+        app.MapEventData();
+        app.MapSnapshots();
         app.MapUserSessions();
         app.MapHub<LiveHub>(ApplicationConstants.LIVE_HUB).RequireCors(ApiServices.CORS_POLICY_NAME);
 

@@ -1,0 +1,9 @@
+@using NoTiming.Ui.Components.EventViews
+@using NTS.Domain.Access
+
+@attribute [Route(HISTORIC_EVENT_DETAILS_PAGE)]
+@inherits HistoricEventDetailsContentBehind
+
+<ViewedEventScope EventId="EventId" Shows="CoreView.Results">
+    <EventResults />
+</ViewedEventScope>

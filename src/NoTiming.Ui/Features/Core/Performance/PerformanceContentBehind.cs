@@ -1,21 +1,17 @@
-using Not.Blazor.Components.Abstractions;
-using NoTiming.Ui.Features.Socket;
+using NoTiming.Ui.Features.Core.EventViews;
 using NTS.Contracts.Core;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Ui.Features.Core.Performance;
 
-public class PerformanceContentBehind : NStatefulComponent
+public class PerformanceContentBehind : EventPageBehind
 {
     [Inject]
     IParticipationContext Context { get; set; } = default!;
 
     [Inject]
     IParticipationStore Store { get; set; } = default!;
-
-    [Inject]
-    BlazorSocketService BlazorSocketService { get; set; } = default!;
 
     protected IReadOnlyList<int> Recent => Context.RecentlyTimed;
 
@@ -31,14 +27,6 @@ public class PerformanceContentBehind : NStatefulComponent
     {
         await Observe(Context);
         await Observe(Store);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await BlazorSocketService.EnsureConnected();
-        }
     }
 
     protected Task<IEnumerable<Participation?>> Search(string term, CancellationToken _)

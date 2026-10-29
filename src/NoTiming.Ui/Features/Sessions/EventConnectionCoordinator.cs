@@ -30,7 +30,7 @@ public class EventConnectionCoordinator : IEventConnectionCoordinator, IScoped
             return;
         }
 
-        var events = await _eventInformationService.GetActive().ToList();
+        var events = await _eventInformationService.GetLive().ToList();
         if (events.Count == 0)
         {
             return;

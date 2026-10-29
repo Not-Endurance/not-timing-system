@@ -24,7 +24,7 @@ public class SelectEventDialogBehind : NDialog
     {
         try
         {
-            Events = await EventInformationService.GetActive();
+            Events = await EventInformationService.GetLive();
         }
         catch (Exception ex)
         {

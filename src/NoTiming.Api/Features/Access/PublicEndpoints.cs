@@ -37,15 +37,23 @@ internal sealed class PublicEndpoint
 /// </summary>
 internal static class PublicEndpoints
 {
-    /// <summary>How the route is reached; protected for any that the list does not name.</summary>
-    public static EndpointAccess AccessOf(string method, string? routePattern)
+    /// <summary>
+    /// How the route is reached; protected for any that the list does not name. The localhost bypass of a Debug build in
+    /// Development adds endpoints of its own, which are <paramref name="localhostEntries"/>: a deployed host has none.
+    /// </summary>
+    public static EndpointAccess AccessOf(
+        string method,
+        string? routePattern,
+        IEnumerable<PublicEndpoint>? localhostEntries = null
+    )
     {
         if (routePattern == null)
         {
             return EndpointAccess.Protected;
         }
 
-        return All.FirstOrDefault(x => x.Matches(method, routePattern))?.Access ?? EndpointAccess.Protected;
+        return All.Concat(localhostEntries ?? []).FirstOrDefault(x => x.Matches(method, routePattern))?.Access
+            ?? EndpointAccess.Protected;
     }
 
     public static IReadOnlyList<PublicEndpoint> All { get; } = Create();
@@ -55,6 +63,21 @@ internal static class PublicEndpoints
         return
         [
             new PublicEndpoint(EndpointAccess.PublicRead, "GET", "healthz"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "past-events"), // sent on to the historic events
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "past-events/{eventId:guid}"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events/live"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events/historic"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events/{id}"),
+            // what an Event keeps is what its public views show: Participations, Rankings, Officials and Handouts
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/participations"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/participations/{id}"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/rankings"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/rankings/{id}"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/officials"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/officials/{id}"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/handouts"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/handouts/{id}"),
             new PublicEndpoint(EndpointAccess.PublicRead, "GET,HEAD", "{**path:nonfile}"), // the Ui
             new PublicEndpoint(EndpointAccess.PublicRead, "*", ApplicationConstants.LIVE_HUB),
             new PublicEndpoint(EndpointAccess.PublicRead, "*", ApplicationConstants.LIVE_HUB + "/negotiate"),
