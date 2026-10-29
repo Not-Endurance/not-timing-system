@@ -38,7 +38,7 @@ Requirements for the scenarios:
 
 ## Browser Setup
 
-The passkey ceremonies (`PasskeyCeremonyTests`) and the registration (`RegistrationBrowserTests`) run Chromium with a virtual authenticator against the real pages of the Api, so they need the browser; so do the classes named `*BrowserTests`, which load the Ui and the Console from the Api in it, and CI installs it (`nts-integration-tests.yml`). Use one browser cache per operating system. For example, after building the test project:
+The passkey ceremonies (`PasskeyCeremonyTests`) and the registration (`RegistrationBrowserTests`) run Chromium with a virtual authenticator against the real pages of the Api, so they need the browser; so do the classes named `*BrowserTests`, which load the Ui and the Console from the Api in it, and CI installs it (`nts-cr.yaml` for pull requests into `master`; `nts-integration-tests.yml` on demand). Use one browser cache per operating system. For example, after building the test project:
 
 ```powershell
 $env:PLAYWRIGHT_BROWSERS_PATH = "$PWD\.tmp\ms-playwright"

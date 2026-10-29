@@ -85,3 +85,27 @@ jobs:
     # The shared library of the tests (ADR-0016): generic, no Docker and no browser.
     - name: Shared test library tests
       run: dotnet test nugets/Not.Test.Tests/Not.Test.Tests.csproj -c ${{ env.CONFIGURATION }} --no-build
+
+    # The integration tests (ADR-0016) need Docker and a browser, both on the runner. They run only for pull requests into master.
+    # Docker Hub rate-limits anonymous pulls, so the MongoDB image is pulled first, with retries.
+    - name: Pull the MongoDB image
+      if: github.base_ref == 'master'
+      run: |
+        for attempt in 1 2 3; do
+          if docker pull mongo:6.0; then exit 0; fi
+          sleep 30
+        done
+        exit 1
+
+    - name: Install Chromium for Playwright
+      if: github.base_ref == 'master'
+      shell: pwsh
+      run: ./tests/NTS.Tests.Integration/bin/${{ env.CONFIGURATION }}/net10.0/playwright.ps1 install --with-deps chromium
+
+    # Ryuk, the Testcontainers reaper, is off: the runner is discarded after the job, and its image comes from Docker Hub.
+    - name: Integration tests
+      if: github.base_ref == 'master'
+      timeout-minutes: 60
+      env:
+        TESTCONTAINERS_RYUK_DISABLED: "true"
+      run: dotnet test tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -c ${{ env.CONFIGURATION }} --no-build
