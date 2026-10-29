@@ -774,13 +774,20 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
         await SignInAndOpenAsync(_host, device, me.Email, "/profile");
+        // The first search is held until the text has moved on, and the second is answered at once. Nothing here waits for time.
         var searches = 0;
+        var moved = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var answered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         await page.RouteAsync(
             new Regex(@"/api/horses/all-tenants\?"),
             async route =>
             {
-                Interlocked.Increment(ref searches);
-                await Task.Delay(4000); // the Api is slow to answer
+                var number = Interlocked.Increment(ref searches);
+                if (number == 1)
+                {
+                    await moved.Task;
+                }
+
                 try
                 {
                     await route.ContinueAsync();
@@ -789,17 +796,25 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
                 {
                     // the page has abandoned the request meanwhile
                 }
+                finally
+                {
+                    if (number == 1)
+                    {
+                        answered.TrySetResult();
+                    }
+                }
             }
         );
         var add = page.GetByLabel("Add a Horse");
 
-        await add.PressSequentiallyAsync(cyrillic[..5], new() { Delay = 300 }); // the keys come slower than the pause of the autocomplete, and faster than the pause of this search
-        await Task.Delay(1500); // and the search for them was sent and is waited for
-        Assert.Equal(1, Volatile.Read(ref searches));
-        await add.PressSequentiallyAsync(cyrillic[5..], new() { Delay = 300 }); // and what was asked for is not wanted now
+        await add.PressSequentiallyAsync(cyrillic[..5]); // typed at once, the picker asks once, after its pause
+        await Eventually(async () => Volatile.Read(ref searches) == 1); // and that search is waited for
+        await add.PressSequentiallyAsync(cyrillic[5..]); // and what was asked for is not wanted now, while it waits
 
-        await Expect(page.GetByTestId("participant-match")).ToHaveCountAsync(1, Counted());
+        await Expect(page.GetByTestId("participant-match")).ToHaveCountAsync(1, Counted()); // the search for the whole text is answered
         Assert.Equal(2, Volatile.Read(ref searches));
+        moved.TrySetResult(); // the answer to the text that is not wanted goes to a list that has moved on
+        await answered.Task;
         await Expect(page.GetByRole(AriaRole.Dialog)).ToHaveCountAsync(0); // nobody is told of an error
         await NoUnhandledErrorAsync(page);
     }

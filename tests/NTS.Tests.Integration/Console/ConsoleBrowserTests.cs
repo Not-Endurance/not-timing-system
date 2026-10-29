@@ -2,8 +2,8 @@ using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Tests.Integration.Harness.UiBrowser;
 
 namespace NTS.Tests.Integration;
@@ -342,9 +342,11 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
         await AddToListAsync(page, "Combinations");
         await dialog.GetByLabel("Combination Number").FillAsync("7");
         await dialog.GetByLabel("Athlete").FillAsync("Ivan");
-        await page.GetByText("Ivan Petrov").First.ClickAsync();
+        await page.Locator(".mud-popover-open .mud-list-item")
+            .Filter(new() { HasText = "Ivan Petrov" })
+            .First.ClickAsync();
         await dialog.GetByLabel("Horse").FillAsync("Barz");
-        await page.GetByText("Barza").First.ClickAsync();
+        await page.Locator(".mud-popover-open .mud-list-item").Filter(new() { HasText = "Barza" }).First.ClickAsync();
         await dialog.GetByRole(AriaRole.Button, new() { Name = "Create", Exact = true }).ClickAsync();
         await Expect(page.GetByText("#7", new() { Exact = false }).First).ToBeVisibleAsync(Loaded());
     }
