@@ -1,5 +1,6 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
+using Not.Async;
 using Not.Injection;
 using Not.Storage.REST;
 using NTS.Contracts.Core;
@@ -26,7 +27,7 @@ public sealed class ParticipationStore
     readonly IEventScopedRepository<Participation> _participations;
     readonly INtsSocketContext? _socketContext;
     readonly object _lock = new();
-    readonly Dictionary<Guid, Reading> _readings = [];
+    readonly CoalesceInvoker<Guid> _refreshes = new();
     readonly HashSet<Guid> _refreshedWhileLoading = [];
     int _connection; // counts the connections: what a read of an earlier one brings back is dropped
     bool _loading;
@@ -142,63 +143,21 @@ public sealed class ParticipationStore
             return Task.CompletedTask; // a message that was on its way when the Event was left
         }
 
-        Reading reading;
-        lock (_lock)
-        {
-            if (_readings.TryGetValue(id, out var inFlight))
-            {
-                inFlight.ReadAgain = true;
-                return inFlight.Finished.Task;
-            }
-
-            reading = new Reading();
-            _readings[id] = reading;
-        }
-
-        _ = ReadUntilQuiet(id, reading);
-        return reading.Finished.Task;
+        return _refreshes.Invoke(id, () => ReadAndApply(id));
     }
 
-    async Task ReadUntilQuiet(Guid id, Reading reading)
+    async Task ReadAndApply(Guid id)
     {
-        try
+        int connection;
+        lock (_lock)
         {
-            while (true)
-            {
-                int connection;
-                lock (_lock)
-                {
-                    connection = _connection;
-                }
-
-                var read = await ReadAsync(id);
-                if (!read.Failed)
-                {
-                    Apply(id, read.Row, connection);
-                }
-
-                lock (_lock)
-                {
-                    if (!reading.ReadAgain)
-                    {
-                        _readings.Remove(id);
-                        break;
-                    }
-
-                    reading.ReadAgain = false;
-                }
-            }
-
-            reading.Finished.SetResult();
+            connection = _connection;
         }
-        catch (Exception ex)
-        {
-            lock (_lock)
-            {
-                _readings.Remove(id);
-            }
 
-            reading.Finished.SetException(ex);
+        var read = await ReadAsync(id);
+        if (!read.Failed)
+        {
+            Apply(id, read.Row, connection);
         }
     }
 
@@ -278,11 +237,5 @@ public sealed class ParticipationStore
         }
 
         return true;
-    }
-
-    sealed class Reading
-    {
-        public bool ReadAgain { get; set; }
-        public TaskCompletionSource Finished { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
     }
 }

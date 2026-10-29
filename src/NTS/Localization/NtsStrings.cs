@@ -368,7 +368,8 @@ namespace NTS.Localization
         public static string Time_not_taken_string => LocalizeString(nameof(Time_not_taken_string));
         public static string Not_signed_in_string => LocalizeString(nameof(Not_signed_in_string));
         public static string Now_string => LocalizeString(nameof(Now_string));
-        public static string Rankings_list_empty_message_string => LocalizeString(nameof(Rankings_list_empty_message_string));
+        public static string Rankings_list_empty_message_string =>
+            LocalizeString(nameof(Rankings_list_empty_message_string));
         public static string Handout_made_string => LocalizeString(nameof(Handout_made_string));
         public static string Handout_not_made_string => LocalizeString(nameof(Handout_not_made_string));
         public static string Startlist_empty_message_string => LocalizeString(nameof(Startlist_empty_message_string));
@@ -399,6 +400,12 @@ namespace NTS.Localization
         public static string Console_connected_string => LocalizeString(nameof(Console_connected_string));
         public static string Console_connecting_string => LocalizeString(nameof(Console_connecting_string));
         public static string Console_disconnected_string => LocalizeString(nameof(Console_disconnected_string));
+        public static string Is_on_time_for_Presentation_Inspection_string =>
+            LocalizeString(nameof(Is_on_time_for_Presentation_Inspection_string));
+        public static string Estimates_string => LocalizeString(nameof(Estimates_string));
+        public static string FEI_string => LocalizeString(nameof(FEI_string));
+        public static string Regional_string => LocalizeString(nameof(Regional_string));
+        public static string Both_string => LocalizeString(nameof(Both_string));
     }
 }
 #pragma warning restore NA0004

@@ -1,55 +1,64 @@
+using System.Text.Json;
+using Microsoft.JSInterop;
+using Not.Application.CRUD.Ports;
+using Not.Async;
+using Not.Blazor.Client.Browser;
 using Not.Events;
 using Not.Notify;
 using NoTiming.Ui.Features.Core.Dashboard;
+using NoTiming.Ui.Storage.Browser;
 using NTS.Contracts.Features.Account;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Objects;
 
 namespace NTS.Tests.Unit.Application;
 
-/// <summary>The group that was sent and not answered, as the browser keeps it: by person and Event, and as it was made.</summary>
-internal sealed class InMemoryUnansweredSnapshots : IUnansweredSnapshots
+/// <summary>
+/// The durable store of the browser under test: the real repository over a local storage that the test can make refuse, and a view
+/// of the groups that storage keeps, for the person and the Event they are of.
+/// </summary>
+internal sealed class DurableStore
 {
-    readonly Dictionary<(Guid, Guid), SnapshotGroup> _kept = [];
+    public DurableStore(IDelay delay)
+    {
+        Browser = new FakeLocalStorage();
+        Repository = new BrowserDurableRepository<DurableSnapshotGroup>(
+            new BrowserLocalStorage(Browser),
+            delay,
+            DurableSnapshotGroup.KEY_PREFIX,
+            DurableSnapshotGroup.Options
+        );
+    }
 
-    /// <summary>A storage that cannot be written, as a browser can be: it keeps nothing and says nothing.</summary>
-    public bool CannotKeep { get; set; }
+    public FakeLocalStorage Browser { get; }
 
-    /// <summary>What was asked of the store, in order.</summary>
-    public List<string> Calls { get; } = [];
+    public IDurableRepository<DurableSnapshotGroup> Repository { get; }
 
+    /// <summary>A storage that cannot be used, as a browser that refuses its storage: every call of it fails.</summary>
+    public bool CannotKeep
+    {
+        get => Browser.Fails != null;
+        set => Browser.Fails = value ? new JSException("The browser refuses its storage.") : null;
+    }
+
+    /// <summary>How many groups are kept, one entry for each.</summary>
+    public int Count =>
+        Browser.Items.Keys.Count(x => x.StartsWith(DurableSnapshotGroup.KEY_PREFIX, StringComparison.Ordinal));
+
+    /// <summary>The first group kept for the person and the Event, as it is made.</summary>
     public SnapshotGroup? Of(Guid accountId, Guid eventId)
     {
-        return _kept.GetValueOrDefault((accountId, eventId));
-    }
-
-    public Task<SnapshotGroup?> Read(Guid accountId, Guid eventId)
-    {
-        Calls.Add("read");
-        return Task.FromResult(Of(accountId, eventId));
-    }
-
-    public Task Keep(Guid accountId, Guid eventId, SnapshotGroup group)
-    {
-        Calls.Add("keep");
-        if (!CannotKeep)
-        {
-            _kept[(accountId, eventId)] = group;
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public Task Forget(Guid accountId, Guid eventId)
-    {
-        Calls.Add("forget");
-        _kept.Remove((accountId, eventId));
-        return Task.CompletedTask;
+        return Browser
+            .Items.Where(x => x.Key.StartsWith(DurableSnapshotGroup.KEY_PREFIX, StringComparison.Ordinal))
+            .Select(x => JsonSerializer.Deserialize<DurableSnapshotGroup>(x.Value, DurableSnapshotGroup.Options))
+            .OfType<DurableSnapshotGroup>()
+            .FirstOrDefault(x => x.AccountId == accountId && x.EventId == eventId)
+            ?.ToGroup();
     }
 }
 
 /// <summary>The time between two sends of a group that waits: it records how long the app waited and goes on when the test says.</summary>
-internal sealed class StepTimer : ISnapshotResendTimer
+internal sealed class StepTimer : IDelay
 {
     readonly List<TaskCompletionSource> _waiting = [];
 

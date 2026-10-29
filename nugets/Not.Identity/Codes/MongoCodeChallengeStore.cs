@@ -41,22 +41,22 @@ public sealed class MongoCodeChallengeStore : ICodeChallengeStore
         var now = _time.GetUtcNow();
         var code = GenerateCode();
         var protectedCode = _protector.Protect(code);
-        var createdAt = now.UtcDateTime;
-        var expiresAt = (now + _options.CodeLifetime).UtcDateTime;
-        var cooledDownBefore = (now - _options.CodeResendCooldown).UtcDateTime;
+        var createdAtUtc = now.UtcDateTime;
+        var expiresAtUtc = (now + _options.CodeLifetime).UtcDateTime;
+        var cooledDownBeforeUtc = (now - _options.CodeResendCooldown).UtcDateTime;
 
         // A challenge that is past its cooldown is replaced in place, so there is only ever one per address and purpose.
         var replaced = await _challenges.UpdateOneAsync(
             Builders<CodeChallenge>.Filter.And(
                 Builders<CodeChallenge>.Filter.Eq(x => x.Email, email),
                 Builders<CodeChallenge>.Filter.Eq(x => x.Purpose, purpose),
-                Builders<CodeChallenge>.Filter.Lte(x => x.CreatedAt, cooledDownBefore)
+                Builders<CodeChallenge>.Filter.Lte(x => x.CreatedAtUtc, cooledDownBeforeUtc)
             ),
             Builders<CodeChallenge>
                 .Update.Set(x => x.ProtectedCode, protectedCode)
                 .Set(x => x.Attempts, 0)
-                .Set(x => x.CreatedAt, createdAt)
-                .Set(x => x.ExpiresAt, expiresAt)
+                .Set(x => x.CreatedAtUtc, createdAtUtc)
+                .Set(x => x.ExpiresAtUtc, expiresAtUtc)
                 .Set(x => x.Pending, pending),
             cancellationToken: cancellationToken
         );
@@ -74,8 +74,8 @@ public sealed class MongoCodeChallengeStore : ICodeChallengeStore
                     Email = email,
                     Purpose = purpose,
                     ProtectedCode = protectedCode,
-                    CreatedAt = createdAt,
-                    ExpiresAt = expiresAt,
+                    CreatedAtUtc = createdAtUtc,
+                    ExpiresAtUtc = expiresAtUtc,
                     Pending = pending,
                 },
                 cancellationToken: cancellationToken
@@ -96,14 +96,14 @@ public sealed class MongoCodeChallengeStore : ICodeChallengeStore
         CancellationToken cancellationToken = default
     )
     {
-        var now = _time.GetUtcNow().UtcDateTime;
+        var nowUtc = _time.GetUtcNow().UtcDateTime;
 
         // The attempt is counted before the code is looked at, atomically, so concurrent guesses cannot exceed the limit.
         var challenge = await _challenges.FindOneAndUpdateAsync(
             Builders<CodeChallenge>.Filter.And(
                 Builders<CodeChallenge>.Filter.Eq(x => x.Email, email),
                 Builders<CodeChallenge>.Filter.Eq(x => x.Purpose, purpose),
-                Builders<CodeChallenge>.Filter.Gt(x => x.ExpiresAt, now),
+                Builders<CodeChallenge>.Filter.Gt(x => x.ExpiresAtUtc, nowUtc),
                 Builders<CodeChallenge>.Filter.Lt(x => x.Attempts, _options.CodeMaxAttempts)
             ),
             Builders<CodeChallenge>.Update.Inc(x => x.Attempts, 1),

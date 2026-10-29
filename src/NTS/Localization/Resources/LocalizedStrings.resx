@@ -1263,4 +1263,16 @@
   <data name="Console_disconnected_string" xml:space="preserve">
     <value>Not connected to {0}</value>
   </data>
+  <data name="Estimates_string" xml:space="preserve">
+    <value>Estimates</value>
+  </data>
+  <data name="FEI_string" xml:space="preserve">
+    <value>FEI</value>
+  </data>
+  <data name="Regional_string" xml:space="preserve">
+    <value>Regional</value>
+  </data>
+  <data name="Both_string" xml:space="preserve">
+    <value>Both</value>
+  </data>
 </root>

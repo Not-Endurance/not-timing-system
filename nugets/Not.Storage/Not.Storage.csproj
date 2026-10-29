@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.4.1" />
-    <PackageReference Include="MongoDB.Driver" Version="3.2.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.13.0" />
   </ItemGroup>
 
   <ItemGroup>

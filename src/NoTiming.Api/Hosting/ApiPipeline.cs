@@ -6,6 +6,7 @@ using NoTiming.Api.Features.Branding;
 using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
+using NoTiming.Api.Features.Localhost;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Snapshots;
@@ -57,9 +58,7 @@ internal static class ApiPipeline
                 )
         );
         app.MapAccount();
-#if DEBUG
-        app.MapLocalSignIn();
-#endif
+        app.MapLocalhost();
         app.MapProfile();
         app.MapTenancy();
         app.MapBranding();

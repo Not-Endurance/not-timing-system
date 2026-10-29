@@ -3,6 +3,7 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
@@ -660,7 +661,7 @@ public sealed class ParticipationSnapshotUpdateTests
     }
 
     /// <summary>The first Phase as it was stored with these events, a representation having been requested.</summary>
-    static Phase PhaseWith(params TimeEvent[] events)
+    static Phase PhaseWith(params ParticipationEventBase[] events)
     {
         return new Phase(
             "",

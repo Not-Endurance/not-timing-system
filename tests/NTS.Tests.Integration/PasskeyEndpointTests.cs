@@ -515,7 +515,7 @@ public sealed class PasskeyEndpointTests : IClassFixture<MongoFixture>
     }
 
     /// <summary>A mail provider that is down for exactly one mail: the one about a passkey. The rest goes to the outbox.</summary>
-    sealed class OutboxThatCannotSendPasskeyMail : IDevelopmentEmailSender, IEmailOutbox
+    sealed class OutboxThatCannotSendPasskeyMail : IEmailSender, IEmailOutbox
     {
         readonly OutboxEmailSender _outbox = new();
 

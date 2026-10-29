@@ -1,6 +1,7 @@
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
@@ -78,7 +79,7 @@ public class Participation : Aggregate, IEventScoped
     /// <param name="snapshot">The time that was captured.</param>
     /// <param name="actorId">The signed-in user that recorded it.</param>
     /// <param name="recordedAt">The instant the server recorded it.</param>
-    public TimeEvent Process(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
+    public ParticipationEventBase Process(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
     {
         var phase = Phases.PhaseAt(snapshot.Timestamp);
         var outBefore = phase.GetOutTime();
@@ -91,7 +92,7 @@ public class Participation : Aggregate, IEventScoped
         Phases.Select(phase);
         if (Eliminated == null)
         {
-            Reevaluate(phase, outBefore);
+            ReEvaluate(phase, outBefore);
         }
         return recorded;
     }
@@ -140,7 +141,7 @@ public class Participation : Aggregate, IEventScoped
         Phases.Select(phase);
         if (Eliminated == null || IsMadeByEvaluation(Eliminated))
         {
-            Reevaluate(phase, outBefore);
+            ReEvaluate(phase, outBefore);
         }
 
         return update;
@@ -154,7 +155,7 @@ public class Participation : Aggregate, IEventScoped
 
         var outBefore = phase.GetOutTime();
         phase.Update(state, actorId, recordedAt);
-        Reevaluate(phase, outBefore);
+        ReEvaluate(phase, outBefore);
     }
 
     /// <summary>
@@ -239,7 +240,7 @@ public class Participation : Aggregate, IEventScoped
     /// eliminated for time when the recovery is over the limit, or restored when it no longer is, the Phase after it starting
     /// when it is out, in place when its Out time moved, and the completion announced once when the Phase is complete.
     /// </summary>
-    void Reevaluate(Phase phase, Timestamp? outBefore)
+    void ReEvaluate(Phase phase, Timestamp? outBefore)
     {
         if (phase.ViolatesRecoveryTime())
         {

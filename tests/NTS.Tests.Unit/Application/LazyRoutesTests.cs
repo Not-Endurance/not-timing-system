@@ -1,5 +1,5 @@
+using Not.Blazor.Client.Lazy;
 using NoTiming.Console;
-using NoTiming.Ui.Features.Lazy;
 
 namespace NTS.Tests.Unit.Application;
 

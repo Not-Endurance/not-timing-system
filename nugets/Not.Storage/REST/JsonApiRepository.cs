@@ -65,9 +65,6 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>, IRowReader<
     protected JsonApiClient Client { get; }
     protected string Collection => _collection;
 
-    /// <summary>The members a new resource is made with; none means every member there is.</summary>
-    protected virtual IReadOnlyCollection<string>? CreateMembers => null;
-
     /// <summary>
     /// The members that are written when the resource is made and a change leaves as they are, such as the Event of a row:
     /// the Api refuses a change that names one.
@@ -88,8 +85,7 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>, IRowReader<
 
     protected virtual async Task<bool> CreateCore(T item)
     {
-        var members = CreateMembers;
-        var response = await Client.Send(HttpMethod.Post, _collection, Document(MapModel(item), members));
+        var response = await Client.Send(HttpMethod.Post, _collection, Document(MapModel(item), null));
         return response.IsSuccess ? Done() : Failed(response);
     }
 
@@ -404,11 +400,7 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>, IRowReader<
                 && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError
             )
             {
-#if DEBUG
-                Notifier?.Error(ex);
-#else
                 Notifier?.Warn(Not.Localization.NStrings.Cannot_connect_to_server_string);
-#endif
             }
             else
             {

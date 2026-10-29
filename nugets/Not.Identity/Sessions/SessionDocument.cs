@@ -14,10 +14,12 @@ internal sealed class SessionDocument
     /// <summary>The serialized authentication ticket: the principal and its properties.</summary>
     public byte[] Ticket { get; set; } = [];
 
+    [BsonElement("CreatedAt")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
 
     /// <summary>The TTL index deletes the document once this has passed.</summary>
+    [BsonElement("ExpiresAt")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-    public DateTime ExpiresAt { get; set; }
+    public DateTime ExpiresAtUtc { get; set; }
 }
