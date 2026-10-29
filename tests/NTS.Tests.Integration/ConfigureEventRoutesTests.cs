@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NoTiming.Api.JsonApi;
@@ -52,6 +53,60 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
         var stored = (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!;
         Assert.Equal("First Name", stored["Name"].AsString);
         Assert.Equal(tenant, stored["TenantId"].AsString);
+    }
+
+    [Fact]
+    public async Task A_Tenant_Root_makes_an_Event_with_everything_its_Setup_holds_in_one_request()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var id = Guid.NewGuid();
+        var sent = ConfigureEventModel.From(SetupFactory.Full(id, "Full Setup"));
+
+        var created = await CreateAsync(root, id, AttributesOf(sent));
+
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        var attributes = (await ApiSessions.ReadJsonAsync(created)).GetProperty("data").GetProperty("attributes");
+        var received = JsonSerializer.Deserialize<ConfigureEventModel>(
+            attributes.GetRawText(),
+            JsonApiResults.Options
+        )!;
+        received.Id = id;
+        received.TenantId = sent.TenantId;
+        received.MainOperatorId = sent.MainOperatorId;
+        Assert.Equal(
+            JsonSerializer.Serialize(sent, JsonApiResults.Options),
+            JsonSerializer.Serialize(received, JsonApiResults.Options)
+        );
+        var stored = (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!;
+        Assert.Equal(tenant, stored["TenantId"].AsString);
+        Assert.Equal(root.Id, stored["MainOperatorId"].AsGuid);
+        Assert.Single(stored["Competitions"].AsBsonArray);
+        Assert.Equal(2, stored["Loops"].AsBsonArray.Count);
+    }
+
+    [Fact]
+    public async Task A_Setup_the_domain_does_not_accept_is_422_when_an_Event_is_made_with_it_and_none_is_made()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var id = Guid.NewGuid();
+        var attributes = AttributesOf(ConfigureEventModel.From(SetupFactory.Full(id, "Twin loops")));
+        var loops = JsonNode.Parse(attributes["loops"].GetRawText())!.AsArray();
+        var twin = loops[0]!.DeepClone();
+        twin["id"] = Guid.NewGuid().ToString();
+        loops.Add(twin); // a second loop of the distance of the first
+        attributes["loops"] = JsonSerializer.SerializeToElement(loops);
+
+        var response = await CreateAsync(root, id, attributes);
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        Assert.Equal("invalid-attribute", await ErrorCodeAsync(response));
+        Assert.Null(await EventSeed.SetupOfAsync(_mongo.ConnectionString, id));
     }
 
     [Fact]
@@ -442,11 +497,16 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
 
     static Task<HttpResponseMessage> CreateAsync(Person person, string name, Guid? id = null)
     {
+        return CreateAsync(person, id, new { name, location = "Sofia" });
+    }
+
+    static Task<HttpResponseMessage> CreateAsync(Person person, Guid? id, object attributes)
+    {
         return person.Page.WriteAsync(
             HttpMethod.Post,
             "/api/configure-events",
             "configure-events",
-            new { name, location = "Sofia" },
+            attributes,
             id: id?.ToString()
         );
     }
