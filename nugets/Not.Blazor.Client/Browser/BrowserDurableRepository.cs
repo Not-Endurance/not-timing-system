@@ -1,78 +1,41 @@
-using System.Linq.Expressions;
 using System.Text.Json;
-using Microsoft.JSInterop;
 using Not.Application.CRUD.Ports;
+using Not.Async;
 
 namespace Not.Blazor.Client.Browser;
 
 /// <summary>
 /// A durable repository whose backup is kept in the local storage of the browser, one entry per id under the prefix (see
-/// <see cref="IDurableRepository{T}"/>). An item with no remote repository is kept only as its backup: its plain operations throw
-/// <see cref="NotImplementedException"/>, as there is no remote to ask, and a read finds nothing but the backup.
+/// <see cref="IDurableRepository{T}"/>). The retries wait five seconds at first, then longer, up to a minute.
 /// </summary>
 public sealed class BrowserDurableRepository<T> : IDurableRepository<T>
 {
-    readonly IRepository<T>? _remote;
+    static readonly TimeSpan FIRST_RETRY = TimeSpan.FromSeconds(5);
+    static readonly TimeSpan LONGEST_RETRY = TimeSpan.FromSeconds(60);
+
     readonly ILocalStorage _backup;
+    readonly IDelay _delay;
     readonly string _prefix;
     readonly JsonSerializerOptions _options;
 
-    public BrowserDurableRepository(
-        IRepository<T>? remote,
-        ILocalStorage backup,
-        string prefix,
-        JsonSerializerOptions options
-    )
+    public BrowserDurableRepository(ILocalStorage backup, IDelay delay, string prefix, JsonSerializerOptions options)
     {
-        _remote = remote;
         _backup = backup;
+        _delay = delay;
         _prefix = prefix;
         _options = options;
     }
 
     public async Task<bool> StoreDurably(Guid id, T item, Func<T, Task<bool>> send)
     {
-        await _backup.SetItem(KeyOf(id), JsonSerializer.Serialize(item, _options));
+        await TryHold(id, item);
         var final = await send(item);
         if (final)
         {
-            // Removing the backup is best effort once the server has answered: a backup that stays is sent again as the same group,
-            // and the server answers it with its first outcome.
-            try
-            {
-                await _backup.RemoveItem(KeyOf(id));
-            }
-            catch (Exception ex) when (ex is JSException or InvalidOperationException)
-            {
-                // The browser refuses to remove it: see above.
-            }
+            await TryRemove(id);
         }
 
         return final;
-    }
-
-    public async Task RemoveDurably(Guid id, T item)
-    {
-        await Remote().Delete(item);
-        await _backup.RemoveItem(KeyOf(id));
-    }
-
-    public async Task<T?> ReadDurably(Guid id)
-    {
-        var text = await _backup.GetItem(KeyOf(id));
-        if (text != null)
-        {
-            try
-            {
-                return JsonSerializer.Deserialize<T>(text, _options);
-            }
-            catch (JsonException)
-            {
-                await _backup.RemoveItem(KeyOf(id)); // what is kept is not an item, and would not be read the next time either
-            }
-        }
-
-        return _remote == null ? default : await _remote.Read(id);
     }
 
     public async Task<IReadOnlyList<T>> ReadPendingDurably(Func<T, bool> match)
@@ -112,49 +75,38 @@ public sealed class BrowserDurableRepository<T> : IDurableRepository<T>
         return _backup.RemoveItem(KeyOf(id));
     }
 
-    public Task Create(T item)
+    public Task RetryDurably(Func<bool> canRetry, Func<CancellationToken, Task<bool>> round, CancellationToken stop)
     {
-        return Remote().Create(item);
+        return RetryUntilDone.Run(_delay, new Retry(canRetry, round), FIRST_RETRY, LONGEST_RETRY, stop);
     }
 
-    public Task<T?> Read(Guid id)
+    /// <summary>
+    /// The backup is written before the remote is asked. A browser that refuses its storage, in any way, does not hold the request
+    /// back: the request goes on without a backup.
+    /// </summary>
+    async Task TryHold(Guid id, T item)
     {
-        return Remote().Read(id);
+        try
+        {
+            await _backup.SetItem(KeyOf(id), JsonSerializer.Serialize(item, _options));
+        }
+        catch (Exception)
+        {
+            // The browser refuses its storage: the request is made all the same, and is kept only as far as the caller keeps it.
+        }
     }
 
-    public Task<T?> Read(Expression<Func<T, bool>> filter)
+    async Task TryRemove(Guid id)
     {
-        return Remote().Read(filter);
-    }
-
-    public Task<IEnumerable<T>> ReadMany()
-    {
-        return Remote().ReadMany();
-    }
-
-    public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
-    {
-        return Remote().ReadMany(filter);
-    }
-
-    public Task Update(T item)
-    {
-        return Remote().Update(item);
-    }
-
-    public Task Delete(T item)
-    {
-        return Remote().Delete(item);
-    }
-
-    public Task DeleteMany(IEnumerable<T> items)
-    {
-        return Remote().DeleteMany(items);
-    }
-
-    public Task DeleteMany(Expression<Func<T, bool>> filter)
-    {
-        return Remote().DeleteMany(filter);
+        try
+        {
+            await _backup.RemoveItem(KeyOf(id));
+        }
+        catch (Exception)
+        {
+            // Removing the backup is best effort once the server has answered: a backup that stays is sent again as the same group,
+            // and the server answers it with its first outcome.
+        }
     }
 
     string KeyOf(Guid id)
@@ -162,9 +114,23 @@ public sealed class BrowserDurableRepository<T> : IDurableRepository<T>
         return _prefix + id.ToString("D");
     }
 
-    IRepository<T> Remote()
+    /// <summary>The round as the retries see it: whether it may go on, and one more round.</summary>
+    sealed class Retry : IRetryable
     {
-        return _remote
-            ?? throw new NotImplementedException("This item has no remote repository: only its backup is kept.");
+        readonly Func<bool> _canRetry;
+        readonly Func<CancellationToken, Task<bool>> _round;
+
+        public Retry(Func<bool> canRetry, Func<CancellationToken, Task<bool>> round)
+        {
+            _canRetry = canRetry;
+            _round = round;
+        }
+
+        public bool CanRetry => _canRetry();
+
+        public Task<bool> RetryAsync(CancellationToken cancellationToken)
+        {
+            return _round(cancellationToken);
+        }
     }
 }

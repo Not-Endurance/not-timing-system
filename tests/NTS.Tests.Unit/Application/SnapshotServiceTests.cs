@@ -551,8 +551,7 @@ public sealed class SnapshotServiceTests
             session,
             publisher,
             new FakeAccount(TestId.Of(1)),
-            new InMemoryDurableSnapshotGroups(),
-            new StepTimer(),
+            new DurableStore(new StepTimer()).Repository,
             new RecordingNotifier()
         );
         await service.Load();
