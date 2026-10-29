@@ -29,7 +29,9 @@ public class ConsoleSameRows : IConsoleSameRows, IScoped
 
     public async Task<IReadOnlyList<SameRow>> OfAthlete(AthleteFormModel model)
     {
-        var own = (await _athletes.ReadMany()).Select(x => new RegistryRow(x.Id, x.Name, x.NameEnglish, x.FeiId)).ToList();
+        var own = (await _athletes.ReadMany())
+            .Select(x => new RegistryRow(x.Id, x.Name, x.NameEnglish, x.FeiId))
+            .ToList();
         var elsewhere = await Elsewhere(
             "athletes",
             model.Name,
@@ -50,12 +52,15 @@ public class ConsoleSameRows : IConsoleSameRows, IScoped
 
     public async Task<IReadOnlyList<SameRow>> OfHorse(HorseFormModel model)
     {
-        var own = (await _horses.ReadMany()).Select(x => new RegistryRow(x.Id, x.Name, x.NameEnglish, x.FeiId)).ToList();
+        var own = (await _horses.ReadMany())
+            .Select(x => new RegistryRow(x.Id, x.Name, x.NameEnglish, x.FeiId))
+            .ToList();
         var elsewhere = await Elsewhere(
             "horses",
             model.Name,
             model.NameEnglish,
-            async term => (await _lookups.SearchHorses(term)).Select(x => new RegistryRow(x.Id, x.Name, x.NameEnglish, x.FeiId))
+            async term =>
+                (await _lookups.SearchHorses(term)).Select(x => new RegistryRow(x.Id, x.Name, x.NameEnglish, x.FeiId))
         );
         var matches = SameRows.Among(
             Merged(own, elsewhere),

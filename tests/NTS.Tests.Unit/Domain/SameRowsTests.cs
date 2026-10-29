@@ -77,8 +77,14 @@ public sealed class SameRowsTests
         var horses = new[] { Row(2, "Other Name", null, "0012"), Row(3, "Another", null, "aaaa") };
 
         Assert.Empty(SameRows.Among(horses, null, "New Name", null, "12", false));
-        Assert.Equal([TestId.Of(2)], SameRows.Among(horses, null, "New Name", null, " 0012", false).Select(x => x.Row.Id));
-        Assert.Equal([TestId.Of(3)], SameRows.Among(horses, null, "New Name", null, "AAAA ", false).Select(x => x.Row.Id));
+        Assert.Equal(
+            [TestId.Of(2)],
+            SameRows.Among(horses, null, "New Name", null, " 0012", false).Select(x => x.Row.Id)
+        );
+        Assert.Equal(
+            [TestId.Of(3)],
+            SameRows.Among(horses, null, "New Name", null, "AAAA ", false).Select(x => x.Row.Id)
+        );
     }
 
     [Fact]
@@ -100,11 +106,7 @@ public sealed class SameRowsTests
     [Fact]
     public void An_empty_name_finds_nothing_and_the_matches_of_one_reason_keep_the_order_they_are_given()
     {
-        var rows = new[]
-        {
-            Row(3, "ivan petrov", null),
-            Row(2, "Ivan Petrov", null),
-        };
+        var rows = new[] { Row(3, "ivan petrov", null), Row(2, "Ivan Petrov", null) };
 
         Assert.Empty(SameRows.Among(rows, null, " ", null, null, true));
         Assert.Equal(
