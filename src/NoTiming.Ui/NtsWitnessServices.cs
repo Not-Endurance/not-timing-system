@@ -1,9 +1,13 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Not.Application.CRUD.Ports;
 using Not.Application.RPC.SignalR;
 using Not.Blazor.Client;
+using Not.Blazor.Client.Browser;
 using Not.Krud.ServiceRegistration;
+using NoTiming.Ui.Storage.Browser;
 using NTS;
 using NTS.Application;
 
@@ -26,6 +30,15 @@ public static class NtsWitnessServices
             .AddRpcClient()
             .AddDomainEvents()
             .AddHttp(settings => settings.Host = baseUrl);
+
+        services.TryAddScoped<IDurableRepository<DurableSnapshotGroup>>(provider =>
+            new BrowserDurableRepository<DurableSnapshotGroup>(
+                remote: null,
+                backup: provider.GetRequiredService<ILocalStorage>(),
+                prefix: "nts.durable-snapshots.",
+                options: DurableSnapshotGroup.Options
+            )
+        );
 
         return services.AddNts(configuration).NClientSideBlazor(configuration);
     }

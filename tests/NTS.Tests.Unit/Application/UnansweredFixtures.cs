@@ -1,55 +1,130 @@
+using Not.Application.CRUD.Ports;
+using Not.Async;
 using Not.Events;
 using Not.Notify;
 using NoTiming.Ui.Features.Core.Dashboard;
+using NoTiming.Ui.Storage.Browser;
 using NTS.Contracts.Features.Account;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Objects;
+using System.Linq.Expressions;
 
 namespace NTS.Tests.Unit.Application;
 
-/// <summary>The group that was sent and not answered, as the browser keeps it: by person and Event, and as it was made.</summary>
-internal sealed class InMemoryUnansweredSnapshots : IUnansweredSnapshots
+/// <summary>
+/// The durable store of the browser, held in memory: what a group that was sent and not answered for good is kept under, for the
+/// person and the Event. A store that cannot be written throws before the remote is asked, as a browser can.
+/// </summary>
+internal sealed class InMemoryDurableSnapshotGroups : IDurableRepository<DurableSnapshotGroup>
 {
-    readonly Dictionary<(Guid, Guid), SnapshotGroup> _kept = [];
+    readonly Dictionary<Guid, DurableSnapshotGroup> _kept = [];
 
-    /// <summary>A storage that cannot be written, as a browser can be: it keeps nothing and says nothing.</summary>
+    /// <summary>A storage that cannot be written, as a browser can be: it refuses and keeps nothing.</summary>
     public bool CannotKeep { get; set; }
 
-    /// <summary>What was asked of the store, in order.</summary>
-    public List<string> Calls { get; } = [];
+    /// <summary>How many groups are kept, one entry for each.</summary>
+    public int Count => _kept.Count;
 
+    /// <summary>The first group kept for the person and the Event, as it is made.</summary>
     public SnapshotGroup? Of(Guid accountId, Guid eventId)
     {
-        return _kept.GetValueOrDefault((accountId, eventId));
+        return _kept.Values.FirstOrDefault(x => x.AccountId == accountId && x.EventId == eventId)?.ToGroup();
     }
 
-    public Task<SnapshotGroup?> Read(Guid accountId, Guid eventId)
+    public async Task<bool> StoreDurably(Guid id, DurableSnapshotGroup item, Func<DurableSnapshotGroup, Task<bool>> send)
     {
-        Calls.Add("read");
-        return Task.FromResult(Of(accountId, eventId));
-    }
-
-    public Task Keep(Guid accountId, Guid eventId, SnapshotGroup group)
-    {
-        Calls.Add("keep");
-        if (!CannotKeep)
+        if (CannotKeep)
         {
-            _kept[(accountId, eventId)] = group;
+            throw new InvalidOperationException("The browser refuses its storage.");
         }
 
+        _kept[id] = item;
+        var final = await send(item);
+        if (final)
+        {
+            _kept.Remove(id);
+        }
+
+        return final;
+    }
+
+    public Task RemoveDurably(Guid id, DurableSnapshotGroup item)
+    {
+        _kept.Remove(id);
         return Task.CompletedTask;
     }
 
-    public Task Forget(Guid accountId, Guid eventId)
+    public Task<DurableSnapshotGroup?> ReadDurably(Guid id)
     {
-        Calls.Add("forget");
-        _kept.Remove((accountId, eventId));
+        return Task.FromResult(_kept.GetValueOrDefault(id));
+    }
+
+    public Task<IReadOnlyList<DurableSnapshotGroup>> ReadPendingDurably(Func<DurableSnapshotGroup, bool> match)
+    {
+        IReadOnlyList<DurableSnapshotGroup> pending = [.. _kept.Values.Where(match)];
+        return Task.FromResult(pending);
+    }
+
+    public Task KeepDurably(Guid id, DurableSnapshotGroup item)
+    {
+        _kept[id] = item;
         return Task.CompletedTask;
+    }
+
+    public Task ForgetDurably(Guid id)
+    {
+        _kept.Remove(id);
+        return Task.CompletedTask;
+    }
+
+    public Task Create(DurableSnapshotGroup item)
+    {
+        throw new NotSupportedException("The test store has no remote.");
+    }
+
+    public Task<DurableSnapshotGroup?> Read(Guid id)
+    {
+        throw new NotSupportedException("The test store has no remote.");
+    }
+
+    public Task<DurableSnapshotGroup?> Read(Expression<Func<DurableSnapshotGroup, bool>> filter)
+    {
+        throw new NotSupportedException("The test store has no remote.");
+    }
+
+    public Task<IEnumerable<DurableSnapshotGroup>> ReadMany()
+    {
+        throw new NotSupportedException("The test store has no remote.");
+    }
+
+    public Task<IEnumerable<DurableSnapshotGroup>> ReadMany(Expression<Func<DurableSnapshotGroup, bool>> filter)
+    {
+        throw new NotSupportedException("The test store has no remote.");
+    }
+
+    public Task Update(DurableSnapshotGroup item)
+    {
+        throw new NotSupportedException("The test store has no remote.");
+    }
+
+    public Task Delete(DurableSnapshotGroup item)
+    {
+        throw new NotSupportedException("The test store has no remote.");
+    }
+
+    public Task DeleteMany(IEnumerable<DurableSnapshotGroup> items)
+    {
+        throw new NotSupportedException("The test store has no remote.");
+    }
+
+    public Task DeleteMany(Expression<Func<DurableSnapshotGroup, bool>> filter)
+    {
+        throw new NotSupportedException("The test store has no remote.");
     }
 }
 
 /// <summary>The time between two sends of a group that waits: it records how long the app waited and goes on when the test says.</summary>
-internal sealed class StepTimer : ISnapshotResendTimer
+internal sealed class StepTimer : IDelay
 {
     readonly List<TaskCompletionSource> _waiting = [];
 

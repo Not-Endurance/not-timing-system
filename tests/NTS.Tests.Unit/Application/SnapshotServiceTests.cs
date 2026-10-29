@@ -551,7 +551,7 @@ public sealed class SnapshotServiceTests
             session,
             publisher,
             new FakeAccount(TestId.Of(1)),
-            new InMemoryUnansweredSnapshots(),
+            new InMemoryDurableSnapshotGroups(),
             new StepTimer(),
             new RecordingNotifier()
         );

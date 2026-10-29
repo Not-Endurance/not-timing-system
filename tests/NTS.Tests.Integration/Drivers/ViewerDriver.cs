@@ -42,7 +42,6 @@ internal sealed class ViewerDriver : IAsyncDisposable
     readonly IParticipationContext _participationContext;
     readonly IWitnessAccessContext _accessContext;
     readonly SessionCookies _cookies = new();
-    readonly MemoryUnansweredSnapshots _unanswered;
     readonly NtsIntegrationFixture? _fixture;
     readonly string _clientName;
 
@@ -50,14 +49,7 @@ internal sealed class ViewerDriver : IAsyncDisposable
     /// Must be null: the Witness is a visitor until a person is signed in at the Api, which is done by
     /// <see cref="SignedInAsync"/> or, on a driver made with the fixture, by <see cref="SignIn"/>.
     /// </param>
-    /// <param name="unanswered">What the browser of the Witness keeps of a group that was sent and not answered: another Witness given the same stands for the page being opened again.</param>
-    public ViewerDriver(
-        Uri apiBaseUrl,
-        Uri functionsBaseUrl,
-        IntegrationUser? user,
-        string clientName,
-        MemoryUnansweredSnapshots? unanswered = null
-    )
+    public ViewerDriver(Uri apiBaseUrl, Uri functionsBaseUrl, IntegrationUser? user, string clientName)
     {
         if (user != null)
         {
@@ -68,7 +60,6 @@ internal sealed class ViewerDriver : IAsyncDisposable
         }
 
         _clientName = clientName;
-        _unanswered = unanswered ?? new MemoryUnansweredSnapshots();
         var configuration = CreateConfiguration(
             apiBaseUrl,
             functionsBaseUrl,
@@ -95,7 +86,6 @@ internal sealed class ViewerDriver : IAsyncDisposable
         // A browser sends the session cookie of the page's own host on every request, and keeps what the app asks it to keep;
         // a program has to send the cookie itself, and keeps what a Witness keeps in memory.
         services.AddHttpClient(nameof(JsonApiClient)).AddHttpMessageHandler(() => new SessionCookieHandler(_cookies));
-        services.Replace(ServiceDescriptor.Singleton<IUnansweredSnapshots>(_unanswered));
 
         _provider = services.BuildServiceProvider();
         _socketService = _provider.GetRequiredService<INtsSocketService>();
@@ -104,16 +94,13 @@ internal sealed class ViewerDriver : IAsyncDisposable
     }
 
     /// <summary>A Witness of the Api of the fixture, as a visitor, who can sign a person in later.</summary>
-    public ViewerDriver(NtsIntegrationFixture fixture, string clientName, MemoryUnansweredSnapshots? unanswered = null)
-        : this(fixture.ApiBaseUrl, fixture.FunctionsBaseUrl, null, clientName, unanswered)
+    public ViewerDriver(NtsIntegrationFixture fixture, string clientName)
+        : this(fixture.ApiBaseUrl, fixture.FunctionsBaseUrl, null, clientName)
     {
         _fixture = fixture;
     }
 
     public WitnessAccessLevel AccessLevel => _accessContext.AccessLevel;
-
-    /// <summary>What the browser of this Witness keeps of a group that was sent and not answered.</summary>
-    public MemoryUnansweredSnapshots Unanswered => _unanswered;
 
     public T GetRequiredService<T>()
         where T : notnull

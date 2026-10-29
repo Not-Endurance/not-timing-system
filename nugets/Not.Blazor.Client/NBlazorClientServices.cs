@@ -18,6 +18,8 @@ public static class NBlazorClientServices
         services.TryAddTransient<BrowserPrintService>();
         services.TryAddTransient<IFileService>(provider => provider.GetRequiredService<BrowserPrintService>());
         services.TryAddTransient<INPrintService>(provider => provider.GetRequiredService<BrowserPrintService>());
+        services.TryAddScoped<ILocalStorage, BrowserLocalStorage>();
+        services.TryAddScoped<ISessionStorage, BrowserSessionStorage>();
         return services.AddNBlazor(configuration);
     }
 }
