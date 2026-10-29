@@ -29,6 +29,7 @@ rtk git commit -F .tmp/msg.txt
 After committing, check `rtk git log --oneline -1` and confirm the subject is the real subject.
 
 10. Temporary files (drafts, fetched issue bodies, commit message files, backups, intermediate output) go in `.tmp/` at the repository root, which is gitignored. Do not use the system temp directory, AppData, `/tmp` or any scratchpad a tool suggests: they are outside the working directory (rule 1). Create the folder if it is missing and keep what you create in a subfolder named for the task. Delete it as the last step of that task; when the task produces a spec, delete the drafts once the spec is published. Never delete anything in `.tmp/` that you did not create.
+11. Code that is not NoTiming business logic goes into a `Not*` package in `nugets/`, never into `src/` or `tools/`. Business logic is what NoTiming does for timing and sport: its Events, Participants, Rankings and Snapshots and the rules of their stages. Anything another product on the same platform would carry too belongs in the package of its layer. A `Not*` package names no NoTiming type and references no NoTiming project. The layer map and the test are in `docs/agents/shared-packages.md`.
 
 <!-- rtk-instructions v2 -->
 # RTK (Rust Token Killer) - Token-Optimized Commands
@@ -194,3 +195,7 @@ Issues and specs live as GitHub issues in Not-Endurance/not-timing-system, via t
 ### Domain docs
 
 Single-context layout — `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+### Shared packages
+
+Where code belongs, between NoTiming and the `Not*` packages in `nugets/` (rule 11). See `docs/agents/shared-packages.md`.
