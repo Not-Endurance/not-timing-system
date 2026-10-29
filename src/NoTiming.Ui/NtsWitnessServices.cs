@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Not.Application.CRUD.Ports;
 using Not.Application.RPC.SignalR;
+using Not.Async;
 using Not.Blazor.Client;
 using Not.Blazor.Client.Browser;
 using Not.Krud.ServiceRegistration;
@@ -33,9 +34,9 @@ public static class NtsWitnessServices
 
         services.TryAddScoped<IDurableRepository<DurableSnapshotGroup>>(provider =>
             new BrowserDurableRepository<DurableSnapshotGroup>(
-                remote: null,
                 backup: provider.GetRequiredService<ILocalStorage>(),
-                prefix: "nts.durable-snapshots.",
+                delay: provider.GetRequiredService<IDelay>(),
+                prefix: DurableSnapshotGroup.KEY_PREFIX,
                 options: DurableSnapshotGroup.Options
             )
         );

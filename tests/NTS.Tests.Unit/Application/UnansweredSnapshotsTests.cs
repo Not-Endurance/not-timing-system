@@ -572,12 +572,13 @@ public sealed class UnansweredSnapshotsTests
             _repository = new ControlledParticipationRepository(participations);
             _store = new ParticipationStore(_repository, _socket);
             Service = null!;
+            Kept = new DurableStore(Timer);
         }
 
         public SnapshotService Service { get; private set; }
         public NoSession Session { get; } = new();
         public Publisher Publisher { get; } = new();
-        public InMemoryDurableSnapshotGroups Kept { get; } = new();
+        public DurableStore Kept { get; }
         public StepTimer Timer { get; } = new();
         public FakeAccount Account { get; } = new(TestId.Of(1));
         public RecordingNotifier Notifier { get; } = new();
@@ -586,7 +587,7 @@ public sealed class UnansweredSnapshotsTests
         public async Task<SnapshotService> ReloadAsync()
         {
             Service?.Dispose();
-            Service = new SnapshotService(_socket, _store, Session, Publisher, Account, Kept, Timer, Notifier);
+            Service = new SnapshotService(_socket, _store, Session, Publisher, Account, Kept.Repository, Notifier);
             await Service.Load();
             return Service;
         }

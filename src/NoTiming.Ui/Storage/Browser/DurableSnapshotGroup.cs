@@ -14,6 +14,9 @@ namespace NoTiming.Ui.Storage.Browser;
 /// </summary>
 public sealed class DurableSnapshotGroup
 {
+    /// <summary>The prefix of the key each group is kept under in the local storage of the browser.</summary>
+    public const string KEY_PREFIX = "nts.durable-snapshots.";
+
     public static DurableSnapshotGroup Of(SnapshotGroup group, Guid accountId, Guid eventId)
     {
         return new DurableSnapshotGroup

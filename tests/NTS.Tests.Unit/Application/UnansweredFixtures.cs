@@ -1,5 +1,8 @@
+using System.Text.Json;
+using Microsoft.JSInterop;
 using Not.Application.CRUD.Ports;
 using Not.Async;
+using Not.Blazor.Client.Browser;
 using Not.Events;
 using Not.Notify;
 using NoTiming.Ui.Features.Core.Dashboard;
@@ -7,119 +10,49 @@ using NoTiming.Ui.Storage.Browser;
 using NTS.Contracts.Features.Account;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Objects;
-using System.Linq.Expressions;
 
 namespace NTS.Tests.Unit.Application;
 
 /// <summary>
-/// The durable store of the browser, held in memory: what a group that was sent and not answered for good is kept under, for the
-/// person and the Event. A store that cannot be written throws before the remote is asked, as a browser can.
+/// The durable store of the browser under test: the real repository over a local storage that the test can make refuse, and a view
+/// of the groups that storage keeps, for the person and the Event they are of.
 /// </summary>
-internal sealed class InMemoryDurableSnapshotGroups : IDurableRepository<DurableSnapshotGroup>
+internal sealed class DurableStore
 {
-    readonly Dictionary<Guid, DurableSnapshotGroup> _kept = [];
+    public DurableStore(IDelay delay)
+    {
+        Browser = new FakeLocalStorage();
+        Repository = new BrowserDurableRepository<DurableSnapshotGroup>(
+            new BrowserLocalStorage(Browser),
+            delay,
+            DurableSnapshotGroup.KEY_PREFIX,
+            DurableSnapshotGroup.Options
+        );
+    }
 
-    /// <summary>A storage that cannot be written, as a browser can be: it refuses and keeps nothing.</summary>
-    public bool CannotKeep { get; set; }
+    public FakeLocalStorage Browser { get; }
+
+    public IDurableRepository<DurableSnapshotGroup> Repository { get; }
+
+    /// <summary>A storage that cannot be used, as a browser that refuses its storage: every call of it fails.</summary>
+    public bool CannotKeep
+    {
+        get => Browser.Fails != null;
+        set => Browser.Fails = value ? new JSException("The browser refuses its storage.") : null;
+    }
 
     /// <summary>How many groups are kept, one entry for each.</summary>
-    public int Count => _kept.Count;
+    public int Count => Browser.Items.Keys.Count(x => x.StartsWith(DurableSnapshotGroup.KEY_PREFIX, StringComparison.Ordinal));
 
     /// <summary>The first group kept for the person and the Event, as it is made.</summary>
     public SnapshotGroup? Of(Guid accountId, Guid eventId)
     {
-        return _kept.Values.FirstOrDefault(x => x.AccountId == accountId && x.EventId == eventId)?.ToGroup();
-    }
-
-    public async Task<bool> StoreDurably(Guid id, DurableSnapshotGroup item, Func<DurableSnapshotGroup, Task<bool>> send)
-    {
-        if (CannotKeep)
-        {
-            throw new InvalidOperationException("The browser refuses its storage.");
-        }
-
-        _kept[id] = item;
-        var final = await send(item);
-        if (final)
-        {
-            _kept.Remove(id);
-        }
-
-        return final;
-    }
-
-    public Task RemoveDurably(Guid id, DurableSnapshotGroup item)
-    {
-        _kept.Remove(id);
-        return Task.CompletedTask;
-    }
-
-    public Task<DurableSnapshotGroup?> ReadDurably(Guid id)
-    {
-        return Task.FromResult(_kept.GetValueOrDefault(id));
-    }
-
-    public Task<IReadOnlyList<DurableSnapshotGroup>> ReadPendingDurably(Func<DurableSnapshotGroup, bool> match)
-    {
-        IReadOnlyList<DurableSnapshotGroup> pending = [.. _kept.Values.Where(match)];
-        return Task.FromResult(pending);
-    }
-
-    public Task KeepDurably(Guid id, DurableSnapshotGroup item)
-    {
-        _kept[id] = item;
-        return Task.CompletedTask;
-    }
-
-    public Task ForgetDurably(Guid id)
-    {
-        _kept.Remove(id);
-        return Task.CompletedTask;
-    }
-
-    public Task Create(DurableSnapshotGroup item)
-    {
-        throw new NotSupportedException("The test store has no remote.");
-    }
-
-    public Task<DurableSnapshotGroup?> Read(Guid id)
-    {
-        throw new NotSupportedException("The test store has no remote.");
-    }
-
-    public Task<DurableSnapshotGroup?> Read(Expression<Func<DurableSnapshotGroup, bool>> filter)
-    {
-        throw new NotSupportedException("The test store has no remote.");
-    }
-
-    public Task<IEnumerable<DurableSnapshotGroup>> ReadMany()
-    {
-        throw new NotSupportedException("The test store has no remote.");
-    }
-
-    public Task<IEnumerable<DurableSnapshotGroup>> ReadMany(Expression<Func<DurableSnapshotGroup, bool>> filter)
-    {
-        throw new NotSupportedException("The test store has no remote.");
-    }
-
-    public Task Update(DurableSnapshotGroup item)
-    {
-        throw new NotSupportedException("The test store has no remote.");
-    }
-
-    public Task Delete(DurableSnapshotGroup item)
-    {
-        throw new NotSupportedException("The test store has no remote.");
-    }
-
-    public Task DeleteMany(IEnumerable<DurableSnapshotGroup> items)
-    {
-        throw new NotSupportedException("The test store has no remote.");
-    }
-
-    public Task DeleteMany(Expression<Func<DurableSnapshotGroup, bool>> filter)
-    {
-        throw new NotSupportedException("The test store has no remote.");
+        return Browser
+            .Items.Where(x => x.Key.StartsWith(DurableSnapshotGroup.KEY_PREFIX, StringComparison.Ordinal))
+            .Select(x => JsonSerializer.Deserialize<DurableSnapshotGroup>(x.Value, DurableSnapshotGroup.Options))
+            .OfType<DurableSnapshotGroup>()
+            .FirstOrDefault(x => x.AccountId == accountId && x.EventId == eventId)
+            ?.ToGroup();
     }
 }
 
