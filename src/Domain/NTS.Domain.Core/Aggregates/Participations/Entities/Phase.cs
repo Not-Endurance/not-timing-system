@@ -338,7 +338,11 @@ public class Phase : Entity
         return true;
     }
 
-    static IEnumerable<ParticipationEventBase> EventsOfTimes(Timestamp? arriveTime, Timestamp? presentTime, Timestamp? representTime)
+    static IEnumerable<ParticipationEventBase> EventsOfTimes(
+        Timestamp? arriveTime,
+        Timestamp? presentTime,
+        Timestamp? representTime
+    )
     {
         (TimeSlot Slot, Timestamp? Time)[] times =
         [

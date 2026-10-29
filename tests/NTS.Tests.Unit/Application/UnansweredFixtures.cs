@@ -42,7 +42,8 @@ internal sealed class DurableStore
     }
 
     /// <summary>How many groups are kept, one entry for each.</summary>
-    public int Count => Browser.Items.Keys.Count(x => x.StartsWith(DurableSnapshotGroup.KEY_PREFIX, StringComparison.Ordinal));
+    public int Count =>
+        Browser.Items.Keys.Count(x => x.StartsWith(DurableSnapshotGroup.KEY_PREFIX, StringComparison.Ordinal));
 
     /// <summary>The first group kept for the person and the Event, as it is made.</summary>
     public SnapshotGroup? Of(Guid accountId, Guid eventId)

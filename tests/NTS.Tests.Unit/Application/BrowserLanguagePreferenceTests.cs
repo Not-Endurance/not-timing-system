@@ -34,7 +34,9 @@ public sealed class BrowserLanguagePreferenceTests
     {
         var browser = new FakeLocalStorage();
 
-        await Assert.ThrowsAsync<ArgumentException>(() => new BrowserLanguagePreference(new BrowserLocalStorage(browser)).Choose(chosen));
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => new BrowserLanguagePreference(new BrowserLocalStorage(browser)).Choose(chosen)
+        );
 
         Assert.Empty(browser.Calls);
     }
@@ -44,6 +46,8 @@ public sealed class BrowserLanguagePreferenceTests
     {
         var browser = new FakeLocalStorage { Fails = new JSException("The quota has been exceeded.") };
 
-        await Assert.ThrowsAsync<JSException>(() => new BrowserLanguagePreference(new BrowserLocalStorage(browser)).Choose("bg"));
+        await Assert.ThrowsAsync<JSException>(
+            () => new BrowserLanguagePreference(new BrowserLocalStorage(browser)).Choose("bg")
+        );
     }
 }

@@ -32,8 +32,8 @@ public static class NtsWitnessServices
             .AddDomainEvents()
             .AddHttp(settings => settings.Host = baseUrl);
 
-        services.TryAddScoped<IDurableRepository<DurableSnapshotGroup>>(provider =>
-            new BrowserDurableRepository<DurableSnapshotGroup>(
+        services.TryAddScoped<IDurableRepository<DurableSnapshotGroup>>(
+            provider => new BrowserDurableRepository<DurableSnapshotGroup>(
                 backup: provider.GetRequiredService<ILocalStorage>(),
                 delay: provider.GetRequiredService<IDelay>(),
                 prefix: DurableSnapshotGroup.KEY_PREFIX,

@@ -47,7 +47,10 @@ public sealed class DateTimeShapeTests
             }
         }
 
-        Assert.True(offenders.Count == 0, "DateTime properties that do not say they are UTC:\n" + string.Join("\n", offenders));
+        Assert.True(
+            offenders.Count == 0,
+            "DateTime properties that do not say they are UTC:\n" + string.Join("\n", offenders)
+        );
     }
 
     [Fact]
@@ -65,7 +68,10 @@ public sealed class DateTimeShapeTests
             }
         }
 
-        Assert.True(offenders.Count == 0, "DateTimeOffset properties stored without their offset:\n" + string.Join("\n", offenders));
+        Assert.True(
+            offenders.Count == 0,
+            "DateTimeOffset properties stored without their offset:\n" + string.Join("\n", offenders)
+        );
     }
 
     [Fact]

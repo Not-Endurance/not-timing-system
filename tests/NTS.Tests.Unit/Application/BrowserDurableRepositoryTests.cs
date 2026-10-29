@@ -70,8 +70,13 @@ public sealed class BrowserDurableRepositoryTests
         var browser = new FakeLocalStorage();
         var repository = Repository(browser);
 
-        await Assert.ThrowsAsync<HttpRequestException>(() =>
-            repository.StoreDurably(ID, new Note { Id = ID, Text = "Ana" }, _ => throw new HttpRequestException("The Api did not answer."))
+        await Assert.ThrowsAsync<HttpRequestException>(
+            () =>
+                repository.StoreDurably(
+                    ID,
+                    new Note { Id = ID, Text = "Ana" },
+                    _ => throw new HttpRequestException("The Api did not answer.")
+                )
         );
 
         Assert.Contains("Ana", browser.Items[KeyOf()]);
@@ -236,7 +241,12 @@ public sealed class BrowserDurableRepositoryTests
 
     static BrowserDurableRepository<Note> Repository(FakeLocalStorage browser, IDelay? delay = null)
     {
-        return new BrowserDurableRepository<Note>(new BrowserLocalStorage(browser), delay ?? new StepTimer(), PREFIX, OPTIONS);
+        return new BrowserDurableRepository<Note>(
+            new BrowserLocalStorage(browser),
+            delay ?? new StepTimer(),
+            PREFIX,
+            OPTIONS
+        );
     }
 
     static string KeyOf()

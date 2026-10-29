@@ -21,7 +21,8 @@ public static class WitnessAccessPolicy
             return Routes.HOME;
         }
 
-        var page = accessLevel == WitnessAccessLevel.Official ? Routes.EVENT_SNAPSHOT_PAGE : Routes.EVENT_PERFORMANCE_PAGE;
+        var page =
+            accessLevel == WitnessAccessLevel.Official ? Routes.EVENT_SNAPSHOT_PAGE : Routes.EVENT_PERFORMANCE_PAGE;
         return Routes.Of(page, eventId);
     }
 

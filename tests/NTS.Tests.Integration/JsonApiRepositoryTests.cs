@@ -330,7 +330,10 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
             JsonSerializer.Serialize(received, JsonApiResults.Options)
         );
         Assert.Equal(id, Assert.Single(listed).Id);
-        Assert.Equal(["POST /api/configure-events"], requests.Asked.Where(x => !x.StartsWith("GET", StringComparison.Ordinal)));
+        Assert.Equal(
+            ["POST /api/configure-events"],
+            requests.Asked.Where(x => !x.StartsWith("GET", StringComparison.Ordinal))
+        );
         Assert.Empty(dispatcher.Events); // a Setup that was made is not a Setup that was updated
         var stored = (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!;
         Assert.Equal(root.Id, stored["MainOperatorId"].AsGuid);

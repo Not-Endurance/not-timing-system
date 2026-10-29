@@ -163,7 +163,8 @@ public class SnapshotService
                     return false;
                 }
 
-                var group = _waiting.RepeatOf(view.Event.Id, readySnapshots, snapshotType)
+                var group =
+                    _waiting.RepeatOf(view.Event.Id, readySnapshots, snapshotType)
                     ?? new SnapshotGroup(readySnapshots, snapshotType);
                 var receipts = await _waiting.Send(view.Event.Id, group);
                 return await Settle(view.Event.Id, group, receipts, snapshotType);
@@ -185,7 +186,8 @@ public class SnapshotService
                     return true;
                 }
 
-                var group = _waiting.RepeatOf(view.Event.Id, snapshots, snapshotType)
+                var group =
+                    _waiting.RepeatOf(view.Event.Id, snapshots, snapshotType)
                     ?? new SnapshotGroup(snapshots, snapshotType);
                 var receipts = await _waiting.Send(view.Event.Id, group);
                 await _waiting.Release(view.Event.Id, group, receipts);
@@ -329,7 +331,9 @@ public class SnapshotService
         SnapshotType snapshotType
     )
     {
-        var recorded = snapshotGroup.Entries.Where(x => SnapshotReceipts.IsRecorded(receipts, snapshotGroup.IdOf(x))).ToList();
+        var recorded = snapshotGroup
+            .Entries.Where(x => SnapshotReceipts.IsRecorded(receipts, snapshotGroup.IdOf(x)))
+            .ToList();
         if (recorded.Count > 0)
         {
             var sent = new SnapshotGroup(recorded, snapshotType, snapshotGroup.Id);

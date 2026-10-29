@@ -427,7 +427,11 @@ public sealed class SignInTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Production_with_the_console_sender_fails_loudly_instead_of_printing_a_code()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString, environment: "Production", emailSender: "Console");
+        await using var api = new ApiFactory(
+            _mongo.ConnectionString,
+            environment: "Production",
+            emailSender: "Console"
+        );
         using var client = api.CreateClient(
             new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") }
         );

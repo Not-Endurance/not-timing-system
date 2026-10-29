@@ -14,11 +14,14 @@ public sealed class CoalesceInvokerOfKeyTests
         var invoker = new CoalesceInvoker<int>();
         var runs = 0;
 
-        await invoker.Invoke(1, () =>
-        {
-            runs++;
-            return Task.CompletedTask;
-        });
+        await invoker.Invoke(
+            1,
+            () =>
+            {
+                runs++;
+                return Task.CompletedTask;
+            }
+        );
 
         Assert.Equal(1, runs);
     }
@@ -73,21 +76,30 @@ public sealed class CoalesceInvokerOfKeyTests
         var ran = new List<string>();
         var held = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        var first = invoker.Invoke(1, () =>
-        {
-            ran.Add("first");
-            return held.Task;
-        });
-        var second = invoker.Invoke(1, () =>
-        {
-            ran.Add("second");
-            return Task.CompletedTask;
-        });
-        var third = invoker.Invoke(1, () =>
-        {
-            ran.Add("third");
-            return Task.CompletedTask;
-        });
+        var first = invoker.Invoke(
+            1,
+            () =>
+            {
+                ran.Add("first");
+                return held.Task;
+            }
+        );
+        var second = invoker.Invoke(
+            1,
+            () =>
+            {
+                ran.Add("second");
+                return Task.CompletedTask;
+            }
+        );
+        var third = invoker.Invoke(
+            1,
+            () =>
+            {
+                ran.Add("third");
+                return Task.CompletedTask;
+            }
+        );
         held.SetResult();
         await Task.WhenAll(first, second, third);
 
@@ -107,11 +119,14 @@ public sealed class CoalesceInvokerOfKeyTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => first);
         await Assert.ThrowsAsync<InvalidOperationException>(() => second);
         var again = 0;
-        await invoker.Invoke(1, () =>
-        {
-            again++;
-            return Task.CompletedTask;
-        });
+        await invoker.Invoke(
+            1,
+            () =>
+            {
+                again++;
+                return Task.CompletedTask;
+            }
+        );
         Assert.Equal(1, again);
     }
 

@@ -66,7 +66,9 @@ public sealed class WaitingGroups
     public SnapshotGroup? RepeatOf(Guid eventId, IReadOnlyList<Snapshot> snapshots, SnapshotType snapshotType)
     {
         return _entries
-            .FirstOrDefault(x => x.EventId == eventId && SnapshotGroupRules.IsSentAgain(x.Group, snapshotType, snapshots))
+            .FirstOrDefault(x =>
+                x.EventId == eventId && SnapshotGroupRules.IsSentAgain(x.Group, snapshotType, snapshots)
+            )
             ?.Group;
     }
 

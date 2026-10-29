@@ -10,7 +10,13 @@ namespace NTS.Domain.Core.Aggregates.Participations.Objects;
 /// </summary>
 public sealed class SnapshotUpdate
 {
-    internal SnapshotUpdate(Phase phase, ParticipationEventBase timeEvent, TimeSlot slot, Timestamp? previous, Timestamp? current)
+    internal SnapshotUpdate(
+        Phase phase,
+        ParticipationEventBase timeEvent,
+        TimeSlot slot,
+        Timestamp? previous,
+        Timestamp? current
+    )
     {
         Phase = phase;
         Event = timeEvent;
