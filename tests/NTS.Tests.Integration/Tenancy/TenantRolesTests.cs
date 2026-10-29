@@ -17,22 +17,22 @@ namespace NTS.Tests.Integration;
 /// documents that only the Developer's command writes: no route gives one. A Tenant has rules for its Regional
 /// competitions, which a Tenant Root edits.
 /// </summary>
-public sealed class TenantRolesTests : IClassFixture<MongoFixture>
+public sealed class TenantRolesTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public TenantRolesTests(MongoFixture mongo)
+    public TenantRolesTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_new_account_has_a_Membership_in_its_home_Tenant_with_no_role_and_that_Tenant_is_the_current_one()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home);
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home);
 
         var me = await MeAsync(person);
 
@@ -48,14 +48,14 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Tenant_Root_seeded_by_the_command_shows_the_role_and_makes_the_Tenant_operational()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var before = await TenantAsync(person, tenant);
 
         await DeveloperCommands.SeedTenantRoot(
-            new MongoClient(_mongo.ConnectionString).GetDatabase(UserSeed.DATABASE),
+            new MongoClient(_shared.MongoConnectionString).GetDatabase(UserSeed.DATABASE),
             tenant,
             person.Email,
             apply: true
@@ -72,13 +72,13 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Developer_granted_by_the_command_is_one_in_the_account_and_holds_no_Membership_for_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
 
         await DeveloperCommands.GrantDeveloper(
-            new MongoClient(_mongo.ConnectionString).GetDatabase(UserSeed.DATABASE),
+            new MongoClient(_shared.MongoConnectionString).GetDatabase(UserSeed.DATABASE),
             person.Email,
             apply: true
         );
@@ -91,14 +91,14 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_account_selects_a_Tenant_it_is_a_member_of_and_the_selection_is_the_current_Tenant_until_it_is_cleared()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var other = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var other = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var person = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             home,
             TenancySeed.TenantRootOf(other)
         );
@@ -120,11 +120,11 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_account_cannot_select_a_Tenant_it_is_not_a_member_of()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var stranger = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home);
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var stranger = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home);
 
         var response = await SelectAsync(person, stranger);
 
@@ -136,11 +136,11 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_selection_of_a_Tenant_the_account_is_no_longer_a_member_of_does_not_count()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var gone = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home, selectedTenant: gone);
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var gone = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, selectedTenant: gone);
 
         var me = await MeAsync(person);
 
@@ -151,9 +151,9 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_account_that_has_no_home_Tenant_has_no_current_Tenant()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
 
         var me = await MeAsync(person);
 
@@ -169,10 +169,10 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [InlineData("homeTenantId")]
     public async Task No_route_of_the_account_gives_a_role_the_Developer_flag_or_another_home(string member)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home);
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home);
         var before = await StoredAsync(person.Email);
         var attributes = new Dictionary<string, object>
         {
@@ -191,14 +191,14 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Any_signed_in_account_reads_a_Tenant_and_it_says_whether_the_Tenant_is_operational_and_its_rules()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var tenant = await TenancySeed.TenantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             "Bulgaria",
             new BsonDocument { { "OnlyAverageLoopSpeed", true }, { "RankerCode", "BG" } }
         );
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
 
         var resource = await TenantAsync(person, tenant);
 
@@ -215,10 +215,10 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Tenant_that_has_set_no_rules_has_the_FEIs_and_one_that_is_not_there_is_not_found()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
 
         var rules = (await TenantAsync(person, tenant)).GetProperty("attributes").GetProperty("regionalRules");
         var missing = await person.Page.GetAsync("/api/tenants/country-nowhere");
@@ -232,16 +232,16 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Tenant_Root_edits_the_rules_of_its_Tenant_and_the_edit_changes_only_what_it_names()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var tenant = await TenancySeed.TenantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             rules: new BsonDocument { { "OnlyAverageLoopSpeed", true }, { "RankerCode", "BG" } }
         );
         var root = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             TenancySeed.TenantRootOf(tenant)
         );
@@ -272,10 +272,10 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_a_Tenant_keeps_among_its_rules_beyond_the_ones_the_Api_knows_survives_an_edit()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var tenant = await TenancySeed.TenantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             rules: new BsonDocument
             {
                 { "OnlyAverageLoopSpeed", false },
@@ -286,7 +286,7 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
         var root = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             TenancySeed.TenantRootOf(tenant)
         );
@@ -306,12 +306,12 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     public async Task Two_edits_of_different_rules_that_started_from_the_same_rules_do_not_undo_each_other()
     {
         var store = new TenantStore(
-            new MongoClient(_mongo.ConnectionString),
+            new MongoClient(_shared.MongoConnectionString),
             Options.Create(new NIdentityOptions { Database = UserSeed.DATABASE })
         );
         var started = RegionalRules.None;
-        var speedFirst = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var rankerFirst = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var speedFirst = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var rankerFirst = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
 
         // Each was made from the rules as they were at the start, and each changes one member of them: in either order.
         var speed = await store.SetRulesAsync(speedFirst, started, new RegionalRules(true), CancellationToken.None);
@@ -348,19 +348,19 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Only_a_Tenant_Root_of_that_Tenant_or_the_Developer_edits_its_rules()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var other = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var member = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var other = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var member = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var rootElsewhere = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             other,
             TenancySeed.TenantRootOf(other)
         );
-        var developer = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, other, isDeveloper: true);
+        var developer = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, other, isDeveloper: true);
 
         var byAMember = await EditRulesAsync(member, tenant, new { onlyAverageLoopSpeed = true });
         var byARootElsewhere = await EditRulesAsync(rootElsewhere, tenant, new { onlyAverageLoopSpeed = true });
@@ -376,13 +376,13 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Nothing_of_a_Tenant_but_its_rules_is_edited_by_naming_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var root = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             TenancySeed.TenantRootOf(tenant)
         );
@@ -413,13 +413,13 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [InlineData("{\"unknown\":true}")]
     public async Task Rules_that_are_not_valid_are_refused_and_nothing_is_saved(string rules)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var root = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             TenancySeed.TenantRootOf(tenant)
         );
@@ -435,21 +435,21 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_a_person_may_do_in_a_Tenant_is_told_by_the_same_policy_that_refuses_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var member = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var member = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var root = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             TenancySeed.TenantRootOf(tenant)
         );
         var developer = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             isDeveloper: true
         );
@@ -471,13 +471,13 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Tenant_that_has_no_Tenant_Root_holds_no_Events_whoever_asks()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var developer = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             isDeveloper: true
         );
@@ -491,11 +491,11 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Developer_selects_any_Tenant_that_exists_without_being_a_member_of_it_and_none_that_does_not()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var elsewhere = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var developer = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home, isDeveloper: true);
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var elsewhere = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var developer = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, isDeveloper: true);
 
         var selected = await SelectAsync(developer, elsewhere);
         var nowhere = await SelectAsync(developer, "country-nowhere");
@@ -511,13 +511,13 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Console_Operator_of_an_Event_that_is_not_Historic_edits_the_registry_and_searches_the_accounts_of_the_Tenant()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var consoleOperator = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var former = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
-        await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, former.Id, DateTimeOffset.UtcNow);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var consoleOperator = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var former = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id);
+        await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, former.Id, DateTimeOffset.UtcNow);
 
         var ofTheConsoleOperator = await CapabilitiesOfTenantAsync(consoleOperator, tenant);
         var ofTheFormerOne = await CapabilitiesOfTenantAsync(former, tenant);
@@ -590,11 +590,11 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
 
     async Task<BsonDocument> StoredAsync(string email)
     {
-        return await UserSeed.Users(_mongo.ConnectionString).Find(new BsonDocument("Email", email)).FirstAsync();
+        return await UserSeed.Users(_shared.MongoConnectionString).Find(new BsonDocument("Email", email)).FirstAsync();
     }
 
     async Task<BsonDocument> StoredTenantAsync(string tenant)
     {
-        return await TenancySeed.Tenants(_mongo.ConnectionString).Find(new BsonDocument("_id", tenant)).FirstAsync();
+        return await TenancySeed.Tenants(_shared.MongoConnectionString).Find(new BsonDocument("_id", tenant)).FirstAsync();
     }
 }

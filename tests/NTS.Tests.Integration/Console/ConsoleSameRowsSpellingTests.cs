@@ -10,19 +10,19 @@ namespace NTS.Tests.Integration;
 /// transliteration, and is like it when its name is a spelling of the row's by the looser key. A near-miss is not a warning.
 /// Over the real Api in this process, with the services of the Ui built as the app builds them. The names are made up.
 /// </summary>
-public sealed class ConsoleSameRowsSpellingTests : IClassFixture<MongoFixture>
+public sealed class ConsoleSameRowsSpellingTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ConsoleSameRowsSpellingTests(MongoFixture mongo)
+    public ConsoleSameRowsSpellingTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task An_Athlete_whose_name_is_a_row_in_the_other_script_is_the_same_and_one_whose_name_is_a_spelling_of_it_is_a_similar_one()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rows = scene.Ui.Get<IConsoleSameRows>();
 
@@ -40,7 +40,7 @@ public sealed class ConsoleSameRowsSpellingTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_near_miss_is_not_a_warning_and_neither_is_a_name_that_is_nothing_like()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rows = scene.Ui.Get<IConsoleSameRows>();
 
@@ -54,7 +54,7 @@ public sealed class ConsoleSameRowsSpellingTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_name_that_is_a_rows_under_another_FEI_ID_is_still_the_same_name_and_a_FEI_ID_that_is_a_rows_under_another_name_is_still_the_same_FEI_ID()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rows = scene.Ui.Get<IConsoleSameRows>();
 
@@ -70,7 +70,7 @@ public sealed class ConsoleSameRowsSpellingTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Horse_is_the_same_as_a_row_in_the_other_script_and_the_row_being_renamed_is_not_the_same_as_itself()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rows = scene.Ui.Get<IConsoleSameRows>();
 
@@ -88,18 +88,18 @@ public sealed class ConsoleSameRowsSpellingTests : IClassFixture<MongoFixture>
     async Task<Scene> SceneAsync(ApiFactory api)
     {
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var token = Guid.NewGuid().ToString("N")[..8];
         var own = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Юлия Тестова {token}",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
             null,
             "10012345"
         );
-        var ownHorse = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, $"Тест Огън {token}");
+        var ownHorse = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, $"Тест Огън {token}");
         return new Scene(ConsoleUi.Open(api, person), token, own, ownHorse);
     }
 

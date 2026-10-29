@@ -15,23 +15,23 @@ namespace NTS.Tests.Integration;
 /// Every kind of person the matrix names is asked about an Event that has not started, one that is Live and one that is
 /// Historic, and what the endpoint answers is what the policy answers over the same facts.
 /// </summary>
-public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
+public sealed class EventCapabilitiesTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public EventCapabilitiesTests(MongoFixture mongo)
+    public EventCapabilitiesTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task What_the_endpoint_says_is_what_the_policy_says_for_every_kind_of_caller_at_every_stage()
     {
         var time = new FakeTimeProvider(DateTimeOffset.UtcNow);
-        await using var api = new ApiFactory(_mongo.ConnectionString, time: time);
+        await using var api = new ApiFactory(_shared.MongoConnectionString, time: time);
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
         var people = new[]
         {
             await PersonAsync(api, client, "console operator", tenant, kind: "ConsoleOperator"),
@@ -71,16 +71,16 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
         var now = time.GetUtcNow();
         var events = new Dictionary<EventStage, Guid>
         {
-            [EventStage.Unstarted] = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, null),
-            [EventStage.Live] = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, now),
-            [EventStage.Historic] = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, null, now),
+            [EventStage.Unstarted] = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, null),
+            [EventStage.Live] = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, now),
+            [EventStage.Historic] = await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, null, now),
         };
         foreach (var person in people.Where(x => x.Kind != null))
         {
             foreach (var eventId in events.Values)
             {
                 await EventSeed.GrantAsync(
-                    _mongo.ConnectionString,
+                    _shared.MongoConnectionString,
                     tenant,
                     eventId,
                     person.Kind!,
@@ -130,12 +130,12 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_people_who_may_send_a_Snapshot_to_a_Live_Event_are_the_ones_the_matrix_names_and_nobody_else()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var live = await EventSeed.LiveAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             DateTimeOffset.UtcNow
@@ -160,8 +160,8 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
             }
         )
         {
-            var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-            await EventSeed.GrantAsync(_mongo.ConnectionString, tenant, live, kind, role, person.Email, person.Id);
+            var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+            await EventSeed.GrantAsync(_shared.MongoConnectionString, tenant, live, kind, role, person.Email, person.Id);
 
             var can = (await CapabilitiesAsync(person, live)).GetProperty("canSnapshot").GetBoolean();
 
@@ -176,14 +176,14 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Tenant_that_has_no_Tenant_Root_is_offered_no_new_Event_by_the_capabilities_even_to_the_Developer()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, isDeveloper: true);
+        var unstarted = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, null);
 
         var withoutARoot = await CapabilitiesAsync(developer, unstarted);
-        await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var withARoot = await CapabilitiesAsync(developer, unstarted);
 
         Assert.False(withoutARoot.GetProperty("canCreateEvents").GetBoolean());
@@ -204,7 +204,7 @@ public sealed class EventCapabilitiesTests : IClassFixture<MongoFixture>
         var person = await SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             home,
             tenantRoot == null ? null : TenantRootOf(tenantRoot),
             isDeveloper

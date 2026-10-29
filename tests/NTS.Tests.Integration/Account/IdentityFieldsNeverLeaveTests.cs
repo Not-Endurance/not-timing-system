@@ -13,7 +13,7 @@ namespace NTS.Tests.Integration;
 /// and never as the account is kept. One account with every identity field set and recognisable is put in each place such a
 /// route could show it from, and every route that could is read as the people who may.
 /// </summary>
-public sealed class IdentityFieldsNeverLeaveTests : IClassFixture<MongoFixture>
+public sealed class IdentityFieldsNeverLeaveTests : IClassFixture<SharedApiFixture>
 {
     static readonly string[] SECRET_NAMES =
     [
@@ -33,27 +33,27 @@ public sealed class IdentityFieldsNeverLeaveTests : IClassFixture<MongoFixture>
         "NormalizedEmail",
     ];
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public IdentityFieldsNeverLeaveTests(MongoFixture mongo)
+    public IdentityFieldsNeverLeaveTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task No_route_that_stands_where_the_user_routes_stood_or_shows_a_person_gives_what_the_account_signs_in_with()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
         var marker = Guid.NewGuid().ToString("N")[..8];
         var stamp = "STAMP-" + Guid.NewGuid().ToString("N");
         var credential = new byte[] { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 12 };
         var person = await AccountWithEverythingAsync(tenant, marker, stamp, credential);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var athlete = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Rider {marker}",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
@@ -66,12 +66,12 @@ public sealed class IdentityFieldsNeverLeaveTests : IClassFixture<MongoFixture>
             }
         );
         var eventId = await EventSeed.SetupAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             $"Event {marker}"
         );
-        await EventSeed.GrantAsync(_mongo.ConnectionString, tenant, eventId, "Operator", null, person.Email, person.Id);
+        await EventSeed.GrantAsync(_shared.MongoConnectionString, tenant, eventId, "Operator", null, person.Email, person.Id);
         var secrets = new[] { stamp, Convert.ToBase64String(credential), Base64Url(credential) };
 
         var routes = new[]
@@ -118,10 +118,10 @@ public sealed class IdentityFieldsNeverLeaveTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_legacy_routes_that_listed_users_and_read_one_by_email_are_not_in_the_Api()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
 
         foreach (
             var route in new[]
@@ -146,7 +146,7 @@ public sealed class IdentityFieldsNeverLeaveTests : IClassFixture<MongoFixture>
     {
         var email = UserSeed.NewEmail("secret");
         var id = await UserSeed.AddLegacyUserAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             email,
             shape: document =>
             {

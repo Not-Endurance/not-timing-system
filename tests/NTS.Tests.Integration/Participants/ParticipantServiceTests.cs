@@ -16,37 +16,37 @@ namespace NTS.Tests.Integration;
 /// registered in or in English, a page of ten at a time, and told in the language the app is in, and the history of one is read
 /// a page at a time. Over the real Api in this process, as the Ui reaches it.
 /// </summary>
-public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
+public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
 {
     // Every test has Participants of its own: the database is shared by all of them, and a Participant is found by its id.
     readonly Participant _ana = new(Guid.NewGuid(), "Мариела Тестова", "Mariela Testova");
     readonly Participant _fire = new(Guid.NewGuid(), "Огън", "Fire");
     readonly Participant _wind = new(Guid.NewGuid(), "Вятър", "Wind");
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ParticipantServiceTests(MongoFixture mongo)
+    public ParticipantServiceTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_text_finds_the_Athletes_or_the_Horses_by_their_names_in_either_script_and_each_is_told_with_its_kind()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var (latin, cyrillic) = HistorySeed.NameMarker();
         var athlete = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Иван {cyrillic}ов",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
             nameEnglish: $"Ivan {latin}ov"
         );
         var horse = await RegistrySeed.HorseAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Звезда {cyrillic}ов",
             nameEnglish: $"Star {latin}ov"
@@ -67,14 +67,14 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     public async Task A_search_is_a_page_of_ten_and_the_rest_is_on_the_next_page()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var (latin, _) = HistorySeed.NameMarker();
         for (var i = 0; i < 12; i++)
         {
-            await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, $"Horse {latin} {i:00}");
+            await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, $"Horse {latin} {i:00}");
         }
 
         var service = Open(api, person, out var asked);
@@ -102,9 +102,9 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_text_of_more_than_six_words_is_asked_for_with_the_first_six()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var service = Open(api, person, out var asked);
 
         var found = await service.Search(
@@ -122,13 +122,13 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_names_are_told_in_the_language_the_app_is_in()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var (latin, cyrillic) = HistorySeed.NameMarker();
         await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Иван {cyrillic}ов",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
@@ -157,9 +157,9 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     [InlineData("a b c d e f ab")] // the long word is the seventh, and the Api is asked for the first six
     public async Task A_text_with_no_word_of_two_characters_finds_none_and_asks_the_Api_nothing(string text)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var service = Open(api, person, out var asked);
 
         var found = await service.Search(ParticipantKind.Horse, text, 1, CancellationToken.None);
@@ -172,9 +172,9 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_search_the_Api_refuses_says_so()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var service = Open(api, person, out var asked);
         asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.TooManyRequests);
 
@@ -189,20 +189,20 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     public async Task What_was_answered_is_not_asked_again_and_a_text_that_only_grows_from_a_complete_answer_is_answered_without_asking()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var person = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             TenancySeed.TenantRootOf(tenant)
         ); // one of the people who set an Event up, who read the FEI ID of a row
         var (latin, cyrillic) = HistorySeed.NameMarker();
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
         var ivan = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Иван {cyrillic}ов",
             bulgaria,
@@ -210,7 +210,7 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
             feiId: "10007777"
         );
         var petar = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Петър {cyrillic}ев",
             bulgaria,
@@ -248,13 +248,13 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     public async Task An_account_that_sets_nothing_up_finds_a_Participant_by_its_names_and_not_by_its_FEI_ID_whether_the_Api_or_the_memory_answers()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var (latin, cyrillic) = HistorySeed.NameMarker();
         var ivan = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Иван {cyrillic}ов",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
@@ -277,14 +277,14 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     public async Task A_page_is_remembered_by_its_number_and_a_page_that_is_not_complete_is_not_narrowed()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var (latin, _) = HistorySeed.NameMarker();
         for (var i = 0; i < 12; i++)
         {
-            await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, $"Horse {latin} {i:00}");
+            await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, $"Horse {latin} {i:00}");
         }
 
         var service = Open(api, person, out var asked);
@@ -308,13 +308,13 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_remembered_answer_is_told_in_the_language_the_app_is_in_when_it_is_asked_for_and_not_in_the_one_it_was_made_in()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var (latin, cyrillic) = HistorySeed.NameMarker();
         await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Иван {cyrillic}ов",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
@@ -338,9 +338,9 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     public async Task A_search_the_Api_refused_is_not_remembered_and_an_answer_is_forgotten_after_a_minute()
     {
         var time = new FakeTimeProvider(new DateTimeOffset(2030, 5, 21, 8, 0, 0, TimeSpan.Zero));
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var service = Open(api, person, out var asked, time);
         var (latin, _) = HistorySeed.NameMarker();
         asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.TooManyRequests);
@@ -367,16 +367,16 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     public async Task The_history_of_an_Athlete_is_read_a_page_at_a_time_newest_first_with_the_other_half_the_placing_and_the_other_Rankings()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var spring = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
-        var winter = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Winter ride", "Plovdiv", 200);
-        var autumn = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Autumn ride", "Varna", 400);
-        var latest = await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, spring, 1, _ana, _wind, rank: 2);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var spring = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var winter = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Winter ride", "Plovdiv", 200);
+        var autumn = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Autumn ride", "Varna", 400);
+        var latest = await HistorySeed.RideAsync(_shared.MongoConnectionString, tenant, spring, 1, _ana, _wind, rank: 2);
         await HistorySeed.CountAlsoAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             spring,
             "National Championship",
@@ -385,7 +385,7 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
             ParticipationCategory.JuniorOrYoungAdult
         );
         var withdrawn = await HistorySeed.RideAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             winter,
             1,
@@ -394,7 +394,7 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
             eliminated: new Retired()
         );
         var counted = await HistorySeed.RideAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             autumn,
             1,
@@ -438,13 +438,13 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     public async Task The_history_of_a_Horse_has_the_Athlete_as_the_other_half_and_a_ride_with_no_placing_has_none()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 10);
         var ride = HistorySeed.Ride(past, 1, _ana, _fire); // no Ranking counts it
-        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, ride);
+        await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, ride);
         var service = Open(api, person, out _);
 
         var page = await service.HistoryOf(ParticipantKind.Horse, _fire.Id, 1, 20, CancellationToken.None);
@@ -464,16 +464,16 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     public async Task The_Horses_an_Athlete_has_ridden_are_the_other_halves_of_their_history_once_each_newest_first()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var recent = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
-        var middle = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Winter ride", "Plovdiv", 200);
-        var old = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Autumn ride", "Varna", 400);
-        await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, recent, 1, _ana, _wind);
-        await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, middle, 1, _ana, _fire);
-        await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, old, 1, _ana, _wind);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var recent = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var middle = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Winter ride", "Plovdiv", 200);
+        var old = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Autumn ride", "Varna", 400);
+        await HistorySeed.RideAsync(_shared.MongoConnectionString, tenant, recent, 1, _ana, _wind);
+        await HistorySeed.RideAsync(_shared.MongoConnectionString, tenant, middle, 1, _ana, _fire);
+        await HistorySeed.RideAsync(_shared.MongoConnectionString, tenant, old, 1, _ana, _wind);
         var service = Open(api, person, out var asked);
         asked.Before = request =>
         {
@@ -496,12 +496,12 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Participation_of_a_history_is_read_with_its_Phases_by_its_id_and_one_that_is_not_there_is_none()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
-        var ride = await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, past, 7, _ana, _fire);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var ride = await HistorySeed.RideAsync(_shared.MongoConnectionString, tenant, past, 7, _ana, _fire);
         var service = Open(api, person, out _);
 
         var read = await service.ParticipationOf(ride.Id);
@@ -519,12 +519,12 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Participation_the_Api_does_not_answer_for_is_a_read_that_failed_and_not_one_that_is_not_there()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
-        var ride = await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, past, 7, _ana, _fire);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var ride = await HistorySeed.RideAsync(_shared.MongoConnectionString, tenant, past, 7, _ana, _fire);
         var service = Open(api, person, out var asked);
         asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.InternalServerError);
 
@@ -537,9 +537,9 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_text_of_three_characters_is_asked_of_the_registry_of_the_kind()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var service = Open(api, person, out var asked);
 
         var athletes = await service.Search(ParticipantKind.Athlete, " qzx ", 1, CancellationToken.None);
@@ -558,13 +558,13 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     public async Task A_name_with_an_apostrophe_is_found_by_it()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var (latin, _) = HistorySeed.NameMarker();
         var athlete = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Shane O'Brien {latin}",
             RegistrySeed.CountryOf("Ireland", "IE")
@@ -579,9 +579,9 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Every_request_carries_the_language_the_app_is_in_and_none_when_it_is_in_none()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var service = Open(api, person, out var asked);
         var languages = new List<string>();
         asked.Before = request =>
@@ -602,14 +602,14 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     public async Task A_history_of_more_than_a_page_is_a_page_of_the_size_asked_for_and_the_rest()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Long ride", "Sofia", 10);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Long ride", "Sofia", 10);
         for (var number = 1; number <= 21; number++)
         {
-            await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, past, number, _ana, _wind);
+            await HistorySeed.RideAsync(_shared.MongoConnectionString, tenant, past, number, _ana, _wind);
         }
 
         var service = Open(api, person, out _);

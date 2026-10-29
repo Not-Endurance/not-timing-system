@@ -12,24 +12,24 @@ namespace NTS.Tests.Integration;
 /// an account: that link holds the account's email, and no route shows it, takes it or lets it be filtered on, so a rider
 /// cannot be found by the address of an account.
 /// </summary>
-public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
+public sealed class AthleteRoutesTests : IClassFixture<SharedApiFixture>
 {
     const string RIDER_EMAIL = "rider.secret@example.test";
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public AthleteRoutesTests(MongoFixture mongo)
+    public AthleteRoutesTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task An_Athlete_is_made_with_the_Country_and_the_Club_it_embeds_and_read_back_as_they_were_sent()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var id = Guid.NewGuid();
         var country = new
         {
@@ -61,7 +61,7 @@ public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal("10012345", attributes.GetProperty("feiId").GetString());
         Assert.Equal("BG", attributes.GetProperty("country").GetProperty("isoCode").GetString());
         Assert.Equal(club.id.ToString(), attributes.GetProperty("club").GetProperty("id").GetString());
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "athletes", id))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "athletes", id))!;
         Assert.Equal(tenant, stored["TenantId"].AsString);
         Assert.Equal("BG", stored["Country"]["IsoCode"].AsString);
         Assert.Equal("Sofia Riders", stored["Club"]["Name"].AsString);
@@ -72,12 +72,12 @@ public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
     [InlineData("substring(name,100) eq 'x'")]
     public async Task A_filter_that_the_database_cannot_run_on_a_row_is_refused_and_is_not_a_server_error(string filter)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Мария Тест",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
@@ -94,10 +94,10 @@ public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_account_an_Athlete_is_linked_to_is_not_shown_by_any_route_and_does_not_leave_in_a_list()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var id = await LinkedAthleteAsync(tenant);
 
         var item = await member.Page.GetAsync($"/api/athletes/{id}");
@@ -121,10 +121,10 @@ public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
         string filter
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         await LinkedAthleteAsync(tenant);
 
         var response = await member.Page.GetAsync("/api/athletes?filter=" + Uri.EscapeDataString(filter));
@@ -139,10 +139,10 @@ public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_document_cannot_name_the_account_link_and_an_edit_of_the_Athlete_leaves_it_as_it_is()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var id = await LinkedAthleteAsync(tenant);
 
         var naming = await ChangeAsync(root, id, new { user = new { email = "someone.else@example.test" } });
@@ -151,7 +151,7 @@ public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.BadRequest, naming.StatusCode);
         Assert.Equal("unsupported-attribute", await ErrorCodeAsync(naming));
         Assert.Equal(HttpStatusCode.OK, renaming.StatusCode);
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "athletes", id))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "athletes", id))!;
         Assert.Equal("Renamed Rider", stored["Name"].AsString);
         Assert.Equal(RIDER_EMAIL, stored["User"]["Email"].AsString);
     }
@@ -162,10 +162,10 @@ public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
     [InlineData("no name")]
     public async Task An_Athlete_the_domain_does_not_accept_is_422_and_nothing_is_written(string reason)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var country = new
         {
             id = Guid.NewGuid(),
@@ -188,17 +188,17 @@ public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("invalid-attribute", await ErrorCodeAsync(response));
-        Assert.Equal(0, await RegistrySeed.CountAsync(_mongo.ConnectionString, "athletes", tenant));
+        Assert.Equal(0, await RegistrySeed.CountAsync(_shared.MongoConnectionString, "athletes", tenant));
     }
 
     [Fact]
     public async Task The_Athletes_of_the_Tenant_are_found_by_what_they_embed()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
         var turkey = RegistrySeed.CountryOf("Turkey", "TR");
         var sofia = new BsonDocument
@@ -208,15 +208,15 @@ public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
             { "Name", "Sofia Riders" },
         };
         await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Ivan",
             bulgaria,
             club: sofia,
             feiId: "10000001"
         );
-        await RegistrySeed.AthleteAsync(_mongo.ConnectionString, tenant, "Mehmet", turkey, feiId: "10000002");
-        await RegistrySeed.AthleteAsync(_mongo.ConnectionString, other, "Ivan", bulgaria, club: sofia);
+        await RegistrySeed.AthleteAsync(_shared.MongoConnectionString, tenant, "Mehmet", turkey, feiId: "10000002");
+        await RegistrySeed.AthleteAsync(_shared.MongoConnectionString, other, "Ivan", bulgaria, club: sofia);
 
         Assert.Equal(["Ivan"], Names(await ListAsync(member, "?filter=country/isoCode eq 'BG'")));
         Assert.Equal(["Mehmet"], Names(await ListAsync(member, "?filter=country/name eq 'Turkey'")));
@@ -228,13 +228,13 @@ public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_member_an_Athlete_has_not_is_null_in_a_filter_whatever_else_the_expression_says()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
-        await RegistrySeed.AthleteAsync(_mongo.ConnectionString, tenant, "Ivan", bulgaria, feiId: "10000001");
-        await RegistrySeed.AthleteAsync(_mongo.ConnectionString, tenant, "Anna", bulgaria);
+        await RegistrySeed.AthleteAsync(_shared.MongoConnectionString, tenant, "Ivan", bulgaria, feiId: "10000001");
+        await RegistrySeed.AthleteAsync(_shared.MongoConnectionString, tenant, "Anna", bulgaria);
 
         Assert.Equal(["Ivan"], Names(await ListAsync(member, "?filter=contains(name,'a') and feiId ne null")));
         Assert.Equal(["Ivan"], Names(await ListAsync(member, "?filter=feiId ne null and contains(name,'a')")));
@@ -249,7 +249,7 @@ public sealed class AthleteRoutesTests : IClassFixture<MongoFixture>
     async Task<Guid> LinkedAthleteAsync(string tenant)
     {
         return await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Linked Rider",
             RegistrySeed.CountryOf("Bulgaria", "BG"),

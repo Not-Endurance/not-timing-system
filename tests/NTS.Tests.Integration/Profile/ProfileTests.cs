@@ -13,19 +13,19 @@ namespace NTS.Tests.Integration;
 /// another account. Every country has a name and an ISO code of its own, because the countries are shared by the tests
 /// of the class.
 /// </summary>
-public sealed class ProfileTests : IClassFixture<MongoFixture>
+public sealed class ProfileTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ProfileTests(MongoFixture mongo)
+    public ProfileTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task The_profile_is_the_callers_own_with_the_country_it_names_resolved_and_nobody_elses()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var land = await NewCountryAsync();
         var ana = await SignedInAsync(api, client, "Ana", "Petrova", land.Name);
@@ -65,7 +65,7 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_account_of_the_caller_says_whether_the_profile_is_complete_and_which_Tenant_is_home()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var land = await NewCountryAsync();
         var complete = await SignedInAsync(api, client, "Ana", "Petrova", land.Name);
@@ -87,12 +87,12 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Editing_the_profile_changes_what_it_names_and_leaves_the_home_Tenant_and_the_rest_of_the_account_alone()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var home = await NewCountryAsync();
         var elsewhere = await NewCountryAsync();
         var ana = await SignedInAsync(api, client, "Ana", "Petrova", home.Name);
-        var before = (await ApiClients.FindUserAsync(_mongo.ConnectionString, ana.Email))!;
+        var before = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, ana.Email))!;
 
         var saved = await PatchAsync(
             ana.Page,
@@ -113,7 +113,7 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
         var attributes = resource.GetProperty("attributes");
         Assert.Equal("Anna", attributes.GetProperty("givenName").GetString());
         Assert.Equal(elsewhere.Id.ToString(), attributes.GetProperty("countryId").GetString());
-        var after = (await ApiClients.FindUserAsync(_mongo.ConnectionString, ana.Email))!;
+        var after = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, ana.Email))!;
         Assert.Equal("Anna Maria Petrova-Ivanova", after["Name"].AsString);
         Assert.Equal("Anna", after["GivenName"].AsString);
         Assert.Equal("Maria", after["MiddleName"].AsString);
@@ -134,13 +134,13 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_member_that_is_not_named_is_left_as_it_is_and_an_optional_one_that_is_blank_or_null_is_cleared()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var land = await NewCountryAsync();
         var ana = await SignedInAsync(api, client, "Ana", "Petrova", land.Name);
 
         var onlyTheClub = await PatchAsync(ana.Page, new { club = "Just the club" });
-        var afterClub = (await ApiClients.FindUserAsync(_mongo.ConnectionString, ana.Email))!;
+        var afterClub = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, ana.Email))!;
         var cleared = await PatchAsync(
             ana.Page,
             new
@@ -150,7 +150,7 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
                 feiId = "",
             }
         );
-        var afterClear = (await ApiClients.FindUserAsync(_mongo.ConnectionString, ana.Email))!;
+        var afterClear = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, ana.Email))!;
 
         Assert.Equal(HttpStatusCode.OK, onlyTheClub.StatusCode);
         Assert.Equal("Just the club", afterClub["Club"].AsString);
@@ -167,22 +167,22 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Only_the_members_that_are_named_are_written_so_a_name_that_is_not_the_three_names_put_together_stays()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var land = await NewCountryAsync();
         var ana = await SignedInAsync(api, client, "Ana", "Petrova", land.Name);
         // A name that somebody wrote by hand: it is not what the three names make, and an edit of the club leaves it.
         await UserSeed
-            .Users(_mongo.ConnectionString)
+            .Users(_shared.MongoConnectionString)
             .UpdateOneAsync(
                 new BsonDocument("Email", ana.Email),
                 MongoDB.Driver.Builders<BsonDocument>.Update.Set("Name", "Ana Petrova (the rider)")
             );
 
         var club = await PatchAsync(ana.Page, new { club = "Only the club" });
-        var afterClub = (await ApiClients.FindUserAsync(_mongo.ConnectionString, ana.Email))!;
+        var afterClub = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, ana.Email))!;
         var renamed = await PatchAsync(ana.Page, new { surname = "Ivanova" });
-        var afterRename = (await ApiClients.FindUserAsync(_mongo.ConnectionString, ana.Email))!;
+        var afterRename = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, ana.Email))!;
 
         Assert.Equal(HttpStatusCode.OK, club.StatusCode);
         Assert.Equal("Ana Petrova (the rider)", afterClub["Name"].AsString);
@@ -194,7 +194,7 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_member_is_found_whatever_its_case_like_the_members_of_every_other_document()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var land = await NewCountryAsync();
         var ana = await SignedInAsync(api, client, "Ana", "Petrova", land.Name);
@@ -205,7 +205,7 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
         );
 
         Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
-        var after = (await ApiClients.FindUserAsync(_mongo.ConnectionString, ana.Email))!;
+        var after = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, ana.Email))!;
         Assert.Equal("Anna", after["GivenName"].AsString);
         Assert.Equal("Loud Club", after["Club"].AsString);
     }
@@ -231,11 +231,11 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
         string expectedCode
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var land = await NewCountryAsync();
         var ana = await SignedInAsync(api, client, "Ana", "Petrova", land.Name);
-        var before = (await ApiClients.FindUserAsync(_mongo.ConnectionString, ana.Email))!;
+        var before = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, ana.Email))!;
         var attributes = new Dictionary<string, object?>
         {
             ["club"] = "Would be saved",
@@ -246,13 +246,13 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
 
         Assert.Equal(HttpStatusCode.BadRequest, refused.StatusCode);
         Assert.Equal(expectedCode, await ErrorCodeAsync(refused));
-        Assert.Equal(before, await ApiClients.FindUserAsync(_mongo.ConnectionString, ana.Email));
+        Assert.Equal(before, await ApiClients.FindUserAsync(_shared.MongoConnectionString, ana.Email));
     }
 
     [Fact]
     public async Task A_name_a_club_and_an_FEI_ID_have_a_longest_length_and_the_longest_is_accepted()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var land = await NewCountryAsync();
         var ana = await SignedInAsync(api, client, "Ana", "Petrova", land.Name);
@@ -279,11 +279,11 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_country_without_an_ISO_code_cannot_be_chosen_for_a_profile()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var land = await NewCountryAsync();
         var ana = await SignedInAsync(api, client, "Ana", "Petrova", land.Name);
-        var noIso = await CountrySeed.AddAsync(_mongo.ConnectionString, $"Noisoland {Guid.NewGuid():N}", null);
+        var noIso = await CountrySeed.AddAsync(_shared.MongoConnectionString, $"Noisoland {Guid.NewGuid():N}", null);
 
         var refused = await PatchAsync(ana.Page, new { countryId = noIso.ToString() });
 
@@ -294,11 +294,11 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_profile_that_would_lack_a_country_a_first_name_or_a_surname_is_refused_as_incomplete_and_nothing_is_saved()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var land = await NewCountryAsync();
         var bare = await SignedInAsync(api, client, null, null, null);
-        var before = (await ApiClients.FindUserAsync(_mongo.ConnectionString, bare.Email))!;
+        var before = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, bare.Email))!;
 
         var onlyTheClub = await PatchAsync(bare.Page, new { club = "A club" });
         var noSurname = await PatchAsync(bare.Page, new { givenName = "Ana", countryId = land.Id.ToString() });
@@ -310,13 +310,13 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
             Assert.Equal("profile-incomplete", await ErrorCodeAsync(refused));
         }
 
-        Assert.Equal(before, await ApiClients.FindUserAsync(_mongo.ConnectionString, bare.Email));
+        Assert.Equal(before, await ApiClients.FindUserAsync(_shared.MongoConnectionString, bare.Email));
     }
 
     [Fact]
     public async Task A_person_without_a_home_Tenant_is_placed_when_they_first_complete_the_profile_and_never_moved_after()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var first = await NewCountryAsync();
         var second = await NewCountryAsync();
@@ -331,9 +331,9 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
                 countryId = first.Id.ToString(),
             }
         );
-        var afterFirst = (await ApiClients.FindUserAsync(_mongo.ConnectionString, bare.Email))!;
+        var afterFirst = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, bare.Email))!;
         await PatchAsync(bare.Page, new { countryId = second.Id.ToString() });
-        var afterSecond = (await ApiClients.FindUserAsync(_mongo.ConnectionString, bare.Email))!;
+        var afterSecond = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, bare.Email))!;
 
         Assert.Equal(HttpStatusCode.OK, completed.StatusCode);
         var tenant = $"country-{first.Iso.ToLowerInvariant()}";
@@ -341,32 +341,32 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
         Assert.Equal(tenant, Assert.Single(afterFirst["Memberships"].AsBsonArray)["TenantId"].AsString);
         Assert.Equal(second.Name, afterSecond["CountryRegion"].AsString);
         Assert.Equal(tenant, afterSecond["HomeTenantId"].AsString);
-        Assert.NotNull(await ApiClients.FindTenantAsync(_mongo.ConnectionString, tenant));
+        Assert.NotNull(await ApiClients.FindTenantAsync(_shared.MongoConnectionString, tenant));
     }
 
     [Fact]
     public async Task The_caller_cannot_name_another_account_because_a_body_that_names_one_is_refused_and_it_stays_as_it_was()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var land = await NewCountryAsync();
         var mallory = await SignedInAsync(api, client, "Mallory", "Mischief", land.Name);
         var ana = await SignedInAsync(api, client, "Ana", "Petrova", land.Name);
-        var before = (await ApiClients.FindUserAsync(_mongo.ConnectionString, ana.Email))!;
+        var before = (await ApiClients.FindUserAsync(_shared.MongoConnectionString, ana.Email))!;
 
         var response = await WriteRawAsync(mallory.Page, Document(ana.Id, new { givenName = "Hacked" }));
         var ownId = await WriteRawAsync(mallory.Page, Document(mallory.Id, new { club = "Fine" }));
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         Assert.Equal("profile-id-mismatch", await ErrorCodeAsync(response));
-        Assert.Equal(before, await ApiClients.FindUserAsync(_mongo.ConnectionString, ana.Email));
+        Assert.Equal(before, await ApiClients.FindUserAsync(_shared.MongoConnectionString, ana.Email));
         Assert.Equal(HttpStatusCode.OK, ownId.StatusCode); // the caller's own id is fine
     }
 
     [Fact]
     public async Task The_profile_routes_need_a_session_the_write_header_and_the_json_api_media_type()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var land = await NewCountryAsync();
         var ana = await SignedInAsync(api, client, "Ana", "Petrova", land.Name);
@@ -403,7 +403,7 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
     {
         var name = $"Profileland {Guid.NewGuid():N}";
         var iso = CountrySeed.UniqueIsoCode();
-        var id = await CountrySeed.AddAsync(_mongo.ConnectionString, name, iso);
+        var id = await CountrySeed.AddAsync(_shared.MongoConnectionString, name, iso);
         return new NewCountry(id, name, iso);
     }
 
@@ -420,7 +420,7 @@ public sealed class ProfileTests : IClassFixture<MongoFixture>
     {
         var email = UserSeed.NewEmail("profile");
         var id = await UserSeed.AddLegacyUserAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             email,
             shape: document =>
             {

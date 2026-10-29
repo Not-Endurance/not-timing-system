@@ -15,19 +15,19 @@ namespace NTS.Tests.Integration;
 /// surname is asked to complete it, which only sending a Snapshot requires; saving completes it and the account says so;
 /// and a context that was loaded for a visitor loads again when the person signs in. Over the real Api in this process.
 /// </summary>
-public sealed class ProfileContextTests : IClassFixture<MongoFixture>
+public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ProfileContextTests(MongoFixture mongo)
+    public ProfileContextTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_visitor_has_no_profile_and_is_asked_for_none()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var ui = Open(api, null, out var asked);
 
         await ui.Profile.Load();
@@ -41,10 +41,10 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_session_that_ended_while_the_profile_was_read_leaves_no_profile_and_is_not_read_again_and_again()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home, name: "Ana Petrova");
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, name: "Ana Petrova");
         using var ui = Open(api, person, out var asked);
         asked.Answer = request =>
             request.RequestUri!.AbsolutePath.EndsWith("/me/profile", StringComparison.Ordinal)
@@ -61,10 +61,10 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_person_who_is_signed_in_has_the_profile_the_host_keeps_and_is_welcomed_by_their_first_name()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home, name: "Ana Petrova");
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, name: "Ana Petrova");
         using var ui = Open(api, person, out _);
 
         await ui.Profile.Load();
@@ -81,9 +81,9 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_person_without_a_country_is_asked_to_complete_the_profile_and_is_welcomed_by_what_there_is()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, null);
         using var ui = Open(api, person, out _);
 
         await ui.Profile.Load();
@@ -98,11 +98,11 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Saving_the_profile_completes_it_and_the_account_and_the_person_know_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var iso = CountrySeed.UniqueIsoCode();
-        await CountrySeed.AddAsync(_mongo.ConnectionString, "Testland " + iso, iso, "T" + iso[..2]);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, null);
+        await CountrySeed.AddAsync(_shared.MongoConnectionString, "Testland " + iso, iso, "T" + iso[..2]);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, null);
         using var ui = Open(api, person, out _);
         await ui.Profile.Load();
         var country = (await ui.Profile.SearchCountries(iso, CancellationToken.None)).Single();
@@ -134,11 +134,11 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_profile_the_host_refuses_is_not_saved_and_says_why()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var iso = CountrySeed.UniqueIsoCode();
-        await CountrySeed.AddAsync(_mongo.ConnectionString, "Testland " + iso, iso, "T" + iso[..2]);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, null, name: "Ana Petrova");
+        await CountrySeed.AddAsync(_shared.MongoConnectionString, "Testland " + iso, iso, "T" + iso[..2]);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, null, name: "Ana Petrova");
         using var ui = Open(api, person, out _);
         await ui.Profile.Load();
         var model = ui.Profile.CreateFormModel();
@@ -154,10 +154,10 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_profile_that_lacks_what_is_required_is_not_sent_to_the_host_at_all()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home, name: "Ana Petrova");
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, name: "Ana Petrova");
         using var ui = Open(api, person, out var asked);
         await ui.Profile.Load();
         var before = asked.Asked.Count;
@@ -172,17 +172,17 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_countries_to_choose_from_are_found_by_name_ISO_code_and_NF_code_in_any_case()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var iso = CountrySeed.UniqueIsoCode();
         var nf = "N" + iso[..3];
-        await CountrySeed.AddAsync(_mongo.ConnectionString, "Searchland " + iso, iso, nf);
+        await CountrySeed.AddAsync(_shared.MongoConnectionString, "Searchland " + iso, iso, nf);
         var last = CountrySeed.UniqueIsoCode();
         var first = CountrySeed.UniqueIsoCode();
         // The Api lists them in the order of their ids, so the one that is first by name has the last id, and the other way round.
         await AddCountryAsync("Zzz " + last, last, "Z" + last[..2], "00");
         await AddCountryAsync("!!! " + first, first, "A" + first[..2], "ff");
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, null);
         using var ui = Open(api, person, out _);
         await ui.Profile.Load();
 
@@ -203,11 +203,11 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_the_person_typed_is_saved_without_the_spaces_around_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var iso = CountrySeed.UniqueIsoCode();
-        await CountrySeed.AddAsync(_mongo.ConnectionString, "Testland " + iso, iso, "T" + iso[..2]);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, null);
+        await CountrySeed.AddAsync(_shared.MongoConnectionString, "Testland " + iso, iso, "T" + iso[..2]);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, null);
         using var ui = Open(api, person, out var asked);
         await ui.Profile.Load();
         string? sent = null;
@@ -244,10 +244,10 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_context_loaded_for_a_visitor_loads_again_when_the_person_signs_in_and_forgets_them_when_they_sign_out()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home, name: "Ana Petrova");
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, name: "Ana Petrova");
         var cookie = new JsonApiClients.Cookie(null);
         var json = JsonApiClients.WithCookie(api, cookie, out _);
         using var account = new AccountSession(json);
@@ -289,7 +289,7 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
     {
         var id = Guid.Parse(idStartsWith + Guid.NewGuid().ToString()[2..]);
         await CountrySeed
-            .Countries(_mongo.ConnectionString)
+            .Countries(_shared.MongoConnectionString)
             .InsertOneAsync(
                 new BsonDocument
                 {

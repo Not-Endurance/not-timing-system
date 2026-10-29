@@ -10,26 +10,26 @@ namespace NTS.Tests.Integration;
 /// and the Developer alone keeps them (ADR-0012: the platform owner). They are served the way every family of reference
 /// data is (see <c>ClubRoutesTests</c>), except that a country is not removed: Events and Athletes embed one.
 /// </summary>
-public sealed class CountryRoutesTests : IClassFixture<MongoFixture>
+public sealed class CountryRoutesTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public CountryRoutesTests(MongoFixture mongo)
+    public CountryRoutesTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task Any_signed_in_account_reads_the_countries_whatever_its_Tenant()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var stateless = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var stateless = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var iso = CountrySeed.UniqueIsoCode();
         var id = await CountrySeed.AddAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             "Land " + iso,
             iso,
             nfCode: iso[..3],
@@ -54,7 +54,7 @@ public sealed class CountryRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_caller_who_is_not_signed_in_reads_no_country()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
 
         var response = await client.GetAsync("/api/countries");
@@ -65,9 +65,9 @@ public sealed class CountryRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Developer_makes_a_country_with_the_id_it_names_and_it_belongs_to_no_Tenant()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, home: null, isDeveloper: true);
+        var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null, isDeveloper: true);
         var iso = CountrySeed.UniqueIsoCode();
         var id = Guid.NewGuid();
 
@@ -87,7 +87,7 @@ public sealed class CountryRoutesTests : IClassFixture<MongoFixture>
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Equal($"/api/countries/{id}", response.Headers.Location?.ToString());
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "countries", id))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "countries", id))!;
         Assert.Equal("nts", stored["TenantId"].AsString);
         Assert.Equal(iso, stored["IsoCode"].AsString);
         Assert.Equal("xx-XX", stored["Locale"].AsString);
@@ -96,14 +96,14 @@ public sealed class CountryRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_countries_are_kept_by_the_Developer_alone()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id);
         var iso = CountrySeed.UniqueIsoCode();
-        var existing = await CountrySeed.AddAsync(_mongo.ConnectionString, "Land " + iso, iso);
+        var existing = await CountrySeed.AddAsync(_shared.MongoConnectionString, "Land " + iso, iso);
 
         foreach (var person in new[] { root, consoleOperator })
         {
@@ -125,19 +125,19 @@ public sealed class CountryRoutesTests : IClassFixture<MongoFixture>
             Assert.Equal(HttpStatusCode.Forbidden, changed.StatusCode);
         }
 
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "countries", existing))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "countries", existing))!;
         Assert.Equal("Land " + iso, stored["Name"].AsString);
     }
 
     [Fact]
     public async Task The_Developer_changes_the_members_it_names_and_a_member_sent_as_null_is_taken_away()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, home: null, isDeveloper: true);
+        var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null, isDeveloper: true);
         var iso = CountrySeed.UniqueIsoCode();
         var id = await CountrySeed.AddAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             "Land " + iso,
             iso,
             nfCode: iso[..3],
@@ -159,7 +159,7 @@ public sealed class CountryRoutesTests : IClassFixture<MongoFixture>
 
         Assert.Equal(HttpStatusCode.OK, renamed.StatusCode);
         Assert.Equal(HttpStatusCode.OK, cleared.StatusCode);
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "countries", id))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "countries", id))!;
         Assert.Equal("Renamed " + iso, stored["Name"].AsString);
         Assert.Equal(iso[..3], stored["NfCode"].AsString);
         Assert.False(stored.Contains("Locale"));
@@ -169,11 +169,11 @@ public sealed class CountryRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_country_needs_a_name_and_there_is_no_route_that_removes_one()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, home: null, isDeveloper: true);
+        var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null, isDeveloper: true);
         var iso = CountrySeed.UniqueIsoCode();
-        var id = await CountrySeed.AddAsync(_mongo.ConnectionString, "Land " + iso, iso);
+        var id = await CountrySeed.AddAsync(_shared.MongoConnectionString, "Land " + iso, iso);
 
         var nameless = await developer.Page.WriteAsync(
             HttpMethod.Patch,
@@ -187,7 +187,7 @@ public sealed class CountryRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.NotFound, removed.StatusCode);
         Assert.Equal(
             "Land " + iso,
-            (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "countries", id))!["Name"].AsString
+            (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "countries", id))!["Name"].AsString
         );
     }
 

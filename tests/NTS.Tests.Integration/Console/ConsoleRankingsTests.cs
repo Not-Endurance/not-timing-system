@@ -18,19 +18,19 @@ namespace NTS.Tests.Integration;
 /// The Rankings of a Live Event as the Console Operator changes them (#646, ADR-0006): made of the Participations it chooses,
 /// stored by the Api for the Event of the view, and removed. Over the real Api in this process.
 /// </summary>
-public sealed class ConsoleRankingsTests : IClassFixture<MongoFixture>
+public sealed class ConsoleRankingsTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ConsoleRankingsTests(MongoFixture mongo)
+    public ConsoleRankingsTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_Ranking_of_chosen_Participations_is_stored_for_the_Event_of_the_view_which_reads_its_Rankings_again()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rankings = scene.Open();
 
@@ -45,7 +45,7 @@ public sealed class ConsoleRankingsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Ranking_is_removed_by_the_Console_Operator_and_the_view_reads_its_Rankings_again()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rankings = scene.Open();
         var model = scene.Model("Open class", 1);
@@ -60,7 +60,7 @@ public sealed class ConsoleRankingsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Ranking_that_the_Api_does_not_take_is_said_in_its_words_and_nothing_is_stored()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, consoleOperator: false);
         var rankings = scene.Open();
 
@@ -77,7 +77,7 @@ public sealed class ConsoleRankingsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_view_that_cannot_write_refuses_before_the_Api_is_asked()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, canWrite: false);
         var rankings = scene.Open();
         var model = scene.Model("Open class", 1);
@@ -96,15 +96,15 @@ public sealed class ConsoleRankingsTests : IClassFixture<MongoFixture>
     async Task<Scene> SceneAsync(ApiFactory api, bool consoleOperator = true, bool canWrite = true)
     {
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var boss = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var person = consoleOperator ? boss : await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, boss.Id, DateTimeOffset.UtcNow);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var boss = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var person = consoleOperator ? boss : await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, boss.Id, DateTimeOffset.UtcNow);
         var participations = new List<Participation>();
         foreach (var number in new[] { 1, 2 })
         {
             var participation = IntegrationPayloadFactory.ActiveParticipation(eventId, number, Guid.NewGuid());
-            await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
+            await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, participation);
             participations.Add(participation);
         }
 
@@ -114,7 +114,7 @@ public sealed class ConsoleRankingsTests : IClassFixture<MongoFixture>
     async Task<List<BsonDocument>> StoredAsync(Guid eventId)
     {
         var filter = new BsonDocument("EventId", EventSeed.Binary(eventId));
-        return await RegistrySeed.Collection(_mongo.ConnectionString, "event_rankings").Find(filter).ToListAsync();
+        return await RegistrySeed.Collection(_shared.MongoConnectionString, "event_rankings").Find(filter).ToListAsync();
     }
 
     sealed class Scene

@@ -20,29 +20,29 @@ namespace NTS.Tests.Integration;
 /// A list names the Event it is of, a Participation is read with its version and changed against it, and what the Api refuses
 /// comes back with its code.
 /// </summary>
-public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
+public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
 {
     static readonly DateTimeOffset START = new(2030, 5, 21, 8, 0, 0, TimeSpan.Zero);
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public EventDataRepositoryTests(MongoFixture mongo)
+    public EventDataRepositoryTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_scoped_repository_lists_the_rows_of_the_selected_Event_with_the_Event_at_the_head_of_every_filter()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
-        var other = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var api = _shared.Api;
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var other = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         var first = Ridden(eventId, 1);
         var second = Ridden(eventId, 2);
-        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, first, version: 3);
-        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, second);
-        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, Ridden(other, 9));
+        await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, first, version: 3);
+        await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, second);
+        await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, Ridden(other, 9));
         var participations = new ParticipationEventScopedApiRepository(
             JsonApiClients.Of(api, null, out var requests),
             new EventScopeFactory<Participation>(new SelectedEvent(eventId))
@@ -69,14 +69,14 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_repository_that_is_not_scoped_reads_what_the_filter_of_the_call_names_and_nothing_without_one()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
-        var other = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var api = _shared.Api;
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var other = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         var mine = IntegrationPayloadFactory.Official(eventId, null, Guid.NewGuid());
-        await EventSeed.OfficialAsync(_mongo.ConnectionString, tenant, mine);
+        await EventSeed.OfficialAsync(_shared.MongoConnectionString, tenant, mine);
         await EventSeed.OfficialAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             IntegrationPayloadFactory.Official(other, null, Guid.NewGuid())
         );
@@ -95,18 +95,18 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Participation_is_changed_against_the_version_it_was_read_at_and_the_Api_refuses_one_that_was_not()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var participation = Ridden(eventId, 1);
-        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation, version: 2);
+        await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, participation, version: 2);
         var participations = new ParticipationEventScopedApiRepository(
             JsonApiClients.Of(api, consoleOperator, out var requests),
             new EventScopeFactory<Participation>(new SelectedEvent(eventId))
@@ -117,7 +117,7 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
         read.Withdraw();
         await participations.Update(read);
         var taken = (
-            await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_participations", participation.Id)
+            await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_participations", participation.Id)
         )!;
         var error = participations.LastError;
         staleRead.Retire();
@@ -129,7 +129,7 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
         Assert.Equal(eventId, taken["EventId"].AsGuid);
         Assert.Equal("participation-changed", participations.LastError?.Code);
         var stored = (
-            await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_participations", participation.Id)
+            await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_participations", participation.Id)
         )!;
         Assert.Equal(3, stored["Version"].AsInt32);
         Assert.Equal("WD", stored["Eliminated"]["Code"].AsString);
@@ -139,19 +139,19 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_the_Api_refuses_of_a_Participation_comes_back_with_its_code()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var participation = Ridden(eventId, 1);
-        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
+        await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, participation);
         var scope = new EventScopeFactory<Participation>(new SelectedEvent(eventId));
         var asMember = new ParticipationEventScopedApiRepository(JsonApiClients.Of(api, member, out _), scope);
         var read = (await asMember.Read(participation.Id))!;
@@ -162,7 +162,7 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
         Assert.Equal("not-console-operator", asMember.LastError?.Code);
         Assert.False(
             (
-                await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_participations", participation.Id)
+                await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_participations", participation.Id)
             )!.Contains("Eliminated")
         );
     }
@@ -170,12 +170,12 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Ranking_is_made_changed_and_removed_through_the_repository_by_the_Console_Operator()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             DateTimeOffset.UtcNow
@@ -188,9 +188,9 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
         var ranking = IntegrationPayloadFactory.Ranking(eventId, [participation], Guid.NewGuid(), "CEI 1*");
 
         await rankings.Create(ranking);
-        var made = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_rankings", ranking.Id))!;
+        var made = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_rankings", ranking.Id))!;
         await rankings.Update(IntegrationPayloadFactory.Ranking(eventId, [participation], ranking.Id, "CEI 2*"));
-        var changed = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_rankings", ranking.Id))!;
+        var changed = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_rankings", ranking.Id))!;
         var read = await rankings.Read(ranking.Id);
         await rankings.Delete(ranking.Id);
 
@@ -200,7 +200,7 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
         Assert.Equal("CEI 2*", changed["Name"].AsString);
         Assert.Equal("CEI 2*", read!.Name);
         Assert.Equal([participation.Id], read.Entries.Select(x => x.ParticipationId));
-        Assert.Null(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_rankings", ranking.Id));
+        Assert.Null(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_rankings", ranking.Id));
         Assert.Null(rankings.LastError);
         Assert.Equal(
             [
@@ -216,12 +216,12 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_account_an_Official_is_linked_to_is_not_sent_and_the_Official_is_made_all_the_same()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             DateTimeOffset.UtcNow
@@ -235,7 +235,7 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
         await officials.Create(linked);
 
         Assert.Null(officials.LastError);
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_officials", linked.Id))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_officials", linked.Id))!;
         Assert.Equal("Integration Official", stored["Name"].AsString);
         Assert.False(stored.Contains("UserId"));
         Assert.Null((await officials.Read(linked.Id))!.UserId);
@@ -244,15 +244,15 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Handout_is_found_by_the_Participation_it_is_of_within_the_Event()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var api = _shared.Api;
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         var first = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 1, Guid.NewGuid());
         var second = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 2, Guid.NewGuid());
         var handout = IntegrationPayloadFactory.Handout(first, Guid.NewGuid());
-        await EventSeed.HandoutAsync(_mongo.ConnectionString, tenant, handout);
+        await EventSeed.HandoutAsync(_shared.MongoConnectionString, tenant, handout);
         await EventSeed.HandoutAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             IntegrationPayloadFactory.Handout(second, Guid.NewGuid())
         );
@@ -273,10 +273,10 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_the_Api_answers_is_not_taken_for_a_list_when_it_does_not_arrive_whole()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
-        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, Ridden(eventId, 1));
+        var api = _shared.Api;
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, Ridden(eventId, 1));
         var participations = new ParticipationEventScopedApiRepository(
             JsonApiClients.Of(api, null, out var requests),
             new EventScopeFactory<Participation>(new SelectedEvent(eventId))
@@ -299,21 +299,21 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Whether_a_person_may_send_Snapshots_is_asked_of_the_Api_and_not_worked_out_from_the_Officials_and_Operators()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
-        var steward = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var veterinary = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var visitor = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var steward = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var veterinary = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var visitor = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         await EventSeed.GrantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             eventId,
             "Official",
@@ -322,7 +322,7 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
             steward.Id
         );
         await EventSeed.GrantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             eventId,
             "Official",
@@ -332,7 +332,7 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
         );
         // What the legacy lists said is not what counts: an Official that only the documents of the Event name is nobody's grant.
         await EventSeed.OfficialAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             IntegrationPayloadFactory.Official(eventId, visitor.Id, Guid.NewGuid())
         );
@@ -355,9 +355,9 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_person_who_is_not_signed_in_to_the_Api_is_a_visitor_and_may_not_send_Snapshots()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var api = _shared.Api;
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
 
         var said = await WhatIsSaidAsync(api, null, eventId);
 
@@ -367,16 +367,16 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_filter_the_Api_cannot_be_asked_for_is_applied_to_what_the_Event_has_and_not_to_what_the_Tenant_has()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
-        var other = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var api = _shared.Api;
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var other = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         var steward = new Official("Steward Of The Event", null, OfficialRole.Steward, eventId, Guid.NewGuid(), null);
         var judge = new Official("Judge Of The Event", null, OfficialRole.GroundJury, eventId, Guid.NewGuid(), null);
         var elsewhere = new Official("Steward Of Another", null, OfficialRole.Steward, other, Guid.NewGuid(), null);
         foreach (var official in new[] { steward, judge, elsewhere })
         {
-            await EventSeed.OfficialAsync(_mongo.ConnectionString, tenant, official);
+            await EventSeed.OfficialAsync(_shared.MongoConnectionString, tenant, official);
         }
 
         var officials = new OfficialEventScopedApiRepository(
@@ -396,12 +396,12 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_Api_that_cannot_be_reached_leaves_the_person_registered_and_the_state_to_be_loaded_again()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             DateTimeOffset.UtcNow

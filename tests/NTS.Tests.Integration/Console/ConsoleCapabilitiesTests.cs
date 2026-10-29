@@ -14,7 +14,7 @@ namespace NTS.Tests.Integration;
 /// Console Operators. Each is the policy's own answer for the caller and the Event as they are now, at every stage, for
 /// every kind of person the matrix names, so that what a button offers and what the Api accepts cannot differ.
 /// </summary>
-public sealed class ConsoleCapabilitiesTests : IClassFixture<MongoFixture>
+public sealed class ConsoleCapabilitiesTests : IClassFixture<SharedApiFixture>
 {
     static readonly (string Member, Capability Capability)[] FLAGS =
     [
@@ -24,21 +24,21 @@ public sealed class ConsoleCapabilitiesTests : IClassFixture<MongoFixture>
         ("canAssignConsoleOperators", Capability.AssignConsoleOperators),
     ];
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ConsoleCapabilitiesTests(MongoFixture mongo)
+    public ConsoleCapabilitiesTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task What_the_Console_may_do_is_what_the_policy_says_for_every_kind_of_caller_at_every_stage()
     {
         var time = new FakeTimeProvider(DateTimeOffset.UtcNow);
-        await using var api = new ApiFactory(_mongo.ConnectionString, time: time);
+        await using var api = new ApiFactory(_shared.MongoConnectionString, time: time);
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
         var people = new[]
         {
             await PersonAsync(api, client, "console operator", tenant, kind: "ConsoleOperator"),
@@ -52,16 +52,16 @@ public sealed class ConsoleCapabilitiesTests : IClassFixture<MongoFixture>
         var now = time.GetUtcNow();
         var events = new Dictionary<EventStage, Guid>
         {
-            [EventStage.Unstarted] = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, null),
-            [EventStage.Live] = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, now),
-            [EventStage.Historic] = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, null, now),
+            [EventStage.Unstarted] = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, null),
+            [EventStage.Live] = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, now),
+            [EventStage.Historic] = await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, null, now),
         };
         foreach (var person in people.Where(x => x.Kind != null))
         {
             foreach (var eventId in events.Values)
             {
                 await EventSeed.GrantAsync(
-                    _mongo.ConnectionString,
+                    _shared.MongoConnectionString,
                     tenant,
                     eventId,
                     person.Kind!,
@@ -100,22 +100,22 @@ public sealed class ConsoleCapabilitiesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Console_Operators_and_Root_are_offered_the_Console_of_a_Live_Event_and_Operators_and_Officials_are_not()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var tenantRoot = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
-        var operatorGrant = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var tenantRoot = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, isDeveloper: true);
+        var operatorGrant = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var official = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var live = await EventSeed.LiveAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         await EventSeed.GrantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             live,
             "Operator",
@@ -124,7 +124,7 @@ public sealed class ConsoleCapabilitiesTests : IClassFixture<MongoFixture>
             operatorGrant.Id
         );
         await EventSeed.GrantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             live,
             "Official",
@@ -169,7 +169,7 @@ public sealed class ConsoleCapabilitiesTests : IClassFixture<MongoFixture>
         var person = await SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             home,
             tenantRoot == null ? null : TenantRootOf(tenantRoot),
             isDeveloper

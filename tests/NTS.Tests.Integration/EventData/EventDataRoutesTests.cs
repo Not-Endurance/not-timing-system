@@ -14,26 +14,26 @@ namespace NTS.Tests.Integration;
 /// read by anybody. What each family keeps to the server is not shown: the Official's linked account in particular, because
 /// a visitor must not learn who is behind a name. The documents are seeded straight into MongoDB.
 /// </summary>
-public sealed class EventDataRoutesTests : IClassFixture<MongoFixture>
+public sealed class EventDataRoutesTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public EventDataRoutesTests(MongoFixture mongo)
+    public EventDataRoutesTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task The_Rankings_of_an_Event_are_listed_and_read_by_anybody_with_the_Participations_they_count()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var anonymous = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         var first = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 1, Guid.NewGuid());
         var second = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 2, Guid.NewGuid());
         var ranking = IntegrationPayloadFactory.Ranking(eventId, [first, second], Guid.NewGuid(), "CEI 1*");
-        await EventSeed.RankingAsync(_mongo.ConnectionString, tenant, ranking);
+        await EventSeed.RankingAsync(_shared.MongoConnectionString, tenant, ranking);
 
         var list = await anonymous.GetAsync($"/api/rankings?filter=eventId eq {eventId}");
         var read = await anonymous.GetAsync($"/api/rankings/{ranking.Id}");
@@ -59,14 +59,14 @@ public sealed class EventDataRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Officials_of_an_Event_are_shown_by_name_and_role_and_never_by_the_account_they_are_linked_to()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var anonymous = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         var linked = IntegrationPayloadFactory.Official(eventId, TestId.Of(77), Guid.NewGuid());
         var unlinked = IntegrationPayloadFactory.Official(eventId, null, Guid.NewGuid());
-        await EventSeed.OfficialAsync(_mongo.ConnectionString, tenant, linked);
-        await EventSeed.OfficialAsync(_mongo.ConnectionString, tenant, unlinked);
+        await EventSeed.OfficialAsync(_shared.MongoConnectionString, tenant, linked);
+        await EventSeed.OfficialAsync(_shared.MongoConnectionString, tenant, unlinked);
 
         var list = await anonymous.GetAsync($"/api/officials?filter=eventId eq {eventId}");
         var read = await anonymous.GetAsync($"/api/officials/{linked.Id}");
@@ -99,16 +99,16 @@ public sealed class EventDataRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Handouts_of_an_Event_are_listed_and_read_by_anybody_and_found_by_their_Participation()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var anonymous = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         var first = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 1, Guid.NewGuid());
         var second = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 2, Guid.NewGuid());
         var handout = IntegrationPayloadFactory.Handout(first, Guid.NewGuid());
-        await EventSeed.HandoutAsync(_mongo.ConnectionString, tenant, handout);
+        await EventSeed.HandoutAsync(_shared.MongoConnectionString, tenant, handout);
         await EventSeed.HandoutAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             IntegrationPayloadFactory.Handout(second, Guid.NewGuid())
         );
@@ -134,7 +134,7 @@ public sealed class EventDataRoutesTests : IClassFixture<MongoFixture>
         string family
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var anonymous = ApiClients.Of(api);
 
         var unnamed = await anonymous.GetAsync($"/api/{family}");
@@ -153,18 +153,18 @@ public sealed class EventDataRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_an_Event_that_has_ended_kept_is_read_by_anybody_as_it_was_while_it_ran()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var anonymous = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var eventId = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var eventId = await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         var participation = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 1, Guid.NewGuid());
         var ranking = IntegrationPayloadFactory.Ranking(eventId, [participation], Guid.NewGuid(), "CEI 1*");
         var official = IntegrationPayloadFactory.Official(eventId, null, Guid.NewGuid());
         var handout = IntegrationPayloadFactory.Handout(participation, Guid.NewGuid());
-        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation, version: 4);
-        await EventSeed.RankingAsync(_mongo.ConnectionString, tenant, ranking);
-        await EventSeed.OfficialAsync(_mongo.ConnectionString, tenant, official);
-        await EventSeed.HandoutAsync(_mongo.ConnectionString, tenant, handout);
+        await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, participation, version: 4);
+        await EventSeed.RankingAsync(_shared.MongoConnectionString, tenant, ranking);
+        await EventSeed.OfficialAsync(_shared.MongoConnectionString, tenant, official);
+        await EventSeed.HandoutAsync(_shared.MongoConnectionString, tenant, handout);
 
         foreach (
             var (family, id) in new[]
@@ -200,10 +200,10 @@ public sealed class EventDataRoutesTests : IClassFixture<MongoFixture>
         string family
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var anonymous = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
 
         foreach (var parameter in new[] { "tenantId=country-xx", "tenant=country-xx", "allTenants=true", "all=true" })
         {
@@ -217,18 +217,18 @@ public sealed class EventDataRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_rows_of_one_Event_are_not_in_the_list_of_another_even_in_the_same_Tenant()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var anonymous = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mine = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
-        var other = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var mine = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var other = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         await EventSeed.OfficialAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             IntegrationPayloadFactory.Official(other, null, Guid.NewGuid())
         );
         var shown = IntegrationPayloadFactory.Official(mine, null, Guid.NewGuid());
-        await EventSeed.OfficialAsync(_mongo.ConnectionString, tenant, shown);
+        await EventSeed.OfficialAsync(_shared.MongoConnectionString, tenant, shown);
 
         var response = await anonymous.GetAsync($"/api/officials?filter=eventId eq {mine}");
         var crafted = await anonymous.GetAsync($"/api/officials?filter=eventId eq {mine} or eventId eq {other}");
@@ -252,7 +252,7 @@ public sealed class EventDataRoutesTests : IClassFixture<MongoFixture>
         string collection
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var reads = api.Services.GetRequiredService<CrossTenantReads>();
 
         await Assert.ThrowsAsync<ArgumentException>(

@@ -11,13 +11,13 @@ namespace NTS.Tests.Integration;
 /// The name of an endpoint of the Api is derived from its method and its route (ADR-0015): the one rule, the routes that are made
 /// up for each case with no host, and the real routes held to it beside them.
 /// </summary>
-public sealed class EndpointNamesTests : IClassFixture<MongoFixture>
+public sealed class EndpointNamesTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public EndpointNamesTests(MongoFixture mongo)
+    public EndpointNamesTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Theory]
@@ -106,7 +106,7 @@ public sealed class EndpointNamesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Every_route_of_the_Api_is_named_for_its_method_and_its_route()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
 
         var endpoints = api.Services.GetServices<EndpointDataSource>().SelectMany(x => x.Endpoints);
 

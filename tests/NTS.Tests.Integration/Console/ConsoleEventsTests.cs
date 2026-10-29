@@ -21,27 +21,27 @@ namespace NTS.Tests.Integration;
 /// starting it and resetting it. Root runs every Event of the Tenant, and a Console Operator runs the Events it is assigned.
 /// Over the real Api in this process.
 /// </summary>
-public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
+public sealed class ConsoleEventsTests : IClassFixture<SharedApiFixture>
 {
     static readonly DateTimeOffset NOW = DateTimeOffset.UtcNow;
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ConsoleEventsTests(MongoFixture mongo)
+    public ConsoleEventsTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_Tenant_Root_sees_every_Setup_of_the_Tenant_at_its_stage_and_runs_every_one_of_them_as_the_stage_allows()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var open = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, null, "Open");
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, NOW);
-        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, null, NOW);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var open = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, null, "Open");
+        var live = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, NOW);
+        var historic = await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, null, NOW);
         using var console = Open(api, root);
 
         await console.Events.Load();
@@ -75,14 +75,14 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Console_Operator_sees_the_Events_it_runs_and_may_configure_the_one_that_has_not_started_and_run_or_reset_the_Live_one()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var somebodyElse = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var open = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
-        var notMine = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, somebodyElse.Id, "Not mine");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var somebodyElse = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var open = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, "Open");
+        var live = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
+        var notMine = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, somebodyElse.Id, "Not mine");
         using var console = Open(api, consoleOperator);
 
         await console.Events.Load();
@@ -105,11 +105,11 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Tenant_Root_makes_an_Event_that_it_runs_and_assigns_a_Console_Operator_found_by_name_who_then_runs_it_too()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var next = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Boris Ivanov");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var next = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, name: "Boris Ivanov");
         using var console = Open(api, root);
         await console.Events.Load();
 
@@ -140,13 +140,13 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Live_Event_is_run_by_Root_and_by_every_Console_Operator_assigned_to_it_at_once()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var first = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var second = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, first.Id, NOW);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var first = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var second = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var live = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, first.Id, NOW);
         using var console = Open(api, root);
         await console.Events.Load();
 
@@ -165,12 +165,12 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_removed_Console_Operator_no_longer_runs_the_Event_and_the_Api_says_so_to_one_that_is_not_there()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var live = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
         using var console = Open(api, root);
         await console.Events.Load();
         var assigned = Assert.Single(await console.Events.ConsoleOperators(live));
@@ -188,11 +188,11 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_account_is_found_by_a_name_that_has_a_quote_in_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var conan = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Conan O'Brien");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var conan = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, name: "Conan O'Brien");
         using var console = Open(api, root);
         await console.Events.Load();
 
@@ -204,11 +204,11 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_text_with_no_word_of_two_characters_finds_no_account_and_is_not_sent_and_one_of_many_words_is_cut_to_six()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var wu = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Li Wu Konstantin");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var wu = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, name: "Li Wu Konstantin");
         using var console = Open(api, root, out var requests);
         await console.Events.Load();
         int Searches() => requests.Asked.Count(x => x.Contains("/api/accounts", StringComparison.Ordinal));
@@ -225,14 +225,14 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Root_cannot_assign_a_Console_Operator_to_an_Event_that_has_ended_and_a_Console_Operator_cannot_assign_one_at_all()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var other = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
-        var open = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var other = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var historic = await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
+        var open = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, "Open");
         using var byRoot = Open(api, root);
         using var byConsoleOperator = Open(api, consoleOperator);
         await byRoot.Events.Load();
@@ -254,11 +254,11 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_the_Console_lists_is_gone_when_the_session_ends()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, null, "Open");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, null, "Open");
         using var console = Open(api, root);
         await console.Events.Load();
         var before = (console.Events.Events.Count, console.Events.CanCreate, console.Events.CanEditRegistry);
@@ -274,13 +274,13 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Events_are_listed_by_name_whatever_the_case_and_one_that_is_not_there_is_not_validated()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         foreach (var name in new[] { "delta", "Alpha", "charlie", "Bravo", "echo" })
         {
-            await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, name);
+            await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, name);
         }
 
         using var console = Open(api, consoleOperator);
@@ -294,11 +294,11 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Console_Operator_resets_a_Live_Event_to_its_Setup_which_can_be_configured_again()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id);
         using var console = Open(api, consoleOperator);
         await console.Events.Load();
         await console.Events.Start(id);
@@ -317,12 +317,12 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Starting_a_Setup_that_is_whole_makes_the_Event_Live_and_one_that_is_not_says_what_is_missing_and_starts_nothing()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var whole = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
-        var empty = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Empty");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var whole = await EventSeed.FullSetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id);
+        var empty = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, "Empty");
         using var console = Open(api, consoleOperator);
         await console.Events.Load();
 
@@ -341,16 +341,16 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_Operator_and_an_Official_see_no_Event_to_run_and_the_Developer_runs_the_Events_of_the_Tenant_it_acts_in()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var operatorGrant = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var operatorGrant = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var official = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, isDeveloper: true);
+        var live = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
         await EventSeed.GrantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             live,
             "Operator",
@@ -359,7 +359,7 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
             operatorGrant.Id
         );
         await EventSeed.GrantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             live,
             "Official",
@@ -386,15 +386,15 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_registry_is_open_for_writing_to_a_Tenant_Root_and_to_the_Console_Operator_of_an_Event_that_is_not_over_and_to_nobody_else()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var running = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var plain = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, running.Id, "Open");
-        await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, past.Id, NOW);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var running = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var plain = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, running.Id, "Open");
+        await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, past.Id, NOW);
 
         var allowed = new Dictionary<string, bool>();
         foreach (var (name, person) in new[] { ("root", root), ("running", running), ("past", past), ("plain", plain) })
@@ -414,7 +414,7 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     async Task<long> ConsoleOperatorsOfAsync(Guid eventId)
     {
         return await EventSeed
-            .Grants(_mongo.ConnectionString)
+            .Grants(_shared.MongoConnectionString)
             .CountDocumentsAsync(
                 new BsonDocument { { "EventId", EventSeed.Binary(eventId) }, { "Kind", "ConsoleOperator" } }
             );

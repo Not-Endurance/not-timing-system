@@ -13,21 +13,21 @@ namespace NTS.Tests.Integration;
 /// another person is as good as missing, and there is no way to ask for everybody's. What is stored has the shape the
 /// Functions API stored (PascalCase members, enums as text), so the Event-scoped records that exist read the same.
 /// </summary>
-public sealed class UserSessionTests : IClassFixture<MongoFixture>
+public sealed class UserSessionTests : IClassFixture<SharedApiFixture>
 {
     const string COLLECTION = "event_user_sessions";
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public UserSessionTests(MongoFixture mongo)
+    public UserSessionTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_person_has_no_state_for_any_Event_until_they_make_one()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
 
@@ -41,7 +41,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Making_the_state_for_an_Event_stores_it_for_the_caller_in_the_shape_the_Functions_API_uses()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var eventId = Guid.NewGuid();
@@ -84,7 +84,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Asking_for_the_state_of_an_Event_that_has_one_returns_it_and_never_makes_a_second()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var eventId = Guid.NewGuid();
@@ -105,7 +105,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_record_that_the_Functions_API_stored_reads_the_same_way()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var eventId = Guid.NewGuid();
@@ -128,7 +128,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_list_is_the_callers_own_and_a_filter_on_the_Event_narrows_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var boris = await SignedInAsync(api, client);
@@ -152,7 +152,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Nobody_reads_changes_or_deletes_the_state_of_another_person_and_it_is_as_good_as_missing()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var mallory = await SignedInAsync(api, client);
@@ -185,7 +185,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_filter_cannot_name_the_owner_so_there_is_no_way_to_ask_for_somebody_elses()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var mallory = await SignedInAsync(api, client);
@@ -205,7 +205,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_list_is_cut_into_pages_in_the_order_of_the_Events_and_a_page_says_where_the_next_one_is()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var first = Guid.Parse("00000000-0000-0000-0000-000000000001");
@@ -244,7 +244,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_page_of_records_with_the_same_Event_follows_the_order_of_their_ids_so_that_none_is_twice_or_missing()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var eventId = Guid.NewGuid();
@@ -278,7 +278,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [InlineData("?sort=eventId,id", "invalid-sort")]
     public async Task A_page_or_a_sort_that_the_list_does_not_have_is_refused(string query, string code)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
 
@@ -294,7 +294,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [InlineData("?something=1")]
     public async Task A_parameter_that_nothing_needs_yet_is_refused(string query)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
 
@@ -310,7 +310,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [InlineData("eventId missing")]
     public async Task A_record_for_something_that_is_not_an_Event_id_is_refused(string kind)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         object attributes = kind switch
@@ -330,7 +330,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_id_of_a_record_is_made_by_the_server_and_a_document_that_brings_one_is_refused()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
 
@@ -362,7 +362,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [InlineData("""{"eventId":"{EVENT}","state":{"snapshotSelections":[{"number":"seven","name":"x"}]}}""")]
     public async Task A_state_that_is_not_a_state_is_refused_as_malformed_and_nothing_is_stored(string attributes)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var body =
@@ -386,7 +386,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [InlineData("""{"eventId":"{EVENT}","state":{"snapshotSelections":[null]}}""")]
     public async Task A_state_with_a_hole_in_it_is_refused_as_not_valid_and_nothing_is_stored(string attributes)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var body =
@@ -404,7 +404,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_change_to_a_state_with_a_hole_in_it_is_refused_and_the_state_stays_as_it_was()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var id = IdOf(await ApiSessions.ReadJsonAsync(await MakeAsync(ana, Guid.NewGuid(), AState())));
@@ -425,7 +425,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_record_that_cannot_be_addressed_is_left_out_of_the_list_and_never_breaks_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var eventId = Guid.NewGuid();
@@ -450,7 +450,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_record_without_an_id_for_the_Event_does_not_stop_the_caller_from_making_theirs()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var eventId = Guid.NewGuid();
@@ -475,7 +475,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Changing_the_state_replaces_it_and_leaves_the_Event_and_the_owner_alone()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var eventId = Guid.NewGuid();
@@ -517,7 +517,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Deleting_the_state_removes_it_and_a_second_delete_finds_nothing()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var id = IdOf(await ApiSessions.ReadJsonAsync(await MakeAsync(ana, Guid.NewGuid(), AState())));
@@ -535,7 +535,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_body_of_more_than_a_megabyte_is_refused()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var ana = await SignedInAsync(api, client);
         var big = new string('x', 1_100_000);
@@ -656,7 +656,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
 
     IMongoCollection<BsonDocument> Records()
     {
-        return new MongoClient(_mongo.ConnectionString)
+        return new MongoClient(_shared.MongoConnectionString)
             .GetDatabase(UserSeed.DATABASE)
             .GetCollection<BsonDocument>(COLLECTION);
     }
@@ -721,7 +721,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
     async Task<Person> SignedInAsync(ApiFactory api, HttpClient client)
     {
         var email = UserSeed.NewEmail("session-state");
-        var id = await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
+        var id = await UserSeed.AddLegacyUserAsync(_shared.MongoConnectionString, email);
         var page = new PageClient(client);
         page.Set(await ApiSessions.SignInAsync(api, client, email));
         return new Person(id, page);

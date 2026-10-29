@@ -17,9 +17,17 @@ public sealed class ApiHostFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _mongo = await MongoContainer.StartAsync();
-
-        _api = new ApiFactory(_mongo.ConnectionString, kestrel: true);
-        _ = _api.BaseAddress; // starts the host
+        try
+        {
+            _api = new ApiFactory(_mongo.ConnectionString, kestrel: true);
+            _ = _api.BaseAddress; // starts the host
+        }
+        catch
+        {
+            // A start that fails may never reach DisposeAsync, and the container holds one of the places.
+            await DisposeAsync();
+            throw;
+        }
     }
 
     public async Task DisposeAsync()

@@ -8,21 +8,21 @@ namespace NTS.Tests.Integration;
 /// The time of the server as the Ui knows it (#646): what the Api says it is on every answer, against the clock of the device,
 /// so that a request for a Representation or an Inspection is placed in a Phase by the clock of the server.
 /// </summary>
-public sealed class ServerClockTests : IClassFixture<MongoFixture>
+public sealed class ServerClockTests : IClassFixture<SharedApiFixture>
 {
     static readonly DateTimeOffset DEVICE = new(2031, 5, 3, 7, 0, 0, TimeSpan.Zero);
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ServerClockTests(MongoFixture mongo)
+    public ServerClockTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task The_server_is_as_far_ahead_of_the_device_as_the_time_it_says_in_its_answer_is()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var json = JsonApiClients.WithCookie(api, new JsonApiClients.Cookie(null), out var requests);
         requests.Answer = _ => Said(DEVICE.AddMinutes(5));
         var clock = new ServerClock(json, new Fixed(DEVICE));
@@ -37,7 +37,7 @@ public sealed class ServerClockTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_time_a_request_took_does_not_count_in_the_difference()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var json = JsonApiClients.WithCookie(api, new JsonApiClients.Cookie(null), out var requests);
         var device = new Moving(DEVICE);
         requests.Answer = _ =>
@@ -56,7 +56,7 @@ public sealed class ServerClockTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_server_that_says_nothing_or_cannot_be_reached_leaves_the_clock_of_the_device_as_it_is()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var json = JsonApiClients.WithCookie(api, new JsonApiClients.Cookie(null), out var requests);
         var clock = new ServerClock(json, new Fixed(DEVICE));
 

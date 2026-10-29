@@ -16,7 +16,7 @@ namespace NTS.Tests.Integration;
 /// from the real endpoints, so adding a public endpoint is a change to the list and to this test, and nothing else
 /// can make an endpoint public.
 /// </summary>
-public sealed class DenyByDefaultTests : IClassFixture<MongoFixture>
+public sealed class DenyByDefaultTests : IClassFixture<SharedApiFixture>
 {
     // What an anonymous caller may reach: the views of ADR-0001 and the surface where a person signs in or registers.
     // An unknown API route answers 404 to everyone, and the hub has no method a client can call.
@@ -53,17 +53,17 @@ public sealed class DenyByDefaultTests : IClassFixture<MongoFixture>
         "sign-in POST api/sessions",
     ];
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public DenyByDefaultTests(MongoFixture mongo)
+    public DenyByDefaultTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task The_endpoints_that_an_anonymous_caller_may_reach_are_exactly_the_ones_on_the_list()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
 
         var actual = EndpointsOf(api)
             .Where(x => x.Access != "protected")
@@ -76,7 +76,7 @@ public sealed class DenyByDefaultTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task No_endpoint_declares_itself_anonymous_so_the_list_is_the_only_way_to_be_public()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
 
         var declared = EndpointsOf(api).Where(x => x.DeclaresAnonymous).Select(x => $"{x.Methods} {x.Pattern}");
 
@@ -86,7 +86,7 @@ public sealed class DenyByDefaultTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Every_entry_of_the_list_is_an_endpoint_that_exists()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var endpoints = EndpointsOf(api);
 
         foreach (var entry in PublicEndpoints.All)
@@ -100,7 +100,7 @@ public sealed class DenyByDefaultTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Every_endpoint_that_is_not_on_the_list_answers_401_not_signed_in_to_an_anonymous_caller()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
 
         var protectedEndpoints = EndpointsOf(api).Where(x => x.Access == "protected").ToList();
@@ -137,7 +137,7 @@ public sealed class DenyByDefaultTests : IClassFixture<MongoFixture>
     [InlineData("/api/anything", HttpStatusCode.NotFound)] // an unknown route is a 404 for everybody
     public async Task The_public_pages_and_views_stay_open_to_an_anonymous_caller(string path, HttpStatusCode expected)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
 
         var response = await client.GetAsync(path);
@@ -148,7 +148,7 @@ public sealed class DenyByDefaultTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_signed_in_caller_reads_without_the_header_and_changes_state_only_with_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var page = await SignedInAsync(api, client);
 
@@ -175,7 +175,7 @@ public sealed class DenyByDefaultTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_write_that_carries_the_session_cookie_from_another_origin_is_refused_without_the_header()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var page = await SignedInAsync(api, client);
         page.WriteHeader = null;
@@ -199,7 +199,7 @@ public sealed class DenyByDefaultTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_sign_in_surface_needs_no_header_because_nobody_is_signed_in_yet()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
 
         var asked = await ApiSessions.RequestCodeAsync(client, UserSeed.NewEmail("anonymous"));
@@ -212,7 +212,7 @@ public sealed class DenyByDefaultTests : IClassFixture<MongoFixture>
     async Task<PageClient> SignedInAsync(ApiFactory api, HttpClient client)
     {
         var email = UserSeed.NewEmail("baseline");
-        await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
+        await UserSeed.AddLegacyUserAsync(_shared.MongoConnectionString, email);
         var page = new PageClient(client);
         page.Set(await ApiSessions.SignInAsync(api, client, email));
         return page;

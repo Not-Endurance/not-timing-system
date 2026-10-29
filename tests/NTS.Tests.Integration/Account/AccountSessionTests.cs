@@ -12,19 +12,19 @@ namespace NTS.Tests.Integration;
 /// says, and derives what to show from the answer. It holds no token and no authentication state of its own: a visitor is
 /// nobody until the host says otherwise, and signing out is the host ending the session. Over the real Api in this process.
 /// </summary>
-public sealed class AccountSessionTests : IClassFixture<MongoFixture>
+public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public AccountSessionTests(MongoFixture mongo)
+    public AccountSessionTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_visitor_who_has_not_signed_in_is_nobody()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var session = new AccountSession(JsonApiClients.Of(api, null, out var asked));
 
         await session.Load();
@@ -38,14 +38,14 @@ public sealed class AccountSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_person_who_signed_in_is_their_account_and_the_Tenants_they_stand_in()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var other = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var other = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var person = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             home,
             new Dictionary<string, string[]> { [home] = ["tenant-root"], [other] = [] },
             name: "Ana Petrova"
@@ -71,9 +71,9 @@ public sealed class AccountSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Developer_is_told_by_the_host()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, null, isDeveloper: true);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, null, isDeveloper: true);
         using var session = new AccountSession(JsonApiClients.Of(api, person, out _));
 
         await session.Load();
@@ -85,10 +85,10 @@ public sealed class AccountSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_session_the_host_no_longer_knows_is_nobody_on_the_next_load()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home);
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home);
         using var session = new AccountSession(JsonApiClients.Of(api, person, out _));
         await session.Load();
         Assert.True(session.IsSignedIn);
@@ -103,10 +103,10 @@ public sealed class AccountSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Signing_out_ends_the_session_at_the_host_forgets_the_account_and_tells_who_watches()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home);
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home);
         using var session = new AccountSession(JsonApiClients.Of(api, person, out var asked));
         await session.Load();
         var told = 0;
@@ -126,15 +126,15 @@ public sealed class AccountSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Selecting_a_Tenant_changes_where_the_person_reads_and_writes_and_a_Tenant_they_are_not_in_is_refused()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var other = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var stranger = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var other = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var stranger = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var person = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             home,
             new Dictionary<string, string[]> { [other] = [] }
         );
@@ -176,7 +176,7 @@ public sealed class AccountSessionTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_host_that_answers_with_a_failure_is_not_a_visitor_and_is_asked_again_on_the_next_load()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var session = new AccountSession(JsonApiClients.Of(api, null, out var asked));
         asked.Answer = _ => new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError);
 

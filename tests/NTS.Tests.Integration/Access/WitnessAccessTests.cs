@@ -18,19 +18,19 @@ namespace NTS.Tests.Integration;
 /// again what they may do (a page that decides by it, such as the Snapshot page, would send an Official away for the time it
 /// takes), and it does change when the Api says they may not. Over the real Api in this process.
 /// </summary>
-public sealed class WitnessAccessTests : IClassFixture<MongoFixture>
+public sealed class WitnessAccessTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public WitnessAccessTests(MongoFixture mongo)
+    public WitnessAccessTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task What_a_person_who_may_send_Snapshots_may_do_does_not_dip_while_the_Api_is_asked_again()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var (eventId, official) = await SceneAsync(api, client);
         var json = JsonApiClients.Of(api, official, out var asked);
@@ -60,7 +60,7 @@ public sealed class WitnessAccessTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_the_person_may_do_changes_when_the_Api_says_they_may_no_longer_send_Snapshots()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var (eventId, official) = await SceneAsync(api, client);
         var json = JsonApiClients.Of(api, official, out _);
@@ -68,7 +68,7 @@ public sealed class WitnessAccessTests : IClassFixture<MongoFixture>
         using var access = new WitnessAccessContext(new SelectedEvent(eventId), account, json);
         await access.Load();
         Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
-        await EventSeed.Grants(_mongo.ConnectionString).DeleteManyAsync(new BsonDocument("Email", official.Email));
+        await EventSeed.Grants(_shared.MongoConnectionString).DeleteManyAsync(new BsonDocument("Email", official.Email));
 
         await account.Refresh();
 
@@ -82,7 +82,7 @@ public sealed class WitnessAccessTests : IClassFixture<MongoFixture>
         bool failsWithAStatus
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var (eventId, official) = await SceneAsync(api, client);
         var json = JsonApiClients.Of(api, official, out var asked);
@@ -100,7 +100,7 @@ public sealed class WitnessAccessTests : IClassFixture<MongoFixture>
         await Eventually(() => told.Count > 0);
 
         Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
-        await EventSeed.Grants(_mongo.ConnectionString).DeleteManyAsync(new BsonDocument("Email", official.Email));
+        await EventSeed.Grants(_shared.MongoConnectionString).DeleteManyAsync(new BsonDocument("Email", official.Email));
         asked.Answer = null;
         await account.Refresh();
         await Eventually(() => told.Count > 1);
@@ -111,7 +111,7 @@ public sealed class WitnessAccessTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_the_Api_said_of_one_Event_is_not_kept_for_another_when_it_cannot_answer()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var (eventId, official) = await SceneAsync(api, client);
         var json = JsonApiClients.Of(api, official, out var asked);
@@ -133,14 +133,14 @@ public sealed class WitnessAccessTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_the_Api_said_of_one_person_is_not_kept_for_another_when_it_cannot_answer()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var (eventId, official) = await SceneAsync(api, client);
         var somebodyElse = await SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
-            await TenantAsync(_mongo.ConnectionString)
+            _shared.MongoConnectionString,
+            await TenantAsync(_shared.MongoConnectionString)
         );
         var cookie = new JsonApiClients.Cookie(
             $"{ApiSessions.COOKIE_NAME}={official.Page.Cookie(ApiSessions.COOKIE_NAME)}"
@@ -167,7 +167,7 @@ public sealed class WitnessAccessTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_the_person_may_do_is_not_said_while_the_host_has_not_said_who_is_signed_in_and_is_asked_again()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var json = JsonApiClients.Of(api, null, out var asked);
         asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
         using var account = new AccountSession(json);
@@ -193,17 +193,17 @@ public sealed class WitnessAccessTests : IClassFixture<MongoFixture>
 
     async Task<(Guid EventId, TenancySeed.Person Official)> SceneAsync(ApiFactory api, HttpClient client)
     {
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
-        var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var official = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         await EventSeed.GrantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             eventId,
             "Official",

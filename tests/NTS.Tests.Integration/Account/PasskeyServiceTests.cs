@@ -12,19 +12,19 @@ namespace NTS.Tests.Integration;
 /// The rules of the passkey service that no single request shows (#600): what is stored when a passkey has signed in,
 /// while other requests change the same person. The service is resolved from the host, as the routes get it.
 /// </summary>
-public sealed class PasskeyServiceTests : IClassFixture<MongoFixture>
+public sealed class PasskeyServiceTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public PasskeyServiceTests(MongoFixture mongo)
+    public PasskeyServiceTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_passkey_removed_while_it_was_signing_in_is_not_added_back()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var removed = RandomNumberGenerator.GetBytes(32);
         var kept = RandomNumberGenerator.GetBytes(32);
         var email = await SeedUserWithAsync(removed, kept);
@@ -50,7 +50,7 @@ public sealed class PasskeyServiceTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_passkey_that_signs_in_moves_its_sign_count_and_keeps_the_name_it_has_now()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var credentialId = RandomNumberGenerator.GetBytes(32);
         var email = await SeedUserWithAsync(credentialId);
         await Users()
@@ -97,7 +97,7 @@ public sealed class PasskeyServiceTests : IClassFixture<MongoFixture>
     {
         var email = UserSeed.NewEmail("service");
         await UserSeed.AddLegacyUserAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             email,
             shape: document =>
             {
@@ -120,6 +120,6 @@ public sealed class PasskeyServiceTests : IClassFixture<MongoFixture>
 
     IMongoCollection<BsonDocument> Users()
     {
-        return UserSeed.Users(_mongo.ConnectionString);
+        return UserSeed.Users(_shared.MongoConnectionString);
     }
 }

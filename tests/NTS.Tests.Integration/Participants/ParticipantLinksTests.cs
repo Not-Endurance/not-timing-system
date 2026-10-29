@@ -12,30 +12,30 @@ namespace NTS.Tests.Integration;
 /// is no way to reach the links of another person; the Participant has to be a row of the registry of any Tenant; the profile of
 /// the caller tells what they are linked to, with the names.
 /// </summary>
-public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
+public sealed class ParticipantLinksTests : IClassFixture<SharedApiFixture>
 {
     const string PROFILE = "/api/me/profile";
     const string PARTICIPANT_LINKS = "participant-links";
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ParticipantLinksTests(MongoFixture mongo)
+    public ParticipantLinksTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_person_links_themselves_as_an_Athlete_of_any_Tenant_and_their_profile_tells_it_with_the_name()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var person = await SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
-            await TenantAsync(_mongo.ConnectionString)
+            _shared.MongoConnectionString,
+            await TenantAsync(_shared.MongoConnectionString)
         );
-        var athlete = await AthleteAsync(await TenantAsync(_mongo.ConnectionString), "Иван Петров", "Ivan Petrov");
+        var athlete = await AthleteAsync(await TenantAsync(_shared.MongoConnectionString), "Иван Петров", "Ivan Petrov");
         var path = $"/api/athletes/{athlete}/link";
 
         var before = await person.Page.GetAsync(path);
@@ -84,10 +84,10 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_person_is_one_Athlete_at_a_time_and_linking_another_moves_the_link()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var first = await AthleteAsync(tenant, "Иван Петров", "Ivan Petrov");
         var second = await AthleteAsync(tenant, "Георги Иванов", "Georgi Ivanov");
 
@@ -116,12 +116,12 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_person_adds_and_removes_Horses_and_their_profile_lists_them_in_the_order_they_were_added()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var fire = await HorseAsync(tenant, "Огън", "Fire");
-        var wind = await HorseAsync(await TenantAsync(_mongo.ConnectionString), "Вятър", "Wind");
+        var wind = await HorseAsync(await TenantAsync(_shared.MongoConnectionString), "Вятър", "Wind");
 
         var addedWind = await PostAsync(person, $"/api/horses/{wind}/link");
         var addedFire = await PostAsync(person, $"/api/horses/{fire}/link");
@@ -176,10 +176,10 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_person_and_an_Athlete_and_a_Horse_are_linked_independently()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var athlete = await AthleteAsync(tenant, "Иван Петров", "Ivan Petrov");
         var horse = await HorseAsync(tenant, "Огън", "Fire");
 
@@ -198,10 +198,10 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_names_are_told_in_the_language_of_the_request_by_the_link_and_the_profile_alike()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var athlete = await AthleteAsync(tenant, "Иван Петров", "Ivan Petrov");
         var horse = await HorseAsync(tenant, "Огън", "Fire");
 
@@ -226,11 +226,11 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_links_of_a_person_are_theirs_alone()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var one = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var other = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var one = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var other = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var athlete = await AthleteAsync(tenant, "Иван Петров", "Ivan Petrov");
         var horse = await HorseAsync(tenant, "Огън", "Fire");
         await PostAsync(one, $"/api/athletes/{athlete}/link");
@@ -257,7 +257,7 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
         Assert.Equal(1, profileOfTheFirst.GetProperty("horses").GetArrayLength());
 
         // what is kept is one document for the account that made the links, and none for the one that only read its own
-        var stored = RegistrySeed.Collection(_mongo.ConnectionString, "user_links");
+        var stored = RegistrySeed.Collection(_shared.MongoConnectionString, "user_links");
         Assert.Equal(1, await stored.CountDocumentsAsync(new BsonDocument("_id", RegistrySeed.Binary(one.Id))));
         Assert.Equal(0, await stored.CountDocumentsAsync(new BsonDocument("_id", RegistrySeed.Binary(other.Id))));
     }
@@ -265,10 +265,10 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_row_that_is_not_in_the_registry_of_that_kind_cannot_be_linked()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var athlete = await AthleteAsync(tenant, "Иван Петров", "Ivan Petrov");
         var horse = await HorseAsync(tenant, "Огън", "Fire");
 
@@ -307,10 +307,10 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_person_adds_at_most_a_hundred_Horses_and_one_they_have_is_added_again_all_the_same()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var horses = new List<Guid>();
         for (var i = 0; i < 101; i++)
         {
@@ -349,10 +349,10 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_link_to_a_row_that_was_deleted_since_is_not_shown_and_the_person_can_still_take_it_away()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var athlete = await AthleteAsync(tenant, "Иван Петров", "Ivan Petrov");
         var kept = await HorseAsync(tenant, "Огън", "Fire");
         var gone = await HorseAsync(tenant, "Вятър", "Wind");
@@ -360,10 +360,10 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
         await PostAsync(person, $"/api/horses/{gone}/link");
         await PostAsync(person, $"/api/horses/{kept}/link");
         await RegistrySeed
-            .Collection(_mongo.ConnectionString, "athletes")
+            .Collection(_shared.MongoConnectionString, "athletes")
             .DeleteOneAsync(new BsonDocument("_id", RegistrySeed.Binary(athlete)));
         await RegistrySeed
-            .Collection(_mongo.ConnectionString, "horses")
+            .Collection(_shared.MongoConnectionString, "horses")
             .DeleteOneAsync(new BsonDocument("_id", RegistrySeed.Binary(gone)));
 
         var profile = (await ReadAsync(await person.Page.GetAsync(PROFILE), HttpStatusCode.OK)).GetProperty(
@@ -388,10 +388,10 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_profile_that_is_changed_tells_the_links_and_does_not_take_them_as_members()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var athlete = await AthleteAsync(tenant, "Иван Петров", "Ivan Petrov");
         var other = await AthleteAsync(tenant, "Георги Иванов", "Georgi Ivanov");
         await PostAsync(person, $"/api/athletes/{athlete}/link");
@@ -421,10 +421,10 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Nobody_who_is_not_signed_in_reads_makes_or_takes_away_a_link_and_a_write_needs_the_header_of_the_pages()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var athlete = await AthleteAsync(tenant, "Иван Петров", "Ivan Petrov");
         var path = $"/api/athletes/{athlete}/link";
         var visitor = new PageClient(client);
@@ -452,7 +452,7 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
     Task<Guid> AthleteAsync(string tenant, string name, string nameEnglish)
     {
         return RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             name,
             RegistrySeed.CountryOf("Bulgaria", "BG"),
@@ -462,7 +462,7 @@ public sealed class ParticipantLinksTests : IClassFixture<MongoFixture>
 
     Task<Guid> HorseAsync(string tenant, string name, string nameEnglish)
     {
-        return RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, name, nameEnglish);
+        return RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, name, nameEnglish);
     }
 
     static Task<HttpResponseMessage> PostAsync(Person person, string path, string? language = null)

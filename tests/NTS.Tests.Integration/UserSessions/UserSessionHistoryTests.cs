@@ -14,21 +14,21 @@ namespace NTS.Tests.Integration;
 /// instant, which a correction of the time of an entry names; and the correction of an entry, which is kept in the group it is
 /// of and nowhere else. What was kept before the ids were is still read, without them. Over the real Api in this process.
 /// </summary>
-public sealed class UserSessionHistoryTests : IClassFixture<MongoFixture>
+public sealed class UserSessionHistoryTests : IClassFixture<SharedApiFixture>
 {
     static readonly DateTimeOffset YESTERDAY = new(2026, 10, 11, 23, 59, 30, TimeSpan.FromHours(3));
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public UserSessionHistoryTests(MongoFixture mongo)
+    public UserSessionHistoryTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_group_that_is_sent_is_kept_with_its_id_and_the_instant_of_each_time_and_comes_back_in_another_tab()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var ana = await SignedInAsync(api, client);
         var eventId = Guid.NewGuid();
@@ -54,7 +54,7 @@ public sealed class UserSessionHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_time_of_an_entry_is_corrected_in_the_group_it_is_of_and_in_no_other_entry()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var ana = await SignedInAsync(api, client);
         var eventId = Guid.NewGuid();
@@ -84,7 +84,7 @@ public sealed class UserSessionHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_correction_of_a_group_the_history_does_not_have_changes_nothing_and_is_not_an_error()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var ana = await SignedInAsync(api, client);
         using var tab = Open(api, ana);
@@ -102,7 +102,7 @@ public sealed class UserSessionHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_group_kept_before_the_ids_were_is_read_without_one_and_with_the_times_of_the_day_it_had()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var ana = await SignedInAsync(api, client);
         var eventId = Guid.NewGuid();
@@ -209,14 +209,14 @@ public sealed class UserSessionHistoryTests : IClassFixture<MongoFixture>
 
     IMongoCollection<BsonDocument> Records()
     {
-        return new MongoClient(_mongo.ConnectionString)
+        return new MongoClient(_shared.MongoConnectionString)
             .GetDatabase(UserSeed.DATABASE)
             .GetCollection<BsonDocument>("event_user_sessions");
     }
 
     async Task<TenancySeed.Person> SignedInAsync(ApiFactory api, HttpClient client)
     {
-        return await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, null);
+        return await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, null);
     }
 
     sealed class Tab : IDisposable

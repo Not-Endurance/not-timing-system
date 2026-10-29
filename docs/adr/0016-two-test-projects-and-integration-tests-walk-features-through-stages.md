@@ -18,7 +18,7 @@ The unit tests run in no workflow, the integration tests run only when someone s
 
 **Robustness.** No automatic retries and no quarantine. A flaky test is made deterministic in the change that finds it. A change lands only after three consecutive full runs of the integration project pass on one machine.
 
-**Containers.** One MongoDB container per run, shared by every class, with each class in a database of its own. Chromium runs at most two at a time, and xUnit at most four threads; both are set once for the assembly.
+**Containers.** One MongoDB container per run, shared by every class, with each class in a database of its own. Chromium runs at most two at a time (`PasskeyBrowserFixture`), and four classes run at a time, each holding its MongoDB container (`MongoContainer`), because the Visual Studio adapter does not apply the xUnit thread limit.
 
 **CI.** Pull requests run the unit tests, which include the architecture tests, and fail on them. Integration tests run only from the manual workflow.
 

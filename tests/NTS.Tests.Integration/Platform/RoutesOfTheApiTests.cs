@@ -15,22 +15,22 @@ namespace NTS.Tests.Integration;
 /// reaches across Tenants is a named view and never a parameter. Adding a route is a change to this test, and so a
 /// decision about both.
 /// </summary>
-public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
+public sealed class RoutesOfTheApiTests : IClassFixture<SharedApiFixture>
 {
     // What is sent to every read to try to turn it across Tenants. A route either refuses these or answers as it did without them.
     const string ACROSS = "tenantId=country-xx&tenant=country-xx&allTenants=true&acrossTenants=true&all=true";
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public RoutesOfTheApiTests(MongoFixture mongo)
+    public RoutesOfTheApiTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task The_routes_that_change_state_are_exactly_the_ones_listed_and_none_is_named_for_a_role()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
 
         var actual = RoutesOf(api).Where(x => x.Method is "POST" or "PUT" or "PATCH" or "DELETE").Select(x => x.Text);
 
@@ -45,7 +45,7 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Every_route_of_the_Api_is_public_or_declares_what_it_needs()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
 
         var endpoints = api.Services.GetServices<EndpointDataSource>().SelectMany(x => x.Endpoints);
 
@@ -55,7 +55,7 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_routes_that_read_are_exactly_the_ones_listed_besides_the_public_views()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
 
         var actual = RoutesOf(api)
             .Where(x => x.Method == "GET" && x.Pattern.StartsWith("api/", StringComparison.Ordinal))
@@ -67,22 +67,22 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task No_read_takes_a_Tenant_or_a_flag_for_every_Tenant_as_a_parameter()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var worker = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, root.Id, DateTimeOffset.UtcNow);
-        await EventSeed.GrantAsync(_mongo.ConnectionString, tenant, live, "Operator", null, worker.Email, worker.Id);
-        var club = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Reads");
-        var horse = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, "Reads");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var worker = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var live = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, root.Id, DateTimeOffset.UtcNow);
+        await EventSeed.GrantAsync(_shared.MongoConnectionString, tenant, live, "Operator", null, worker.Email, worker.Id);
+        var club = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Reads");
+        var horse = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, "Reads");
         var athlete = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Reads",
             RegistrySeed.CountryOf("Bulgaria", "BG")
         );
-        var country = await CountrySeed.AddAsync(_mongo.ConnectionString, "Reads", CountrySeed.UniqueIsoCode());
+        var country = await CountrySeed.AddAsync(_shared.MongoConnectionString, "Reads", CountrySeed.UniqueIsoCode());
         var urls = new[]
         {
             "/api/clubs",
@@ -139,13 +139,13 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_search_across_Tenants_is_a_route_of_its_own_and_the_search_in_a_Tenant_cannot_be_widened_into_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var marker = Guid.NewGuid().ToString("N")[..8];
-        await AccountAsync(_mongo.ConnectionString, other, name: $"Foreign{marker} Person");
+        await AccountAsync(_shared.MongoConnectionString, other, name: $"Foreign{marker} Person");
 
         var inTheTenant = await root.Page.GetAsync($"/api/accounts?filter=contains(name,'foreign{marker}')");
         var widened = await root.Page.GetAsync(

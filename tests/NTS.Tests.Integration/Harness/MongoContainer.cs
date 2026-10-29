@@ -11,8 +11,17 @@ namespace NTS.Tests.Integration.Harness;
 /// </summary>
 internal sealed class MongoContainer : IAsyncDisposable
 {
+    /// <summary>
+    /// The containers that run at once, which is what the localhost starts at once (ADR-0016). A fixture holds its place from
+    /// its start to its disposal, and a class runs while its fixture does, so the places are the classes that run at once.
+    /// xUnit's thread limit is not one here: the Visual Studio adapter ignores both xunit.runner.json and the assembly
+    /// attribute that sets it, and a run with one thread still had twelve classes in flight.
+    /// </summary>
+    static readonly SemaphoreSlim PLACES = new(4, 4);
+
     public static async Task<MongoContainer> StartAsync()
     {
+        await PLACES.WaitAsync();
         var container = new MongoDbBuilder().WithImage("mongo:6.0").Build();
         try
         {
@@ -21,6 +30,7 @@ internal sealed class MongoContainer : IAsyncDisposable
         catch
         {
             await ReleaseAsync(container);
+            PLACES.Release();
             throw;
         }
 
@@ -38,7 +48,14 @@ internal sealed class MongoContainer : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await ReleaseAsync(_container);
+        try
+        {
+            await ReleaseAsync(_container);
+        }
+        finally
+        {
+            PLACES.Release();
+        }
     }
 
     static async Task ReleaseAsync(MongoDbContainer container)

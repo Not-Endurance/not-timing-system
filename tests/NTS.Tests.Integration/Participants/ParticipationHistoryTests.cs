@@ -18,28 +18,28 @@ namespace NTS.Tests.Integration;
 /// Participations resource refuses an anonymous filter on the Athlete or the Horse. Over the real Api in this process, with the
 /// rides and the Rankings stored the way the Api keeps them.
 /// </summary>
-public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
+public sealed class ParticipationHistoryTests : IClassFixture<SharedApiFixture>
 {
     // Every test has Participants of its own: the database is shared by all of them, and a Participant is found by its id.
     readonly Participant _ana = new(Guid.NewGuid(), "Мариела Тестова", "Mariela Testova");
     readonly Participant _boris = new(Guid.NewGuid(), "Борис Примеров", "Boris Primerov");
     readonly Participant _fire = new(Guid.NewGuid(), "Огън", "Fire");
     readonly Participant _wind = new(Guid.NewGuid(), "Вятър", "Wind");
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ParticipationHistoryTests(MongoFixture mongo)
+    public ParticipationHistoryTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_caller_who_is_not_signed_in_is_refused_and_a_signed_in_one_reads_the_rides_of_an_Athlete_and_of_a_Horse()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Plovdiv", 30);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Plovdiv", 30);
         var ride = HistorySeed.Ride(past, 1, _ana, _fire);
         await StoreAsync(tenant, ride, Ranked(past, "CEI 1*", (ride, 1)));
 
@@ -87,16 +87,16 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Only_the_rides_of_Events_that_have_ended_are_listed_newest_first_in_any_Tenant_and_a_deleted_ride_is_not_one()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var other = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var oldest = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Autumn ride", "Varna", 400);
-        var newest = await HistorySeed.HistoricAsync(_mongo.ConnectionString, other, "Spring ride", "Sofia", 10);
-        var middle = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Winter ride", "Plovdiv", 200);
-        var live = await HistorySeed.LiveAsync(_mongo.ConnectionString, tenant, "Summer ride", "Burgas");
-        var deleted = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Deleted ride", "Ruse", 100);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var other = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var oldest = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Autumn ride", "Varna", 400);
+        var newest = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, other, "Spring ride", "Sofia", 10);
+        var middle = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Winter ride", "Plovdiv", 200);
+        var live = await HistorySeed.LiveAsync(_shared.MongoConnectionString, tenant, "Summer ride", "Burgas");
+        var deleted = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Deleted ride", "Ruse", 100);
         var rides = new Dictionary<string, Participation>
         {
             ["oldest"] = HistorySeed.Ride(oldest, 1, _ana, _fire),
@@ -111,8 +111,8 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
         await StoreAsync(tenant, rides["middle"], Ranked(middle, "CEI 1*", (rides["middle"], 1)));
         await StoreAsync(tenant, rides["live"], Ranked(live, "CEI 1*", (rides["live"], 1)));
         await StoreAsync(tenant, rides["deleted"], Ranked(deleted, "CEI 1*", (rides["deleted"], 1)));
-        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, rides["somebody else"]);
-        await HistorySeed.SoftDeleteAsync(_mongo.ConnectionString, rides["deleted"].Id);
+        await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, rides["somebody else"]);
+        await HistorySeed.SoftDeleteAsync(_shared.MongoConnectionString, rides["deleted"].Id);
 
         var response = await me.Page.GetAsync($"/api/participations/history?filter=athleteId eq {_ana.Id}");
 
@@ -130,12 +130,12 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_ride_of_an_Event_that_was_deleted_is_not_listed()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var kept = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Kept ride", "Plovdiv", 30);
-        var gone = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Deleted ride", "Varna", 60);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var kept = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Kept ride", "Plovdiv", 30);
+        var gone = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Deleted ride", "Varna", 60);
         var keptRide = HistorySeed.Ride(kept, 1, _ana, _fire);
         var goneRide = HistorySeed.Ride(gone, 1, _ana, _fire);
         await StoreAsync(
@@ -145,7 +145,7 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
             goneRide,
             Ranked(gone, "CEI 1*", (goneRide, 1))
         );
-        await HistorySeed.SoftDeleteEventAsync(_mongo.ConnectionString, gone);
+        await HistorySeed.SoftDeleteEventAsync(_shared.MongoConnectionString, gone);
 
         var response = await me.Page.GetAsync($"/api/participations/history?filter=athleteId eq {_ana.Id}");
 
@@ -160,14 +160,14 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [InlineData(true)] // the Event was deleted
     public async Task What_was_deleted_takes_no_place_on_a_page_and_makes_no_page_after_it(bool theEvent)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var spring = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
-        var goneFirst = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Deleted ride", "Varna", 30);
-        var autumn = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Autumn ride", "Ruse", 50);
-        var goneLast = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Deleted again", "Burgas", 70);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var spring = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var goneFirst = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Deleted ride", "Varna", 30);
+        var autumn = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Autumn ride", "Ruse", 50);
+        var goneLast = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Deleted again", "Burgas", 70);
         var springRide = HistorySeed.Ride(spring, 1, _ana, _fire);
         var firstGone = HistorySeed.Ride(goneFirst, 1, _ana, _fire);
         var autumnRide = HistorySeed.Ride(autumn, 1, _ana, _fire);
@@ -175,13 +175,13 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
         await StoreAsync(tenant, springRide, firstGone, autumnRide, lastGone);
         if (theEvent)
         {
-            await HistorySeed.SoftDeleteEventAsync(_mongo.ConnectionString, goneFirst);
-            await HistorySeed.SoftDeleteEventAsync(_mongo.ConnectionString, goneLast);
+            await HistorySeed.SoftDeleteEventAsync(_shared.MongoConnectionString, goneFirst);
+            await HistorySeed.SoftDeleteEventAsync(_shared.MongoConnectionString, goneLast);
         }
         else
         {
-            await HistorySeed.SoftDeleteAsync(_mongo.ConnectionString, firstGone.Id);
-            await HistorySeed.SoftDeleteAsync(_mongo.ConnectionString, lastGone.Id);
+            await HistorySeed.SoftDeleteAsync(_shared.MongoConnectionString, firstGone.Id);
+            await HistorySeed.SoftDeleteAsync(_shared.MongoConnectionString, lastGone.Id);
         }
 
         var response = await me.Page.GetAsync(
@@ -202,12 +202,12 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     {
         var end = new DateTimeOffset(2030, 5, 21, 23, 59, 59, TimeSpan.Zero);
         var time = new FakeTimeProvider(end.AddSeconds(-1));
-        await using var api = new ApiFactory(_mongo.ConnectionString, time: time);
+        await using var api = new ApiFactory(_shared.MongoConnectionString, time: time);
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var edge = await HistorySeed.EventAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Edge ride",
             "Plovdiv",
@@ -229,13 +229,13 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_page_reads_only_the_rides_the_Events_and_the_Rankings_that_are_on_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var oldest = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Autumn ride", "Varna", 300);
-        var middle = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Winter ride", "Plovdiv", 200);
-        var newest = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 100);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var oldest = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Autumn ride", "Varna", 300);
+        var middle = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Winter ride", "Plovdiv", 200);
+        var newest = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 100);
         var oldestRide = HistorySeed.Ride(oldest, 1, _ana, _fire);
         var middleRide = HistorySeed.Ride(middle, 1, _ana, _fire);
         var newestRide = HistorySeed.Ride(newest, 1, _ana, _fire);
@@ -249,8 +249,8 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
             newestRide,
             Ranked(newest, "CEI 1*", (newestRide, 1))
         );
-        await HistorySeed.SpoilParticipationAsync(_mongo.ConnectionString, oldestRide.Id); // something that cannot be read whole
-        await HistorySeed.SpoilRankingAsync(_mongo.ConnectionString, oldestRanking.Id);
+        await HistorySeed.SpoilParticipationAsync(_shared.MongoConnectionString, oldestRide.Id); // something that cannot be read whole
+        await HistorySeed.SpoilRankingAsync(_shared.MongoConnectionString, oldestRanking.Id);
 
         var response = await me.Page.GetAsync(
             $"/api/participations/history?filter=athleteId eq {_ana.Id}&page[size]=2"
@@ -270,20 +270,20 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_placing_is_the_stored_rank_in_the_Ranking_of_the_rides_own_Competition_and_Category_and_a_ride_counted_in_two_Rankings_lists_the_other()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var ranked = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Ranked ride", "Plovdiv", 30);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var ranked = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Ranked ride", "Plovdiv", 30);
         var eliminated = await HistorySeed.HistoricAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Eliminated ride",
             "Varna",
             60
         );
         var notRanked = await HistorySeed.HistoricAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Not ranked ride",
             "Sofia",
@@ -377,16 +377,16 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
         );
         foreach (var ranking in new[] { own, anotherName, anotherRuleset, anotherCategory, custom, twin, unrelated })
         {
-            await EventSeed.RankingAsync(_mongo.ConnectionString, tenant, ranking);
+            await EventSeed.RankingAsync(_shared.MongoConnectionString, tenant, ranking);
         }
 
         await EventSeed.RankingAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             Ranked(eliminated, "CEI 1*", (winner, 1), (withdrawn, 2))
         );
         await EventSeed.RankingAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             HistorySeed.Ranking(
                 notRanked,
@@ -442,12 +442,12 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Ranking_that_holds_no_ranks_yet_is_ranked_in_memory_and_its_only_entry_is_rank_1()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var shared = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Shared ride", "Plovdiv", 30);
-        var alone = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Lonely ride", "Varna", 60);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var shared = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Shared ride", "Plovdiv", 30);
+        var alone = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Lonely ride", "Varna", 60);
         var arrive = DateTimeOffset.UtcNow.AddHours(-5);
         var quick = HistorySeed.Ride(shared, 1, _boris, _wind, arrive: arrive);
         var slow = HistorySeed.Ride(shared, 2, _ana, _fire, arrive: arrive.AddMinutes(40));
@@ -455,7 +455,7 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
         await StoreAsync(tenant, quick, slow);
         await StoreAsync(tenant, single);
         await EventSeed.RankingAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             HistorySeed.Ranking(
                 shared,
@@ -467,7 +467,7 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
             ) // listed the other way round, with nothing stored: the times rank them
         );
         await EventSeed.RankingAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             HistorySeed.Ranking(
                 alone,
@@ -493,14 +493,14 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Ranking_that_cannot_be_ranked_leaves_the_placing_out_and_the_ride_is_listed_all_the_same()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var broken = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Broken ride", "Plovdiv", 30);
-        var fine = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Fine ride", "Varna", 60);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var broken = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Broken ride", "Plovdiv", 30);
+        var fine = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Fine ride", "Varna", 60);
         var unreadable = await HistorySeed.HistoricAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Unreadable ride",
             "Sofia",
@@ -513,9 +513,9 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
         await StoreAsync(tenant, mine);
         await StoreAsync(tenant, good, Ranked(fine, "CEI 1*", (good, 1)));
         await StoreAsync(tenant, spoiled, Ranked(unreadable, "CEI 1*", (spoiled, 1)));
-        await HistorySeed.BlankTheAthleteNameAsync(_mongo.ConnectionString, spoiled.Id);
+        await HistorySeed.BlankTheAthleteNameAsync(_shared.MongoConnectionString, spoiled.Id);
         await EventSeed.RankingAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             HistorySeed.Ranking(
                 broken,
@@ -553,11 +553,11 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Ranking_that_the_domain_does_not_accept_is_listed_without_a_placing_and_the_others_keep_theirs()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Damaged ride", "Plovdiv", 30);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Damaged ride", "Plovdiv", 30);
         var mine = HistorySeed.Ride(past, 1, _ana, _fire);
         var own = Ranked(past, "CEI 1*", (mine, 2));
         var damaged = HistorySeed.Ranking(
@@ -568,7 +568,7 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
             Entry(mine, 1)
         );
         await StoreAsync(tenant, mine, own, damaged);
-        await HistorySeed.CountTwiceAsync(_mongo.ConnectionString, damaged.Id, mine.Id);
+        await HistorySeed.CountTwiceAsync(_shared.MongoConnectionString, damaged.Id, mine.Id);
 
         var rows = await RowsAsync(
             await me.Page.GetAsync($"/api/participations/history?filter=athleteId eq {_ana.Id}")
@@ -584,15 +584,15 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_ride_in_no_Ranking_of_its_own_has_no_placing_and_lists_the_Rankings_that_do_count_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Custom ride", "Plovdiv", 30);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Custom ride", "Plovdiv", 30);
         var mine = HistorySeed.Ride(past, 1, _ana, _fire);
         await StoreAsync(tenant, mine);
         await EventSeed.RankingAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             HistorySeed.Ranking(
                 past,
@@ -618,11 +618,11 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_other_half_of_the_Combination_is_named_by_the_display_name_rule_of_the_ruleset_and_the_language_of_the_request()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Two rides", "Plovdiv", 30);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Two rides", "Plovdiv", 30);
         var fei = HistorySeed.Ride(past, 1, _ana, _fire, "CEI 1*", CompetitionRuleset.FEI);
         var regional = HistorySeed.Ride(past, 2, _ana, _wind, "Regional 40", CompetitionRuleset.Regional);
         await StoreAsync(tenant, fei, regional);
@@ -659,16 +659,16 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_list_is_cut_into_pages_and_sorted_by_the_members_of_a_row()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var places = new[] { "Burgas", "Ruse", "Varna", "Sofia", "Plovdiv" };
         var rides = new List<Participation>();
         for (var i = 0; i < places.Length; i++)
         {
             var past = await HistorySeed.HistoricAsync(
-                _mongo.ConnectionString,
+                _shared.MongoConnectionString,
                 tenant,
                 $"Ride {i}",
                 places[i],
@@ -718,13 +718,13 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Rides_of_Events_that_end_together_are_listed_the_later_started_first_and_then_by_the_id_of_the_ride()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var end = DateTimeOffset.UtcNow.Date.AddDays(-20).AddHours(23);
         var longer = await HistorySeed.EventAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Long",
             "Sofia",
@@ -732,7 +732,7 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
             end
         );
         var shorter = await HistorySeed.EventAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Short",
             "Varna",
@@ -759,11 +759,11 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [InlineData("-location")]
     public async Task Rides_that_are_equal_in_the_sort_of_the_caller_come_in_the_order_of_their_ids(string sort)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "One Event", "Sofia", 30);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "One Event", "Sofia", 30);
         var low = HistorySeed.Ride(past, 1, _ana, _fire, id: IdStartingWith("00"));
         var middle = HistorySeed.Ride(past, 2, _ana, _wind, id: IdStartingWith("80"));
         var high = HistorySeed.Ride(past, 3, _ana, _fire, id: IdStartingWith("ff"));
@@ -782,11 +782,11 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_person_may_be_in_parentheses_and_the_filter_may_have_spaces_around_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Ride", "Plovdiv", 30);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Ride", "Plovdiv", 30);
         var ride = HistorySeed.Ride(past, 1, _ana, _fire);
         await StoreAsync(tenant, ride);
 
@@ -817,10 +817,10 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     )] // or is not and
     public async Task A_list_that_names_nobody_is_refused_with_a_code(string query, string code)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var path = query.StartsWith('?')
             ? "/api/participations/history" + query
             : "/api/participations/history" + (query.Length == 0 ? "" : "?" + query.TrimStart('&'));
@@ -834,11 +834,11 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_filter_that_goes_on_with_or_cannot_widen_the_list_to_the_rides_of_somebody_else()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Ride", "Plovdiv", 30);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Ride", "Plovdiv", 30);
         var mine = HistorySeed.Ride(past, 1, _ana, _fire);
         var yours = HistorySeed.Ride(past, 2, _boris, _wind);
         await StoreAsync(tenant, mine, yours);
@@ -871,11 +871,11 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [InlineData("&sort=other/displayName", "invalid-sort")]
     public async Task What_the_list_does_not_take_is_refused_with_the_code_the_skill_names(string more, string code)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Ride", "Plovdiv", 30);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Ride", "Plovdiv", 30);
         var ride = HistorySeed.Ride(past, 1, _ana, _fire);
         await StoreAsync(tenant, ride, Ranked(past, "CEI 1*", (ride, 1)));
 
@@ -888,11 +888,11 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_list_filtered_further_is_cut_to_what_the_filter_keeps()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Ride", "Plovdiv", 30);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Ride", "Plovdiv", 30);
         var onFire = HistorySeed.Ride(past, 1, _ana, _fire);
         var onWind = HistorySeed.Ride(past, 2, _ana, _wind, "CEI 2*");
         await StoreAsync(tenant, onFire, onWind);
@@ -934,12 +934,12 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_list_is_filtered_and_sorted_by_the_name_of_the_Event_and_by_the_ruleset_of_the_ride()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var spring = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
-        var autumn = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Autumn ride", "Varna", 30);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var spring = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var autumn = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Autumn ride", "Varna", 30);
         var onFire = HistorySeed.Ride(spring, 1, _ana, _fire);
         var onWind = HistorySeed.Ride(autumn, 1, _ana, _wind, "Regional 40", CompetitionRuleset.Regional);
         await StoreAsync(tenant, onFire, onWind);
@@ -960,11 +960,11 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_public_Participations_resource_refuses_an_anonymous_filter_on_the_Athlete_or_the_Horse_and_is_otherwise_unchanged()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await HistorySeed.LiveAsync(_mongo.ConnectionString, tenant, "Live ride", "Plovdiv");
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var live = await HistorySeed.LiveAsync(_shared.MongoConnectionString, tenant, "Live ride", "Plovdiv");
         var ride = HistorySeed.Ride(live, 1, _ana, _fire);
         await StoreAsync(tenant, ride);
         var inTheEvent = $"/api/participations?filter=eventId eq {live}";
@@ -1004,13 +1004,13 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Participations_collection_is_indexed_on_the_Athlete_and_the_Horse_when_the_host_starts_and_again_without_harm()
     {
-        await using var first = new ApiFactory(_mongo.ConnectionString);
+        await using var first = new ApiFactory(_shared.MongoConnectionString);
         using var _ = ApiClients.Of(first); // starts the host
-        await using var second = new ApiFactory(_mongo.ConnectionString);
+        await using var second = new ApiFactory(_shared.MongoConnectionString);
         using var __ = ApiClients.Of(second);
 
         var indexes = await (
-            await new MongoClient(_mongo.ConnectionString)
+            await new MongoClient(_shared.MongoConnectionString)
                 .GetDatabase(UserSeed.DATABASE)
                 .GetCollection<BsonDocument>("event_participations")
                 .Indexes.ListAsync()
@@ -1028,11 +1028,11 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
         {
             if (document is Participation ride)
             {
-                await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, ride);
+                await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, ride);
             }
             else
             {
-                await EventSeed.RankingAsync(_mongo.ConnectionString, tenant, (Ranking)document);
+                await EventSeed.RankingAsync(_shared.MongoConnectionString, tenant, (Ranking)document);
             }
         }
     }

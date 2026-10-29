@@ -18,20 +18,20 @@ namespace NTS.Tests.Integration;
 /// confirms nothing of the address and takes no invitation. The real host over a MongoDB in a container, the address of the
 /// caller named by the test.
 /// </summary>
-public sealed class LocalSignInTests : IClassFixture<MongoFixture>
+public sealed class LocalSignInTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public LocalSignInTests(MongoFixture mongo)
+    public LocalSignInTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task An_account_on_the_allow_list_is_signed_in_as_by_a_request_from_the_machine_itself()
     {
         var email = UserSeed.NewEmail("local");
-        var id = await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
+        var id = await UserSeed.AddLegacyUserAsync(_shared.MongoConnectionString, email);
         await MarkAsync("Staging");
         await using var api = ApiOf(email);
         using var client = api.CreateClient();
@@ -60,7 +60,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
     public async Task The_address_may_be_typed_in_any_case_and_with_spaces_and_the_account_keeps_its_address_unconfirmed()
     {
         var email = UserSeed.NewEmail("local");
-        var id = await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
+        var id = await UserSeed.AddLegacyUserAsync(_shared.MongoConnectionString, email);
         await MarkAsync("Development");
         await using var api = ApiOf($" {email.ToUpperInvariant()} ");
         using var client = api.CreateClient();
@@ -69,7 +69,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var stored = await UserSeed
-            .Users(_mongo.ConnectionString)
+            .Users(_shared.MongoConnectionString)
             .Find(new BsonDocument("_id", LegacyTenantData.Uuid(id)))
             .SingleAsync();
         Assert.False(stored.GetValue("EmailConfirmed", false).AsBoolean); // nothing was proved of the address
@@ -80,11 +80,11 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
     public async Task An_invitation_waiting_for_the_address_is_not_taken_by_signing_in_as_somebody()
     {
         var email = UserSeed.NewEmail("local");
-        var id = await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
+        var id = await UserSeed.AddLegacyUserAsync(_shared.MongoConnectionString, email);
         await MarkAsync("Staging");
         var invitation = Guid.NewGuid();
         await EventSeed
-            .Grants(_mongo.ConnectionString)
+            .Grants(_shared.MongoConnectionString)
             .InsertOneAsync(
                 new BsonDocument
                 {
@@ -102,7 +102,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var grant = await EventSeed
-            .Grants(_mongo.ConnectionString)
+            .Grants(_shared.MongoConnectionString)
             .Find(new BsonDocument("_id", EventSeed.Binary(invitation)))
             .SingleAsync();
         Assert.False(grant.Contains("AccountId"));
@@ -113,7 +113,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
     public async Task Without_an_allow_list_there_is_no_route_and_no_page()
     {
         await MarkAsync("Staging");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
 
         var post = await SignInAsAsync(client, "someone@example.test");
@@ -128,7 +128,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
     public async Task Outside_Development_there_is_no_route_even_with_an_allow_list()
     {
         var email = UserSeed.NewEmail("local");
-        await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
+        await UserSeed.AddLegacyUserAsync(_shared.MongoConnectionString, email);
         await MarkAsync("Staging");
         await using var api = ApiOf(email, environment: "Staging");
         using var client = api.CreateClient();
@@ -157,7 +157,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
     )
     {
         var email = UserSeed.NewEmail("local");
-        await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
+        await UserSeed.AddLegacyUserAsync(_shared.MongoConnectionString, email);
         await MarkAsync("Staging");
         await using var api = ApiOf(email);
         using var client = api.CreateClient();
@@ -179,7 +179,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
     public async Task A_request_from_the_machine_to_any_of_its_own_names_is_signed_in(string remote, string host)
     {
         var email = UserSeed.NewEmail("local");
-        await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
+        await UserSeed.AddLegacyUserAsync(_shared.MongoConnectionString, email);
         await MarkAsync("Staging");
         await using var api = ApiOf(email);
         using var client = api.CreateClient();
@@ -211,7 +211,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
     public async Task A_database_that_is_marked_Production_is_refused_and_one_that_is_not_marked_is_refused_too()
     {
         var email = UserSeed.NewEmail("local");
-        await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
+        await UserSeed.AddLegacyUserAsync(_shared.MongoConnectionString, email);
         await using var api = ApiOf(email);
         using var client = api.CreateClient();
 
@@ -238,8 +238,8 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
     )
     {
         var email = UserSeed.NewEmail("local");
-        await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
-        await SetHandWrittenMarkerAsync(_mongo.ConnectionString, marker);
+        await UserSeed.AddLegacyUserAsync(_shared.MongoConnectionString, email);
+        await SetHandWrittenMarkerAsync(_shared.MongoConnectionString, marker);
         await using var api = ApiOf(email);
         using var client = api.CreateClient();
 
@@ -256,7 +256,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
         var listed = UserSeed.NewEmail("listed");
         var other = UserSeed.NewEmail("other");
         var missing = UserSeed.NewEmail("missing");
-        await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, other);
+        await UserSeed.AddLegacyUserAsync(_shared.MongoConnectionString, other);
         await MarkAsync("Staging");
         await using var api = ApiOf(listed, missing);
         using var client = api.CreateClient();
@@ -323,12 +323,12 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
 
     ApiFactory ApiOf(string email, string? second = null, string environment = "Development")
     {
-        return ApiOver(_mongo.ConnectionString, email, second, environment);
+        return ApiOver(_shared.MongoConnectionString, email, second, environment);
     }
 
     Task MarkAsync(string? name)
     {
-        return SetMarkerAsync(_mongo.ConnectionString, name);
+        return SetMarkerAsync(_shared.MongoConnectionString, name);
     }
 }
 #endif

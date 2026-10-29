@@ -16,24 +16,24 @@ namespace NTS.Tests.Integration;
 /// The people a Console Operator links to the Officials and Operators of its Event, by the exact email, and what the forms of the
 /// Setup pick from (#646, ADR-0010, ADR-0012). Over the real Api in this process and the container the app builds.
 /// </summary>
-public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
+public sealed class ConsoleAccessAndLookupsTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ConsoleAccessAndLookupsTests(MongoFixture mongo)
+    public ConsoleAccessAndLookupsTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_Console_Operator_links_an_account_by_its_exact_email_and_an_address_with_no_account_waits_as_an_invitation()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var known = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Georgi Ivanov");
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var known = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, name: "Georgi Ivanov");
+        var id = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, "Open");
         await using var ui = ConsoleUi.Open(api, consoleOperator);
         var grants = ui.Get<IConsoleGrants>();
 
@@ -66,11 +66,11 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_list_that_the_Api_cuts_into_pages_is_read_page_after_page_to_its_end_and_the_grants_ask_for_the_biggest_page()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, "Open");
         await using var ui = ConsoleUi.Open(api, consoleOperator);
         var grants = ui.Get<IConsoleGrants>();
         var marker = Guid.NewGuid().ToString("N");
@@ -104,12 +104,12 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Api_says_why_it_will_not_link_a_person_and_what_it_says_is_what_the_form_shows()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, "Open");
         await using var mine = ConsoleUi.Open(api, consoleOperator);
         await using var theirs = ConsoleUi.Open(api, member);
 
@@ -132,12 +132,12 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_Official_is_asked_for_a_role_before_the_Api_is_and_a_grant_is_removed_only_by_the_one_who_may()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, "Open");
         await using var mine = ConsoleUi.Open(api, consoleOperator);
         await using var theirs = ConsoleUi.Open(api, member);
         var grant = await mine.Get<IConsoleGrants>().Link(id, GrantKind.Operator, null, "someone@example.test");
@@ -157,21 +157,21 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_other_Tenants_are_asked_for_two_characters_a_quote_is_part_of_the_name_and_the_Tenants_own_rows_are_all_there_is_when_the_others_cannot_say()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
         var own = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Мария Тенант",
             bulgaria,
             "Maria Tenant"
         );
         var theirs = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             other,
             "Конан О'Брайън",
             bulgaria,
@@ -203,15 +203,15 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_FEI_ID_of_a_row_of_another_Tenant_reaches_the_Setup_of_a_Tenant_Root_and_no_other_account()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var (latin, cyrillic) = HistorySeed.NameMarker(); // the registries are shared by the tests of this class: the name is this test's own
         var theirs = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             other,
             $"Мария Друга {cyrillic}",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
@@ -232,14 +232,14 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Other_Tenants_are_asked_for_a_term_with_a_word_of_two_characters_and_for_the_first_six_words_of_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var (latin, cyrillic) = HistorySeed.NameMarker(); // the registries are shared by the tests of this class: the name is this test's own
         var theirs = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             other,
             $"Конан {cyrillic}",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
@@ -260,29 +260,29 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Tenants_own_rows_are_found_by_name_and_another_Tenants_rows_by_a_term_with_a_word_of_two_characters_or_more()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
         var (latin, cyrillic) = HistorySeed.NameMarker(); // the registries are shared by the tests of this class: the names are this test's own
         var own = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Мария Тенант {cyrillic}",
             bulgaria,
             $"Maria Tenant {latin}"
         );
         var theirs = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             other,
             $"Мария Друга {cyrillic}",
             bulgaria,
             $"Maria Other {latin}"
         );
-        await RegistrySeed.HorseAsync(_mongo.ConnectionString, other, $"Далечен {cyrillic}", $"Faraway {latin}");
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, other, $"Далечен клуб {cyrillic}");
+        await RegistrySeed.HorseAsync(_shared.MongoConnectionString, other, $"Далечен {cyrillic}", $"Faraway {latin}");
+        await RegistrySeed.ClubAsync(_shared.MongoConnectionString, other, $"Далечен клуб {cyrillic}");
         await using var ui = ConsoleUi.Open(api, consoleOperator);
         var lookups = ui.Get<IConsoleLookups>();
 
@@ -303,13 +303,13 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_country_of_the_Tenant_is_the_country_that_a_new_row_starts_with_and_countries_are_found_by_name()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        await TenantAsync(_mongo.ConnectionString, "Another Land", withCountry: true);
-        await TenantAsync(_mongo.ConnectionString, "A Third Land", withCountry: true);
-        await TenantAsync(_mongo.ConnectionString, "Yet Another Land", withCountry: true);
+        await TenantAsync(_shared.MongoConnectionString, "Another Land", withCountry: true);
+        await TenantAsync(_shared.MongoConnectionString, "A Third Land", withCountry: true);
+        await TenantAsync(_shared.MongoConnectionString, "Yet Another Land", withCountry: true);
         await CountrySeed
-            .Countries(_mongo.ConnectionString)
+            .Countries(_shared.MongoConnectionString)
             .InsertOneAsync(
                 new BsonDocument
                 {
@@ -325,9 +325,9 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
                     { "IsoCode", CountrySeed.UniqueIsoCode() },
                 }
             ); // the first of the countries by its id, which is not the country of the Tenant
-        var tenant = await TenantAsync(_mongo.ConnectionString, "Land of Test", withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var nobody = await SignedInAsync(api, client, _mongo.ConnectionString, null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, "Land of Test", withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var nobody = await SignedInAsync(api, client, _shared.MongoConnectionString, null);
         await using var ui = ConsoleUi.Open(api, consoleOperator);
         await using var none = ConsoleUi.Open(api, nobody);
         var lookups = ui.Get<IConsoleLookups>();

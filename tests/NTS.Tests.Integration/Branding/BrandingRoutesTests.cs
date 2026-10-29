@@ -13,25 +13,25 @@ namespace NTS.Tests.Integration;
 /// has not ended, and what an Event is printed with is its own logo for a position and the Tenant's where it has none. A logo is an
 /// image of a kind a browser prints, of at most 512 KiB, sent as base64 and checked by what it starts with.
 /// </summary>
-public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
+public sealed class BrandingRoutesTests : IClassFixture<SharedApiFixture>
 {
     const int LIMIT = 512 * 1024;
     static readonly DateTimeOffset NOW = DateTimeOffset.UtcNow;
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public BrandingRoutesTests(MongoFixture mongo)
+    public BrandingRoutesTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_Tenant_Root_sets_a_logo_of_the_Tenant_reads_it_again_and_clears_it_and_what_it_does_not_name_stays()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var left = Png(100, 1);
         var right = Jpeg(200, 2);
         var nothing = await Edit(root, $"/api/tenants/{tenant}/branding", new { });
@@ -63,13 +63,13 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Nobody_but_a_Tenant_Root_of_the_Tenant_or_the_Developer_reads_or_edits_the_logos_of_the_Tenant()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var plain = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var ofOther = await SignedInAsync(api, client, _mongo.ConnectionString, other, TenantRootOf(other));
-        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, other, isDeveloper: true);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var plain = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var ofOther = await SignedInAsync(api, client, _shared.MongoConnectionString, other, TenantRootOf(other));
+        var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, other, isDeveloper: true);
 
         foreach (var person in new[] { plain, ofOther })
         {
@@ -105,10 +105,10 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_logo_that_is_not_one_is_refused_and_changes_nothing_not_even_the_other_logo_of_the_same_request()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var good = Document("image/png", Png(10, 1));
         var cases = new (object Attributes, HttpStatusCode Status, string Code)[]
         {
@@ -238,11 +238,11 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_document_for_another_resource_than_the_route_names_or_for_one_that_is_not_there_is_not_taken()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, root.Id, "Not yet");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var unstarted = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, root.Id, "Not yet");
         var logo = new { left = Document("image/png", Png(10, 1)) };
 
         var anotherTenant = await root.Page.WriteAsync(
@@ -287,10 +287,10 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Every_kind_a_browser_prints_is_taken_by_what_it_starts_with()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
 
         foreach (
             var (type, bytes) in new[]
@@ -336,10 +336,10 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_logo_that_is_sent_back_as_it_was_read_is_taken_and_what_the_Api_computes_in_it_is_ignored()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var image = Png(40, 3);
         var read = new
         {
@@ -361,10 +361,10 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Two_large_logos_in_one_request_are_more_than_a_request_may_hold()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
 
         var response = await Edit(
             root,
@@ -380,15 +380,15 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Console_Operator_puts_a_logo_of_its_Event_in_place_of_the_Tenants_and_an_Event_is_printed_with_the_logo_it_has_or_the_Tenants()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var official = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
         await EventSeed.GrantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             eventId,
             "Official",
@@ -432,17 +432,17 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Nobody_but_Root_and_a_Console_Operator_edits_the_logos_of_an_Event_and_not_once_it_has_ended()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var operatorGrant = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
-        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Not yet");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var operatorGrant = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var live = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
+        var historic = await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
+        var unstarted = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, "Not yet");
         await EventSeed.GrantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             live,
             "Operator",
@@ -481,12 +481,12 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_logos_of_an_Event_that_was_deleted_before_it_started_go_with_it_and_those_of_another_stay()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var doomed = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, root.Id, "Doomed");
-        var kept = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, root.Id, "Kept");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var doomed = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, root.Id, "Doomed");
+        var kept = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, root.Id, "Kept");
         var logo = new { left = Document("image/png", Png(10, 1)) };
         await Edit(root, $"/api/events/{doomed}/branding", logo);
         await Edit(root, $"/api/events/{kept}/branding", logo);
@@ -581,7 +581,7 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     async Task<BsonDocument?> FindAsync(string key)
     {
         return await RegistrySeed
-            .Collection(_mongo.ConnectionString, "brandings")
+            .Collection(_shared.MongoConnectionString, "brandings")
             .Find(new BsonDocument("_id", key))
             .FirstOrDefaultAsync();
     }

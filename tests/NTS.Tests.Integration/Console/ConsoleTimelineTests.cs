@@ -27,23 +27,23 @@ namespace NTS.Tests.Integration;
 /// and enables the chosen events, written to the Api against the version the Participation was read at. Over the real Api in this
 /// process, with the store and the services of the Ui built as the app builds them.
 /// </summary>
-public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
+public sealed class ConsoleTimelineTests : IClassFixture<SharedApiFixture>
 {
     static readonly DateTimeOffset START = new(DateTime.Today.AddHours(6));
     static readonly DateTimeOffset ARRIVE = START.AddMinutes(30);
     static readonly DateTimeOffset PRESENT = START.AddMinutes(40);
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ConsoleTimelineTests(MongoFixture mongo)
+    public ConsoleTimelineTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task The_timeline_lists_every_time_event_of_every_Phase_in_the_order_they_were_recorded_with_who_recorded_each_and_when()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
 
@@ -74,7 +74,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_entry_says_what_became_of_its_time_and_whether_it_may_be_disabled_or_enabled_and_whether_it_is_the_time_the_Phase_shows()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         await tab.Dashboard.ChangeTimeEvents([scene.Presented], []);
@@ -100,7 +100,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_person_whose_account_the_Api_does_not_know_is_left_unnamed()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, strangerActor: true);
         await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
 
@@ -113,7 +113,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_chosen_events_are_saved_in_one_write_against_the_version_and_the_Api_keeps_the_outcome_and_when()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var before = VersionOf(await StoredAsync(scene.ParticipationId));
@@ -141,7 +141,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     {
         var changes = new RecordedChanges();
         await using var api = new ApiFactory(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             configureServices: services => services.AddSingleton<IParticipationChanges>(changes)
         );
         var scene = await SceneAsync(api);
@@ -159,7 +159,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_was_disabled_is_enabled_again_by_a_save()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         await tab.Dashboard.ChangeTimeEvents([scene.Updated], []);
@@ -177,7 +177,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_save_made_on_a_view_that_another_tab_changed_is_refused_the_Participation_is_read_again_and_nothing_is_applied()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         await using var other = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
@@ -197,7 +197,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_save_that_would_leave_an_earlier_Phase_incomplete_while_a_later_one_has_times_is_refused_naming_the_events_and_nothing_is_stored()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, laterPhaseHasATime: true);
         await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var before = VersionOf(await StoredAsync(scene.ParticipationId));
@@ -218,7 +218,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_event_the_rules_rejected_cannot_be_disabled_and_nothing_is_stored()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var before = VersionOf(await StoredAsync(scene.ParticipationId));
@@ -233,7 +233,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_view_that_cannot_write_cannot_save_and_the_Api_is_not_asked()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId, canWrite: false);
         tab.Requests.Asked.Clear();
@@ -246,7 +246,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_container_of_the_app_makes_the_timeline_service_over_the_dashboard()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         await using var ui = ConsoleUi.Open(api, scene.ConsoleOperator);
 
@@ -259,11 +259,11 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     async Task<Scene> SceneAsync(ApiFactory api, bool strangerActor = false, bool laterPhaseHasATime = false)
     {
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Marin Main");
-        var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Olga Official");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, name: "Marin Main");
+        var official = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, name: "Olga Official");
         var eventId = await EventSeed.LiveAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             DateTimeOffset.UtcNow
@@ -303,7 +303,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
             );
         }
 
-        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
+        await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, participation);
         return new Scene(
             consoleOperator,
             eventId,
@@ -325,7 +325,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
     async Task<BsonDocument> StoredAsync(Guid id)
     {
         return await RegistrySeed
-            .Collection(_mongo.ConnectionString, "event_participations")
+            .Collection(_shared.MongoConnectionString, "event_participations")
             .Find(new BsonDocument("_id", EventSeed.Binary(id)))
             .SingleAsync();
     }

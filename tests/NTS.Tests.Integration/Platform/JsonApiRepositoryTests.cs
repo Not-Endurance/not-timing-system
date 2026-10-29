@@ -22,24 +22,24 @@ namespace NTS.Tests.Integration;
 /// the Api answers with an error is read with its code and never lost; and what the Api keeps to itself is neither read nor
 /// sent. The routes themselves are the other tests' (<c>ClubRoutesTests</c>, <c>ConfigureEventRoutesTests</c>, ...).
 /// </summary>
-public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
+public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
 {
     static readonly DateTimeOffset NOW = DateTimeOffset.UtcNow;
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public JsonApiRepositoryTests(MongoFixture mongo)
+    public JsonApiRepositoryTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_club_made_through_the_repository_is_the_Tenants_and_is_read_back_by_its_id()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var clubs = new ClubApiRepository(JsonApiClients.Of(api, root, out var requests));
         var id = Guid.NewGuid();
 
@@ -51,7 +51,7 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
         Assert.Equal("Sofia Riders", read.Name);
         Assert.Equal(
             tenant,
-            (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id))!["TenantId"].AsString
+            (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["TenantId"].AsString
         );
         Assert.Equal(["POST /api/clubs", $"GET /api/clubs/{id}"], requests.Asked);
     }
@@ -59,13 +59,13 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Every_club_of_the_Tenant_is_read_however_many_pages_they_make()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await RegistrySeed.ClubsAsync(_mongo.ConnectionString, tenant, 1203, "Club");
-        await RegistrySeed.ClubsAsync(_mongo.ConnectionString, other, 5, "Foreign");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        await RegistrySeed.ClubsAsync(_shared.MongoConnectionString, tenant, 1203, "Club");
+        await RegistrySeed.ClubsAsync(_shared.MongoConnectionString, other, 5, "Foreign");
         var clubs = new ClubApiRepository(JsonApiClients.Of(api, member, out var requests));
 
         var read = (await clubs.ReadMany()).ToList();
@@ -81,11 +81,11 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_list_that_cannot_be_read_to_its_end_is_not_returned_in_part_and_says_why()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await RegistrySeed.ClubsAsync(_mongo.ConnectionString, tenant, 1203, "Club");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        await RegistrySeed.ClubsAsync(_shared.MongoConnectionString, tenant, 1203, "Club");
         var clubs = new ClubApiRepository(JsonApiClients.Of(api, member, out var requests));
         requests.Answer = request =>
             Uri.UnescapeDataString(request.RequestUri!.Query).Contains("page[number]=2", StringComparison.Ordinal)
@@ -104,13 +104,13 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_filter_that_can_be_written_is_asked_of_the_server_and_one_that_cannot_is_applied_to_what_is_read()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Alpha");
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Alpine");
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Beta");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Alpha");
+        await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Alpine");
+        await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Beta");
         var clubs = new ClubApiRepository(JsonApiClients.Of(api, member, out var requests));
 
         var byServer = (await clubs.ReadMany(x => x.Name == "Alpha")).ToList();
@@ -128,14 +128,14 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_club_is_changed_and_removed_through_the_repository()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var clubs = new ClubApiRepository(JsonApiClients.Of(api, root, out var requests));
-        var id = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Old Name");
-        var other = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Another");
-        var third = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Third");
+        var id = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Old Name");
+        var other = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Another");
+        var third = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Third");
 
         await clubs.Update(new Club("New Name", id));
         await clubs.Delete(other);
@@ -144,10 +144,10 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
         Assert.Null(clubs.LastError);
         Assert.Equal(
             "New Name",
-            (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id))!["Name"].AsString
+            (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString
         );
-        Assert.Null(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", other));
-        Assert.Null(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", third));
+        Assert.Null(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", other));
+        Assert.Null(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", third));
         Assert.Contains($"PATCH /api/clubs/{id}", requests.Asked);
         Assert.Contains($"DELETE /api/clubs/{other}", requests.Asked);
     }
@@ -155,12 +155,12 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_row_that_is_not_there_is_read_as_none_and_neither_it_nor_its_removal_is_an_error()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var theirs = await RegistrySeed.ClubAsync(_mongo.ConnectionString, other, "Theirs");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var theirs = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, other, "Theirs");
         var clubs = new ClubApiRepository(JsonApiClients.Of(api, root, out _));
 
         var missing = await clubs.Read(Guid.NewGuid());
@@ -172,17 +172,17 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
 
         Assert.Null(missing);
         Assert.Null(foreign);
-        Assert.NotNull(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", theirs));
+        Assert.NotNull(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", theirs));
     }
 
     [Fact]
     public async Task What_the_Api_refuses_is_read_with_its_code_and_what_it_was_asked_to_change_is_left_as_it_was()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Kept");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var id = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Kept");
         var asMember = new ClubApiRepository(JsonApiClients.Of(api, member, out _));
         var asNobody = new ClubApiRepository(JsonApiClients.Of(api, null, out _));
 
@@ -205,25 +205,25 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
         Assert.Equal(401, notSignedIn!.Status);
         Assert.Equal("not-signed-in", notSignedIn.Code);
         Assert.Null(asMember.LastError); // the next request that is taken clears what the last said
-        Assert.Equal("Kept", (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id))!["Name"].AsString);
-        Assert.Equal(1, await RegistrySeed.CountAsync(_mongo.ConnectionString, "clubs", tenant));
+        Assert.Equal("Kept", (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString);
+        Assert.Equal(1, await RegistrySeed.CountAsync(_shared.MongoConnectionString, "clubs", tenant));
     }
 
     [Fact]
     public async Task A_Horse_that_loses_its_optional_members_loses_them_in_the_Api_too()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var horses = new HorseApiRepository(JsonApiClients.Of(api, root, out _));
-        var id = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, "Barza", "Barza", "103AB45");
+        var id = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, "Barza", "Barza", "103AB45");
 
         await horses.Update(new Horse("Barza", null, null, id));
         var read = await horses.Read(id);
 
         Assert.Null(horses.LastError);
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "horses", id))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "horses", id))!;
         Assert.False(stored.Contains("NameEnglish"));
         Assert.False(stored.Contains("FeiId"));
         Assert.Null(read!.NameEnglish);
@@ -233,14 +233,14 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_account_an_Athlete_is_linked_to_is_neither_read_nor_sent_and_an_edit_leaves_the_link_alone()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var athletes = new AthleteApiRepository(JsonApiClients.Of(api, root, out _));
         var country = new Country(Guid.NewGuid(), "Bulgaria", "BG", "BUL", "bg-BG");
         var linked = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Linked Rider",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
@@ -259,10 +259,10 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
         await athletes.Create(new Athlete("Made Rider", null, null, country, new Club("Sofia Riders"), madeId));
 
         Assert.Null(athletes.LastError);
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "athletes", linked))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "athletes", linked))!;
         Assert.Equal("Renamed Rider", stored["Name"].AsString);
         Assert.Equal("rider.secret@example.test", stored["User"]["Email"].AsString);
-        var made = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "athletes", madeId))!;
+        var made = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "athletes", madeId))!;
         Assert.False(made.Contains("User"));
         Assert.Equal("Sofia Riders", made["Club"]["Name"].AsString);
     }
@@ -270,11 +270,11 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_country_is_made_by_the_Developer_and_refused_to_anybody_else_with_the_code_that_says_so()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, home: null, isDeveloper: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null, isDeveloper: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var byDeveloper = new CountryApiRepository(JsonApiClients.Of(api, developer, out _));
         var byRoot = new CountryApiRepository(JsonApiClients.Of(api, root, out _));
         var iso = CountrySeed.UniqueIsoCode();
@@ -296,10 +296,10 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Setup_with_everything_in_it_is_made_by_the_Tenant_Root_and_read_back_by_the_repository()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var dispatcher = new RecordingDispatcher();
         var setups = new ConfigureEventApiRepository(JsonApiClients.Of(api, root, out var requests), dispatcher);
         var id = Guid.NewGuid();
@@ -320,7 +320,7 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
         Assert.Equal(id, Assert.Single(listed).Id);
         Assert.Equal(["POST /api/configure-events", $"PATCH /api/configure-events/{id}"], requests.Asked.Take(2));
         Assert.Empty(dispatcher.Events); // a Setup that was made is not a Setup that was updated
-        var stored = (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!;
+        var stored = (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, id))!;
         Assert.False(stored.Contains("MainOperatorId")); // Root made it and runs it; nobody is assigned (#671)
         Assert.Equal(tenant, stored["TenantId"].AsString);
         Assert.Single(stored["Competitions"].AsBsonArray);
@@ -329,14 +329,14 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Setup_that_has_not_started_is_updated_and_announced_and_one_that_has_is_refused_and_not()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var dispatcher = new RecordingDispatcher();
         var setups = new ConfigureEventApiRepository(JsonApiClients.Of(api, consoleOperator, out _), dispatcher);
-        var open = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var open = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, "Open");
+        var live = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
         var openSetup = (await setups.Read(open))!;
         var liveSetup = (await setups.Read(live))!;
 
@@ -354,8 +354,8 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
             open,
             Assert.Single(dispatcher.Events.OfType<NTS.Domain.Setup.Events.ConfigureEventUpdated>()).EventId
         );
-        Assert.Equal("Configured", (await EventSeed.SetupOfAsync(_mongo.ConnectionString, open))!["Name"].AsString);
-        Assert.StartsWith("Event ", (await EventSeed.SetupOfAsync(_mongo.ConnectionString, live))!["Name"].AsString);
+        Assert.Equal("Configured", (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, open))!["Name"].AsString);
+        Assert.StartsWith("Event ", (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, live))!["Name"].AsString);
     }
 
     sealed class RecordingDispatcher : IDomainEventDispatcher

@@ -17,19 +17,19 @@ namespace NTS.Tests.Integration;
 /// the access it wraps then. It must be told what the Api says of the person and that Event, and not that the person is only
 /// registered, which sends an Official from the Snapshot page to the Performance page. Over the real Api in this process.
 /// </summary>
-public sealed class WitnessAccessOfTheFollowedEventTests : IClassFixture<MongoFixture>
+public sealed class WitnessAccessOfTheFollowedEventTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public WitnessAccessOfTheFollowedEventTests(MongoFixture mongo)
+    public WitnessAccessOfTheFollowedEventTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task The_access_of_a_person_who_followed_no_Event_is_made_again_when_it_is_loaded_for_the_Event_that_is_followed_next_and_then_it_is_made_once()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var (eventId, official) = await SceneAsync(api, client);
         var json = JsonApiClients.Of(api, official, out var asked);
@@ -57,7 +57,7 @@ public sealed class WitnessAccessOfTheFollowedEventTests : IClassFixture<MongoFi
     [Fact]
     public async Task The_access_for_an_Event_that_is_followed_from_the_start_is_made_once()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
         var (eventId, official) = await SceneAsync(api, client);
         var json = JsonApiClients.Of(api, official, out var asked);
@@ -83,17 +83,17 @@ public sealed class WitnessAccessOfTheFollowedEventTests : IClassFixture<MongoFi
 
     async Task<(Guid EventId, TenancySeed.Person Official)> SceneAsync(ApiFactory api, HttpClient client)
     {
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
-        var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var official = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         await EventSeed.GrantAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             eventId,
             "Official",

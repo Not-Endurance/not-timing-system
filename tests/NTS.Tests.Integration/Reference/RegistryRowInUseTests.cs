@@ -14,29 +14,29 @@ namespace NTS.Tests.Integration;
 /// the refusal is the Api's, so that every client is held to it. A row that nothing refers to is deleted as before. Over the real
 /// Api in this process.
 /// </summary>
-public sealed class RegistryRowInUseTests : IClassFixture<MongoFixture>
+public sealed class RegistryRowInUseTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public RegistryRowInUseTests(MongoFixture mongo)
+    public RegistryRowInUseTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task An_Athlete_and_a_Horse_that_a_Participation_of_a_started_Event_names_are_refused_and_stay_until_nothing_names_them()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var participation = await RiddenAsync(tenant);
         var (athlete, horse) = await RowsAsync(tenant, participation);
 
         var athleteRefused = await root.Page.DeleteAsync($"/api/athletes/{athlete}");
         var horseRefused = await root.Page.DeleteAsync($"/api/horses/{horse}");
         await RegistrySeed
-            .Collection(_mongo.ConnectionString, "event_participations")
+            .Collection(_shared.MongoConnectionString, "event_participations")
             .DeleteOneAsync(new BsonDocument("_id", RegistrySeed.Binary(participation.Id)));
         var athleteDeleted = await root.Page.DeleteAsync($"/api/athletes/{athlete}");
         var horseDeleted = await root.Page.DeleteAsync($"/api/horses/{horse}");
@@ -47,17 +47,17 @@ public sealed class RegistryRowInUseTests : IClassFixture<MongoFixture>
         Assert.Equal("horse-in-use", await ErrorCodeAsync(horseRefused));
         Assert.Equal(HttpStatusCode.NoContent, athleteDeleted.StatusCode); // nothing names them any more
         Assert.Equal(HttpStatusCode.NoContent, horseDeleted.StatusCode);
-        Assert.Null(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "athletes", athlete));
-        Assert.Null(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "horses", horse));
+        Assert.Null(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "athletes", athlete));
+        Assert.Null(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "horses", horse));
     }
 
     [Fact]
     public async Task A_row_stays_while_a_refused_delete_is_asked_again_and_says_the_same()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var participation = await RiddenAsync(tenant);
         var (athlete, _) = await RowsAsync(tenant, participation);
 
@@ -66,17 +66,17 @@ public sealed class RegistryRowInUseTests : IClassFixture<MongoFixture>
 
         Assert.Equal(HttpStatusCode.Conflict, first.StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, second.StatusCode);
-        Assert.NotNull(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "athletes", athlete));
+        Assert.NotNull(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "athletes", athlete));
     }
 
     [Fact]
     public async Task A_row_that_a_Participation_of_another_Tenants_Event_names_is_refused_too()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var participation = await RiddenAsync(other); // an Event of another Tenant rides the Athlete of this one
         var (athlete, horse) = await RowsAsync(tenant, participation);
 
@@ -90,22 +90,22 @@ public sealed class RegistryRowInUseTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_row_that_a_Participation_of_an_Event_that_has_not_started_names_is_refused_too()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var setupId = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, root.Id);
-        var setup = (await EventSeed.SetupOfAsync(_mongo.ConnectionString, setupId))!;
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var setupId = await EventSeed.FullSetupAsync(_shared.MongoConnectionString, tenant, root.Id);
+        var setup = (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, setupId))!;
         var combination = setup["Competitions"][0]["Participations"][0]["Combination"].AsBsonDocument;
         var athlete = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Мариела Тестова",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
             id: combination["Athlete"]["_id"].AsGuid
         );
         var horse = await RegistrySeed.HorseAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Тест Огън",
             id: combination["Horse"]["_id"].AsGuid
@@ -121,18 +121,18 @@ public sealed class RegistryRowInUseTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_row_that_nothing_names_is_deleted_as_before_and_a_Club_is_not_held_to_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var athlete = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Борис Примеров",
             RegistrySeed.CountryOf("Bulgaria", "BG")
         );
-        var horse = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, "Друг Кон");
-        var club = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Sofia Riders");
+        var horse = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, "Друг Кон");
+        var club = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Sofia Riders");
         await RiddenAsync(tenant); // a Participation that names other rows
 
         var athleteDeleted = await root.Page.DeleteAsync($"/api/athletes/{athlete}");
@@ -149,15 +149,15 @@ public sealed class RegistryRowInUseTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_row_of_another_Tenant_is_not_found_whether_a_Participation_names_it_or_not()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var participation = await RiddenAsync(other);
         var (named, _) = await RowsAsync(other, participation);
         var unnamed = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             other,
             "Ясен Проверов",
             RegistrySeed.CountryOf("Bulgaria", "BG")
@@ -168,17 +168,17 @@ public sealed class RegistryRowInUseTests : IClassFixture<MongoFixture>
 
         Assert.Equal(HttpStatusCode.NotFound, ofNamed.StatusCode); // nothing tells that it is in use
         Assert.Equal(HttpStatusCode.NotFound, ofUnnamed.StatusCode);
-        Assert.NotNull(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "athletes", named));
-        Assert.NotNull(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "athletes", unnamed));
+        Assert.NotNull(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "athletes", named));
+        Assert.NotNull(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "athletes", unnamed));
     }
 
     [Fact]
     public async Task A_person_who_may_not_edit_the_registry_is_refused_before_the_row_is_asked_about()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var participation = await RiddenAsync(tenant);
         var (athlete, _) = await RowsAsync(tenant, participation);
 
@@ -191,9 +191,9 @@ public sealed class RegistryRowInUseTests : IClassFixture<MongoFixture>
     /// <summary>A Participation of a Live Event of the Tenant, which names an Athlete and a Horse by their ids.</summary>
     async Task<NTS.Domain.Core.Aggregates.Participation> RiddenAsync(string tenant)
     {
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         var participation = IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid());
-        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
+        await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, participation);
         return participation;
     }
 
@@ -201,14 +201,14 @@ public sealed class RegistryRowInUseTests : IClassFixture<MongoFixture>
     async Task<(Guid Athlete, Guid Horse)> RowsAsync(string tenant, NTS.Domain.Core.Aggregates.Participation named)
     {
         var athlete = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Мариела Тестова",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
             id: named.Combination.Athlete.Id
         );
         var horse = await RegistrySeed.HorseAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Тест Огън",
             id: named.Combination.Horse.Id

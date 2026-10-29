@@ -9,19 +9,19 @@ namespace NTS.Tests.Integration;
 /// about to be registered is the same as, by its name in either script or by its FEI ID, as the Api tells of them. Over the real Api
 /// in this process, with the services of the Ui built as the app builds them.
 /// </summary>
-public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
+public sealed class ConsoleSameRowsTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ConsoleSameRowsTests(MongoFixture mongo)
+    public ConsoleSameRowsTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task An_Athlete_is_the_same_as_a_row_of_its_Tenant_by_its_name_in_either_script_or_by_its_FEI_ID()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rows = scene.Ui.Get<IConsoleSameRows>();
 
@@ -41,7 +41,7 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_Athlete_is_the_same_as_a_row_of_another_Tenant_that_the_search_finds_by_its_name()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rows = scene.Ui.Get<IConsoleSameRows>();
 
@@ -63,7 +63,7 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_same_text_in_both_names_is_searched_once_and_the_row_it_finds_is_named_once()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rows = scene.Ui.Get<IConsoleSameRows>();
         var name = $"Мария Друга {scene.Token}";
@@ -81,7 +81,7 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_other_Tenants_are_asked_for_a_name_with_a_word_of_two_characters_or_more_and_once_for_each_registry_whatever_its_case()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rows = scene.Ui.Get<IConsoleSameRows>();
         int Searches() => scene.Ui.Requests.Asked.Count(x => x.Contains("/all-tenants", StringComparison.Ordinal));
@@ -107,7 +107,7 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_row_that_is_renamed_is_not_the_same_as_itself()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rows = scene.Ui.Get<IConsoleSameRows>();
 
@@ -126,7 +126,7 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Horse_is_the_same_as_a_row_by_its_name_or_by_its_FEI_ID_as_the_text_it_is()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api);
         var rows = scene.Ui.Get<IConsoleSameRows>();
 
@@ -146,13 +146,13 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
     async Task<Scene> SceneAsync(ApiFactory api)
     {
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var token = Guid.NewGuid().ToString("N")[..8];
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
         var own = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Мария Тенант {token}",
             bulgaria,
@@ -160,7 +160,7 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
             "12"
         );
         var theirs = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             other,
             $"Мария Друга {token}",
             bulgaria,
@@ -168,15 +168,15 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
             "777"
         );
         var horse = await RegistrySeed.HorseAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             other,
             $"Далечен {token}",
             $"Faraway {token}",
             "ABC1"
         );
-        var ownHorse = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, $"Свой {token}", null, "XYZ-9");
+        var ownHorse = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, $"Свой {token}", null, "XYZ-9");
         var numericHorse = await RegistrySeed.HorseAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             $"Цифров {token}",
             null,

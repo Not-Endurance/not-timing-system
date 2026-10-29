@@ -21,27 +21,27 @@ namespace NTS.Tests.Integration;
 /// an Event's own in place of them, which its Console Operator edits, and what the pages print with, which is what the Api says an
 /// Event is printed with. Over the real Api in this process, with the services of the Ui built as the app builds them.
 /// </summary>
-public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
+public sealed class ConsoleBrandingTests : IClassFixture<SharedApiFixture>
 {
     static readonly DateTimeOffset NOW = DateTimeOffset.UtcNow;
     static readonly byte[] PNG = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 1, 2, 3];
     static readonly byte[] OTHER_PNG = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 9, 9, 9, 9];
     static readonly byte[] JPEG = [0xFF, 0xD8, 0xFF, 0xE0, 4, 5, 6];
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ConsoleBrandingTests(MongoFixture mongo)
+    public ConsoleBrandingTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_Tenant_Root_sets_the_logos_of_its_Tenant_reads_them_again_and_clears_one_of_them()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         await using var ui = ConsoleUi.Open(api, root);
         var branding = ui.Get<IConsoleBranding>();
 
@@ -66,12 +66,12 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Console_Operator_puts_a_logo_of_its_Event_in_place_of_the_Tenants_and_the_pages_print_with_what_the_Api_says()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
         await using var rootUi = ConsoleUi.Open(api, root);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Left, "image/png", PNG);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Right, "image/jpeg", JPEG);
@@ -101,12 +101,12 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_right_logo_of_an_Event_is_its_own_to_change_and_the_left_one_stays_the_Tenants()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
         await using var rootUi = ConsoleUi.Open(api, root);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Left, "image/png", PNG);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Right, "image/jpeg", JPEG);
@@ -128,10 +128,10 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_file_of_the_largest_size_is_taken_and_so_is_every_kind_the_Api_takes()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         await using var ui = ConsoleUi.Open(api, root);
         var branding = ui.Get<IConsoleBranding>();
         var largest = new byte[LogoLimits.MAX_BYTES];
@@ -161,12 +161,12 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_the_Api_does_not_take_from_a_person_is_said_in_its_words_and_nothing_is_kept()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var plain = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var plain = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
         await using var ui = ConsoleUi.Open(api, plain);
         var branding = ui.Get<IConsoleBranding>();
 
@@ -187,10 +187,10 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_file_that_no_server_would_take_is_refused_before_it_is_sent()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var json = JsonApiClients.Of(api, root, out var requests);
         var account = new AccountSession(json);
         var branding = new ConsoleBranding(json, new ConsoleTenant(account, json), new Notifier());
@@ -215,12 +215,12 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_page_that_cannot_read_the_logos_prints_without_them_and_says_so()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
         await using var rootUi = ConsoleUi.Open(api, root);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Left, "image/png", PNG);
         await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Right, "image/jpeg", JPEG);
@@ -247,10 +247,10 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_branding_of_the_Console_is_in_the_container_the_app_builds()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         await using var ui = ConsoleUi.Open(api, person);
 
         var branding = ui.Get<IConsoleBranding>();
@@ -272,7 +272,7 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
     async Task<BsonDocument?> FindAsync(string key)
     {
         return await RegistrySeed
-            .Collection(_mongo.ConnectionString, "brandings")
+            .Collection(_shared.MongoConnectionString, "brandings")
             .Find(new BsonDocument("_id", key))
             .FirstOrDefaultAsync();
     }

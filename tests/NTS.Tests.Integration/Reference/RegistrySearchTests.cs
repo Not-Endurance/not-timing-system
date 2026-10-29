@@ -16,13 +16,13 @@ namespace NTS.Tests.Integration;
 /// accounts, a page being a search. The rows of other Tenants are found only here: nothing that is sent to any other route
 /// turns it across Tenants. The database matches, sorts and pages (the rest-api skill, ADR-0010).
 /// </summary>
-public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
+public sealed class RegistrySearchTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public RegistrySearchTests(MongoFixture mongo)
+    public RegistrySearchTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Theory]
@@ -35,11 +35,11 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
         string collection
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var a = await TenantAsync(_mongo.ConnectionString);
-        var b = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var a = await TenantAsync(_shared.MongoConnectionString);
+        var b = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var marker = Guid.NewGuid().ToString("N")[..8];
         var inA = await AddAsync(collection, a, $"Alpha{marker} Name");
         var inB = await AddAsync(collection, b, $"Alpha{marker} Other");
@@ -77,10 +77,10 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_Athlete_is_found_by_the_English_name_or_the_FEI_ID_and_shows_the_club_the_country_and_nothing_of_its_account_to_a_Tenant_Root()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var marker = Guid.NewGuid().ToString("N")[..8];
         await AddAsync(
             "athletes",
@@ -136,11 +136,11 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
         string registry
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var marker = Guid.NewGuid().ToString("N")[..8];
         await AddAsync(
             registry,
@@ -177,18 +177,18 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Tenant_Root_the_Console_Operator_of_an_Event_that_is_not_Historic_and_the_Developer_read_the_whole_row_and_no_other_account_does()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var other = await TenantAsync(_mongo.ConnectionString);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var rootElsewhere = await SignedInAsync(api, client, _mongo.ConnectionString, other, TenantRootOf(other));
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var formerConsoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
-        await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, formerConsoleOperator.Id, DateTimeOffset.UtcNow);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var other = await TenantAsync(_shared.MongoConnectionString);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var rootElsewhere = await SignedInAsync(api, client, _shared.MongoConnectionString, other, TenantRootOf(other));
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var formerConsoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, isDeveloper: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id);
+        await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, formerConsoleOperator.Id, DateTimeOffset.UtcNow);
         var marker = Guid.NewGuid().ToString("N")[..8];
         await AddAsync("athletes", tenant, $"Rider{marker} Name", feiId: $"FEI{marker}");
 
@@ -211,25 +211,25 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_Official_is_found_once_with_the_role_whatever_the_number_of_Events_it_is_in()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var marker = Guid.NewGuid().ToString("N")[..8];
         await AddAsync(
             "event_officials",
-            await TenantAsync(_mongo.ConnectionString),
+            await TenantAsync(_shared.MongoConnectionString),
             $"Judge{marker} One",
             role: "GroundJury"
         );
         await AddAsync(
             "event_officials",
-            await TenantAsync(_mongo.ConnectionString),
+            await TenantAsync(_shared.MongoConnectionString),
             $"Judge{marker} One",
             role: "GroundJury"
         );
         await AddAsync(
             "event_officials",
-            await TenantAsync(_mongo.ConnectionString),
+            await TenantAsync(_shared.MongoConnectionString),
             $"Judge{marker} One",
             role: "Steward"
         );
@@ -253,9 +253,9 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
         string registry
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var path = $"/api/{registry}/all-tenants";
 
         var tooShort = await SearchAsync(person, registry, "a");
@@ -277,7 +277,7 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [InlineData("officials")]
     public async Task Nobody_who_is_not_signed_in_searches_a_registry(string registry)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
 
         var response = await client.GetAsync($"/api/{registry}/all-tenants?filter=contains(name,'abc')");
@@ -296,10 +296,10 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
         string collection
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var marker = Guid.NewGuid().ToString("N")[..8];
         for (var i = 11; i >= 0; i--)
         {
@@ -321,10 +321,10 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_page_is_as_big_as_it_was_asked_for_up_to_twenty_five_rows_and_the_next_link_keeps_the_rest_of_the_query()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var marker = Guid.NewGuid().ToString("N")[..8];
         for (var i = 0; i < 27; i++)
         {
@@ -354,11 +354,11 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
         string collection
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var a = await TenantAsync(_mongo.ConnectionString);
-        var b = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var a = await TenantAsync(_shared.MongoConnectionString);
+        var b = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var marker = Guid.NewGuid().ToString("N")[..8];
         var ids = new List<Guid>();
         for (var i = 0; i < 5; i++)
@@ -386,10 +386,10 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
         string collection
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var marker = Guid.NewGuid().ToString("N")[..8];
         foreach (var name in new[] { "Charlie", "Alpha", "Bravo" })
         {
@@ -423,9 +423,9 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [InlineData("&page%5Bnumber%5D=2147483647", "invalid-page")] // a page whose first row is beyond what a number can count
     public async Task A_sort_or_a_page_that_the_search_does_not_take_is_refused(string parameters, string code)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
 
         foreach (var registry in new[] { "athletes", "horses", "clubs", "officials" })
         {
@@ -439,10 +439,10 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Every_word_of_the_text_is_part_of_one_of_the_names_in_any_order_in_any_case_and_in_either_script()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var (latin, cyrillic) = HistorySeed.NameMarker();
         var maria = await AddAsync("athletes", tenant, $"Мария {cyrillic}ова", nameEnglish: $"Maria {latin}ova");
         await AddAsync("athletes", tenant, $"Мария Друга {cyrillic}", nameEnglish: $"Maria Other {latin}");
@@ -463,10 +463,10 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_is_asked_for_is_a_name_and_not_a_pattern()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var marker = Guid.NewGuid().ToString("N")[..8];
         await AddAsync("clubs", tenant, $"Pattern{marker} Club");
 
@@ -484,9 +484,9 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [InlineData("officials")]
     public async Task A_text_with_no_word_of_two_characters_is_too_short_however_long_it_is(string registry)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
 
         foreach (var text in new[] { "a b", "a b c d e", "  a  " })
         {
@@ -503,9 +503,9 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_text_has_at_most_six_words_and_a_word_written_again_is_the_same_word()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
 
         var six = await SearchAsync(person, "athletes", "one two three four five six");
         var seven = await SearchAsync(person, "athletes", "one two three four five six seven");
@@ -520,9 +520,9 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_text_with_a_null_character_is_refused_before_it_reaches_the_database()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
 
         var response = await SearchAsync(person, "clubs", "ab\0cd");
 
@@ -533,10 +533,10 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_last_page_that_is_exactly_full_has_no_next_page()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var marker = Guid.NewGuid().ToString("N")[..8];
         for (var i = 0; i < 10; i++)
         {
@@ -562,10 +562,10 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
         string collection
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var marker = Guid.NewGuid().ToString("N")[..8];
         var ids = new List<Guid>();
         for (var i = 0; i < 6; i++)
@@ -584,10 +584,10 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_Official_is_found_by_the_name_in_English_as_well()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var (latin, cyrillic) = HistorySeed.NameMarker();
         var official = await AddAsync(
             "event_officials",
@@ -605,10 +605,10 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Officials_with_the_same_name_come_in_the_order_of_their_roles()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var marker = Guid.NewGuid().ToString("N")[..8];
         foreach (var role in new[] { "Steward", "ChiefSteward", "GroundJury" })
         {
@@ -628,12 +628,12 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     public async Task Each_page_is_a_search_that_draws_on_the_budget_of_the_account()
     {
         await using var api = new ApiFactory(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             configureHost: builder => builder.UseSetting("Search:RateLimits:PerAccount", "2")
         );
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var marker = Guid.NewGuid().ToString("N")[..8];
         for (var i = 0; i < 3; i++)
         {
@@ -652,12 +652,12 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     public async Task At_most_ten_rows_are_answered_and_the_searches_of_every_registry_and_of_accounts_share_one_budget()
     {
         await using var api = new ApiFactory(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             configureHost: builder => builder.UseSetting("Search:RateLimits:PerAccount", "4")
         );
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var marker = Guid.NewGuid().ToString("N")[..8];
         for (var i = 0; i < 12; i++)
         {
@@ -760,7 +760,7 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
             document.AddRange(extra);
         }
 
-        await new MongoClient(_mongo.ConnectionString)
+        await new MongoClient(_shared.MongoConnectionString)
             .GetDatabase(UserSeed.DATABASE)
             .GetCollection<BsonDocument>(collection)
             .InsertOneAsync(document);

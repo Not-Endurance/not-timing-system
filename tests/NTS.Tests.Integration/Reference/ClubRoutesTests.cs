@@ -11,22 +11,22 @@ namespace NTS.Tests.Integration;
 /// may edit, the Tenant that owns a row and that no other Tenant sees, the id a client makes, what a document may name,
 /// and the filter, the sort and the pages of a list.
 /// </summary>
-public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
+public sealed class ClubRoutesTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ClubRoutesTests(MongoFixture mongo)
+    public ClubRoutesTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_Tenant_Root_makes_a_club_in_its_Tenant_with_the_id_the_document_names()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var id = Guid.NewGuid();
 
         var response = await CreateAsync(root, "Sofia Riders", id);
@@ -38,7 +38,7 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(id.ToString(), resource.GetProperty("id").GetString());
         Assert.Equal("Sofia Riders", resource.GetProperty("attributes").GetProperty("name").GetString());
         Assert.Equal(tenant, resource.GetProperty("attributes").GetProperty("tenantId").GetString());
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!;
         Assert.Equal(tenant, stored["TenantId"].AsString);
         Assert.Equal("Sofia Riders", stored["Name"].AsString);
     }
@@ -46,10 +46,10 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_server_makes_the_id_of_a_club_whose_document_names_none()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
 
         var response = await CreateAsync(root, "Plovdiv Riders");
 
@@ -58,16 +58,16 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
             (await ApiSessions.ReadJsonAsync(response)).GetProperty("data").GetProperty("id").GetString()!
         );
         Assert.NotEqual(Guid.Empty, id);
-        Assert.NotNull(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id));
+        Assert.NotNull(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id));
     }
 
     [Fact]
     public async Task A_club_made_again_with_the_same_id_is_the_one_that_was_made_and_nothing_is_put_over_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var id = Guid.NewGuid();
         await CreateAsync(root, "First", id);
 
@@ -76,24 +76,24 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.OK, again.StatusCode);
         var resource = (await ApiSessions.ReadJsonAsync(again)).GetProperty("data");
         Assert.Equal("First", resource.GetProperty("attributes").GetProperty("name").GetString());
-        Assert.Equal("First", (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id))!["Name"].AsString);
+        Assert.Equal("First", (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString);
     }
 
     [Fact]
     public async Task An_id_that_is_another_Tenants_is_not_given_away_by_making_a_club_with_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var theirs = await RegistrySeed.ClubAsync(_mongo.ConnectionString, other, "Theirs");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var theirs = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, other, "Theirs");
 
         var response = await CreateAsync(root, "Mine", theirs);
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         Assert.Equal("id-taken", await ErrorCodeAsync(response));
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", theirs))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", theirs))!;
         Assert.Equal(other, stored["TenantId"].AsString);
         Assert.Equal("Theirs", stored["Name"].AsString);
     }
@@ -101,18 +101,18 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Whoever_the_matrix_lets_edit_the_registry_makes_a_club_and_nobody_else_does()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var historicOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var rootElsewhere = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(other));
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
-        await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, historicOperator.Id, DateTimeOffset.UtcNow);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var historicOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, isDeveloper: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var rootElsewhere = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(other));
+        await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id);
+        await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, historicOperator.Id, DateTimeOffset.UtcNow);
 
         foreach (var who in new[] { root, consoleOperator, developer })
         {
@@ -126,13 +126,13 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
             Assert.Equal("not-console-operator", await ErrorCodeAsync(response));
         }
 
-        Assert.Equal(3, await RegistrySeed.CountAsync(_mongo.ConnectionString, "clubs", tenant));
+        Assert.Equal(3, await RegistrySeed.CountAsync(_shared.MongoConnectionString, "clubs", tenant));
     }
 
     [Fact]
     public async Task A_caller_who_is_not_signed_in_reads_and_writes_nothing()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
         var id = Guid.NewGuid();
 
@@ -147,13 +147,13 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Any_signed_in_account_reads_a_club_of_its_Tenant_and_one_of_another_is_not_found()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var mine = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Mine");
-        var theirs = await RegistrySeed.ClubAsync(_mongo.ConnectionString, other, "Theirs");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var mine = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Mine");
+        var theirs = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, other, "Theirs");
 
         var found = await member.Page.GetAsync($"/api/clubs/{mine}");
         var foreign = await member.Page.GetAsync($"/api/clubs/{theirs}");
@@ -174,15 +174,15 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_clubs_listed_are_the_ones_of_the_current_Tenant_and_an_account_with_none_gets_an_empty_list()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var stateless = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Alpha");
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Beta");
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, other, "Gamma");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var stateless = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
+        await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Alpha");
+        await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Beta");
+        await RegistrySeed.ClubAsync(_shared.MongoConnectionString, other, "Gamma");
 
         var mine = await ListAsync(member);
         var none = await ListAsync(stateless);
@@ -194,9 +194,9 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task An_account_with_no_current_Tenant_writes_nothing_to_the_registry_and_is_told_why()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var stateless = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var stateless = await SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         var id = Guid.NewGuid();
 
         var made = await CreateAsync(stateless, "Nowhere", id);
@@ -214,22 +214,22 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
             Assert.Equal("no-current-tenant", await ErrorCodeAsync(response));
         }
 
-        Assert.Null(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id));
+        Assert.Null(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id));
     }
 
     [Fact]
     public async Task A_list_is_filtered_by_an_expression_of_the_OData_grammar_over_the_clubs_of_the_Tenant_only()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var alpha = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Alpha Riders");
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Beta Riders");
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Gamma Club");
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "O'Brien Club");
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, other, "Alpha Foreign");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var alpha = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Alpha Riders");
+        await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Beta Riders");
+        await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Gamma Club");
+        await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "O'Brien Club");
+        await RegistrySeed.ClubAsync(_shared.MongoConnectionString, other, "Alpha Foreign");
 
         Assert.Equal(["Beta Riders"], Names(await ListAsync(member, "?filter=name eq 'Beta Riders'")));
         Assert.Equal(
@@ -260,11 +260,11 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_list_that_names_no_page_is_the_first_hundred_rows_and_the_next_page_is_the_rest()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await RegistrySeed.ClubsAsync(_mongo.ConnectionString, tenant, 130, "Club");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        await RegistrySeed.ClubsAsync(_shared.MongoConnectionString, tenant, 130, "Club");
 
         var first = await ListAsync(member);
         var next = first.GetProperty("links").GetProperty("next").GetString()!;
@@ -291,10 +291,10 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [InlineData("contains(name)")]
     public async Task A_filter_that_is_not_valid_is_refused_and_nothing_is_listed(string filter)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
 
         var response = await member.Page.GetAsync("/api/clubs?filter=" + Uri.EscapeDataString(filter));
 
@@ -305,13 +305,13 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_list_is_sorted_by_the_members_asked_for_and_a_member_with_a_minus_goes_down()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         foreach (var name in new[] { "Beta", "Alpha", "Gamma" })
         {
-            await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, name);
+            await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, name);
         }
 
         Assert.Equal(["Alpha", "Beta", "Gamma"], Names(await ListAsync(member, "?sort=name")));
@@ -329,10 +329,10 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [InlineData("nope")]
     public async Task A_sort_that_is_not_a_list_of_members_of_the_resource_is_refused(string sort)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
 
         var response = await member.Page.GetAsync("/api/clubs?sort=" + Uri.EscapeDataString(sort));
 
@@ -343,13 +343,13 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_list_is_cut_into_pages_that_do_not_overlap_and_say_where_the_next_one_is()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         for (var i = 0; i < 5; i++)
         {
-            await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, $"Club {i}");
+            await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, $"Club {i}");
         }
 
         var first = await ListAsync(member, "?page[size]=2&page[number]=1");
@@ -379,10 +379,10 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [InlineData("page[number]=-1")]
     public async Task A_page_that_is_not_a_size_of_one_to_five_hundred_and_a_number_from_one_is_refused(string page)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
 
         var response = await member.Page.GetAsync("/api/clubs?" + page);
 
@@ -397,10 +397,10 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [InlineData("allTenants=true")]
     public async Task Any_other_parameter_of_a_list_is_refused_and_none_widens_it_to_another_Tenant(string parameter)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
 
         var response = await member.Page.GetAsync("/api/clubs?" + parameter);
 
@@ -411,11 +411,11 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_club_is_changed_in_the_members_the_document_names_and_in_no_other()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var id = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Old Name");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var id = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Old Name");
 
         var response = await ChangeAsync(root, id, new { name = "New Name" });
 
@@ -423,7 +423,7 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         var resource = (await ApiSessions.ReadJsonAsync(response)).GetProperty("data");
         Assert.Equal(id.ToString(), resource.GetProperty("id").GetString());
         Assert.Equal("New Name", resource.GetProperty("attributes").GetProperty("name").GetString());
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!;
         Assert.Equal("New Name", stored["Name"].AsString);
         Assert.Equal(tenant, stored["TenantId"].AsString);
     }
@@ -436,11 +436,11 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         string member
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var id = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Old Name");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var id = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Old Name");
 
         var change = await ChangeAsync(
             root,
@@ -460,9 +460,9 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal("unsupported-attribute", await ErrorCodeAsync(create));
         Assert.Equal(
             "Old Name",
-            (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id))!["Name"].AsString
+            (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString
         );
-        Assert.Equal(1, await RegistrySeed.CountAsync(_mongo.ConnectionString, "clubs", tenant));
+        Assert.Equal(1, await RegistrySeed.CountAsync(_shared.MongoConnectionString, "clubs", tenant));
     }
 
     [Theory]
@@ -470,11 +470,11 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [InlineData("   ")]
     public async Task A_name_the_domain_does_not_accept_is_422_and_nothing_is_written(string name)
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var id = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Old Name");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var id = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Old Name");
 
         var change = await ChangeAsync(root, id, new { name });
         var create = await CreateAsync(root, name);
@@ -484,19 +484,19 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.UnprocessableEntity, create.StatusCode);
         Assert.Equal(
             "Old Name",
-            (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id))!["Name"].AsString
+            (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString
         );
-        Assert.Equal(1, await RegistrySeed.CountAsync(_mongo.ConnectionString, "clubs", tenant));
+        Assert.Equal(1, await RegistrySeed.CountAsync(_shared.MongoConnectionString, "clubs", tenant));
     }
 
     [Fact]
     public async Task A_change_names_the_row_it_is_about_by_the_route_and_a_document_of_another_id_is_a_conflict()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var id = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Old Name");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var id = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Old Name");
 
         var response = await ChangeAsync(root, id, new { name = "New Name" }, bodyId: Guid.NewGuid());
         var withTheSameId = await ChangeAsync(root, id, new { name = "Same Id" }, bodyId: id);
@@ -509,19 +509,19 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_club_of_another_Tenant_is_not_changed_or_removed_by_anybody_who_may_edit_the_registry_of_this_one()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var theirs = await RegistrySeed.ClubAsync(_mongo.ConnectionString, other, "Theirs");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var other = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var theirs = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, other, "Theirs");
 
         var change = await ChangeAsync(root, theirs, new { name = "Taken" });
         var remove = await root.Page.DeleteAsync($"/api/clubs/{theirs}");
 
         Assert.Equal(HttpStatusCode.NotFound, change.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, remove.StatusCode);
-        var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", theirs))!;
+        var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", theirs))!;
         Assert.Equal("Theirs", stored["Name"].AsString);
         Assert.Equal(other, stored["TenantId"].AsString);
     }
@@ -529,11 +529,11 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Only_whoever_may_edit_the_registry_changes_or_removes_a_club()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Kept");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var id = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Kept");
 
         var change = await ChangeAsync(member, id, new { name = "Taken" });
         var remove = await member.Page.DeleteAsync($"/api/clubs/{id}");
@@ -543,17 +543,17 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal("not-console-operator", await ErrorCodeAsync(change));
         Assert.Equal(HttpStatusCode.Forbidden, remove.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
-        Assert.Equal("Kept", (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id))!["Name"].AsString);
+        Assert.Equal("Kept", (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString);
     }
 
     [Fact]
     public async Task A_club_is_removed_and_is_then_not_found_and_one_that_is_not_there_is_not_found_either()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var id = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Gone");
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
+        var id = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Gone");
 
         var removed = await root.Page.DeleteAsync($"/api/clubs/{id}");
         var again = await root.Page.DeleteAsync($"/api/clubs/{id}");
@@ -564,16 +564,16 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.NotFound, again.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, malformed.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, read.StatusCode);
-        Assert.Null(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "clubs", id));
+        Assert.Null(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id));
     }
 
     [Fact]
     public async Task A_write_needs_the_json_api_media_type_and_a_document_of_one_club()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
 
         var wrongType = await root.Page.WriteAsync(HttpMethod.Post, "/api/clubs", "horses", new { name = "x" });
         using var plain = new HttpRequestMessage(HttpMethod.Post, "/api/clubs")
@@ -588,7 +588,7 @@ public sealed class ClubRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.UnsupportedMediaType, json.StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, badId.StatusCode);
         Assert.Equal("invalid-id", await ErrorCodeAsync(badId));
-        Assert.Equal(0, await RegistrySeed.CountAsync(_mongo.ConnectionString, "clubs", tenant));
+        Assert.Equal(0, await RegistrySeed.CountAsync(_shared.MongoConnectionString, "clubs", tenant));
     }
 
     static Task<HttpResponseMessage> ChangeAsync(Person person, Guid id, object attributes, Guid? bodyId = null)

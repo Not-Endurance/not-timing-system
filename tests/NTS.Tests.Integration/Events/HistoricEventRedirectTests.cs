@@ -8,13 +8,13 @@ namespace NTS.Tests.Integration;
 /// the old address is sent on to the new one, with what it asked for, by the host that serves the Ui, before the Ui is
 /// loaded; anybody may follow it, signed in or not.
 /// </summary>
-public sealed class HistoricEventRedirectTests : IClassFixture<MongoFixture>
+public sealed class HistoricEventRedirectTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public HistoricEventRedirectTests(MongoFixture mongo)
+    public HistoricEventRedirectTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Theory]
@@ -33,7 +33,7 @@ public sealed class HistoricEventRedirectTests : IClassFixture<MongoFixture>
         string expected
     )
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
 
         var response = await client.GetAsync(old);
@@ -45,7 +45,7 @@ public sealed class HistoricEventRedirectTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_new_addresses_are_the_Ui_and_an_old_address_that_is_not_a_page_of_it_is_not_sent_anywhere()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
 
         var historic = await client.GetAsync("/historic-events");

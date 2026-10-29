@@ -7,22 +7,22 @@ namespace NTS.Tests.Integration;
 /// The Tenants a person can switch between at the Ui (#645, ADR-0012): the ones they hold a Membership in, named as the Api
 /// names them, and only when there is more than one, as there is nothing to choose between otherwise. Over the real Api.
 /// </summary>
-public sealed class TenantDirectoryTests : IClassFixture<MongoFixture>
+public sealed class TenantDirectoryTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public TenantDirectoryTests(MongoFixture mongo)
+    public TenantDirectoryTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_person_with_a_Membership_in_one_Tenant_has_nothing_to_switch_between()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString, "Federation of one");
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home);
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString, "Federation of one");
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home);
         using var ui = Open(api, person);
 
         Assert.Empty(await ui.Tenants.OptionsOfTheAccount());
@@ -31,7 +31,7 @@ public sealed class TenantDirectoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_visitor_has_nothing_to_switch_between()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var ui = Open(api, null);
 
         Assert.Empty(await ui.Tenants.OptionsOfTheAccount());
@@ -40,14 +40,14 @@ public sealed class TenantDirectoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_person_with_Memberships_in_more_Tenants_can_switch_between_them_by_the_names_the_Api_gives()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString, "Home Federation");
-        var other = await TenancySeed.TenantAsync(_mongo.ConnectionString, "Other Federation");
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString, "Home Federation");
+        var other = await TenancySeed.TenantAsync(_shared.MongoConnectionString, "Other Federation");
         var person = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             home,
             roles: new Dictionary<string, string[]> { [other] = [] }
         );
@@ -61,14 +61,14 @@ public sealed class TenantDirectoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Tenant_whose_name_cannot_be_read_is_shown_by_its_key()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString, "Home Federation");
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString, "Home Federation");
         var gone = $"country-gone-{Guid.NewGuid():N}";
         var person = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             home,
             roles: new Dictionary<string, string[]> { [gone] = [] }
         );
@@ -84,14 +84,14 @@ public sealed class TenantDirectoryTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Switching_to_a_Tenant_makes_it_the_current_one_and_the_names_are_asked_for_once()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = api.CreateClient();
-        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString, "Home Federation");
-        var other = await TenancySeed.TenantAsync(_mongo.ConnectionString, "Other Federation");
+        var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString, "Home Federation");
+        var other = await TenancySeed.TenantAsync(_shared.MongoConnectionString, "Other Federation");
         var person = await TenancySeed.SignedInAsync(
             api,
             client,
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             home,
             roles: new Dictionary<string, string[]> { [other] = [] }
         );

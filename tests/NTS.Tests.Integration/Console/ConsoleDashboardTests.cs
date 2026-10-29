@@ -30,22 +30,22 @@ namespace NTS.Tests.Integration;
 /// Over the real Api in this process, with the store and the services of the Ui built as the app builds them; the hub is left
 /// to the tests of the hub, so a tab reads a Participation again only when it asks to.
 /// </summary>
-public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
+public sealed class ConsoleDashboardTests : IClassFixture<SharedApiFixture>
 {
     static readonly DateTimeOffset START = new(DateTime.Today.AddHours(6)); // a time of the day that the clock of the test does not decide
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
     string _tenant = string.Empty;
 
-    public ConsoleDashboardTests(MongoFixture mongo)
+    public ConsoleDashboardTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task The_Console_Operator_withdraws_a_Participation_and_restores_it_and_the_Api_stores_each_change()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, ids) = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, person, eventId);
         tab.Dashboard.Selected = tab.Dashboard.Participations.Single(x => x.Combination.Number == 2);
@@ -69,7 +69,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Representation_and_an_Inspection_are_requested_in_the_Phase_that_a_request_made_now_acts_on_and_withdrawn_again()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, ids) = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, person, eventId);
         tab.Dashboard.Selected = tab.Dashboard.Participations.First();
@@ -100,7 +100,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_time_the_Console_Operator_names_is_recorded_by_the_server_as_an_Arrival_of_the_Participation()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, _) = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, person, eventId);
         tab.Dashboard.Selected = tab.Dashboard.Participations.First();
@@ -118,14 +118,14 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_first_Participation_is_selected_when_the_dashboard_opens_and_the_next_one_when_it_is_gone()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, ids) = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, person, eventId);
         var opened = tab.Dashboard.Selected!.Combination.Number;
         Assert.Equal([1, 2], tab.Dashboard.Participations.Select(x => x.Combination.Number)); // by their numbers
 
         await RegistrySeed
-            .Collection(_mongo.ConnectionString, "event_participations")
+            .Collection(_shared.MongoConnectionString, "event_participations")
             .DeleteOneAsync(new MongoDB.Bson.BsonDocument("_id", EventSeed.Binary(ids[0])));
         await tab.Store.Refresh(ids[0]);
 
@@ -137,7 +137,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task What_a_request_acts_on_is_told_by_the_clock_of_the_server_which_is_asked_when_the_dashboard_opens()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, ids) = await SceneAsync(api, [Requested(1)]);
         var late = new FixedClock(new DateTimeOffset(DateTime.Today.AddHours(23).AddMinutes(59).AddSeconds(30)));
         var early = new FixedClock(new DateTimeOffset(DateTime.Today.AddHours(7).AddMinutes(30)));
@@ -167,7 +167,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_time_that_the_server_records_and_does_not_accept_is_said_by_its_outcome_and_the_Participation_is_marked_as_timed()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, ids) = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, person, eventId);
         tab.Dashboard.Selected = tab.Dashboard.Participations.First();
@@ -188,7 +188,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_time_the_server_does_not_take_is_said_with_its_reason()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, _) = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, person, eventId);
         tab.Dashboard.Selected = tab.Dashboard.Participations.First();
@@ -204,7 +204,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_time_that_the_Api_does_not_record_for_the_person_is_said_in_its_words_and_nothing_is_marked_as_timed()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (_, eventId, ids) = await SceneAsync(api);
         var plain = await SomebodyElseAsync(api); // not the Console Operator of the Event, nor an Official of it
         await using var tab = await Tab.OpenAsync(api, plain, eventId);
@@ -223,7 +223,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_change_that_is_made_on_a_Participation_that_another_tab_changed_is_refused_and_the_Participation_is_read_again()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, ids) = await SceneAsync(api);
         await using var first = await Tab.OpenAsync(api, person, eventId);
         await using var second = await Tab.OpenAsync(api, person, eventId); // read before the first one changes anything
@@ -243,7 +243,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_times_of_a_Phase_that_were_typed_over_a_Participation_that_changed_are_kept_and_taken_when_they_are_sent_again()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, ids) = await SceneAsync(api);
         await using var first = await Tab.OpenAsync(api, person, eventId);
         await using var second = await Tab.OpenAsync(api, person, eventId);
@@ -268,7 +268,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_times_typed_for_a_Phase_are_taken_for_its_Participation_by_the_person_who_typed_them()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, ids) = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, person, eventId);
         var typed = new PhaseUpdateModel(tab.Dashboard.Participations.Last().Phases.First())
@@ -288,7 +288,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_times_typed_for_a_Phase_are_not_taken_from_nobody()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, ids) = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, person, eventId);
         tab.Requests.Answer = request =>
@@ -312,7 +312,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_change_that_the_Api_refuses_for_another_reason_is_said_in_its_words_and_is_not_taken_for_a_stale_one()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (_, eventId, ids) = await SceneAsync(api);
         var plain = await SomebodyElseAsync(api); // not the Console Operator of the Event
         await using var tab = await Tab.OpenAsync(api, plain, eventId);
@@ -329,7 +329,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_view_that_cannot_write_refuses_before_the_Api_is_asked()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, _) = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, person, eventId, canWrite: false);
         tab.Dashboard.Selected = tab.Dashboard.Participations.First();
@@ -354,7 +354,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Participation_that_could_not_be_read_again_stays_where_it_is_and_one_that_is_gone_goes()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var (person, eventId, ids) = await SceneAsync(api);
         await using var tab = await Tab.OpenAsync(api, person, eventId);
         var asked = $"/api/participations/{ids[0]}";
@@ -379,10 +379,10 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_container_of_the_app_makes_the_dashboard_and_the_form_of_a_Phase_one_service()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         await using var ui = ConsoleUi.Open(api, person);
 
         var dashboard = ui.Get<IConsoleDashboard>();
@@ -398,10 +398,10 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     )
     {
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
         _tenant = tenant;
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, person.Id, DateTimeOffset.UtcNow);
+        var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, person.Id, DateTimeOffset.UtcNow);
         var ids = new List<Guid>();
         foreach (
             var make in participations
@@ -413,7 +413,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
         )
         {
             var participation = make(eventId);
-            await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
+            await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, participation);
             ids.Add(participation.Id);
         }
 
@@ -424,7 +424,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     async Task<Person> SomebodyElseAsync(ApiFactory api)
     {
         using var client = ApiClients.Of(api);
-        return await SignedInAsync(api, client, _mongo.ConnectionString, _tenant);
+        return await SignedInAsync(api, client, _shared.MongoConnectionString, _tenant);
     }
 
     /// <summary>A Participation of two Phases, of which the first has been presented and has a Representation and an Inspection requested and the second starts a minute before midnight.</summary>
@@ -482,7 +482,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
 
     async Task<MongoDB.Bson.BsonDocument> StoredAsync(Guid id)
     {
-        return (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_participations", id))!;
+        return (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_participations", id))!;
     }
 
     sealed class FixedClock : IServerClock

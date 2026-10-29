@@ -31,21 +31,21 @@ namespace NTS.Tests.Integration;
 /// once it was printed. Over the real Api in this process, with the store and the services of the Ui built as the app builds
 /// them; the hub is left to the tests of the hub, so the store reads a Participation again when a time was recorded.
 /// </summary>
-public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
+public sealed class ConsoleHandoutsTests : IClassFixture<SharedApiFixture>
 {
     static readonly DateTimeOffset START = new(DateTime.Today.AddHours(6)); // a time of the day that the clock of the test does not decide
 
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ConsoleHandoutsTests(MongoFixture mongo)
+    public ConsoleHandoutsTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_Handout_made_by_the_number_of_a_Participation_is_stored_under_its_id_and_made_again_it_is_the_one_there_is()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [Plain(1), Plain(2)]);
         await using var tab = await Tab.OpenAsync(api, scene);
 
@@ -64,7 +64,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Participation_that_the_Event_does_not_have_is_said_and_nothing_is_stored()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [Plain(1)]);
         await using var tab = await Tab.OpenAsync(api, scene);
 
@@ -77,10 +77,10 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Participation_that_has_a_Handout_under_another_id_is_not_given_a_second()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [Plain(1)]);
         await EventSeed.HandoutAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             scene.Tenant,
             new Handout(scene.EventId, scene.Ids[0], Guid.NewGuid()) // one that came with the Event
         );
@@ -95,7 +95,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_documents_are_by_start_number_and_show_the_Participation_as_it_is_when_they_are_composed()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [Plain(1), Plain(2), Plain(3)]);
         await using var tab = await Tab.OpenAsync(api, scene);
         await tab.Handouts.Create(3);
@@ -117,7 +117,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Handouts_that_were_printed_are_removed_and_the_ones_that_were_not_stay()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [Plain(1), Plain(2), Plain(3)]);
         await using var tab = await Tab.OpenAsync(api, scene);
         foreach (var number in new[] { 1, 2, 3 })
@@ -136,15 +136,15 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Handouts_that_are_stored_are_shown_when_the_page_opens_and_the_Combinations_are_by_number()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [Plain(3), Plain(1), Plain(2)]);
         await EventSeed.HandoutAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             scene.Tenant,
             new Handout(scene.EventId, scene.Ids[0], scene.Ids[0])
         );
         await EventSeed.HandoutAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             scene.Tenant,
             new Handout(scene.EventId, scene.Ids[2], scene.Ids[2])
         );
@@ -158,7 +158,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_page_that_opens_the_Handouts_alone_watches_from_what_the_Event_was_when_it_opened()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [TwoPhases(1, arrived: true), TwoPhases(2)]);
         await using var alone = await Tab.OpenAsync(api, scene, opensDashboard: false);
         await using var other = await Tab.OpenAsync(api, scene);
@@ -176,11 +176,11 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_removal_that_the_Api_refuses_stops_at_the_first_Handout_and_says_why()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [Plain(1), Plain(2), Plain(3)], consoleOperator: false);
         foreach (var id in scene.Ids)
         {
-            await EventSeed.HandoutAsync(_mongo.ConnectionString, scene.Tenant, new Handout(scene.EventId, id, id));
+            await EventSeed.HandoutAsync(_shared.MongoConnectionString, scene.Tenant, new Handout(scene.EventId, id, id));
         }
 
         await using var tab = await Tab.OpenAsync(api, scene, opensDashboard: false); // it may not remove them
@@ -196,7 +196,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Handout_that_the_Api_does_not_take_is_said_in_its_words_and_nothing_is_stored()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [Plain(1)], consoleOperator: false);
         await using var tab = await Tab.OpenAsync(api, scene);
 
@@ -210,7 +210,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_view_that_cannot_write_refuses_before_the_Api_is_asked()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [Plain(1)]);
         await using var tab = await Tab.OpenAsync(api, scene, canWrite: false);
 
@@ -224,7 +224,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Phase_that_completes_while_the_Event_is_watched_makes_the_Handout_of_its_Participation_and_tells_it()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [TwoPhases(1), TwoPhases(2)]);
         await using var tab = await Tab.OpenAsync(api, scene);
         using var watching = tab.Handouts.Watch(tab.View);
@@ -246,10 +246,10 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Phase_that_completes_for_a_Participation_that_has_a_Handout_makes_no_second_and_tells_nothing()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [TwoPhases(1)]);
         await EventSeed.HandoutAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             scene.Tenant,
             new Handout(scene.EventId, scene.Ids[0], Guid.NewGuid()) // one that came with the Event
         );
@@ -274,7 +274,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_view_that_cannot_write_makes_no_Handout_when_a_Phase_completes_and_does_not_ask_the_Api_to()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [TwoPhases(1)]);
         await using var reader = await Tab.OpenAsync(api, scene, canWrite: false);
         await using var other = await Tab.OpenAsync(api, scene);
@@ -292,7 +292,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_last_Phase_and_a_Phase_that_was_complete_before_the_watching_began_make_no_Handout()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [Plain(1), TwoPhases(2, arrived: true), TwoPhases(3)]);
         await using var tab = await Tab.OpenAsync(api, scene);
         using var watching = tab.Handouts.Watch(tab.View);
@@ -312,7 +312,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task Nothing_is_made_before_the_watching_begins_or_once_the_last_page_that_watches_has_left()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [TwoPhases(1), TwoPhases(2), TwoPhases(3), TwoPhases(4)]);
         await using var tab = await Tab.OpenAsync(api, scene);
         await CompleteFirstPhaseAsync(tab, 1); // nobody watches
@@ -341,7 +341,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Handout_that_the_Api_does_not_take_while_the_Event_is_watched_is_told_and_the_Event_goes_on()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [TwoPhases(1), TwoPhases(2)], consoleOperator: false);
         await using var tab = await Tab.OpenAsync(api, scene, scene.Person); // it may not make Handouts, and sees the Event as it is
         await using var other = await Tab.OpenAsync(api, scene, scene.Boss);
@@ -363,7 +363,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Handouts_of_the_Console_are_in_the_container_the_app_builds()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         var scene = await SceneAsync(api, [Plain(1)]);
         await using var ui = ConsoleUi.Open(api, scene.Person);
 
@@ -394,15 +394,15 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     )
     {
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var boss = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var person = consoleOperator ? boss : await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, boss.Id, DateTimeOffset.UtcNow);
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var boss = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var person = consoleOperator ? boss : await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, boss.Id, DateTimeOffset.UtcNow);
         var ids = new List<Guid>();
         foreach (var make in participations)
         {
             var participation = make(eventId);
-            await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
+            await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, participation);
             ids.Add(participation.Id);
         }
 
@@ -412,7 +412,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     async Task<List<BsonDocument>> StoredAsync(Guid eventId)
     {
         var filter = new BsonDocument("EventId", EventSeed.Binary(eventId));
-        return await RegistrySeed.Collection(_mongo.ConnectionString, "event_handouts").Find(filter).ToListAsync();
+        return await RegistrySeed.Collection(_shared.MongoConnectionString, "event_handouts").Find(filter).ToListAsync();
     }
 
     /// <summary>A Participation with its one Phase, the last, that starts at six in the morning.</summary>

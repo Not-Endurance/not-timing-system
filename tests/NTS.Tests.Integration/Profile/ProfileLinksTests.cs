@@ -14,21 +14,21 @@ namespace NTS.Tests.Integration;
 /// they add, read and changed with the profile. The links are the host's (#638): the Ui changes one and reads the profile
 /// again, so that what it shows is what the host keeps. Over the real Api in this process.
 /// </summary>
-public sealed class ProfileLinksTests : IClassFixture<MongoFixture>
+public sealed class ProfileLinksTests : IClassFixture<SharedApiFixture>
 {
-    readonly MongoFixture _mongo;
+    readonly SharedApiFixture _shared;
 
-    public ProfileLinksTests(MongoFixture mongo)
+    public ProfileLinksTests(SharedApiFixture shared)
     {
-        _mongo = mongo;
+        _shared = shared;
     }
 
     [Fact]
     public async Task A_person_with_no_links_has_no_Athlete_and_no_Horses()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         using var ui = Open(api, person, out _);
 
         await ui.Profile.Load();
@@ -41,19 +41,19 @@ public sealed class ProfileLinksTests : IClassFixture<MongoFixture>
     public async Task A_person_links_an_Athlete_as_themselves_and_linking_another_moves_the_link_and_it_is_taken_away()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var first = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Първа Тестова",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
             nameEnglish: "First Testova"
         );
         var second = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Втора Тестова",
             RegistrySeed.CountryOf("Bulgaria", "BG"),
@@ -85,12 +85,12 @@ public sealed class ProfileLinksTests : IClassFixture<MongoFixture>
     public async Task A_person_adds_Horses_and_takes_them_away_and_the_host_keeps_them()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var fire = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, "Огън", nameEnglish: "Fire");
-        var wind = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, "Вятър", nameEnglish: "Wind");
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var fire = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, "Огън", nameEnglish: "Fire");
+        var wind = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, "Вятър", nameEnglish: "Wind");
         using var ui = Open(api, person, out _);
         await ui.Profile.Load();
 
@@ -115,11 +115,11 @@ public sealed class ProfileLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_names_of_the_links_are_told_in_the_language_the_app_is_in()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var fire = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, "Огън", nameEnglish: "Fire");
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var fire = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, "Огън", nameEnglish: "Fire");
         using var ui = Open(api, person, out _);
         await ui.Profile.Load();
 
@@ -136,9 +136,9 @@ public sealed class ProfileLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_link_to_a_Participant_that_is_not_in_a_registry_is_refused_and_the_profile_stays_as_it_was()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         using var ui = Open(api, person, out _);
         await ui.Profile.Load();
         var before = ui.Profile.Profile;
@@ -152,9 +152,9 @@ public sealed class ProfileLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_Horse_the_host_will_not_add_says_why()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home: null);
         using var ui = Open(api, person, out var asked);
         await ui.Profile.Load();
         asked.Answer = request =>
@@ -178,17 +178,17 @@ public sealed class ProfileLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_link_that_is_gone_when_it_is_taken_away_is_taken_away_all_the_same()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var athlete = await RegistrySeed.AthleteAsync(
-            _mongo.ConnectionString,
+            _shared.MongoConnectionString,
             tenant,
             "Първа Тестова",
             RegistrySeed.CountryOf("Bulgaria", "BG")
         );
-        var horse = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, "Огън");
+        var horse = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, "Огън");
         using var here = Open(api, person, out _);
         await here.Profile.Load();
         await here.Profile.LinkAthlete(athlete);
@@ -211,12 +211,12 @@ public sealed class ProfileLinksTests : IClassFixture<MongoFixture>
     public async Task Links_made_at_once_are_made_one_after_the_other_and_what_is_kept_is_the_latest_profile()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var fire = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, "Огън", nameEnglish: "Fire");
-        var wind = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, "Вятър", nameEnglish: "Wind");
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var fire = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, "Огън", nameEnglish: "Fire");
+        var wind = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, "Вятър", nameEnglish: "Wind");
         using var ui = Open(api, person, out var asked);
         await ui.Profile.Load();
         Task? second = null;
@@ -245,11 +245,11 @@ public sealed class ProfileLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_link_made_when_the_profile_cannot_be_read_again_says_so_and_the_profile_stays_as_it_was()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var client = ApiClients.Of(api);
-        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var fire = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, "Огън", nameEnglish: "Fire");
+        var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
+        var fire = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, "Огън", nameEnglish: "Fire");
         using var ui = Open(api, person, out var asked);
         await ui.Profile.Load();
         var before = ui.Profile.Profile;
@@ -275,7 +275,7 @@ public sealed class ProfileLinksTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task A_visitor_links_nothing_and_asks_the_host_nothing()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var api = _shared.Api;
         using var ui = Open(api, null, out var asked);
         await ui.Profile.Load();
 
