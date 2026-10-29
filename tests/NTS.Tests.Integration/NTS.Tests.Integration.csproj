@@ -39,6 +39,14 @@
     <Compile Remove="Parked\**" />
   </ItemGroup>
 
+  <!--
+    A manual check, which no verification run includes: the budget of the Ui's first load publishes the Ui for Release, which
+    takes about half a minute on an idle machine. It is compiled only when it is asked for, with -p:IncludeManualTests=true (see README.md).
+  -->
+  <ItemGroup Condition="'$(IncludeManualTests)' != 'true'">
+    <Compile Remove="Ui\UiFirstLoadBudgetTests.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <Using Include="Xunit" />
     <Using Include="Not.Test" />

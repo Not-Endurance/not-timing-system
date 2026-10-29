@@ -14,6 +14,7 @@ dotnet test .\tests\NTS.Tests.Integration\NTS.Tests.Integration.csproj -c Debug
 - `Harness` holds the support the tests use (fixtures, seeds, drivers, the browser helpers) and no test (AGENTS.md rule 7). Its namespace is `NTS.Tests.Integration.Harness`. The generic helpers are in `nugets/Not.Test`: the deadline wait, the journey runner, `TestId`, and the reader of the project graph. One MongoDB container serves the whole run (`Harness/MongoContainer.cs`, ADR-0016), and each class has a database of its own in it (`Harness/MongoLease.cs`), which the class drops when it ends. The container and its volume go when the test process ends: MongoDB keeps its data in a volume that the image declares, and that volume otherwise stays on the disk after the run.
 - `Parked` holds the parked scenarios, which are not compiled (see Parked scenarios).
 - A run stays within what the localhost can start at once (ADR-0016): four classes at a time, each holding a place of `MongoLease` (the Visual Studio adapter does not apply the xUnit thread limit), and two browsers at a time (`PasskeyBrowserFixture`).
+- `Ui/UiFirstLoadBudgetTests` is a manual check, left out of the verification runs, since it publishes the Ui for Release, which takes about half a minute on an idle machine. It is compiled only when asked for: `dotnet test tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -p:IncludeManualTests=true --filter FullyQualifiedName~UiFirstLoadBudgetTests`.
 
 Four kinds of test run in the project:
 
