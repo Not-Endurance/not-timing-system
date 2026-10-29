@@ -1,14 +1,14 @@
 namespace NTS.Tests.Integration.Harness;
 
 /// <summary>
-/// The Api of a test class, in memory, on a MongoDB in a container for the class. The tests of a class run one at a time,
+/// The Api of a test class, in memory, on a database of the class in the run's MongoDB. The tests of a class run one at a time,
 /// so they share the host and its database, as they shared the database before: each brings its own people, Events and
 /// codes. A test that needs a host of its own, with a clock, settings or services of its own, builds one with
 /// <c>new ApiFactory</c>.
 /// </summary>
 public sealed class SharedApiFixture : IAsyncLifetime
 {
-    MongoContainer? _mongo;
+    MongoLease? _mongo;
     ApiFactory? _api;
 
     /// <summary>The Api of the class. It starts with the first request a test makes to it.</summary>
@@ -19,7 +19,7 @@ public sealed class SharedApiFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _mongo = await MongoContainer.StartAsync();
+        _mongo = await MongoLease.StartAsync();
         _api = new ApiFactory(_mongo.ConnectionString);
     }
 

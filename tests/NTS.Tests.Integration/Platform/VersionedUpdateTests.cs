@@ -4,8 +4,8 @@ using MongoDB.Driver;
 using Not.Identity;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 
 namespace NTS.Tests.Integration;
 
@@ -135,7 +135,7 @@ public sealed class VersionedUpdateTests : IClassFixture<MongoFixture>
     {
         return new TenantCollections(
             new MongoClient(_mongo.ConnectionString),
-            Options.Create(new NIdentityOptions { Database = UserSeed.DATABASE })
+            Options.Create(new NIdentityOptions { Database = MongoLease.DatabaseNameOf(_mongo.ConnectionString) })
         );
     }
 

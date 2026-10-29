@@ -22,7 +22,7 @@ internal static class CountrySeed
     public static IMongoCollection<BsonDocument> Countries(string mongoConnectionString)
     {
         return new MongoClient(mongoConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(mongoConnectionString))
             .GetCollection<BsonDocument>(COLLECTION);
     }
 

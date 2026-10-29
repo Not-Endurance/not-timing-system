@@ -74,7 +74,7 @@ public sealed class TypedTenantCollectionTests : IClassFixture<MongoFixture>
         var tenant = NewTenant();
         await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Short");
         var clubs = new MongoClient(_mongo.ConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(_mongo.ConnectionString))
             .GetCollection<ClubModel>(CLUBS);
 
         // no filter of a caller is applied, so a part of a text that starts past its end is the Api's own mistake
@@ -207,7 +207,7 @@ public sealed class TypedTenantCollectionTests : IClassFixture<MongoFixture>
         var id = await CountrySeed.AddAsync(_mongo.ConnectionString, "Globe", CountrySeed.UniqueIsoCode());
         var globals = new GlobalCollections(
             new MongoClient(_mongo.ConnectionString),
-            Options.Create(new NIdentityOptions { Database = UserSeed.DATABASE })
+            Options.Create(new NIdentityOptions { Database = MongoLease.DatabaseNameOf(_mongo.ConnectionString) })
         );
 
         var countries = globals.Of<CountryModel>("countries");
@@ -222,7 +222,7 @@ public sealed class TypedTenantCollectionTests : IClassFixture<MongoFixture>
     {
         return new TenantCollections(
             new MongoClient(_mongo.ConnectionString),
-            Options.Create(new NIdentityOptions { Database = UserSeed.DATABASE })
+            Options.Create(new NIdentityOptions { Database = MongoLease.DatabaseNameOf(_mongo.ConnectionString) })
         );
     }
 

@@ -189,7 +189,7 @@ public sealed class ConditionalUpdateTests : IClassFixture<MongoFixture>
     {
         return new TenantCollections(
             new MongoClient(_mongo.ConnectionString),
-            Options.Create(new NIdentityOptions { Database = UserSeed.DATABASE })
+            Options.Create(new NIdentityOptions { Database = MongoLease.DatabaseNameOf(_mongo.ConnectionString) })
         );
     }
 

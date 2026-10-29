@@ -210,7 +210,7 @@ public sealed class UserSessionHistoryTests : IClassFixture<SharedApiFixture>
     IMongoCollection<BsonDocument> Records()
     {
         return new MongoClient(_shared.MongoConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(_shared.MongoConnectionString))
             .GetCollection<BsonDocument>("event_user_sessions");
     }
 

@@ -291,7 +291,7 @@ internal static class HistorySeed
     public static async Task SpoilRankingAsync(string mongoConnectionString, Guid rankingId)
     {
         await new MongoClient(mongoConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(mongoConnectionString))
             .GetCollection<BsonDocument>("event_rankings")
             .UpdateOneAsync(
                 new BsonDocument("_id", EventSeed.Binary(rankingId)),
@@ -319,7 +319,7 @@ internal static class HistorySeed
     public static async Task CountTwiceAsync(string mongoConnectionString, Guid rankingId, Guid participationId)
     {
         await new MongoClient(mongoConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(mongoConnectionString))
             .GetCollection<BsonDocument>("event_rankings")
             .UpdateOneAsync(
                 new BsonDocument("_id", EventSeed.Binary(rankingId)),
@@ -341,7 +341,7 @@ internal static class HistorySeed
     static IMongoCollection<BsonDocument> Participations(string mongoConnectionString)
     {
         return new MongoClient(mongoConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(mongoConnectionString))
             .GetCollection<BsonDocument>("event_participations");
     }
 }

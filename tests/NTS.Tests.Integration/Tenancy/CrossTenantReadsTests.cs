@@ -359,14 +359,14 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
     {
         return new CrossTenantReads(
             new MongoClient(_mongo.ConnectionString),
-            Options.Create(new NIdentityOptions { Database = UserSeed.DATABASE })
+            Options.Create(new NIdentityOptions { Database = MongoLease.DatabaseNameOf(_mongo.ConnectionString) })
         );
     }
 
     IMongoCollection<BsonDocument> Collection(string name)
     {
         return new MongoClient(_mongo.ConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(_mongo.ConnectionString))
             .GetCollection<BsonDocument>(name);
     }
 

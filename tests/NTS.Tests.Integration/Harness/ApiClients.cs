@@ -59,7 +59,7 @@ internal static class ApiClients
     public static async Task<BsonDocument?> FindTenantAsync(string mongoConnectionString, string id)
     {
         return await new MongoClient(mongoConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(mongoConnectionString))
             .GetCollection<BsonDocument>("tenants")
             .Find(new BsonDocument("_id", id))
             .FirstOrDefaultAsync();
@@ -68,7 +68,7 @@ internal static class ApiClients
     public static async Task<long> CountTenantsAsync(string mongoConnectionString, string id)
     {
         return await new MongoClient(mongoConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(mongoConnectionString))
             .GetCollection<BsonDocument>("tenants")
             .CountDocumentsAsync(new BsonDocument("_id", id));
     }

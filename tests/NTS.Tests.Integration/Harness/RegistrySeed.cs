@@ -12,7 +12,9 @@ internal static class RegistrySeed
 {
     public static IMongoCollection<BsonDocument> Collection(string mongoConnectionString, string name)
     {
-        return new MongoClient(mongoConnectionString).GetDatabase(UserSeed.DATABASE).GetCollection<BsonDocument>(name);
+        return new MongoClient(mongoConnectionString)
+            .GetDatabase(MongoLease.DatabaseNameOf(mongoConnectionString))
+            .GetCollection<BsonDocument>(name);
     }
 
     public static async Task<Guid> ClubAsync(string mongoConnectionString, string tenant, string name, Guid? id = null)

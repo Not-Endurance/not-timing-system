@@ -657,7 +657,7 @@ public sealed class UserSessionTests : IClassFixture<SharedApiFixture>
     IMongoCollection<BsonDocument> Records()
     {
         return new MongoClient(_shared.MongoConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(_shared.MongoConnectionString))
             .GetCollection<BsonDocument>(COLLECTION);
     }
 

@@ -92,11 +92,29 @@ public sealed class ParticipationHistoryTests : IClassFixture<SharedApiFixture>
         var tenant = await TenantAsync(_shared.MongoConnectionString);
         var other = await TenantAsync(_shared.MongoConnectionString);
         var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
-        var oldest = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Autumn ride", "Varna", 400);
+        var oldest = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Autumn ride",
+            "Varna",
+            400
+        );
         var newest = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, other, "Spring ride", "Sofia", 10);
-        var middle = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Winter ride", "Plovdiv", 200);
+        var middle = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Winter ride",
+            "Plovdiv",
+            200
+        );
         var live = await HistorySeed.LiveAsync(_shared.MongoConnectionString, tenant, "Summer ride", "Burgas");
-        var deleted = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Deleted ride", "Ruse", 100);
+        var deleted = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Deleted ride",
+            "Ruse",
+            100
+        );
         var rides = new Dictionary<string, Participation>
         {
             ["oldest"] = HistorySeed.Ride(oldest, 1, _ana, _fire),
@@ -165,9 +183,21 @@ public sealed class ParticipationHistoryTests : IClassFixture<SharedApiFixture>
         var tenant = await TenantAsync(_shared.MongoConnectionString);
         var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var spring = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 10);
-        var goneFirst = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Deleted ride", "Varna", 30);
+        var goneFirst = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Deleted ride",
+            "Varna",
+            30
+        );
         var autumn = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Autumn ride", "Ruse", 50);
-        var goneLast = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Deleted again", "Burgas", 70);
+        var goneLast = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Deleted again",
+            "Burgas",
+            70
+        );
         var springRide = HistorySeed.Ride(spring, 1, _ana, _fire);
         var firstGone = HistorySeed.Ride(goneFirst, 1, _ana, _fire);
         var autumnRide = HistorySeed.Ride(autumn, 1, _ana, _fire);
@@ -233,9 +263,27 @@ public sealed class ParticipationHistoryTests : IClassFixture<SharedApiFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_shared.MongoConnectionString);
         var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
-        var oldest = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Autumn ride", "Varna", 300);
-        var middle = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Winter ride", "Plovdiv", 200);
-        var newest = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 100);
+        var oldest = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Autumn ride",
+            "Varna",
+            300
+        );
+        var middle = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Winter ride",
+            "Plovdiv",
+            200
+        );
+        var newest = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Spring ride",
+            "Sofia",
+            100
+        );
         var oldestRide = HistorySeed.Ride(oldest, 1, _ana, _fire);
         var middleRide = HistorySeed.Ride(middle, 1, _ana, _fire);
         var newestRide = HistorySeed.Ride(newest, 1, _ana, _fire);
@@ -274,7 +322,13 @@ public sealed class ParticipationHistoryTests : IClassFixture<SharedApiFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_shared.MongoConnectionString);
         var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
-        var ranked = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Ranked ride", "Plovdiv", 30);
+        var ranked = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Ranked ride",
+            "Plovdiv",
+            30
+        );
         var eliminated = await HistorySeed.HistoricAsync(
             _shared.MongoConnectionString,
             tenant,
@@ -446,7 +500,13 @@ public sealed class ParticipationHistoryTests : IClassFixture<SharedApiFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_shared.MongoConnectionString);
         var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
-        var shared = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Shared ride", "Plovdiv", 30);
+        var shared = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Shared ride",
+            "Plovdiv",
+            30
+        );
         var alone = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Lonely ride", "Varna", 60);
         var arrive = DateTimeOffset.UtcNow.AddHours(-5);
         var quick = HistorySeed.Ride(shared, 1, _boris, _wind, arrive: arrive);
@@ -497,7 +557,13 @@ public sealed class ParticipationHistoryTests : IClassFixture<SharedApiFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_shared.MongoConnectionString);
         var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
-        var broken = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Broken ride", "Plovdiv", 30);
+        var broken = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Broken ride",
+            "Plovdiv",
+            30
+        );
         var fine = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Fine ride", "Varna", 60);
         var unreadable = await HistorySeed.HistoricAsync(
             _shared.MongoConnectionString,
@@ -557,7 +623,13 @@ public sealed class ParticipationHistoryTests : IClassFixture<SharedApiFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_shared.MongoConnectionString);
         var me = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
-        var past = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Damaged ride", "Plovdiv", 30);
+        var past = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Damaged ride",
+            "Plovdiv",
+            30
+        );
         var mine = HistorySeed.Ride(past, 1, _ana, _fire);
         var own = Ranked(past, "CEI 1*", (mine, 2));
         var damaged = HistorySeed.Ranking(
@@ -1011,7 +1083,7 @@ public sealed class ParticipationHistoryTests : IClassFixture<SharedApiFixture>
 
         var indexes = await (
             await new MongoClient(_shared.MongoConnectionString)
-                .GetDatabase(UserSeed.DATABASE)
+                .GetDatabase(MongoLease.DatabaseNameOf(_shared.MongoConnectionString))
                 .GetCollection<BsonDocument>("event_participations")
                 .Indexes.ListAsync()
         ).ToListAsync();

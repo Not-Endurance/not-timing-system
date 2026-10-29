@@ -1,12 +1,12 @@
 namespace NTS.Tests.Integration.Harness;
 
 /// <summary>
-/// The Api alone, on a real loopback port, with a MongoDB in a container for its users, sessions and codes. It needs
+/// The Api alone, on a real loopback port, with a database of the run's MongoDB for its users, sessions and codes. It needs
 /// Docker and nothing else.
 /// </summary>
 public sealed class ApiHostFixture : IAsyncLifetime
 {
-    MongoContainer? _mongo;
+    MongoLease? _mongo;
     ApiFactory? _api;
 
     internal ApiFactory Api => _api ?? throw new InvalidOperationException("The Api is not started.");
@@ -16,7 +16,7 @@ public sealed class ApiHostFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _mongo = await MongoContainer.StartAsync();
+        _mongo = await MongoLease.StartAsync();
         try
         {
             _api = new ApiFactory(_mongo.ConnectionString, kestrel: true);
@@ -24,7 +24,7 @@ public sealed class ApiHostFixture : IAsyncLifetime
         }
         catch
         {
-            // A start that fails may never reach DisposeAsync, and the container holds one of the places.
+            // A start that fails may never reach DisposeAsync, and the lease holds one of the places.
             await DisposeAsync();
             throw;
         }

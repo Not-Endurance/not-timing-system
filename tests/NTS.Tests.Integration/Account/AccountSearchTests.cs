@@ -211,7 +211,7 @@ public sealed class AccountSearchTests : IClassFixture<MongoFixture>
     {
         var search = new AccountSearch(
             new MongoClient(_mongo.ConnectionString),
-            Options.Create(new NIdentityOptions { Database = UserSeed.DATABASE })
+            Options.Create(new NIdentityOptions { Database = MongoLease.DatabaseNameOf(_mongo.ConnectionString) })
         );
 
         await Assert.ThrowsAsync<ArgumentException>(

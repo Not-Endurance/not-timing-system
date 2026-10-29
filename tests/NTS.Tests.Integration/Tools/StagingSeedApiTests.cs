@@ -105,7 +105,9 @@ public sealed class StagingSeedApiTests : IClassFixture<MongoFixture>
         );
 
         Assert.Equal(HttpStatusCode.NoContent, reset.StatusCode);
-        var database = new MongoClient(_mongo.ConnectionString).GetDatabase(UserSeed.DATABASE);
+        var database = new MongoClient(_mongo.ConnectionString).GetDatabase(
+            MongoLease.DatabaseNameOf(_mongo.ConnectionString)
+        );
         Assert.Equal(
             0,
             await database.GetCollection<BsonDocument>("event_participations").CountDocumentsAsync(new BsonDocument())
@@ -146,7 +148,9 @@ public sealed class StagingSeedApiTests : IClassFixture<MongoFixture>
 
     async Task<(Guid EventId, ApiFactory Api, HttpClient Client)> SeededApiAsync()
     {
-        var database = new MongoClient(_mongo.ConnectionString).GetDatabase(UserSeed.DATABASE);
+        var database = new MongoClient(_mongo.ConnectionString).GetDatabase(
+            MongoLease.DatabaseNameOf(_mongo.ConnectionString)
+        );
         var report = await StagingSeed.Run(
             database,
             new StagingSeedOptions

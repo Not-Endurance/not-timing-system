@@ -13,8 +13,8 @@ using NoTiming.Ui.Storage.Core.Repositories;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
@@ -457,7 +457,9 @@ public sealed class RankingFinalisationTests : IClassFixture<MongoFixture>, IAsy
                 services.AddSingleton(sp => new RankingFinaliser(
                     new CrossTenantReads(
                         new MongoClient("mongodb://127.0.0.1:1/?serverSelectionTimeoutMS=300&connectTimeoutMS=300"),
-                        Options.Create(new NIdentityOptions { Database = UserSeed.DATABASE })
+                        Options.Create(
+                            new NIdentityOptions { Database = MongoLease.DatabaseNameOf(_mongo.ConnectionString) }
+                        )
                     ),
                     sp.GetRequiredService<EventDataAccess>(),
                     sp.GetRequiredService<ILogger<RankingFinaliser>>()

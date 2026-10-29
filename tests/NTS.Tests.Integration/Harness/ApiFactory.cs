@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MongoDB.Driver;
+using Not.Identity;
 
 namespace NTS.Tests.Integration.Harness;
 
@@ -31,6 +33,7 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     }
 
     readonly string _mongoConnectionString;
+    readonly string? _database;
     readonly string _environment;
     readonly string? _emailSender;
     readonly string _dataProtectionKeys;
@@ -77,6 +80,7 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
         Environment.SetEnvironmentVariable("PORT", null);
 
         _mongoConnectionString = mongoConnectionString;
+        _database = MongoUrl.Create(mongoConnectionString).DatabaseName;
         _environment = environment;
         _emailSender = emailSender ?? (environment == "Production" ? null : "Outbox");
         _dataProtectionKeys = dataProtectionKeys ?? NewDataProtectionKeys();
@@ -155,6 +159,13 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
             {
                 services.RemoveAll<TimeProvider>();
                 services.AddSingleton(_time);
+            }
+
+            if (_database != null)
+            {
+                // The Api keeps its users, sessions and codes in the database its identity options name. A class has a
+                // database of its own in the run's MongoDB (ADR-0016), and the host keeps to that one.
+                services.PostConfigure<NIdentityOptions>(options => options.Database = _database);
             }
 
             _configureServices?.Invoke(services);

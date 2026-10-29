@@ -1,12 +1,12 @@
 namespace NTS.Tests.Integration.Harness;
 
 /// <summary>
-/// MongoDB in a container and the Api in this process on a real loopback port, with a clock that a scenario can move.
+/// A database of the run's MongoDB and the Api in this process on a real loopback port, with a clock that a scenario can move.
 /// It needs Docker and nothing else.
 /// </summary>
 public sealed class NtsIntegrationFixture : IAsyncLifetime
 {
-    MongoContainer? _mongo;
+    MongoLease? _mongo;
     ApiFactory? _api;
 
     /// <summary>The Api, for a test that signs a person in at it.</summary>
@@ -24,7 +24,7 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _mongo = await MongoContainer.StartAsync();
+        _mongo = await MongoLease.StartAsync();
         try
         {
             _api = new ApiFactory(_mongo.ConnectionString, kestrel: true, time: Clock);
@@ -32,7 +32,7 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
         }
         catch
         {
-            // A start that fails may never reach DisposeAsync, and the container holds one of the places.
+            // A start that fails may never reach DisposeAsync, and the lease holds one of the places.
             await DisposeAsync();
             throw;
         }

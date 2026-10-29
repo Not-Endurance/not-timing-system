@@ -606,7 +606,7 @@ public sealed class SignInTests : IClassFixture<MongoFixture>
     IMongoCollection<BsonDocument> Sessions()
     {
         return new MongoClient(_mongo.ConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(_mongo.ConnectionString))
             .GetCollection<BsonDocument>("auth_sessions");
     }
 

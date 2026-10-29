@@ -188,7 +188,12 @@ public sealed class RegistrySearchTests : IClassFixture<SharedApiFixture>
         var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, isDeveloper: true);
         var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id);
-        await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, formerConsoleOperator.Id, DateTimeOffset.UtcNow);
+        await EventSeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            formerConsoleOperator.Id,
+            DateTimeOffset.UtcNow
+        );
         var marker = Guid.NewGuid().ToString("N")[..8];
         await AddAsync("athletes", tenant, $"Rider{marker} Name", feiId: $"FEI{marker}");
 
@@ -761,7 +766,7 @@ public sealed class RegistrySearchTests : IClassFixture<SharedApiFixture>
         }
 
         await new MongoClient(_shared.MongoConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(_shared.MongoConnectionString))
             .GetCollection<BsonDocument>(collection)
             .InsertOneAsync(document);
         return id;

@@ -2,8 +2,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tools.ParticipationCopies;
 
 namespace NTS.Tests.Integration;
@@ -30,7 +30,9 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<MongoFixtu
     {
         _connectionString = mongo.ConnectionString;
         _stored = new StoredDocuments(mongo.ConnectionString);
-        _database = new MongoClient(mongo.ConnectionString).GetDatabase(UserSeed.DATABASE);
+        _database = new MongoClient(mongo.ConnectionString).GetDatabase(
+            MongoLease.DatabaseNameOf(mongo.ConnectionString)
+        );
     }
 
     /// <summary>The migration reads every document of the three collections, so each test starts from empty ones.</summary>
@@ -313,9 +315,10 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<MongoFixtu
     {
         await SeedDanglingReferences(await SeedLegacyEvent());
         var connection = _connectionString;
+        var database = MongoLease.DatabaseNameOf(connection);
 
-        var dryRun = await Command(["--connection-string", connection]);
-        var refused = await Command(["--connection-string", connection, "--apply"]);
+        var dryRun = await Command(["--connection-string", connection, "--database", database]);
+        var refused = await Command(["--connection-string", connection, "--database", database, "--apply"]);
         var wrongly = await Command(["--apply"]);
         var help = await Command(["--help"]);
 

@@ -15,7 +15,7 @@ internal static class TenancySeed
     public static IMongoCollection<BsonDocument> Tenants(string mongoConnectionString)
     {
         return new MongoClient(mongoConnectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(mongoConnectionString))
             .GetCollection<BsonDocument>(TENANTS);
     }
 

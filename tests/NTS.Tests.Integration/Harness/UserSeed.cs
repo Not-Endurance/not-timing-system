@@ -10,7 +10,6 @@ namespace NTS.Tests.Integration.Harness;
 /// </summary>
 internal static class UserSeed
 {
-    public const string DATABASE = "nts";
     public const string COLLECTION = "users";
 
     public static string NewEmail(string prefix = "user")
@@ -20,7 +19,9 @@ internal static class UserSeed
 
     public static IMongoCollection<BsonDocument> Users(string mongoConnectionString)
     {
-        return new MongoClient(mongoConnectionString).GetDatabase(DATABASE).GetCollection<BsonDocument>(COLLECTION);
+        return new MongoClient(mongoConnectionString)
+            .GetDatabase(MongoLease.DatabaseNameOf(mongoConnectionString))
+            .GetCollection<BsonDocument>(COLLECTION);
     }
 
     public static async Task<Guid> AddLegacyUserAsync(

@@ -55,7 +55,9 @@ public sealed class TenantRolesTests : IClassFixture<SharedApiFixture>
         var before = await TenantAsync(person, tenant);
 
         await DeveloperCommands.SeedTenantRoot(
-            new MongoClient(_shared.MongoConnectionString).GetDatabase(UserSeed.DATABASE),
+            new MongoClient(_shared.MongoConnectionString).GetDatabase(
+                MongoLease.DatabaseNameOf(_shared.MongoConnectionString)
+            ),
             tenant,
             person.Email,
             apply: true
@@ -78,7 +80,9 @@ public sealed class TenantRolesTests : IClassFixture<SharedApiFixture>
         var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
 
         await DeveloperCommands.GrantDeveloper(
-            new MongoClient(_shared.MongoConnectionString).GetDatabase(UserSeed.DATABASE),
+            new MongoClient(_shared.MongoConnectionString).GetDatabase(
+                MongoLease.DatabaseNameOf(_shared.MongoConnectionString)
+            ),
             person.Email,
             apply: true
         );
@@ -140,7 +144,13 @@ public sealed class TenantRolesTests : IClassFixture<SharedApiFixture>
         using var client = ApiClients.Of(api);
         var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var gone = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, selectedTenant: gone);
+        var person = await TenancySeed.SignedInAsync(
+            api,
+            client,
+            _shared.MongoConnectionString,
+            home,
+            selectedTenant: gone
+        );
 
         var me = await MeAsync(person);
 
@@ -307,7 +317,7 @@ public sealed class TenantRolesTests : IClassFixture<SharedApiFixture>
     {
         var store = new TenantStore(
             new MongoClient(_shared.MongoConnectionString),
-            Options.Create(new NIdentityOptions { Database = UserSeed.DATABASE })
+            Options.Create(new NIdentityOptions { Database = MongoLease.DatabaseNameOf(_shared.MongoConnectionString) })
         );
         var started = RegionalRules.None;
         var speedFirst = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
@@ -360,7 +370,13 @@ public sealed class TenantRolesTests : IClassFixture<SharedApiFixture>
             other,
             TenancySeed.TenantRootOf(other)
         );
-        var developer = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, other, isDeveloper: true);
+        var developer = await TenancySeed.SignedInAsync(
+            api,
+            client,
+            _shared.MongoConnectionString,
+            other,
+            isDeveloper: true
+        );
 
         var byAMember = await EditRulesAsync(member, tenant, new { onlyAverageLoopSpeed = true });
         var byARootElsewhere = await EditRulesAsync(rootElsewhere, tenant, new { onlyAverageLoopSpeed = true });
@@ -495,7 +511,13 @@ public sealed class TenantRolesTests : IClassFixture<SharedApiFixture>
         using var client = ApiClients.Of(api);
         var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var elsewhere = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
-        var developer = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, isDeveloper: true);
+        var developer = await TenancySeed.SignedInAsync(
+            api,
+            client,
+            _shared.MongoConnectionString,
+            home,
+            isDeveloper: true
+        );
 
         var selected = await SelectAsync(developer, elsewhere);
         var nowhere = await SelectAsync(developer, "country-nowhere");
@@ -595,6 +617,9 @@ public sealed class TenantRolesTests : IClassFixture<SharedApiFixture>
 
     async Task<BsonDocument> StoredTenantAsync(string tenant)
     {
-        return await TenancySeed.Tenants(_shared.MongoConnectionString).Find(new BsonDocument("_id", tenant)).FirstAsync();
+        return await TenancySeed
+            .Tenants(_shared.MongoConnectionString)
+            .Find(new BsonDocument("_id", tenant))
+            .FirstAsync();
     }
 }

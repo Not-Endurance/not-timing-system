@@ -41,7 +41,7 @@ internal static class LocalSignInHarness
     /// <summary>The marker of the database the Api is over, written as it is asked: none removes it.</summary>
     public static async Task SetMarkerAsync(string connectionString, string? name)
     {
-        var database = new MongoClient(connectionString).GetDatabase(UserSeed.DATABASE);
+        var database = new MongoClient(connectionString).GetDatabase(MongoLease.DatabaseNameOf(connectionString));
         await database
             .GetCollection<BsonDocument>(EnvironmentMarker.COLLECTION)
             .DeleteManyAsync(FilterDefinition<BsonDocument>.Empty);
@@ -56,7 +56,7 @@ internal static class LocalSignInHarness
     {
         await SetMarkerAsync(connectionString, null);
         await new MongoClient(connectionString)
-            .GetDatabase(UserSeed.DATABASE)
+            .GetDatabase(MongoLease.DatabaseNameOf(connectionString))
             .GetCollection<BsonDocument>(EnvironmentMarker.COLLECTION)
             .InsertOneAsync(new BsonDocument { { "_id", EnvironmentMarker.ID }, { "Name", name } });
     }

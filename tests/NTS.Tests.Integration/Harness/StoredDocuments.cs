@@ -138,7 +138,9 @@ internal sealed class StoredDocuments
 
     IMongoCollection<BsonDocument> Collection(string collection)
     {
-        return _client.GetDatabase(UserSeed.DATABASE).GetCollection<BsonDocument>(collection);
+        return _client
+            .GetDatabase(MongoLease.DatabaseNameOf(_connectionString))
+            .GetCollection<BsonDocument>(collection);
     }
 
     static BsonDocument IdFilter(Guid id)

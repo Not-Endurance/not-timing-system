@@ -318,7 +318,9 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var worker = await AccountAsync(_mongo.ConnectionString, tenant);
-        var database = new MongoClient(_mongo.ConnectionString).GetDatabase(UserSeed.DATABASE);
+        var database = new MongoClient(_mongo.ConnectionString).GetDatabase(
+            MongoLease.DatabaseNameOf(_mongo.ConnectionString)
+        );
 
         // The host has started and made its indexes. From here the grants cannot be written, as if the store did not
         // answer: a view of another collection takes their place, and a view cannot be updated.

@@ -326,6 +326,8 @@ internal static class EventSeed
 
     static IMongoCollection<BsonDocument> Collection(string mongoConnectionString, string name)
     {
-        return new MongoClient(mongoConnectionString).GetDatabase(UserSeed.DATABASE).GetCollection<BsonDocument>(name);
+        return new MongoClient(mongoConnectionString)
+            .GetDatabase(MongoLease.DatabaseNameOf(mongoConnectionString))
+            .GetCollection<BsonDocument>(name);
     }
 }

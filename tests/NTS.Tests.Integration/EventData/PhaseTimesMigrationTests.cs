@@ -7,8 +7,8 @@ using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tools.PhaseTimes;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Objects.Competition;
 
@@ -38,7 +38,9 @@ public sealed class PhaseTimesMigrationTests : IClassFixture<MongoFixture>, IAsy
     {
         _connectionString = mongo.ConnectionString;
         _stored = new StoredDocuments(mongo.ConnectionString);
-        _database = new MongoClient(mongo.ConnectionString).GetDatabase(UserSeed.DATABASE);
+        _database = new MongoClient(mongo.ConnectionString).GetDatabase(
+            MongoLease.DatabaseNameOf(mongo.ConnectionString)
+        );
     }
 
     /// <summary>The migration reads every Participation, so each test starts from empty collections.</summary>
@@ -359,8 +361,9 @@ public sealed class PhaseTimesMigrationTests : IClassFixture<MongoFixture>, IAsy
     {
         await Seed();
         var before = await Everything();
+        var database = MongoLease.DatabaseNameOf(_connectionString);
 
-        var dryRun = await Command("--connection-string", _connectionString);
+        var dryRun = await Command("--connection-string", _connectionString, "--database", database);
 
         Assert.Equal(0, dryRun.ExitCode);
         Assert.Contains("Dry-run phase-times migration.", dryRun.Output);
@@ -369,7 +372,7 @@ public sealed class PhaseTimesMigrationTests : IClassFixture<MongoFixture>, IAsy
         Assert.Contains("Nothing was changed. Run again with --apply to persist.", dryRun.Output);
         Assert.Equal(before, await Everything());
 
-        var applied = await Command("--connection-string", _connectionString, "--apply");
+        var applied = await Command("--connection-string", _connectionString, "--database", database, "--apply");
 
         Assert.Equal(0, applied.ExitCode);
         Assert.Contains("event_participations: 4 documents read, 2 changed (7 events)", applied.Output);
@@ -386,9 +389,11 @@ public sealed class PhaseTimesMigrationTests : IClassFixture<MongoFixture>, IAsy
         document["Phases"].AsBsonArray[1].AsBsonDocument["ArriveTime"] = "09:00";
         await _stored.Replace(PARTICIPATIONS, seeded.Timed.Id, document);
 
+        var database = MongoLease.DatabaseNameOf(_connectionString);
+
         var withoutConnection = await Command("--apply");
         var unknown = await Command("--connection-string", _connectionString, "--bogus");
-        var refused = await Command("--connection-string", _connectionString, "--apply");
+        var refused = await Command("--connection-string", _connectionString, "--database", database, "--apply");
 
         Assert.Equal(1, withoutConnection.ExitCode);
         Assert.Contains("--connection-string is required.", withoutConnection.Error);

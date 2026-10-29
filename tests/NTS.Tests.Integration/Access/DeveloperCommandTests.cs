@@ -226,7 +226,15 @@ public sealed class DeveloperCommandTests : IClassFixture<MongoFixture>
     {
         var tenant = await NewTenantAsync();
         var account = await NewAccountAsync(tenant);
-        var common = new[] { "--connection-string", _mongo.ConnectionString, "--email", account.Email };
+        var common = new[]
+        {
+            "--connection-string",
+            _mongo.ConnectionString,
+            "--database",
+            MongoLease.DatabaseNameOf(_mongo.ConnectionString),
+            "--email",
+            account.Email,
+        };
 
         var dry = await RunAsync(DeveloperTool.SeedTenantRoot, [.. common, "--tenant", tenant]);
         var applied = await RunAsync(DeveloperTool.SeedTenantRoot, [.. common, "--tenant", tenant, "--apply"]);
@@ -258,7 +266,17 @@ public sealed class DeveloperCommandTests : IClassFixture<MongoFixture>
 
         var run = await RunAsync(
             DeveloperTool.SeedTenantRoot,
-            ["--connection-string", _mongo.ConnectionString, "--email", account.Email, "--tenant", tenant, "--apply"]
+            [
+                "--connection-string",
+                _mongo.ConnectionString,
+                "--database",
+                MongoLease.DatabaseNameOf(_mongo.ConnectionString),
+                "--email",
+                account.Email,
+                "--tenant",
+                tenant,
+                "--apply",
+            ]
         );
 
         Assert.DoesNotContain(_mongo.ConnectionString, run.Output + run.Error);
@@ -267,7 +285,7 @@ public sealed class DeveloperCommandTests : IClassFixture<MongoFixture>
 
     IMongoDatabase Database()
     {
-        return new MongoClient(_mongo.ConnectionString).GetDatabase(UserSeed.DATABASE);
+        return new MongoClient(_mongo.ConnectionString).GetDatabase(MongoLease.DatabaseNameOf(_mongo.ConnectionString));
     }
 
     Task<DeveloperResult> SeedAsync(string tenant, string email, bool apply)
