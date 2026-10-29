@@ -2,7 +2,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
 using Not.Injection;
 
-namespace NoTiming.Ui.Features.Lazy;
+namespace Not.Blazor.Client.Lazy;
 
 /// <summary>The assemblies of the app that are fetched when a person goes to the pages that need them (<see cref="LazyRoutes"/>).</summary>
 public interface ILazyAssemblies

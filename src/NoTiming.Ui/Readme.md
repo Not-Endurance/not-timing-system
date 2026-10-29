@@ -44,7 +44,7 @@ the size past it raises it on purpose, and raises the ceiling in the test, here 
   MB: Core, Edm, the Api's and the model builder), AngleSharp and the Razor language (printing, 0.55 MB) and XML (0.36 MB).
   They arrive through `Not.Storage` and `Not.Application`, which the app uses for the repositories of its REST calls, so taking
   them out is a split of those projects and a task of its own.
-- The pages of the Console are not part of it. `Features/Lazy/LazyRoutes` says which paths belong to an assembly that is fetched
+- The pages of the Console are not part of it. `Not.Blazor.Client`'s `Lazy/LazyRoutes` says which paths belong to an assembly that is fetched
   when a person goes there, and the router fetches it before it looks for a page (`WitnessBlazorRoot`). Nothing is lazy today.
   The Console (#646) fills the seam: it adds `["console"] = ["NoTiming.Console.wasm"]` to `LazyRoutes.Assemblies`, and the
   file as a `<BlazorWebAssemblyLazyLoad Include="NoTiming.Console.wasm" />` item in `NoTiming.Ui.csproj`; no code of the router

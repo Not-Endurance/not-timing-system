@@ -1,4 +1,4 @@
-using NoTiming.Ui.Features.Lazy;
+using Not.Blazor.Client.Lazy;
 
 namespace NTS.Tests.Unit.Application;
 

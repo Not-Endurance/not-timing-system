@@ -1,4 +1,4 @@
-namespace NoTiming.Ui.Features.Lazy;
+namespace Not.Blazor.Client.Lazy;
 
 /// <summary>
 /// Which paths of the app belong to an assembly that is fetched when a person goes there and not when the app opens
