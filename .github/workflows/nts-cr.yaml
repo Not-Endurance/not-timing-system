@@ -5,6 +5,11 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
 
+# One CR run per pull request: a new push cancels the run still going for the commit it replaces.
+concurrency:
+  group: cr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 env:
   # Every project is .NET 10 and builds with the .NET 10 SDK. Csharpier 0.30.6 runs on .NET 8, so that job installs it.
   DOTNET_CORE_VERSION: 8.0.x
