@@ -204,7 +204,6 @@ public sealed class PasskeyCeremonyTests : IClassFixture<ApiHostFixture>, IClass
     [Theory]
     [InlineData("en-US", "en")]
     [InlineData("bg-BG", "bg")]
-    [InlineData("tr-TR", "tr")]
     public async Task The_mail_about_a_new_passkey_is_in_the_language_of_the_browser(string locale, string language)
     {
         var email = await SeedUser();

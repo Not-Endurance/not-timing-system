@@ -106,8 +106,8 @@ public sealed class FeiExport
                 {
                     Venue = new ctVenue { Name = eventInformation.Location, Country = countryCode },
                     EnduranceEvent = enduranceEvents,
-                    StartDate = eventInformation.EventSpan.StartDay.DateTime,
-                    EndDate = eventInformation.EventSpan.EndDay.DateTime,
+                    StartDate = eventInformation.EventSpan.FirstDay.ToDateTime(TimeOnly.MinValue),
+                    EndDate = eventInformation.EventSpan.LastDay.ToDateTime(TimeOnly.MinValue),
                     FEIID = eventInformation.FeiShowId,
                 },
             },
@@ -193,8 +193,8 @@ public sealed class FeiExport
         {
             FEIID = feiEventId,
             Code = feiEventCode,
-            StartDate = eventInformation.EventSpan.StartDay.DateTime,
-            EndDate = eventInformation.EventSpan.EndDay.DateTime,
+            StartDate = eventInformation.EventSpan.FirstDay.ToDateTime(TimeOnly.MinValue),
+            EndDate = eventInformation.EventSpan.LastDay.ToDateTime(TimeOnly.MinValue),
             NF = countryCode,
             Competitions = results.Select(x => CreateCompetition(eventInformation, x)).ToArray(),
         };
@@ -210,7 +210,7 @@ public sealed class FeiExport
             ScheduleCompetitionNr = ranking.FeiScheduleNumber!,
             Rule = ranking.FeiRule!,
             Name = results.Name,
-            StartDate = eventInformation.EventSpan.StartDay.DateTime,
+            StartDate = eventInformation.EventSpan.FirstDay.ToDateTime(TimeOnly.MinValue),
             Team = false,
             ParticipationList = new ctEnduranceParticipations(),
         };

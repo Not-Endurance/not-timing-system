@@ -7,7 +7,7 @@ namespace NTS.Domain.Core.Aggregates.Participations.Events;
 /// <see cref="Presented"/>, because it records a different intent. It carries the marker of the presentation it changes: it
 /// feeds the Present time, or the Represent time when it changes the representation of the Phase, and never makes one.
 /// </summary>
-public sealed class PresentUpdated : ParticipationEventBase
+public sealed class PresentUpdated : SnapshotTimeEvent
 {
     public PresentUpdated(
         Timestamp time,
@@ -16,9 +16,10 @@ public sealed class PresentUpdated : ParticipationEventBase
         SnapshotMethod method,
         DateTimeOffset? recordedAt,
         Guid? actorId,
-        Guid? id = null
+        Guid? id = null,
+        DateTimeOffset? disabledAt = null
     )
-        : base(time, outcome, method, recordedAt, actorId, id)
+        : base(time, outcome, method, recordedAt, actorId, id, disabledAt)
     {
         IsRepresent = isRepresent;
     }

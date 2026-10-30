@@ -1,4 +1,5 @@
 @using NoTiming.Ui.Components.EventViews
+@using NTS.Domain.Access
 
 @attribute [Route(EVENT_DASHBOARD_PAGE)]
 @inherits DashboardContentBehind
@@ -11,7 +12,7 @@
 }
 else
 {
-    <ViewedEventScope EventId="EventId">
+    <ViewedEventScope EventId="EventId" Shows="CoreView.Dashboard">
         <DashboardPage />
     </ViewedEventScope>
 }

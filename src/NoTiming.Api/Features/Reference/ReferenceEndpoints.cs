@@ -25,6 +25,28 @@ internal enum ReferenceWrites
 }
 
 /// <summary>
+/// What keeps a row of a family from being deleted while a Participation refers to it (#635, ADR-0010): the member of the
+/// combination of a Participation that holds a copy of the row, and what the Api answers when there is one.
+/// </summary>
+internal sealed class ReferenceInUse
+{
+    public ReferenceInUse(string member, string code, string title, string detail)
+    {
+        Member = member;
+        Code = code;
+        Title = title;
+        Detail = detail;
+    }
+
+    /// <summary>The member of the combination that holds the copy: <c>Athlete</c> or <c>Horse</c>.</summary>
+    public string Member { get; }
+
+    public string Code { get; }
+    public string Title { get; }
+    public string Detail { get; }
+}
+
+/// <summary>
 /// One family of reference data and how its routes behave (#603): the resource's type, which is the name of its
 /// route, the collection it is kept in, who may write it, and which members it shows, keeps to itself or owns. The
 /// routes of every family are the same: a Tenant's rows are found by their id and by a filter, and only a signed-in
@@ -40,7 +62,8 @@ internal sealed class ReferenceFamily<TModel, TEntity>
         ReferenceWrites writes,
         ReferenceMembers<TModel> members,
         bool isGlobal = false,
-        bool canDelete = true
+        bool canDelete = true,
+        ReferenceInUse? inUse = null
     )
     {
         Route = route;
@@ -49,6 +72,7 @@ internal sealed class ReferenceFamily<TModel, TEntity>
         Members = members;
         IsGlobal = isGlobal;
         CanDelete = canDelete;
+        InUse = inUse;
     }
 
     /// <summary>The type of the resource and the path of its collection: <c>/api/{Route}</c>.</summary>
@@ -62,6 +86,9 @@ internal sealed class ReferenceFamily<TModel, TEntity>
     public bool IsGlobal { get; }
 
     public bool CanDelete { get; }
+
+    /// <summary>What keeps a row from being deleted while a Participation refers to it, or none for a family whose rows are free to go.</summary>
+    public ReferenceInUse? InUse { get; }
 }
 
 /// <summary>
@@ -74,18 +101,21 @@ internal sealed class ReferenceAccess
     readonly GlobalCollections _globals;
     readonly TenantStore _tenantStore;
     readonly CallerReader _callers;
+    readonly CrossTenantReads _reads;
 
     public ReferenceAccess(
         TenantCollections tenants,
         GlobalCollections globals,
         TenantStore tenantStore,
-        CallerReader callers
+        CallerReader callers,
+        CrossTenantReads reads
     )
     {
         _tenants = tenants;
         _globals = globals;
         _tenantStore = tenantStore;
         _callers = callers;
+        _reads = reads;
     }
 
     public IReferenceCollection<TModel> Open<TModel, TEntity>(
@@ -98,6 +128,12 @@ internal sealed class ReferenceAccess
         return family.IsGlobal
             ? _globals.Of<TModel>(family.Collection)
             : _tenants.Of<TModel>(family.Collection, AccountRoles.CurrentTenantOf(user));
+    }
+
+    /// <summary>Whether a Participation of any Tenant refers to the row: the one cross-tenant question a delete of a registry row asks.</summary>
+    public Task<bool> IsReferencedAsync(ReferenceInUse use, Guid rowId, CancellationToken cancellationToken)
+    {
+        return _reads.IsReferencedByParticipationAsync(use.Member, rowId, cancellationToken);
     }
 
     /// <summary>Null when the caller may write the family, and the answer that refuses it when not.</summary>
@@ -253,12 +289,12 @@ internal static class ReferenceEndpoints
 
     /// <summary>
     /// Reads a page of a list. An expression that is valid in the OData grammar and that the data cannot run, such as the
-    /// date parts of a date (<c>year(endDay)</c>), is for the caller to correct: 400 <c>invalid-filter</c>, and not a
-    /// server error.
+    /// date parts of a date (<c>year(endDay)</c>), or that the database cannot run on a row, such as a division by zero or a
+    /// part of a text that starts past its end, is for the caller to correct: 400 <c>invalid-filter</c>, and not a server
+    /// error.
     /// </summary>
-    public static async Task<(IReadOnlyList<T>? Rows, IResult? Refusal)> ReadPageAsync<T>(
-        Func<Task<IReadOnlyList<T>>> read
-    )
+    public static async Task<(TPage? Page, IResult? Refusal)> ReadPageAsync<TPage>(Func<Task<TPage>> read)
+        where TPage : class
     {
         try
         {
@@ -276,13 +312,24 @@ internal static class ReferenceEndpoints
                 )
             );
         }
+        catch (UnrunnableExpressionException)
+        {
+            return (
+                null,
+                JsonApiResults.Error(
+                    StatusCodes.Status400BadRequest,
+                    "invalid-filter",
+                    "The filter cannot be applied.",
+                    "The expression is valid, but the database cannot run it on every row: look at what it divides by, or takes a part of."
+                )
+            );
+        }
     }
 
     public static object Links<T>(HttpRequest request, ReferenceQuery<T> query, bool hasNext)
         where T : class
     {
-        var self = request.Path + request.QueryString;
-        return new { self, next = hasNext ? WithPage(request, query.Number + 1) : null };
+        return JsonApiPaging.Links(request, query.Number, hasNext);
     }
 
     /// <summary>Gives a row the id its client made for it, which a document names as the id of the resource and never as an attribute.</summary>
@@ -483,10 +530,29 @@ internal static class ReferenceEndpoints
             return refusal;
         }
 
-        var removed =
-            Guid.TryParse(id, out var rowId)
-            && await access.Open(family, user).DeleteAsync(rowId, context.RequestAborted);
-        return removed ? Results.NoContent() : JsonApiResults.NotFound();
+        if (!Guid.TryParse(id, out var rowId))
+        {
+            return JsonApiResults.NotFound();
+        }
+
+        var collection = access.Open(family, user);
+        if (family.InUse is { } use)
+        {
+            // a row that is not the Tenant's is not told about, so it is found before it is asked whether it is in use
+            if (await collection.FindAsync(rowId, context.RequestAborted) is null)
+            {
+                return JsonApiResults.NotFound();
+            }
+
+            if (await access.IsReferencedAsync(use, rowId, context.RequestAborted))
+            {
+                return JsonApiResults.Error(StatusCodes.Status409Conflict, use.Code, use.Title, use.Detail);
+            }
+        }
+
+        return await collection.DeleteAsync(rowId, context.RequestAborted)
+            ? Results.NoContent()
+            : JsonApiResults.NotFound();
     }
 
     static IResult Resource<TModel, TEntity>(
@@ -505,16 +571,5 @@ internal static class ReferenceEndpoints
             family.Members.AttributesOf(row),
             location
         );
-    }
-
-    static string WithPage(HttpRequest request, int number)
-    {
-        var parameters = request
-            .Query.Where(x => x.Key != "page[number]")
-            .SelectMany(x =>
-                x.Value.Select(value => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(value ?? "")}")
-            )
-            .Append($"{Uri.EscapeDataString("page[number]")}={number}");
-        return $"{request.Path}?{string.Join('&', parameters)}";
     }
 }

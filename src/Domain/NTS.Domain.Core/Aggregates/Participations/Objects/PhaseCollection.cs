@@ -35,6 +35,12 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
         return next.StartTime != null && time >= next.StartTime ? next : Current;
     }
 
+    /// <summary>The Phases ridden after the Phase, in order.</summary>
+    internal IEnumerable<Phase> After(Phase phase)
+    {
+        return this.Skip(IndexOf(phase) + 1);
+    }
+
     /// <summary>Makes the Phase the current one: the Participation is in it once a Snapshot or a request was placed there.</summary>
     internal void Select(Phase phase)
     {

@@ -379,7 +379,7 @@
     <value>Конфигурирай Комбинация</value>
   </data>
   <data name="Configure_Participation_string" xml:space="preserve">
-    <value>Конфигурирай Участник</value>
+    <value>Конфигурирай Участие</value>
   </data>
   <data name="Configure_Official_string" xml:space="preserve">
     <value>Конфигурирай Официално лице</value>
@@ -487,7 +487,7 @@
     <value>Фази</value>
   </data>
   <data name="Participations_string" xml:space="preserve">
-    <value>Участници</value>
+    <value>Участия</value>
   </data>
   <data name="Athlete_string" xml:space="preserve">
     <value>Атлет</value>
@@ -514,7 +514,7 @@
     <value>Не е класиран</value>
   </data>
   <data name="Override_Start_Time_string" xml:space="preserve">
-    <value>Промени времето на Старт за дадения Участник</value>
+    <value>Промени времето на Старт за даденото Участие</value>
   </data>
   <data name="Start_Time_string" xml:space="preserve">
     <value>Време на Старт</value>
@@ -696,17 +696,14 @@
   <data name="Vetin_string" xml:space="preserve">
     <value>Презентиране</value>
   </data>
-  <data name="Participant_string" xml:space="preserve">
-    <value>Участник</value>
-  </data>
   <data name="Snapshot_page_string" xml:space="preserve">
     <value>Времеизмерване</value>
   </data>
   <data name="Send_snapshot_string" xml:space="preserve">
     <value>Изпрати {0} записа за</value>
   </data>
-  <data name="Select_participants_to_snapshot_string" xml:space="preserve">
-    <value>Изберете участници за засичане на време</value>
+  <data name="Select_participations_to_snapshot_string" xml:space="preserve">
+    <value>Изберете участия за засичане на време</value>
   </data>
   <data name="Edit_timestamp_string" xml:space="preserve">
     <value>Редактиране на време</value>
@@ -808,7 +805,7 @@
     <value>Прекъсната връзка със събитие: {0}</value>
   </data>
   <data name="Cannot_add_completed_participations_in_startlist" xml:space="preserve">
-    <value>Не може да бъде добавен в Стартлист защото участникът е завършил</value>
+    <value>Не може да бъде добавено в Стартлист, защото участието е завършило</value>
   </data>
   <data name="Empty_string" xml:space="preserve">
     <value>Празно</value>
@@ -931,7 +928,7 @@
     <value>#{0}: конфигурацията на фазите се различава между състезанията:</value>
   </data>
   <data name="Start_validation_issue_explanation_string" xml:space="preserve">
-    <value>Участник не може да бъде добавен в няколко състезания с различни фази.</value>
+    <value>Участие не може да бъде добавено в няколко състезания с различни фази.</value>
   </data>
   <data name="Remove_from__string" xml:space="preserve">
     <value>Премахни от {0}</value>
@@ -1011,9 +1008,6 @@
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="This_event_has_ended_string" xml:space="preserve">
     <value>Събитието е приключило и не може да бъде променяно.</value>
   </data>
@@ -1081,7 +1075,7 @@
     <value>Предаване на събитието</value>
   </data>
   <data name="Find_account_string" xml:space="preserve">
-    <value>Намерете профил по име (поне три букви)</value>
+    <value>Намерете профил по име (поне две букви)</value>
   </data>
   <data name="Main_operator_string" xml:space="preserve">
     <value>Главен оператор</value>
@@ -1147,13 +1141,13 @@
     <value>Официално лице</value>
   </data>
   <data name="Select_a_participation_string" xml:space="preserve">
-    <value>Изберете участник</value>
+    <value>Изберете участие</value>
   </data>
   <data name="Participation_not_found_string" xml:space="preserve">
-    <value>Участникът не е намерен.</value>
+    <value>Участието не е намерено.</value>
   </data>
   <data name="Participation_changed_string" xml:space="preserve">
-    <value>Участникът е променен междувременно и е прочетен отново. Въведеното е запазено: прегледайте го върху текущото състояние и го изпратете отново.</value>
+    <value>Участието е променено междувременно и е прочетено отново. Въведеното е запазено: прегледайте го върху текущото състояние и го изпратете отново.</value>
   </data>
   <data name="Time_recorded_string" xml:space="preserve">
     <value>Времето е записано.</value>
@@ -1174,7 +1168,7 @@
     <value>Събитието няма класирания.</value>
   </data>
   <data name="Select_participation_to_add_string" xml:space="preserve">
-    <value>Изберете участник за добавяне</value>
+    <value>Изберете участие за добавяне</value>
   </data>
   <data name="Handout_made_string" xml:space="preserve">
     <value>Създадена е разпечатка за #{0}.</value>
@@ -1211,6 +1205,9 @@
   </data>
   <data name="Same_FEI_ID_string" xml:space="preserve">
     <value>същият FEI ID</value>
+  </data>
+  <data name="Similar_name_string" xml:space="preserve">
+    <value>подобно име</value>
   </data>
   <data name="Of_another_federation_string" xml:space="preserve">
     <value>на друга федерация</value>
@@ -1265,6 +1262,123 @@
   </data>
   <data name="Console_disconnected_string" xml:space="preserve">
     <value>Няма връзка със събитие: {0}</value>
+  </data>
+  <data name="Snapshot_time_updated_string" xml:space="preserve">
+    <value>Времето е обновено.</value>
+  </data>
+  <data name="Snapshot_not_the_latest_string" xml:space="preserve">
+    <value>Може да се променя само последното изпратено време за стартов номер.</value>
+  </data>
+  <data name="Snapshot_update_not_answered_string" xml:space="preserve">
+    <value>Сървърът не отговори. Натиснете „Обнови“, за да изпратите времето отново.</value>
+  </data>
+  <data name="Disabling_these_would_leave_an_earlier_Phase_incomplete_string" xml:space="preserve">
+    <value>Ако се изключат тези, по-ранна фаза ще остане без всичките си времена, докато по-късна фаза има времена.</value>
+  </data>
+  <data name="Time_event_changed_string" xml:space="preserve">
+    <value>Дадено време вече не е такова, каквото беше при избора. Прегледайте хронологията отново.</value>
+  </data>
+  <data name="Time_event_set_aside_by_the_rules_string" xml:space="preserve">
+    <value>Правилата са отхвърлили това време, затова не може да се изключва или включва.</value>
+  </data>
+  <data name="Time_events_blocked_string" xml:space="preserve">
+    <value>{0} не може да бъде изключено: по-ранна фаза ще остане без всичките си времена, докато по-късна фаза има времена.</value>
+  </data>
+  <data name="Timeline_update_of__string" xml:space="preserve">
+    <value>{0} (корекция)</value>
+  </data>
+  <data name="Timeline_manual_string" xml:space="preserve">
+    <value>Ръчно</value>
+  </data>
+  <data name="Timeline_rfid_string" xml:space="preserve">
+    <value>RFID</value>
+  </data>
+  <data name="Timeline_ems_string" xml:space="preserve">
+    <value>EMS интеграция</value>
+  </data>
+  <data name="Timeline_string" xml:space="preserve">
+    <value>Хронология</value>
+  </data>
+  <data name="Timeline_outcome_string" xml:space="preserve">
+    <value>Резултат</value>
+  </data>
+  <data name="Timeline_source_string" xml:space="preserve">
+    <value>Източник</value>
+  </data>
+  <data name="Timeline_actor_string" xml:space="preserve">
+    <value>Записано от</value>
+  </data>
+  <data name="Timeline_recorded_string" xml:space="preserve">
+    <value>Записано</value>
+  </data>
+  <data name="Timeline_actor_unknown_string" xml:space="preserve">
+    <value>Непознат</value>
+  </data>
+  <data name="Timeline_click_to_disable_string" xml:space="preserve">
+    <value>Щракнете, за да изключите</value>
+  </data>
+  <data name="Timeline_click_to_enable_string" xml:space="preserve">
+    <value>Щракнете, за да включите</value>
+  </data>
+  <data name="Timeline_will_be_disabled_string" xml:space="preserve">
+    <value>Ще бъде изключено</value>
+  </data>
+  <data name="Timeline_will_be_enabled_string" xml:space="preserve">
+    <value>Ще бъде включено</value>
+  </data>
+  <data name="Timeline_disabled_at__string" xml:space="preserve">
+    <value>Изключено в {0}</value>
+  </data>
+  <data name="Timeline_shown_string" xml:space="preserve">
+    <value>Показано</value>
+  </data>
+  <data name="Timeline_saved_string" xml:space="preserve">
+    <value>Хронологията е запазена.</value>
+  </data>
+  <data name="Timeline_empty_string" xml:space="preserve">
+    <value>Все още няма записано време за това участие.</value>
+  </data>
+  <data name="Timeline_phase_edit_string" xml:space="preserve">
+    <value>Редакция на фазата</value>
+  </data>
+  <data name="Timeline_cleared_string" xml:space="preserve">
+    <value>няма</value>
+  </data>
+  <data name="My_participations_string" xml:space="preserve">
+    <value>Моите участия</value>
+  </data>
+  <data name="Show_more_string" xml:space="preserve">
+    <value>Покажи още</value>
+  </data>
+  <data name="Also_counted_in_string" xml:space="preserve">
+    <value>Отчетено и в</value>
+  </data>
+  <data name="No_participations_string" xml:space="preserve">
+    <value>Все още няма участия.</value>
+  </data>
+  <data name="Name_of_an_Athlete_or_a_Horse_string" xml:space="preserve">
+    <value>Име на атлет или кон</value>
+  </data>
+  <data name="My_Athlete_string" xml:space="preserve">
+    <value>Моят атлет</value>
+  </data>
+  <data name="My_Athlete_helper_string" xml:space="preserve">
+    <value>Само отметка за вас: с нея не се предоставя нищо.</value>
+  </data>
+  <data name="Add_a_Horse_string" xml:space="preserve">
+    <value>Добави кон</value>
+  </data>
+  <data name="Remove__string" xml:space="preserve">
+    <value>Премахни {0}</value>
+  </data>
+  <data name="Horses_helper_string" xml:space="preserve">
+    <value>Конете, яздени от вашия атлет, се показват автоматично. Конете, които добавите, могат да бъдат премахнати.</value>
+  </data>
+  <data name="Competition_string" xml:space="preserve">
+    <value>Състезание</value>
+  </data>
+  <data name="Nothing_found_string" xml:space="preserve">
+    <value>Не е намерено нищо</value>
   </data>
   <data name="Estimates_string" xml:space="preserve">
     <value>Прогнози</value>

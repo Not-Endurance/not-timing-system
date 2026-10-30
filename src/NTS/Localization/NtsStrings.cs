@@ -251,10 +251,9 @@ namespace NTS.Localization
         public static string Performance_string => LocalizeString(nameof(Performance_string));
         public static string Resend_string => LocalizeString(nameof(Resend_string));
         public static string Vetin_string => LocalizeString(nameof(Vetin_string));
-        public static string Participant_string => LocalizeString(nameof(Participant_string));
         public static string Send_snapshot_string => LocalizeString(nameof(Send_snapshot_string));
-        public static string Select_participants_to_snapshot_string =>
-            LocalizeString(nameof(Select_participants_to_snapshot_string));
+        public static string Select_participations_to_snapshot_string =>
+            LocalizeString(nameof(Select_participations_to_snapshot_string));
         public static string Edit_timestamp_string => LocalizeString(nameof(Edit_timestamp_string));
         public static string Timestamp_string => LocalizeString(nameof(Timestamp_string));
         public static string Save_string => LocalizeString(nameof(Save_string));
@@ -366,6 +365,38 @@ namespace NTS.Localization
         public static string Time_recorded_string => LocalizeString(nameof(Time_recorded_string));
         public static string Time_not_recorded_string => LocalizeString(nameof(Time_not_recorded_string));
         public static string Time_not_taken_string => LocalizeString(nameof(Time_not_taken_string));
+        public static string Snapshot_time_updated_string => LocalizeString(nameof(Snapshot_time_updated_string));
+        public static string Snapshot_not_the_latest_string => LocalizeString(nameof(Snapshot_not_the_latest_string));
+        public static string Snapshot_update_not_answered_string =>
+            LocalizeString(nameof(Snapshot_update_not_answered_string));
+        public static string Disabling_these_would_leave_an_earlier_Phase_incomplete_string =>
+            LocalizeString(nameof(Disabling_these_would_leave_an_earlier_Phase_incomplete_string));
+        public static string Time_event_changed_string => LocalizeString(nameof(Time_event_changed_string));
+        public static string Time_event_set_aside_by_the_rules_string =>
+            LocalizeString(nameof(Time_event_set_aside_by_the_rules_string));
+        public static string Time_events_blocked_string => LocalizeString(nameof(Time_events_blocked_string));
+        public static string Timeline_update_of__string => LocalizeString(nameof(Timeline_update_of__string));
+        public static string Timeline_manual_string => LocalizeString(nameof(Timeline_manual_string));
+        public static string Timeline_rfid_string => LocalizeString(nameof(Timeline_rfid_string));
+        public static string Timeline_ems_string => LocalizeString(nameof(Timeline_ems_string));
+        public static string Timeline_string => LocalizeString(nameof(Timeline_string));
+        public static string Timeline_outcome_string => LocalizeString(nameof(Timeline_outcome_string));
+        public static string Timeline_source_string => LocalizeString(nameof(Timeline_source_string));
+        public static string Timeline_actor_string => LocalizeString(nameof(Timeline_actor_string));
+        public static string Timeline_recorded_string => LocalizeString(nameof(Timeline_recorded_string));
+        public static string Timeline_actor_unknown_string => LocalizeString(nameof(Timeline_actor_unknown_string));
+        public static string Timeline_click_to_disable_string =>
+            LocalizeString(nameof(Timeline_click_to_disable_string));
+        public static string Timeline_click_to_enable_string => LocalizeString(nameof(Timeline_click_to_enable_string));
+        public static string Timeline_will_be_disabled_string =>
+            LocalizeString(nameof(Timeline_will_be_disabled_string));
+        public static string Timeline_will_be_enabled_string => LocalizeString(nameof(Timeline_will_be_enabled_string));
+        public static string Timeline_disabled_at__string => LocalizeString(nameof(Timeline_disabled_at__string));
+        public static string Timeline_shown_string => LocalizeString(nameof(Timeline_shown_string));
+        public static string Timeline_saved_string => LocalizeString(nameof(Timeline_saved_string));
+        public static string Timeline_empty_string => LocalizeString(nameof(Timeline_empty_string));
+        public static string Timeline_phase_edit_string => LocalizeString(nameof(Timeline_phase_edit_string));
+        public static string Timeline_cleared_string => LocalizeString(nameof(Timeline_cleared_string));
         public static string Not_signed_in_string => LocalizeString(nameof(Not_signed_in_string));
         public static string Now_string => LocalizeString(nameof(Now_string));
         public static string Rankings_list_empty_message_string =>
@@ -382,6 +413,7 @@ namespace NTS.Localization
         public static string Already_registered_string => LocalizeString(nameof(Already_registered_string));
         public static string Same_name_string => LocalizeString(nameof(Same_name_string));
         public static string Same_FEI_ID_string => LocalizeString(nameof(Same_FEI_ID_string));
+        public static string Similar_name_string => LocalizeString(nameof(Similar_name_string));
         public static string Of_another_federation_string => LocalizeString(nameof(Of_another_federation_string));
         public static string Logos_string => LocalizeString(nameof(Logos_string));
         public static string Left_logo_string => LocalizeString(nameof(Left_logo_string));
@@ -400,6 +432,19 @@ namespace NTS.Localization
         public static string Console_connected_string => LocalizeString(nameof(Console_connected_string));
         public static string Console_connecting_string => LocalizeString(nameof(Console_connecting_string));
         public static string Console_disconnected_string => LocalizeString(nameof(Console_disconnected_string));
+        public static string My_participations_string => LocalizeString(nameof(My_participations_string));
+        public static string Show_more_string => LocalizeString(nameof(Show_more_string));
+        public static string Also_counted_in_string => LocalizeString(nameof(Also_counted_in_string));
+        public static string No_participations_string => LocalizeString(nameof(No_participations_string));
+        public static string Name_of_an_Athlete_or_a_Horse_string =>
+            LocalizeString(nameof(Name_of_an_Athlete_or_a_Horse_string));
+        public static string My_Athlete_string => LocalizeString(nameof(My_Athlete_string));
+        public static string My_Athlete_helper_string => LocalizeString(nameof(My_Athlete_helper_string));
+        public static string Add_a_Horse_string => LocalizeString(nameof(Add_a_Horse_string));
+        public static string Remove__string => LocalizeString(nameof(Remove__string));
+        public static string Horses_helper_string => LocalizeString(nameof(Horses_helper_string));
+        public static string Competition_string => LocalizeString(nameof(Competition_string));
+        public static string Nothing_found_string => LocalizeString(nameof(Nothing_found_string));
         public static string Is_on_time_for_Presentation_Inspection_string =>
             LocalizeString(nameof(Is_on_time_for_Presentation_Inspection_string));
         public static string Estimates_string => LocalizeString(nameof(Estimates_string));

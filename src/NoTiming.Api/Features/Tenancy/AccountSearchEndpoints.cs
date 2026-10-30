@@ -10,9 +10,10 @@ namespace NoTiming.Api.Features.Tenancy;
 /// The search of accounts by name (#643, ADR-0012), which is how a Tenant Root or a Main Operator finds the person to link
 /// or to assign. <c>GET /api/accounts</c> looks among the members of the Tenant the account acts in, and
 /// <c>GET /api/accounts/all-tenants</c> is the named view that reaches across Tenants for the people who may search at all:
-/// no parameter turns the first into the second. Both take <c>filter=contains(name,'text')</c> and nothing else, with at
-/// least three characters, and answer at most ten matches. A request is answered in this order: who is asking, whether they
-/// may, what they asked, and whether they have searched too often.
+/// no parameter turns the first into the second. Both take <c>filter=contains(name,'text')</c>, whose words have to be parts of
+/// the name in any order and in any case, with one of at least two characters, the <c>sort</c> of the names and the pages
+/// of every list (ten matches a page, twenty-five at most), and nothing else. A request is answered in this order: who is
+/// asking, whether they may, what they asked, and whether they have searched too often, a page being a search.
 /// </summary>
 internal static class AccountSearchEndpoints
 {
@@ -96,13 +97,9 @@ internal static class AccountSearchEndpoints
             return query.Refusal;
         }
 
-        if (query.Text!.Length < AccountSearch.MIN_SEARCH_LENGTH)
+        if (!NameSearch.HasLongWord(query.Words!))
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "search-too-short",
-                $"Search for at least {AccountSearch.MIN_SEARCH_LENGTH} characters of a name."
-            );
+            return RegistrySearchEndpoints.TooShort();
         }
 
         if (limiter.TrySearch(user.Id) is { } refusal)
@@ -114,10 +111,14 @@ internal static class AccountSearchEndpoints
         var found =
             tenantId == null && !acrossTenants
                 ? []
-                : await search.SearchAsync(query.Text, tenantId, context.RequestAborted);
+                : await search.SearchAsync(NameSearch.Of(query), tenantId, context.RequestAborted);
         return JsonApiResults.Collection(
             ACCOUNT_MATCHES,
-            found.Select(x => (x.Id.ToString(), (object)new { displayName = x.DisplayName, email = x.MaskedEmail }))
+            found
+                .Take(query.Size)
+                .Select(x => (x.Id.ToString(), (object)new { displayName = x.DisplayName, email = x.MaskedEmail })),
+            links: JsonApiPaging.Links(context.Request, query.Number, found.Count > query.Size),
+            meta: JsonApiPaging.Meta(query.Size, query.Number)
         );
     }
 }

@@ -48,7 +48,7 @@ public class EventInformationModel : IDocument, ISoftDeletableDocument, IKrudMod
     public EventInformation MapToEntity()
     {
         var country = Country.MapToEntity();
-        var span = new EventSpan(StartDay, EndDay);
+        var span = EventSpan.Stored(StartDay, EndDay); // the instants as they are stored, not made whole again in UTC
         return new EventInformation(
             country,
             Name,

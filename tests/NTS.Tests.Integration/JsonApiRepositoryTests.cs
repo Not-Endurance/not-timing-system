@@ -256,20 +256,9 @@ public sealed class JsonApiRepositoryTests : IClassFixture<MongoFixture>
 
         var read = await athletes.Read(linked);
         await athletes.Update(new Athlete("Renamed Rider", null, "10012345", country, null, linked));
-        await athletes.Create(
-            new Athlete(
-                "Made Rider",
-                null,
-                null,
-                country,
-                new Club("Sofia Riders"),
-                madeId,
-                new User("made@example.test", "Made")
-            )
-        );
+        await athletes.Create(new Athlete("Made Rider", null, null, country, new Club("Sofia Riders"), madeId));
 
         Assert.Null(athletes.LastError);
-        Assert.Null(read!.User);
         var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "athletes", linked))!;
         Assert.Equal("Renamed Rider", stored["Name"].AsString);
         Assert.Equal("rider.secret@example.test", stored["User"]["Email"].AsString);

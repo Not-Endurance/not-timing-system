@@ -1,4 +1,5 @@
 using Not.Blazor.Components.Abstractions;
+using NTS.Contracts.Core;
 using NTS.Contracts.Features.Console;
 using NTS.Contracts.Socket;
 using NTS.Domain.Access;
@@ -12,6 +13,8 @@ namespace NoTiming.Console.Features.Navigation;
 /// </summary>
 public class EventNavigationBehind : NStatefulComponent
 {
+    Guid _endedSubscription;
+
     [Inject]
     IConsoleEvents Events { get; set; } = default!;
 
@@ -20,6 +23,9 @@ public class EventNavigationBehind : NStatefulComponent
 
     [Inject]
     INtsSocketService Socket { get; set; } = default!;
+
+    [Inject]
+    IViewedEventProvider Provider { get; set; } = default!;
 
     protected IReadOnlyList<EventLink> Links =>
         Events.Events.FirstOrDefault(x => x.Id == EventId) is { } row ? EventLinks.For(row, Current) : [];
@@ -39,6 +45,7 @@ public class EventNavigationBehind : NStatefulComponent
 
     protected override async Task OnInitializedAsync()
     {
+        _endedSubscription = Provider.EventEnded.Subscribe(EventHasEnded);
         await Observe(Events);
         await Observe(Socket);
     }
@@ -46,5 +53,20 @@ public class EventNavigationBehind : NStatefulComponent
     protected void Open(EventLink link)
     {
         Navigator.NavigateTo(link.Route);
+    }
+
+    public override void Dispose()
+    {
+        Provider.EventEnded.Unsubscribe(_endedSubscription);
+        base.Dispose();
+    }
+
+    /// <summary>The Event of the page ended while it was open (#631): what the Console lists of it, and so what it offers, is read again.</summary>
+    async Task EventHasEnded(Guid eventId)
+    {
+        if (eventId == EventId)
+        {
+            await Events.Refresh();
+        }
     }
 }

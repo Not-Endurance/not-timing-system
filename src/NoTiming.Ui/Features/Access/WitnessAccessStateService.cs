@@ -74,7 +74,11 @@ public class WitnessAccessContext
             AccessLevel = level;
         }
 
-        return true;
+        // With no Event followed there is nothing to ask the Api, and what is said then is not what the Event will say. The state
+        // is not taken for loaded, so that whoever loads it once there is an Event (the viewed Event, which is opened as soon as
+        // the connection names the Event, while the connection is still handing it to the services that follow it) is told what
+        // the Api says of the person and that Event, and not the level of a person who followed none.
+        return eventId != null;
     }
 
     public async Task Handle(EventConnected notification, CancellationToken ct)

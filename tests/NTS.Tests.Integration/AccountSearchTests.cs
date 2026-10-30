@@ -1,7 +1,11 @@
 using System.Net;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 using MongoDB.Bson;
+using MongoDB.Driver;
+using Not.Identity;
+using NoTiming.Api.Features.Tenancy;
 using NTS.Tests.Integration.Infrastructure;
 using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 
@@ -9,8 +13,9 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// The search of accounts by name (ADR-0012, #643) is how a Tenant Root or a Main Operator finds the person to link or
-/// to assign, in place of a listing of everybody. It takes at least three characters of a name, answers at most ten
-/// accounts with a display name and an email that is partly masked, is limited in how often it can be asked, and finds
+/// to assign, in place of a listing of everybody. It takes words of a name, one of at least two characters, answers a page
+/// (ten by default) of accounts in the order of their names with a display name and an email that is partly masked, is
+/// limited in how often it can be asked, a page being a search, and finds
 /// the accounts of the Tenant it is asked in. It reaches across Tenants only through a route of its own, which the caller
 /// has to ask for by name: no parameter does it.
 /// </summary>
@@ -101,10 +106,10 @@ public sealed class AccountSearchTests : IClassFixture<MongoFixture>
     }
 
     [Theory]
-    [InlineData("ab")]
+    [InlineData("a")]
     [InlineData("  a  ")]
     [InlineData("")]
-    public async Task A_search_takes_at_least_three_characters(string text)
+    public async Task A_search_takes_at_least_two_characters(string text)
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
@@ -139,6 +144,113 @@ public sealed class AccountSearchTests : IClassFixture<MongoFixture>
             .ToList();
         Assert.Equal(10, names.Count);
         Assert.Equal(names.Order(StringComparer.Ordinal), names);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task The_accounts_are_answered_a_page_at_a_time_in_the_order_of_their_names_or_the_other_way_round(
+        bool acrossTenants
+    )
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var marker = Guid.NewGuid().ToString("N")[..6];
+        for (var i = 13; i >= 0; i--)
+        {
+            await AccountAsync(_mongo.ConnectionString, tenant, name: $"Many{marker} Person {i:00}");
+        }
+
+        var first = await ReadAsync(await SearchAsync(root, $"many{marker}", acrossTenants));
+        var second = await ReadAsync(await root.Page.GetAsync(first.Next!));
+        var backwards = await ReadAsync(await SearchAsync(root, $"many{marker}", acrossTenants, "&sort=-name"));
+        var small = await ReadAsync(
+            await SearchAsync(root, $"many{marker}", acrossTenants, "&page%5Bsize%5D=3&page%5Bnumber%5D=5")
+        );
+        var full = await ReadAsync(
+            await SearchAsync(root, $"many{marker}", acrossTenants, "&page%5Bsize%5D=7&page%5Bnumber%5D=2")
+        );
+
+        Assert.Equal(Enumerable.Range(7, 7).Select(i => $"Many{marker} Person {i:00}"), full.Names);
+        Assert.Null(full.Next); // the page is full, and nothing follows
+        Assert.Equal(Enumerable.Range(0, 10).Select(i => $"Many{marker} Person {i:00}"), first.Names);
+        Assert.Equal((10, 1), (first.Size, first.Number));
+        Assert.Equal(Enumerable.Range(10, 4).Select(i => $"Many{marker} Person {i:00}"), second.Names);
+        Assert.Equal((10, 2), (second.Size, second.Number));
+        Assert.Null(second.Next);
+        Assert.Equal(Enumerable.Range(4, 10).Reverse().Select(i => $"Many{marker} Person {i:00}"), backwards.Names);
+        Assert.Equal([$"Many{marker} Person 12", $"Many{marker} Person 13"], small.Names);
+        Assert.Null(small.Next);
+    }
+
+    [Theory]
+    [InlineData("&sort=id")]
+    [InlineData("&sort=name,id")]
+    [InlineData("&page%5Bsize%5D=26")]
+    [InlineData("&page%5Bnumber%5D=0")]
+    public async Task A_sort_or_a_page_that_the_search_does_not_take_is_refused(string parameters)
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+
+        foreach (var acrossTenants in new[] { false, true })
+        {
+            var response = await SearchAsync(root, "abc", acrossTenants, parameters);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.StartsWith("invalid-", (await ErrorCodeAsync(response))!, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public async Task The_search_itself_refuses_words_that_are_too_short_whatever_the_route_did()
+    {
+        var search = new AccountSearch(
+            new MongoClient(_mongo.ConnectionString),
+            Options.Create(new NIdentityOptions { Database = UserSeed.DATABASE })
+        );
+
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => search.SearchAsync(new NameSearch(["a", "b"], descending: false, skip: 0, take: 11), null, default)
+        );
+    }
+
+    [Fact]
+    public async Task Every_word_of_the_text_is_part_of_the_name_in_any_order_and_in_any_case()
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var marker = Guid.NewGuid().ToString("N")[..6];
+        var ours = await AccountAsync(_mongo.ConnectionString, tenant, name: $"Zlatina{marker} Georgieva");
+        await AccountAsync(_mongo.ConnectionString, tenant, name: $"Zlatina{marker} Petrova");
+
+        var found = await ReadAsync(await SearchAsync(root, $"GEORGIEVA zlatina{marker}"));
+        var nobody = await ReadAsync(await SearchAsync(root, $"georgieva zlatina{marker} petrova"));
+
+        Assert.Equal([ours.Id.ToString()], found.Ids);
+        Assert.Empty(nobody.Ids);
+    }
+
+    [Theory]
+    [InlineData("a b")]
+    [InlineData("a b c d")]
+    public async Task A_text_with_no_word_of_two_characters_is_too_short_however_long_it_is(string text)
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+
+        var response = await SearchAsync(root, text);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("search-too-short", await ErrorCodeAsync(response));
     }
 
     [Fact]
@@ -325,11 +437,11 @@ public sealed class AccountSearchTests : IClassFixture<MongoFixture>
 
         for (var i = 0; i < 5; i++)
         {
-            Assert.Equal(HttpStatusCode.BadRequest, (await SearchAsync(root, "ab")).StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, (await SearchAsync(root, "a")).StatusCode);
         }
 
-        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(root, "abc")).StatusCode);
-        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(root, "abc")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(root, "ab")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(root, "ab")).StatusCode);
     }
 
     ApiFactory NewApi()
@@ -337,15 +449,59 @@ public sealed class AccountSearchTests : IClassFixture<MongoFixture>
         return new ApiFactory(_mongo.ConnectionString);
     }
 
-    static Task<HttpResponseMessage> SearchAsync(Person person, string text, bool acrossTenants = false)
+    static Task<HttpResponseMessage> SearchAsync(
+        Person person,
+        string text,
+        bool acrossTenants = false,
+        string parameters = ""
+    )
     {
         var filter = Uri.EscapeDataString($"contains(name,'{text.Replace("'", "''")}')");
-        return person.Page.GetAsync($"/api/accounts{(acrossTenants ? "/all-tenants" : string.Empty)}?filter={filter}");
+        return person.Page.GetAsync(
+            $"/api/accounts{(acrossTenants ? "/all-tenants" : string.Empty)}?filter={filter}{parameters}"
+        );
+    }
+
+    /// <summary>What a page of a search says: its rows, which page it is, and where the next one is when there is one.</summary>
+    static async Task<Found> ReadAsync(HttpResponseMessage response)
+    {
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await ApiSessions.ReadJsonAsync(response);
+        var rows = body.GetProperty("data").EnumerateArray().ToList();
+        var page = body.GetProperty("meta").GetProperty("page");
+        var links = body.GetProperty("links");
+        return new Found(
+            [.. rows.Select(x => x.GetProperty("attributes").GetProperty("displayName").GetString()!)],
+            [.. rows.Select(x => x.GetProperty("id").GetString()!)],
+            page.GetProperty("size").GetInt32(),
+            page.GetProperty("number").GetInt32(),
+            links.TryGetProperty("next", out var next) && next.ValueKind == JsonValueKind.String
+                ? next.GetString()
+                : null
+        );
     }
 
     static async Task<string?> ErrorCodeAsync(HttpResponseMessage response)
     {
         var body = await ApiSessions.ReadJsonAsync(response);
         return body.GetProperty("errors")[0].GetProperty("code").GetString();
+    }
+
+    sealed class Found
+    {
+        public Found(List<string> names, List<string> ids, int size, int number, string? next)
+        {
+            Names = names;
+            Ids = ids;
+            Size = size;
+            Number = number;
+            Next = next;
+        }
+
+        public List<string> Names { get; }
+        public List<string> Ids { get; }
+        public int Size { get; }
+        public int Number { get; }
+        public string? Next { get; }
     }
 }

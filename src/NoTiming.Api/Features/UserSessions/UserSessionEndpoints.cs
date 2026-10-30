@@ -10,8 +10,8 @@ namespace NoTiming.Api.Features.UserSessions;
 /// caller's own. The store finds records by owner only, the routes name no owner, and a record of another person is
 /// answered as a record that is not there. The resource is <c>user-sessions</c>, flat, with the Event as an attribute
 /// and the state as a member; the list of the caller's records takes the filter <c>eventId eq &lt;id&gt;</c> and no
-/// other, so the Event is the only thing a caller can narrow by. The id is the server's: a document that brings one
-/// is refused.
+/// other, so the Event is the only thing a caller can narrow by, the <c>sort</c> of the Events and the pages of every list.
+/// The id is the server's: a document that brings one is refused.
 /// </summary>
 internal static class UserSessionEndpoints
 {
@@ -30,14 +30,14 @@ internal static class UserSessionEndpoints
 
     static async Task<IResult> List(HttpContext context, UserManager<NIdentityUser> users, UserSessionStore store)
     {
-        var filter = JsonApiQuery.Read(context.Request, EVENT_ID);
-        if (filter.Refusal != null)
+        var list = JsonApiQuery.ReadList(context.Request, EVENT_ID, EVENT_ID);
+        if (list.Refusal != null)
         {
-            return filter.Refusal;
+            return list.Refusal;
         }
 
         Guid? eventId = null;
-        if (filter.EqualTo.TryGetValue(EVENT_ID, out var written))
+        if (list.EqualTo.TryGetValue(EVENT_ID, out var written))
         {
             if (!Guid.TryParse(written, out var parsed))
             {
@@ -47,8 +47,20 @@ internal static class UserSessionEndpoints
             eventId = parsed;
         }
 
-        var sessions = await store.ListAsync(users.GetUserId(context.User)!, eventId, context.RequestAborted);
-        return JsonApiResults.Collection(USER_SESSIONS, sessions.Select(x => (x.Id.ToString(), AttributesOf(x))));
+        var (sessions, hasMore) = await store.ListAsync(
+            users.GetUserId(context.User)!,
+            eventId,
+            list.Descending,
+            list.Skip,
+            list.Size,
+            context.RequestAborted
+        );
+        return JsonApiResults.Collection(
+            USER_SESSIONS,
+            sessions.Select(x => (x.Id.ToString(), AttributesOf(x))),
+            links: JsonApiPaging.Links(context.Request, list.Number, hasMore),
+            meta: JsonApiPaging.Meta(list.Size, list.Number)
+        );
     }
 
     static async Task<IResult> Read(

@@ -69,7 +69,8 @@ internal static class TenancySeed
         bool isDeveloper = false,
         string? name = null,
         string? email = null,
-        string? selectedTenant = null
+        string? selectedTenant = null,
+        Guid? id = null
     )
     {
         email ??= UserSeed.NewEmail("tenancy");
@@ -89,9 +90,10 @@ internal static class TenancySeed
             }
         }
 
-        var id = await UserSeed.AddLegacyUserAsync(
+        var userId = await UserSeed.AddLegacyUserAsync(
             mongoConnectionString,
             email,
+            id: id,
             shape: document =>
             {
                 if (name != null)
@@ -125,7 +127,7 @@ internal static class TenancySeed
                 }
             }
         );
-        return new Seeded(id, email);
+        return new Seeded(userId, email);
     }
 
     /// <summary>The account, signed in the way a person does: a code asked for and read from the outbox.</summary>
@@ -137,10 +139,20 @@ internal static class TenancySeed
         IReadOnlyDictionary<string, string[]>? roles = null,
         bool isDeveloper = false,
         string? name = null,
-        string? selectedTenant = null
+        string? selectedTenant = null,
+        Guid? id = null
     )
     {
-        var seeded = await AccountAsync(mongoConnectionString, home, roles, isDeveloper, name, null, selectedTenant);
+        var seeded = await AccountAsync(
+            mongoConnectionString,
+            home,
+            roles,
+            isDeveloper,
+            name,
+            null,
+            selectedTenant,
+            id
+        );
         var page = new PageClient(client);
         page.Set(await ApiSessions.SignInAsync(api, client, seeded.Email));
         return new Person(seeded.Id, seeded.Email, page);

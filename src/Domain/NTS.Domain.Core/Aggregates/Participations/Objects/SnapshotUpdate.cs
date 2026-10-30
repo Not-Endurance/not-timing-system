@@ -12,7 +12,7 @@ public sealed class SnapshotUpdate
 {
     internal SnapshotUpdate(
         Phase phase,
-        ParticipationEventBase timeEvent,
+        SnapshotTimeEvent timeEvent,
         TimeSlot slot,
         Timestamp? previous,
         Timestamp? current
@@ -29,7 +29,7 @@ public sealed class SnapshotUpdate
     public Phase Phase { get; }
 
     /// <summary>The event that was recorded.</summary>
-    public ParticipationEventBase Event { get; }
+    public SnapshotTimeEvent Event { get; }
 
     /// <summary>The time of the Phase the Update was for.</summary>
     public TimeSlot Slot { get; }

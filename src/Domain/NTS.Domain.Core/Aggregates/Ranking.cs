@@ -98,9 +98,58 @@ public class Ranking : Aggregate, IEventScoped
         return new RankingFinalisation(placed, RankingFinalisationOutcome.Finalised);
     }
 
+    /// <summary>
+    /// Whether this is the Ranking of the ride's own Competition and Category (#638, ADR-0006): the one that the start of the
+    /// Event makes for each Category of each Competition, which carries the name and the ruleset of the Competition and the
+    /// Category of the ride. A Ranking that the Main Operator made and that happens to share all three is not told from it.
+    /// </summary>
+    public bool IsOwnOf(Participation participation)
+    {
+        return Name == participation.Competition.Name
+            && Ruleset == participation.Competition.Ruleset
+            && Category == participation.Category;
+    }
+
+    /// <summary>
+    /// What the ride placed as in this Ranking (#638): the elimination as the Results show it, or not ranked, or the rank of its
+    /// entry. A final Ranking gives the rank it stores, whatever the times would rank the ride now, and needs of the Event's
+    /// Participations only the ride itself; one that is not final ranks the ride in memory as the Results do, over all the
+    /// Participations it counts, and its only entry is rank 1, which the Results leave unranked. A Ranking that counts a
+    /// Participation that is not given cannot be ranked in memory, and that is refused as it is for the Results.
+    /// </summary>
+    /// <param name="participation">The ride, which this Ranking has to count.</param>
+    /// <param name="participations">The Participations of the Event, read only while the Ranking is not final.</param>
+    public Placing PlacingOf(
+        Participation participation,
+        IEnumerable<Participation> participations,
+        RegionalRules? rules
+    )
+    {
+        var entry =
+            Entries.FirstOrDefault(x => x.ParticipationId == participation.Id)
+            ?? throw GuardHelper.Exception($"Ranking {Id} does not count Participation {participation.Id}.");
+        if (participation.Eliminated is { } eliminated)
+        {
+            return Placing.Eliminated(eliminated.ToString());
+        }
+
+        if (entry.IsNotRanked)
+        {
+            return Placing.NotRanked();
+        }
+
+        return Placing.Ranked(IsFinal ? entry.Rank!.Value : RankInMemory(participation, participations, rules));
+    }
+
     public override string ToString()
     {
         return $"{Name} {Category}: {Entries.Count}";
+    }
+
+    int RankInMemory(Participation participation, IEnumerable<Participation> participations, RegionalRules? rules)
+    {
+        var placed = new Result(this, participations, rules).Entries.First(x => x.ParticipationId == participation.Id);
+        return placed.Rank ?? 1;
     }
 
     static ReadOnlyCollection<RankingEntry> OnePerParticipation(IEnumerable<RankingEntry> entries)

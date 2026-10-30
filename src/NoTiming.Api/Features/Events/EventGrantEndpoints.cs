@@ -15,12 +15,14 @@ namespace NoTiming.Api.Features.Events;
 /// The Main Operator links people to the Officials and Operators of its Event (#643, ADR-0012): by the exact email, or by
 /// the id of an account found by name. An email that has an account gives that account the grant at once, and one that has
 /// none is a pending invitation that attaches when the person registers. A grant is of a kind the Event has, an Operator or
-/// an Official of a role, and never a role of the Tenant or of the platform. The emails that come back are masked.
+/// an Official of a role, and never a role of the Tenant or of the platform. The emails that come back are masked. The list of
+/// the grants of an Event is in the order of the emails, or the other way round (<c>sort</c>), a page at a time.
 /// </summary>
 internal static class EventGrantEndpoints
 {
     const string EVENT_GRANTS = "event-grants";
     const string EVENT_ID = "eventId";
+    const string EMAIL = "email";
 
     public static IEndpointRouteBuilder MapEventGrants(this IEndpointRouteBuilder app)
     {
@@ -141,7 +143,7 @@ internal static class EventGrantEndpoints
         EventGrantStore grants
     )
     {
-        var query = JsonApiQuery.Read(context.Request, EVENT_ID);
+        var query = JsonApiQuery.ReadList(context.Request, EMAIL, EVENT_ID);
         if (query.Refusal != null)
         {
             return query.Refusal;
@@ -180,13 +182,25 @@ internal static class EventGrantEndpoints
         }
 
         var items = new List<(string Id, object Attributes)>();
-        foreach (var grant in await grants.ListAsync(facts.Record, context.RequestAborted))
+        var (page, hasMore) = await grants.ListAsync(
+            facts.Record,
+            query.Descending,
+            query.Skip,
+            query.Size,
+            context.RequestAborted
+        );
+        foreach (var grant in page)
         {
             var account = grant.AccountId is { } id ? await users.FindByIdAsync(id.ToString()) : null;
             items.Add((grant.Id.ToString(), AttributesOf(grant, account)));
         }
 
-        return JsonApiResults.Collection(EVENT_GRANTS, items);
+        return JsonApiResults.Collection(
+            EVENT_GRANTS,
+            items,
+            links: JsonApiPaging.Links(context.Request, query.Number, hasMore),
+            meta: JsonApiPaging.Meta(query.Size, query.Number)
+        );
     }
 
     static async Task<IResult> Remove(

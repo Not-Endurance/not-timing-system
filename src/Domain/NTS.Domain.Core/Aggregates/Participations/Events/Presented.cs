@@ -7,7 +7,7 @@ namespace NTS.Domain.Core.Aggregates.Participations.Events;
 /// representation, which is taken from the Representation request of the Phase when the time is processed: a
 /// re-presentation is still a presentation.
 /// </summary>
-public sealed class Presented : ParticipationEventBase
+public sealed class Presented : SnapshotTimeEvent
 {
     public Presented(
         Timestamp time,
@@ -16,9 +16,10 @@ public sealed class Presented : ParticipationEventBase
         SnapshotMethod method,
         DateTimeOffset? recordedAt,
         Guid? actorId,
-        Guid? id = null
+        Guid? id = null,
+        DateTimeOffset? disabledAt = null
     )
-        : base(time, outcome, method, recordedAt, actorId, id)
+        : base(time, outcome, method, recordedAt, actorId, id, disabledAt)
     {
         IsRepresent = isRepresent;
     }

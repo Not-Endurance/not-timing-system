@@ -10,15 +10,18 @@ The NTS projects follow the layering of the Not projects, except that the applic
 ### People
 
 **Athlete**:
-The human rider, recognised as the same person across Events. One half of a Combination; a Participation shows the Athlete as entered at that Event.
+The human rider, recognised as the same person across Events. One half of a Combination; a Participation shows the Athlete as entered at that Event. Two copies are one Athlete when they have the same FEI ID, or the same name once trimmed and case-folded, in either script (the Bulgarian name and its Latin form by the official transliteration are the same name), or the same legacy id other than 0; a spelling variant or a near-miss of a name is for a person to decide, a conflict (equal names under different FEI IDs) is held, and the Country and the Club never decide. An Athlete that a Participation refers to is not deleted.
 _Avoid_: Rider, competitor
 
 **Horse**:
-The equine half of a Combination, recognised as the same animal across Events. A Participation shows the Horse as entered at that Event.
+The equine half of a Combination, recognised as the same animal across Events. A Participation shows the Horse as entered at that Event. The rules that make two copies one are the Athlete's, with the FEI ID taken as the text it is; a Horse that a Participation refers to is not deleted.
+
+**Participant**:
+An Athlete or a Horse: the umbrella term for the two kinds of row of the registry (ADR-0010). A Participant is recognised across Events and Tenants, is found by name (in the script it is registered in, and in English where the row has its name in English; a signed-in account reads no more of a Participant than that name, and the FEI ID, the club and the country are for the people who set an Event up), and has a history: the Participations it was in, newest first, each with its placing. It is one half of a Combination, never the Combination itself, and never a ride.
 
 **Combination**:
-An Athlete and a Horse entered together as a single competitor, identified by a start number. This is the pair that competes — it is *not* a person, and it is *not* called a Participant.
-_Avoid_: Participant, pair, entry, competitor
+An Athlete and a Horse entered together as a single competitor, identified by a start number. This is the pair that competes — it is *not* a person, and it is *not* a Participant: each of its halves is one.
+_Avoid_: pair, entry, competitor
 
 **Official**:
 Certified personnel appointed to an event: Ground Jury, Veterinary Commission, Stewards, Technical Delegate, Foreign Judge. Officials are named in produced documents such as Results and FEI exports.
@@ -32,7 +35,7 @@ _Avoid_: Admin, superuser, sysadmin
 The one Operator of an Event who runs it from the Console: the highest authority in the Event's scope, with full access, writes included. An Event has exactly one at a time. It is the Tenant Root who created the Event until that Tenant Root assigns it to someone else, which is only possible while the Event is not yet Live; once the Event is Live only the Main Operator can hand it over, to a named account. The Main Operator links accounts to the Event's Officials and Operators.
 
 **Staff**:
-Operators and Officials together — the people who work an Event and may see how its times were recorded. Everyone else, signed in or not, sees only the recorded times.
+Operators and Officials together — the people who work an Event and may see how its times were recorded: its time events, who recorded them and when. Everyone else, signed in or not, sees only the recorded times.
 
 ### Tenancy
 
@@ -88,11 +91,11 @@ An endurance show held at one location over a span of days. Every Participation,
 _Avoid_: Competition (that is one ride within an Event)
 
 **Live Event**:
-An Event that is still running: its Console and its viewers see changes as they are recorded, and Staff may record and change times. It becomes a Historic Event at the end of its last day, and from then on changes to it are refused.
+An Event that is still running: its Console and its viewers see changes as they are recorded, and Staff may record and change times. It becomes a Historic Event at the end of its last day, and from then on changes to it are refused. Nobody is told when it ends: whoever has it open learns it from the first change that is refused, and the page they are on becomes the record of the Event where it is.
 _Avoid_: Active event, current event
 
 **Historic Event**:
-An Event that has ended, viewed as a record: nothing about it can be changed, and its Results and other produced documents can still be printed. It has no Startlist, which is about who starts next. Opening one never affects a Live Event.
+An Event that has ended, viewed as a record: nothing about it can be changed, and its Results and other produced documents can still be printed. It has no Startlist, which is about who starts next, and no Snapshot to capture. Opening one never affects a Live Event; the connection to an Event that has ended is closed when the page that shows it learns that it has.
 _Avoid_: Past event, archived event
 
 **Console**:
@@ -100,10 +103,10 @@ The Operator's workspace for configuring and running an Event: Setup, the live d
 _Avoid_: Judge, Judge app
 
 **Participation**:
-One Combination's ride at an Event — its category, phases, and outcome. A record of competing, not a competitor and not a person. The same ride can count in the Rankings of more than one Competition.
-_Avoid_: Participant, entry, run
+One Combination's ride at an Event — its category, phases, and outcome: the act of Participants competing, recorded. A record of competing, not a competitor and not a person. The same ride can count in the Rankings of more than one Competition.
+_Avoid_: entry, run
 
-> **"Participant" is not a term in this domain.** The competing pair is a **Combination**; its ride is a **Participation**. Anything named `Participant` is a misnomer to be corrected. `WitnessAccessLevel.Participant` was one such misnomer and is now `Registered` — "signed in without a write role" (see #592).
+> **A Participant is an Athlete or a Horse, not the pair and not the ride.** The competing pair is a **Combination**; its ride is a **Participation**. A thing named `Participant` that means the pair, the ride or a signed-in account is a misnomer to be corrected: `WitnessAccessLevel.Participant` was one such misnomer and is now `Registered` — "signed in without a write role" (see #592).
 
 **Ranking**:
 The Participations that compete for placement in one Competition and Category, each marked ranked or not ranked. While its Event is Live it holds no placings and Results derive them; once the Event is Historic it keeps its final placings.
@@ -132,14 +135,17 @@ A Combination presenting at the vet gate, captured as a time. Presenting again a
 A time an Official captures for a Combination, by start number, and sends in for the Event as an Arrival or a Presentation. It is an input, not part of the Participation: the server records every Snapshot as a time event on a Phase, accepted or rejected, and answers with it. The device makes its id, which is the id of the event, so that a Snapshot sent again is the same Snapshot and is recorded once.
 
 **Time event**:
-A past-tense fact recorded on a Phase — Arrived or Presented, or an Update of one — with an outcome: accepted, or rejected with a reason (including a manual reject by the Main Operator). A Phase's times are the latest accepted time event of each kind; rejected ones stay in its history. A time that breaks the order Start, Arrival, Presentation, Representation, compared among the times that exist, is rejected as an invalid time and never thrown at; a Presentation without an Arrival is legal, because a delayed Arrival looks exactly like that.
+A past-tense fact recorded on a Phase — Arrived or Presented, an Update of one, or the Main Operator's edit of the Phase form (a PhaseUpdated, which lists the several times it changed) — with an outcome: accepted, or rejected with a reason (including a manual reject by the Main Operator). A Phase's times are the latest accepted time event that lists each of them (a time that an edit cleared is listed with none); rejected ones stay in its history. A time that breaks the order Start, Arrival, Presentation, Representation, compared among the times that exist, is rejected as an invalid time and never thrown at; a Presentation without an Arrival is legal, because a delayed Arrival looks exactly like that.
 _Avoid_: Event (that is the show), phase event, snapshot event
 
 **Update**:
-Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, named by the Snapshot's id, or the Main Operator editing the Phase in the Console. It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history. It sets an absolute value, so the last one wins.
+Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, named by the Snapshot's id (an ArriveUpdated or a PresentUpdated), or the Main Operator editing the Phase in the Console (a PhaseUpdated, which lists only the times the Save changed, a cleared one as listed with none, and edits Start in place). It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history. It sets an absolute value, so the last one wins. Name the source when writing about it: a PhaseUpdated is the Phase form, a PresentUpdated is an Official's.
 
 **Disable**:
-The Main Operator negating a time event: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again. The event stays in the history and can be enabled again.
+The Main Operator negating a time event: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again, and it keeps when it was disabled. The event stays in the history and can be enabled again. Only an accepted event is disabled and only a disabled one is enabled: what the rules rejected stays as it is. The choices are made in the timeline of the Console and saved as one change.
+
+**Timeline**:
+The Console's dialog for one Participation: every time event of every Phase, in the order they were recorded, with what became of it, how it was acquired, who recorded it and when. The Main Operator chooses in it the events to disable and to enable, and saves the choice as one change; only Staff may read how times were recorded.
 
 **Change notification**:
 The signal sent to everyone viewing an Event when a Participation has been changed and saved. It names the Participation, never describes it: receivers read the Participation again.

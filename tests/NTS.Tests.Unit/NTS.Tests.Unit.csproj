@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\nugets\Not.Server\Not.Server.csproj" />
     <ProjectReference Include="..\..\src\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\..\src\NoTiming.Ui\NoTiming.Ui.csproj" />
+    <ProjectReference Include="..\..\tools\NTS.Tools\NTS.Tools.csproj" />
   </ItemGroup>
 
   <ItemGroup>

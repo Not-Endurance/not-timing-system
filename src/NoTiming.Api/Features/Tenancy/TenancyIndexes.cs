@@ -11,8 +11,9 @@ namespace NoTiming.Api.Features.Tenancy;
 /// of the same email cannot be linked to an Event twice). The others are the lookups: the grants of an account on an
 /// Event, the invitations that wait for an email, the Events a Main Operator runs, and the accounts of a Tenant, and the two
 /// that a Snapshot is recorded by (#644): the Participation of an Event with a start number, and the Participation that
-/// holds a time event, which is how a Snapshot sent again, or Updated, is found by its id. Creating an index that already
-/// exists with the same definition does nothing.
+/// holds a time event, which is how a Snapshot sent again, or Updated, is found by its id. The history of a Participant (#638)
+/// finds the Participations that copy a row of the registry by the id of the row, whatever Tenant they are in, so each of the
+/// two has an index of its own. Creating an index that already exists with the same definition does nothing.
 /// </summary>
 internal sealed class TenancyIndexes : IHostedService
 {
@@ -68,6 +69,8 @@ internal sealed class TenancyIndexes : IHostedService
                         new BsonDocument { { "EventId", 1 }, { "Combination.Number", 1 } }
                     ),
                     Index("participations_by_time_event", new BsonDocument("Phases.Events._id", 1)),
+                    Index("participations_of_an_athlete", new BsonDocument("Combination.Athlete._id", 1)),
+                    Index("participations_of_a_horse", new BsonDocument("Combination.Horse._id", 1)),
                 ],
                 cancellationToken
             );

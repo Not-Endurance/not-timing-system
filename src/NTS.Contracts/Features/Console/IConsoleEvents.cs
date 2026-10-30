@@ -12,6 +12,9 @@ public interface IConsoleEvents : IStatefulService
 {
     IReadOnlyList<ConsoleEvent> Events { get; }
 
+    /// <summary>Reads the Events again as the Api lists them now, which an Event that has ended since is told by (#631).</summary>
+    Task Refresh();
+
     /// <summary>Whether the person may make an Event in the Tenant they act in.</summary>
     bool CanCreate { get; }
 
@@ -37,6 +40,6 @@ public interface IConsoleEvents : IStatefulService
 
     Task HandOver(Guid eventId, Guid accountId);
 
-    /// <summary>The accounts of the Tenant whose name holds the text, at most ten.</summary>
+    /// <summary>The first page of the accounts of the Tenant whose name holds the words of the text, ten at most.</summary>
     Task<IReadOnlyList<AccountMatch>> FindAccounts(string text);
 }

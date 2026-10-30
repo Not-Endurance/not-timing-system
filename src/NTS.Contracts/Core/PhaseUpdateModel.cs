@@ -6,6 +6,22 @@ namespace NTS.Contracts.Core;
 
 public record PhaseUpdateModel : KrudFormModel<Phase>, IPhaseState
 {
+    /// <summary>
+    /// The input of the form that holds the time a property of <see cref="IPhaseState"/> names, which is where the form shows
+    /// what the domain says of that time; a property that no input holds is its own.
+    /// </summary>
+    public static string InputOf(string property)
+    {
+        return property switch
+        {
+            nameof(IPhaseState.StartTime) => nameof(StartTimeInput),
+            nameof(IPhaseState.ArriveTime) => nameof(ArriveTimeInput),
+            nameof(IPhaseState.PresentTime) => nameof(PresentTimeInput),
+            nameof(IPhaseState.RepresentTime) => nameof(RepresentTimeInput),
+            _ => property,
+        };
+    }
+
     public PhaseUpdateModel() { }
 
     public PhaseUpdateModel(Phase phase)
