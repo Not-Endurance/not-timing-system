@@ -1,10 +1,10 @@
-using NTS.Domain.Core.Aggregates.Participations.Events;
 using System.Net;
 using System.Text.Json;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NoTiming.Api.Features.Reference;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Objects;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;

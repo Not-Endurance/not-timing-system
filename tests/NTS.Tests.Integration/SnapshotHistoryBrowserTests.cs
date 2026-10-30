@@ -1,7 +1,7 @@
-using NTS.Domain.Core.Aggregates.Participations.Events;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Microsoft.Playwright;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Enums;
 using NTS.Tests.Integration.Infrastructure;
 using static NTS.Tests.Integration.Infrastructure.UiBrowser;

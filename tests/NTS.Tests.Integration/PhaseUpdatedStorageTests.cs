@@ -1,11 +1,11 @@
 using MongoDB.Bson;
-using NTS.Domain.Core.Aggregates.Participations.Events;
 using Newtonsoft.Json;
 using Not.Serialization.JSON;
 using NoTiming.Api.JsonApi;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Nexus.HTTP.Mongo;
