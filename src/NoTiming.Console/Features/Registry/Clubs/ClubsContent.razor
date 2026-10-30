@@ -1,0 +1,21 @@
+@using NTS.Domain.Setup.Aggregates
+@using Not.Krud.Blazor.Components
+
+@attribute [Route(CLUBS_PAGE)]
+@inherits ClubsContentBehind
+
+<NContent Title="@Configure_Clubs_string" IsLoading="@IsLoading">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="GoHome" />
+            </MudStack>
+
+            <KrudList T="Club" TModel="ClubFormModel" TShell="ClubShell" Name="@Clubs_string"
+                      UpdateRoute="@CLUB_PAGE" ReadOnly="@ReadOnly" NoScroll />
+        </MudStack>
+    </Main>
+
+</NContent>

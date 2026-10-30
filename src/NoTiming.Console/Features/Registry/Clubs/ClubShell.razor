@@ -1,0 +1,10 @@
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+
+@inherits ClubShellBehind
+
+<KrudForm Shell="this" AdditionalContent="AdditionalContent" DisableBack>
+    <FormFields>
+        <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+    </FormFields>
+</KrudForm>

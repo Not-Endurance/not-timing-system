@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Storage.Mongo;
-using NTS.Application.Contracts.Setup;
-using NTS.Application.Contracts.Setup.Models;
+using NTS.Contracts.Setup;
+using NTS.Contracts.Setup.Models;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -43,8 +43,8 @@ public class ClubFunctions : CrudFunctions<ClubModel>
 
     [Function("clubs-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "clubs/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "clubs/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Delete));
@@ -66,8 +66,8 @@ public class ClubFunctions : CrudFunctions<ClubModel>
 
     [Function("clubs-get-one")]
     public async Task<IActionResult> GetOne(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(GetOne));

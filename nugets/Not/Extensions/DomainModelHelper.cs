@@ -1,6 +1,4 @@
-﻿using Not.Random;
-
-namespace Not.Extensions;
+﻿namespace Not.Extensions;
 
 public static class DomainModelHelper
 {
@@ -8,10 +6,5 @@ public static class DomainModelHelper
     {
         var sections = values.Where(x => x != null);
         return string.Join(" | ", sections);
-    }
-
-    public static int GenerateId()
-    {
-        return RandomHelper.GenerateUniqueInteger();
     }
 }

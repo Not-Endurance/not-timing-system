@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
-using NTS.Application.Contracts.Setup;
-using NTS.Application.Contracts.Setup.Models;
+using NTS.Contracts.Setup;
+using NTS.Contracts.Setup.Models;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -55,8 +55,8 @@ public class ConfigureEventFunctions : FunctionBase
 
     [Function("configure-event-query-by-id")]
     public async Task<IActionResult> QueryById(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "configure-event/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "configure-event/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(QueryById));
@@ -83,8 +83,8 @@ public class ConfigureEventFunctions : FunctionBase
 
     [Function("configure-event-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "configure-event/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "configure-event/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Delete));

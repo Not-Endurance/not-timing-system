@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Dialogs.Abstractions;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.Socket;
+using NTS.Contracts.Core;
+using NTS.Contracts.Core.Models;
+using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 
-namespace NTS.Blazor.Components.SelectEvents;
+namespace NoTiming.Ui.Components.SelectEvents;
 
 public class SelectEventDialogBehind : NDialog
 {
@@ -24,7 +24,7 @@ public class SelectEventDialogBehind : NDialog
     {
         try
         {
-            Events = await EventInformationService.GetActive();
+            Events = await EventInformationService.GetLive();
         }
         catch (Exception ex)
         {

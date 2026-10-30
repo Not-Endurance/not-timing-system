@@ -13,7 +13,7 @@ public abstract class InLineEntityValidator
     protected T NotDefault<T>(string field, T value)
         where T : struct
     {
-        if (value.Equals(default))
+        if (value.Equals(default(T)))
         {
             throw GetRequiredException(field);
         }

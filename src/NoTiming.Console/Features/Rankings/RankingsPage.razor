@@ -1,0 +1,37 @@
+@using NoTiming.Ui.Components.Rankings.Menu
+@using NoTiming.Ui.Components.Results
+@using Not.Blazor.Components.Print
+
+@inherits RankingsPageBehind
+
+<NContent Title="@Ranklist_string" IsLoading="@IsLoading" IsEmpty="@(!IsLoading && Document == null)" EmptyMessage="@Rankings_list_empty_message_string">
+
+    <Main>
+        @if (Document != null)
+        {
+            <ResultComponent Document="Document" LeftLogo="@LeftLogo" RightLogo="@RightLogo" />
+        }
+    </Main>
+
+    <Rightbar>
+        <MudStack Spacing="3" data-testid="console-rankings-panel">
+            <NPrintPanel @bind-Scale="PrintFontScale" Actions="@PrintActions" Disabled="@(!CanPrint)" />
+
+            <NButtonPrimary OnClick="ExportForTheFei"
+                            Text="@Export_FEI_string"
+                            StartIcon="@Icons.Material.Filled.ImportExport"
+                            Disabled="@(!CanExport)" />
+
+            @if (CanChange)
+            {
+                <NButtonSecondary OnClick="OpenCustomRankingDialog" Text="@Custom_ranking_string" StartIcon="@Icons.Material.Filled.Add" />
+            }
+
+            <RankingMenu Rankings="Ranked"
+                         Selected="CurrentRanking"
+                         OnSelectedSafe="SelectRanking"
+                         OnDeleteSafe="OnDelete" />
+        </MudStack>
+    </Rightbar>
+
+</NContent>

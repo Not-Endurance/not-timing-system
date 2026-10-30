@@ -1,0 +1,58 @@
+# One web app replaces Judge and Witness, and the API is its only door
+
+Status: proposed
+
+Judge is a Windows executable (MAUI Blazor Hybrid) with no sign-in, Witness is a Blazor WebAssembly app behind MSAL, and behind them sit an Azure Functions REST API and a separate SignalR host. The two apps share most of their code through six projects, but each has its own shell, navigation, installer or hosting, release and localization, and the Judge surface reaches the backend anonymously (ADR-0003). We decided that NoTiming is one product: `NoTiming.Api`, one ASP.NET Core host that serves REST, sign-in, the hub and the UI, and `NoTiming.Ui`, one Blazor WebAssembly app with a Console for the Main Operator, a Snapshot page for Staff and the public viewer pages. Judge and Witness, along with MAUI, Azure Functions, Warp, Nexus and Static Web Apps, are retired from the code and from the product. Every project moves to .NET 10. The API is the only door to the data: every route requires a signed-in caller unless it belongs to the explicit public-read allowlist (ADR-0001, ADR-0012).
+
+## What follows from it
+
+**Two projects, one origin.** `NoTiming.Api` hosts `NoTiming.Ui` and serves the sign-in pages as static server-rendered pages (passkeys and cookie session, ADR-0002); everything else runs in the browser. There is no CORS and no second host to share a key ring with. The Api references the Ui to serve it and the Ui never references the Api, so the project graph keeps them apart and they can be deployed separately later.
+
+**The Console runs in WebAssembly too.** Judge is already a thin client over REST and a hub, so it moves almost as it is and its state is a cache of what the server stores. The Console's pages load on demand, so a phone that only follows an Event does not download them.
+
+**Seven projects instead of twenty on the NTS side.** `NTS` (localization), `NTS.Domain` (shared, now with Tenant and the account), `NTS.Domain.Setup`, `NTS.Domain.Core` (which absorbs `NTS.Domain.Watcher`), `NTS.Contracts` (the four contracts projects merged) and the two hosts. `NTS.Application`, `NTS.Storage` and `NTS.Client` go: the view services and REST repositories move into the Ui, the server logic and the Mongo wiring into the Api, and tests reference the Ui project directly. The client repositories move at the foundation; `NTS.Application` stays a library until the Functions API retires, because that API still uses it. The layering that those assemblies enforced is kept as folders in the Api and by the project graph. Among the `Not.*` libraries, `Not.MAUI` and the empty `Not.Tests` are deleted, `Not.Blazor.Client` folds into `Not.Blazor`, and `Not.Server` loses the Playwright renderer, the JWT validation and OpenID Connect and stays as the home of the identity library of ADR-0002. The `NTS.*` prefix stays for the surviving libraries.
+
+**.NET 10 everywhere, in two steps.** ADR-0002 moved only the leaf apps because MAUI Judge consumed the shared libraries. Judge leaves first, so the hosts and the tests move to .NET 10 at once. The Functions API is then the last consumer holding the libraries on .NET 8: managed Functions cannot run on .NET 10 (ADR-0003) and a .NET 8 project cannot reference .NET 10 ones, so the libraries move in one pass when that API is retired. .NET 8 and 9 leave support on 10 November 2026.
+
+**Browser print only.** The PDF and ZIP print endpoints and the Playwright renderer are deleted; the Console prints through the browser, which Judge already does in production.
+
+**One cutover.** The MAUI Judge has no login, so it can never call an authorized API. It keeps using the legacy anonymous Functions API until a single cutover that applies every data migration, swaps in the new hosts and retires the Functions API and the desktop executable together. No installed build needs a new address, which removes the cutover cost ADR-0003 accepted. The exposure of the legacy API stays what it is today until then (#593).
+
+**Tests host the Api in-process.** The integration fixture starts the Api with `WebApplicationFactory`, the Judge and Witness drivers merge into one, and `func`, Azurite, Node and Playwright leave the suite and its workflow. The environment-gated test-token path in the production host is deleted; tests authenticate through a scheme registered in the test project.
+
+## Considered options
+
+**Keep two apps and share more.** Still two shells, two navigations and two sets of localized text, and Judge stays outside authorization.
+
+**Blazor Server for the Console, WebAssembly for everything else.** Shared views then need two data paths (in-process for Judge, HTTP for Witness) or Judge calls its own API over loopback, which means carrying the user's cookie into a circuit. A deploy kills every circuit. Judge is already a thin client, so WebAssembly is the smaller change. The door stays open: `IRepository<T>` is the seam, and the Console could move to a server circuit later if a concrete pain shows up.
+
+**Blazor Server for everything.** A circuit per viewer on phones that background constantly, which is the failure ADR-0002 cites against MSAL, and it makes the JSON:API layer serve nobody.
+
+**Interactive Auto.** The first visit of every phone opens a circuit, which is the load that cannot be predicted, and component state resets when it hands over to WebAssembly.
+
+**Keep `NTS.Application`, `NTS.Storage` and `NTS.Client`.** Each would have one consumer; the boundary they enforce costs more than it protects here.
+
+**Keep Functions, or a Function App.** Rejected in ADR-0003 for the same reasons: runtime support, no static address for the Atlas access list, a second deployable.
+
+## Consequences
+
+ADR-0003 is superseded: no anonymous Judge route group is ever built. ADR-0002 is amended: the .NET scope, and the reason the hubs must share a process (it was Judge's in-memory connection, ADR-0013). REST and the hub stay in one process and single-instance until a hub backplane exists.
+
+Phones that follow an Event download the shared Ui bundle; a spike sizes it with the Console loaded on demand. #645 measured it: 8.29 MB as Brotli over 180 files for the viewers' app, which a test holds under 9 MB, and the Console's pages are kept out of it by a seam (the first segment of a path names the assemblies fetched when a person goes there) that the Console ticket fills. Ranking, FEI export and Results rendering run in WebAssembly instead of natively, on Event-sized data; any step that proves slow moves behind the API. A Console tab survives a server restart, because its state is in the browser and the hub reconnects.
+
+Judge and Witness stop existing as names: the remaining wording in ADRs, the glossary, routes, resource strings and the integration tests follows `CONTEXT.md` (Console, Snapshot), one ticket at a time.
+
+Any endpoint this decision adds or changes follows `.claude/skills/rest-api/SKILL.md` (ADR-0008).
+
+## Readings made when the Console was built (#646)
+
+The Console is the pages under `/console` (`src/NoTiming.Console`), the services they inject (`src/NoTiming.Ui/Features/Console`) and the ports of those services (`src/NTS.Contracts/Features/Console`). These are the readings.
+
+- **The services are in the Ui, and the pages are in the Console.** The container is built before the Console is fetched, so a service that a Console page injects is registered in the Ui, the usual way; the Console holds pages, components and what needs no container (the FEI export, the print requests, the links of an Event, the sheet of the Startlist). What both share lives below them, in `NTS.Blazor`. Each page of an Event asks the Api what the person may do about that Event (`GET /api/events/{id}/capabilities`) and offers no more: the Ui keeps no rule of its own about who may.
+- **Only the Main Operator reaches the Console that runs an Event.** A Tenant Root who assigned the role away, an Operator, an Official and the Developer see the Events the Api lists to them and are shown nothing of the dashboard, the Handouts, the Startlist, the logos or the Setup of an Event they do not run (a test shows each, for every page). A Tenant Root reads the Results of every Event of its Tenant and makes Events; a person who is not one is not offered the federation's rules.
+- **A write the Api refuses is said once, in the Api's words.** The repositories the Console writes through are silent (`ConsoleParticipationWrites`, `ConsoleRankingWrites`, `ConsoleHandoutWrites`): the service reads what the Api answered, reads the row again so that what is shown is what is stored, and throws a domain error that the form that asked shows and keeps what was typed in. A change to a Participation carries the version it was read at (ADR-0013); on 409 `participation-changed` the Participation is read again and the person is told, and the form is sent again over what is there now. The time of a request (an Inspection asked for now) is the time of the server, from the `Date` of its answers (`IServerClock`): no route says it.
+- **Printing is the browser's, in the Console too.** A document is rendered by the page into a frame of its own that the browser prints (`NPrintClientSettings.BypassBackendPrinting`), so nothing is sent to a print server and a PDF is the person's choice of printer. The FEI export is a file the browser downloads. The ZIP of the PDFs of every Result, which Judge made on a server, is not brought over: it is a print job for each Ranking. The logos of the federation or of the Event are put into the document as `data:` URLs.
+- **A Handout is the id of a Participation.** Nothing tells the Console that a Phase completed, so a page that watches (the dashboard and the Handouts page) reads the change of the store and makes the Handout of each Participation that has a Phase complete that it did not have when the page opened; the last Phase has none. Under the id of the Participation two tabs make the one Handout and one made by hand is the same. A Handout is therefore made while a page of the Console that watches is open, and by hand otherwise; making it on the server from `PhaseCompleted` would not depend on a Console being open, and is open for the owner.
+- **The registry warns of an exact copy.** Creating or renaming an Athlete or a Horse whose name (trimmed, collapsed, case-folded, in either script) or FEI ID (an Athlete's as a number) is a row's of this Tenant, or of another that the cross-tenant search finds by the name, says so and names the row; it does not stop the person. The spelling variants and the near-misses of ADR-0010 are for the matching service of #635, which replaces this check.
+- **What Judge did and the Console does not.** The settings page (the country comes from the Tenant, the language from the account), the local file browser for logos (a file is uploaded to the Api), the page of the Android download, the window title and splash of the desktop app, the ZIP of PDFs, the history of the Startlist of an Event that is over (a Historic Event shows no Startlist, ADR-0007) and the page of an Operator (an Operator is linked to an account by its email, on the Setup of the Event).
+- **First load.** The app is 8.37 MB over 183 files for a viewer, against 8.29 MB over 180 when #645 measured it: what the Console adds to the first load is its services and ports (they are in the Ui) and its text in three languages, about 0.08 MB; the pages are 76 KB in a file a viewer never fetches. The test holds the ceiling of 9 MB.

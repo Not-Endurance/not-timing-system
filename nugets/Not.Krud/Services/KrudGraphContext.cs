@@ -31,6 +31,15 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
 
     protected T Aggregate => (T)_graph!.Root!.Value!;
 
+    /// <summary>
+    /// Completes when what was changed in the graph has been saved: a change is saved after the call that made it returns, so
+    /// a page that reads the aggregate again waits for this first, or it reads what was stored before the change.
+    /// </summary>
+    public Task Settled()
+    {
+        return _coalescedCommit.WhenIdle();
+    }
+
     public void SetParent(object aggregate)
     {
         GuardHelper.ThrowIfDefault(_graph?.Root);
@@ -73,7 +82,7 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
         }
 
         var pending = new Queue<Entity>();
-        var seen = new HashSet<(Type Type, int Id)>();
+        var seen = new HashSet<(Type Type, Guid Id)>();
         pending.Enqueue(principal);
         seen.Add((principal.GetType(), principal.Id));
 
@@ -81,7 +90,7 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
         while (pending.Count > 0)
         {
             var current = pending.Dequeue();
-            var updatedDependents = new HashSet<(Type Type, int Id)>();
+            var updatedDependents = new HashSet<(Type Type, Guid Id)>();
 
             foreach (var usage in ResolveUsages(root, current))
             {

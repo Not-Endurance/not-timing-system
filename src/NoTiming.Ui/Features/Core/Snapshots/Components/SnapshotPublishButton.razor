@@ -1,0 +1,6 @@
+@using Not.Blazor.Components.Buttons
+@inherits SnapshotPublishButtonBehind
+
+<NDropdownButton Descriptors="@PublishDescriptors"
+                 Disabled="@(CapturedSnapshotsCount == 0 || !CanWrite)"
+                 MaxWidth />

@@ -1,4 +1,37 @@
 /* Backdrop */
+.n-backdrop-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: auto;
+    height: auto;
+    max-width: min(70%, 24rem);
+    transform: translate(-50%, -50%);
+    object-fit: contain;
+    opacity: 0.04;
+    filter: saturate(0.85) contrast(1.06) brightness(1.04);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+}
+
+.n-exception-handler-content {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 22rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 2rem;
+    text-align: center;
+}
+
+.n-exception-handler-content__content {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 34rem);
+}
+
 .n-application-backdrop {
     position: fixed;
     top: 50%;
@@ -76,6 +109,10 @@
     .n-application-backdrop {
         width: 94vw;
         max-height: 74vh;
+    }
+
+    .n-exception-handler-content {
+        padding: 1.25rem;
     }
 }
 

@@ -2,14 +2,30 @@ using Testcontainers.MongoDb;
 
 namespace NTS.Tests.Integration.Infrastructure;
 
+/// <summary>
+/// MongoDB in a container and the legacy Functions API as a child process, until the Functions API is retired (#647),
+/// next to the Api in this process on a real loopback port.
+/// </summary>
 public sealed class NtsIntegrationFixture : IAsyncLifetime
 {
     MongoDbContainer? _mongo;
-    NexusHttpProcess? _nexusHttp;
-    WarpProcess? _warp;
+    FunctionsHttpProcess? _functionsHttp;
+    ApiFactory? _api;
 
-    public Uri NexusBaseUrl => _nexusHttp?.BaseUrl ?? throw new InvalidOperationException("Nexus HTTP is not started.");
-    public Uri WarpBaseUrl => _warp?.BaseUrl ?? throw new InvalidOperationException("Warp is not started.");
+    /// <summary>The Api, for a test that signs a person in at it.</summary>
+    internal ApiFactory Api => _api ?? throw new InvalidOperationException("The Api is not started.");
+
+    /// <summary>The services of the Api, for a test that stands in for what the Api does after a write.</summary>
+    internal IServiceProvider ApiServices => Api.Services;
+
+    /// <summary>The clock of the Api, which a scenario moves forward to let an Event end (ADR-0007).</summary>
+    public OffsetTimeProvider Clock { get; } = new();
+
+    public string MongoConnectionString =>
+        _mongo?.GetConnectionString() ?? throw new InvalidOperationException("MongoDB is not started.");
+    public Uri FunctionsBaseUrl =>
+        _functionsHttp?.BaseUrl ?? throw new InvalidOperationException("The Functions API is not started.");
+    public Uri ApiBaseUrl => _api?.BaseAddress ?? throw new InvalidOperationException("The Api is not started.");
 
     public async Task InitializeAsync()
     {
@@ -17,23 +33,35 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
         _mongo = new MongoDbBuilder().WithImage("mongo:6.0").Build();
         await _mongo.StartAsync();
 
-        _nexusHttp = new NexusHttpProcess(paths, PortAllocator.GetFreeTcpPort(), _mongo.GetConnectionString());
-        await _nexusHttp.Start();
+        _functionsHttp = await PortAllocator.StartOnAFreePort(async port =>
+        {
+            var host = new FunctionsHttpProcess(paths, port, _mongo.GetConnectionString());
+            try
+            {
+                await host.Start();
+                return host;
+            }
+            catch
+            {
+                await host.DisposeAsync();
+                throw;
+            }
+        });
 
-        _warp = new WarpProcess(paths, PortAllocator.GetFreeTcpPort(), _mongo.GetConnectionString());
-        await _warp.Start();
+        _api = new ApiFactory(_mongo.GetConnectionString(), kestrel: true, time: Clock);
+        _ = _api.BaseAddress; // starts the host
     }
 
     public async Task DisposeAsync()
     {
-        if (_warp != null)
+        if (_api != null)
         {
-            await _warp.DisposeAsync();
+            await _api.DisposeAsync();
         }
 
-        if (_nexusHttp != null)
+        if (_functionsHttp != null)
         {
-            await _nexusHttp.DisposeAsync();
+            await _functionsHttp.DisposeAsync();
         }
 
         if (_mongo != null)

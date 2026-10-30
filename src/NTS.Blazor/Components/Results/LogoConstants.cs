@@ -1,4 +1,4 @@
-namespace NTS.Blazor.Components.Results;
+namespace NoTiming.Ui.Components.Results;
 
 public static class LogoConstants
 {

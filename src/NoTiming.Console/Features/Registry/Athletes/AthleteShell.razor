@@ -1,0 +1,25 @@
+@using NTS.Domain.Aggregates
+@using NTS.Domain.Setup.Aggregates
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+
+@inherits AthleteShellBehind
+
+<KrudForm Shell="this" AdditionalContent="AdditionalContent" DisableBack>
+    <FormFields>
+
+        <NTextField @bind-Value="Model.Name" @bind-Value:after="Check" For="() => Model.Name" Label="@Name_string" />
+
+        <NTextField @bind-Value="Model.NameEnglish" @bind-Value:after="Check" For="() => Model.NameEnglish" Label="@Name_in_English_string" />
+
+        <NTextField @bind-Value="Model.FeiId" @bind-Value:after="Check" For="() => Model.FeiId" Label="@FEI_ID_string" />
+
+        <NAutocomplete T="Country" @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountriesSafe" />
+
+        <NAutocomplete T="Club" @bind-Value="Model.Club" For="() => Model.Club" Label="@Club_string" SearchSafe="SearchClubsSafe"
+                       DebounceInterval="SEARCH_DEBOUNCE_MILLISECONDS" />
+
+        <SameRowsAlert Rows="Same" />
+
+    </FormFields>
+</KrudForm>

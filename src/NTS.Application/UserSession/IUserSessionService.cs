@@ -1,13 +1,13 @@
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Watcher;
+using NTS.Contracts.Watcher;
+using NTS.Contracts.Watcher.Models;
+using NTS.Domain.Core.Objects.Snapshots;
 
 namespace NTS.Application.UserSession;
 
 public interface IWitnessUserSession
 {
     Task<NtsUserSessionStateModel?> GetCurrent();
-    Task SetEventId(int? eventId);
+    Task SetEventId(Guid? eventId);
     Task AppendSnapshot(SnapshotGroup snapshot);
     Task ReplaceSnapshotSelections(IReadOnlyCollection<Snapshot> snapshots);
     Task DeleteCurrent();

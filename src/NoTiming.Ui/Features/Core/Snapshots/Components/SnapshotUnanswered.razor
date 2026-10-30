@@ -1,0 +1,9 @@
+@using MudBlazor
+@inherits SnapshotUnansweredBehind
+
+@if (Count > 0)
+{
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" data-testid="snapshots-waiting">
+        @string.Format(Snapshots_waiting_to_be_sent_string, Count)
+    </MudAlert>
+}

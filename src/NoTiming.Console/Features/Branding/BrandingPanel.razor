@@ -1,0 +1,32 @@
+@using NTS.Contracts.Branding
+@inherits BrandingPanelBehind
+
+<MudStack Spacing="3" data-testid="console-branding">
+
+    <MudText Typo="Typo.h6">@Logos_string</MudText>
+
+    <MudText Typo="Typo.body2">@Hint</MudText>
+
+    <NGrid>
+        <MudItem xs="12" md="6">
+            <LogoPanel TestId="logo-left"
+                       Title="@Left_logo_string"
+                       Logo="Current.Left"
+                       CanEdit="CanEdit"
+                       RemoveText="@RemoveText"
+                       OnChosen="@(file => Choose(LogoPosition.Left, file))"
+                       OnRemoved="@(() => Remove(LogoPosition.Left))" />
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <LogoPanel TestId="logo-right"
+                       Title="@Right_logo_string"
+                       Logo="Current.Right"
+                       CanEdit="CanEdit"
+                       RemoveText="@RemoveText"
+                       OnChosen="@(file => Choose(LogoPosition.Right, file))"
+                       OnRemoved="@(() => Remove(LogoPosition.Right))" />
+        </MudItem>
+    </NGrid>
+
+</MudStack>

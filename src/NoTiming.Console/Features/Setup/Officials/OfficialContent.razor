@@ -1,0 +1,17 @@
+@attribute [Route(OFFICIAL_PAGE)]
+@inherits OfficialContentBehind
+
+<NContent Title="@Configure_Official_string" IsEmpty="Model == null">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="@(() => GoBack())" />
+            </MudStack>
+
+            <OfficialShell Model="Model" ReadOnly="@ReadOnly" />
+        </MudStack>
+    </Main>
+
+</NContent>

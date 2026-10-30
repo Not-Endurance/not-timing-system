@@ -1,0 +1,17 @@
+@attribute [Route(CLUB_PAGE)]
+@inherits ClubContentBehind
+
+<NContent Title="@Configure_Club_string" IsEmpty="Model == null">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="@(() => GoBack())" />
+            </MudStack>
+
+            <ClubShell Model="Model" ReadOnly="@ReadOnly" />
+        </MudStack>
+    </Main>
+
+</NContent>

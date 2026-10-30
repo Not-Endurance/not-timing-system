@@ -1,4 +1,4 @@
-﻿namespace NTS.Blazor.Constants;
+﻿namespace NoTiming.Ui.Constants;
 
 public static class Masks
 {

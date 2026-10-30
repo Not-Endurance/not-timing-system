@@ -22,7 +22,7 @@ public abstract class HttpCache<T> : ICache<T>
         return await _repository.ReadMany();
     }
 
-    public async Task<T?> Get(int id)
+    public async Task<T?> Get(Guid id)
     {
         return await List().FirstOrDefault(x => x.Id == id);
     }

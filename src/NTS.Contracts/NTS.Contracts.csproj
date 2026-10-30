@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Bson" Version="3.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\nugets\Not.Application\Not.Application.csproj" />
+    <ProjectReference Include="..\..\nugets\Not.Krud\Not.Krud.csproj" />
+    <ProjectReference Include="..\Domain\NTS.Domain.Setup\NTS.Domain.Setup.csproj" />
+    <ProjectReference Include="..\Domain\NTS.Domain.Core\NTS.Domain.Core.csproj" />
+  </ItemGroup>
+
+</Project>

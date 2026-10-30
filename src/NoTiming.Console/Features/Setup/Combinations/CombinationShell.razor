@@ -1,0 +1,17 @@
+@using NTS.Domain.Setup.Aggregates
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+
+@inherits CombinationShellBehind
+
+<KrudForm Shell="this" AdditionalContent="AdditionalContent" DisableBack>
+    <FormFields>
+        <NNumberField @bind-Value="Model.Number" For="() => Model.Number" Min="0" Label="@Combination_Number_string" />
+
+        <NAutocomplete T="Athlete" @bind-Value="Model.Athlete" For="() => Model.Athlete" Label="@Athlete_string"
+                       SearchSafe="SearchAthletesSafe" DebounceInterval="SEARCH_DEBOUNCE_MILLISECONDS" />
+
+        <NAutocomplete T="Horse" @bind-Value="Model.Horse" For="() => Model.Horse" Label="@Horse_string"
+                       SearchSafe="SearchHorsesSafe" DebounceInterval="SEARCH_DEBOUNCE_MILLISECONDS" />
+    </FormFields>
+</KrudForm>

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Storage.Mongo;
-using NTS.Application.Contracts.Core.Models;
+using NTS.Contracts.Core.Models;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -42,8 +42,8 @@ public class RankingFunctions : CrudFunctions<RankingModel>
 
     [Function("rankings-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "rankings/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "rankings/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Delete));
@@ -65,8 +65,8 @@ public class RankingFunctions : CrudFunctions<RankingModel>
 
     [Function("rankings-read")]
     public async Task<IActionResult> Read(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rankings/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rankings/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Read));

@@ -1,17 +1,15 @@
 ﻿using Not.Domain;
 using NTS.Domain.Enums;
-using NTS.Domain.Settings;
 
 namespace NTS.Domain.Aggregates;
 
 public class Setting : Aggregate
 {
-    public Setting(Country? country, DetectionMode? detectionMode, int? id = null)
+    public Setting(Country? country, DetectionMode? detectionMode, Guid? id = null)
         : base(id)
     {
         Country = Required(nameof(Country), country);
         DetectionMode = detectionMode;
-        StaticSettings.Instance = this;
     }
 
     // TODO: Keep Id on Profile level, decouple settings

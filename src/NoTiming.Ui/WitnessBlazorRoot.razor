@@ -1,0 +1,36 @@
+@using NoTiming.Ui.Layout
+@using NoTiming.Ui.Features.Account
+@using Not.Blazor.Components.Exceptions
+
+@inherits WitnessBlazorRootBehind
+
+<NExceptionHandlerErrorBoundary>
+    <ChildContent>
+        <Router AppAssembly="@Assembly" AdditionalAssemblies="@LazyAssemblies.Loaded" OnNavigateAsync="LoadAssembliesFor">
+
+            <Found Context="routeData">
+
+                <AccountRouteGate RouteData="@routeData">
+                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                </AccountRouteGate>
+
+                <FocusOnNavigate RouteData="@routeData" Selector=".n-route-focus-target" />
+
+            </Found>
+
+            <NotFound>
+
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">@Sorry_theres_nothing_at_this_address_string</p>
+                </LayoutView>
+
+            </NotFound>
+        </Router>
+    </ChildContent>
+
+    <ErrorContent>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <NExceptionHandlerContent />
+        </LayoutView>
+    </ErrorContent>
+</NExceptionHandlerErrorBoundary>

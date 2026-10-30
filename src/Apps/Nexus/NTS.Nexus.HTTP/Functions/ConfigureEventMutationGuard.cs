@@ -1,14 +1,14 @@
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
-using NTS.Application.Contracts.Core.Models;
+using NTS.Contracts.Core.Models;
 
 namespace NTS.Nexus.HTTP.Functions;
 
 public interface IConfigureEventMutationGuard
 {
-    Task EnsureCanMutate(int configureEventId);
-    Task EnsureCanMutate(IEnumerable<int> configureEventIds);
+    Task EnsureCanMutate(Guid configureEventId);
+    Task EnsureCanMutate(IEnumerable<Guid> configureEventIds);
 }
 
 public class ConfigureEventMutationGuard : IConfigureEventMutationGuard, ITransient
@@ -20,10 +20,12 @@ public class ConfigureEventMutationGuard : IConfigureEventMutationGuard, ITransi
         _eventInformation = eventInformation;
     }
 
-    public async Task EnsureCanMutate(int configureEventId)
+    public async Task EnsureCanMutate(Guid configureEventId)
     {
-        var activeEvent = await _eventInformation.Read(x => x.Id == configureEventId && x.IsActive);
-        if (activeEvent == null)
+        // A Setup is frozen from the day its Event starts, which is the day a Core document of the Event exists: the
+        // Console works on the copies the Event made, and the Event is reset to be configured again (ADR-0012).
+        var startedEvent = await _eventInformation.Read(x => x.Id == configureEventId);
+        if (startedEvent == null)
         {
             return;
         }
@@ -31,7 +33,7 @@ public class ConfigureEventMutationGuard : IConfigureEventMutationGuard, ITransi
         throw new DomainException($"Cannot mutate configure event '{configureEventId}' because the event is started.");
     }
 
-    public async Task EnsureCanMutate(IEnumerable<int> configureEventIds)
+    public async Task EnsureCanMutate(IEnumerable<Guid> configureEventIds)
     {
         foreach (var configureEventId in configureEventIds.Distinct())
         {

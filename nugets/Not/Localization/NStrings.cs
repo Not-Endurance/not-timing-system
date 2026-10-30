@@ -16,6 +16,8 @@ public static class NStrings
     public static string X_string => LocalizeString("X");
     public static string Create_string => LocalizeString(nameof(Create_string));
     public static string Back_string => LocalizeString(nameof(Back_string));
+    public static string Home_string => LocalizeString(nameof(Home_string));
+    public static string Reload_string => LocalizeString(nameof(Reload_string));
     public static string Update_string => LocalizeString(nameof(Update_string));
     public static string Updated_string => LocalizeString(nameof(Updated_string));
     public static string Delete_string => LocalizeString(nameof(Delete_string));
@@ -55,6 +57,8 @@ public static class NStrings
     public static string Sign_in_with_Microsoft_string => LocalizeString(nameof(Sign_in_with_Microsoft_string));
     public static string Register_string => LocalizeString(nameof(Register_string));
     public static string Confirm_action_string => LocalizeString(nameof(Confirm_action_string));
+    public static string Try_to_Reload_in_order_to_proceed_string =>
+        LocalizeString(nameof(Try_to_Reload_in_order_to_proceed_string));
 
     public static string? Validation_errors_string => LocalizeString(nameof(Validation_errors_string));
 }

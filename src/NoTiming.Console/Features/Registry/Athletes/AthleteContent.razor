@@ -1,0 +1,17 @@
+@attribute [Route(ATHLETE_PAGE)]
+@inherits AthleteContentBehind
+
+<NContent Title="@Configure_Athlete_string" IsEmpty="Model == null">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="@(() => GoBack())" />
+            </MudStack>
+
+            <AthleteShell Model="Model" ReadOnly="@ReadOnly" />
+        </MudStack>
+    </Main>
+
+</NContent>

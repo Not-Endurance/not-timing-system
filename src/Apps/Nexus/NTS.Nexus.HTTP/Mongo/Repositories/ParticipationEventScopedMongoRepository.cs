@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
+using NTS.Contracts.Core;
+using NTS.Contracts.Core.Models;
 using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
@@ -31,7 +31,6 @@ public class ParticipationEventScopedMongoRepository : EventScopedMongoRepositor
                 .Set(x => x.Competition, document.Competition)
                 .Set(x => x.Combination, document.Combination)
                 .Set(x => x.Phases, document.Phases)
-                .Set(x => x.Total, document.Total)
                 .Set(x => x.EventId, document.EventId)
                 .Set(x => x.Eliminated, document.Eliminated);
         }

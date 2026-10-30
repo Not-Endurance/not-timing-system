@@ -1,24 +1,17 @@
 using System.Reflection;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application;
 using Not.Application.HTTP;
 using Not.Injection;
-using Not.Krud.Abstractions;
 using NTS.Application.Arrivelists;
-using NTS.Application.Contracts.Arrivelists;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.PastEvents;
-using NTS.Application.Contracts.Presentlists;
-using NTS.Application.Contracts.Startlists;
 using NTS.Application.Core;
-using NTS.Application.PastEvents;
 using NTS.Application.Presentlists;
 using NTS.Application.Startlists;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
+using NTS.Contracts.Arrivelists;
+using NTS.Contracts.Core;
+using NTS.Contracts.Presentlists;
+using NTS.Contracts.Startlists;
 
 namespace NTS.Application;
 
@@ -49,47 +42,12 @@ public static class NtsApplicationServices
 
         public Builder AddSharedCoreDomainServices()
         {
-            _services.Add<IEventInformationService, IActiveEventsContext, EventInformationService>(
+            _services.Add<IEventInformationService, ILiveEventsContext, EventInformationService>(
                 ServiceLifetime.Scoped
             );
-            _services.Add<IPastEventService, IPastEventContext, IKrudListBehind<EventInformation>, PastEventService>(
-                ServiceLifetime.Scoped
-            );
-            _services.Add<
-                IArrivelistService,
-                INotificationHandler<ParticipationArrived>,
-                INotificationHandler<PhaseCompleted>,
-                INotificationHandler<ParticipationRestored>,
-                INotificationHandler<ParticipationEliminated>,
-                INotificationHandler<EventConnected>,
-                ArrivelistService
-            >(ServiceLifetime.Scoped);
-            _services.AddScoped<INotificationHandler<EventDisconnected>>(x =>
-                x.GetRequiredService<ArrivelistService>()
-            );
-            _services.Add<
-                IPresentlistService,
-                INotificationHandler<ParticipationArrived>,
-                INotificationHandler<PhaseCompleted>,
-                INotificationHandler<InspectionRequired>,
-                INotificationHandler<RepresentationRequired>,
-                INotificationHandler<ParticipationRestored>,
-                INotificationHandler<ParticipationEliminated>,
-                INotificationHandler<VetInAcknoledged>,
-                INotificationHandler<EventConnected>,
-                INotificationHandler<EventDisconnected>,
-                PresentlistService
-            >(ServiceLifetime.Scoped);
-            _services.Add<
-                IStartUpcoming,
-                IStartHistory,
-                INotificationHandler<PhaseCompleted>,
-                INotificationHandler<ParticipationRestored>,
-                INotificationHandler<ParticipationEliminated>,
-                INotificationHandler<EventConnected>,
-                StartlistService
-            >(ServiceLifetime.Scoped);
-            _services.AddScoped<INotificationHandler<EventDisconnected>>(x => x.GetRequiredService<StartlistService>());
+            _services.Add<IArrivelistService, ArrivelistService>(ServiceLifetime.Scoped);
+            _services.Add<IPresentlistService, PresentlistService>(ServiceLifetime.Scoped);
+            _services.Add<IStartUpcoming, IStartHistory, StartlistService>(ServiceLifetime.Scoped);
             return this;
         }
 

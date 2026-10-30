@@ -5,7 +5,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Objects;
 
-namespace NTS.Blazor.Components.Results;
+namespace NoTiming.Ui.Components.Results;
 
 public class ParticipationSummaryComponentBehind : NComponent
 {

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
-using NTS.Application.Contracts.Startlists;
+using NTS.Contracts.Startlists;
 
-namespace NTS.Blazor.Components.Startlist.History;
+namespace NoTiming.Ui.Components.Startlist.History;
 
 public class StartlistHistoryBehind : NStatefulComponent
 {

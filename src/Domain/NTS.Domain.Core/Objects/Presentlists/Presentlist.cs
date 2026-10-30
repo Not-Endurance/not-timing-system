@@ -30,11 +30,6 @@ public record Presentlist : ValueObject
         return FromEntries(entries);
     }
 
-    public Presentlist Without(PresentlistEntryKey key)
-    {
-        return FromEntries(_entries.Where(x => x.Key != key));
-    }
-
     public Presentlist WithoutParticipation(int number)
     {
         return FromEntries(_entries.Where(x => x.Number != number));
@@ -76,7 +71,7 @@ public record Presentlist : ValueObject
 
     static PresentlistEntry? CreateRepresentationEntry(Participation participation, Phase phase)
     {
-        if (!phase.IsReinspectionRequested || phase.RepresentTime != null || phase.ArriveTime == null)
+        if (!phase.IsRepresentRequested || phase.RepresentTime != null || phase.ArriveTime == null)
         {
             return null;
         }

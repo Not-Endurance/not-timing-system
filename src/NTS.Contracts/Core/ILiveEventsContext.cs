@@ -1,0 +1,12 @@
+using Not.Application.Behinds.Adapters;
+using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Setup.Aggregates;
+
+namespace NTS.Contracts.Core;
+
+public interface ILiveEventsContext : IStatefulService
+{
+    bool IsLive(ConfigureEvent configureEvent);
+    void Add(EventInformation eventInformation);
+    void Remove(Guid eventId);
+}

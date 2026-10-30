@@ -1,0 +1,33 @@
+@using NTS.Domain.Setup.Aggregates
+@using Not.Krud.Blazor.Components
+@using NoTiming.Console.Features.Registry.Athletes
+@using NoTiming.Console.Features.Registry.Horses
+
+@attribute [Route(ATHLETES_HORSES_PAGE)]
+@inherits AthletesHorsesContentBehind
+
+<NContent Title="@Athletes_and_Horses_string" IsLoading="@IsLoading">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="GoHome" />
+            </MudStack>
+
+            <MudGrid Spacing="8" Style="margin-top:0!important;">
+                <MudItem xs="12" md="6">
+                    <KrudList T="Athlete" TShell="AthleteShell" TModel="AthleteFormModel" Name="@Athletes_string"
+                              UpdateRoute="@ATHLETE_PAGE" ReadOnly="@ReadOnly" NoScroll />
+                </MudItem>
+
+                <MudItem xs="12" md="6">
+                    <KrudList T="Horse" TShell="HorseShell" TModel="HorseFormModel" Name="@Horses_string"
+                              UpdateRoute="@HORSE_PAGE" ReadOnly="@ReadOnly" NoScroll />
+                </MudItem>
+            </MudGrid>
+
+        </MudStack>
+    </Main>
+
+</NContent>

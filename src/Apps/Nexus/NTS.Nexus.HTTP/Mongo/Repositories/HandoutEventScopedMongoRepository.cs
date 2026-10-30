@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
+using NTS.Contracts.Core;
+using NTS.Contracts.Core.Models;
 using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
@@ -28,7 +28,7 @@ public class HandoutEventScopedMongoRepository : EventScopedMongoRepository<Hand
         {
             return Builders<HandoutModel>
                 .Update.Set(x => x.EventId, document.EventId)
-                .Set(x => x.Participation, document.Participation);
+                .Set(x => x.ParticipationId, document.ParticipationId);
         }
         catch (Exception ex)
         {

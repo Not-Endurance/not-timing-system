@@ -3,7 +3,6 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Presentlists;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
@@ -164,17 +163,18 @@ public sealed class PresentlistTests
     }
 
     [Fact]
-    public void ToggleInspection_raises_inspection_required_when_state_changes()
+    public void ToggleInspection_requests_the_inspection_and_turning_it_off_withdraws_it()
     {
         var participation = CreateParticipation(1, [CreatePhase()]);
 
-        participation.ToggleInspection(true);
+        participation.ToggleInspection(true, DateTimeOffset.Now);
+        participation.ToggleInspection(true, DateTimeOffset.Now);
 
-        Assert.Contains(participation.DequeueDomainEvents(), x => x is InspectionRequired);
+        Assert.True(participation.Phases.Current.IsRequiredInspectionRequested);
 
-        participation.ToggleInspection(true);
+        participation.ToggleInspection(false, DateTimeOffset.Now);
 
-        Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is InspectionRequired);
+        Assert.False(participation.Phases.Current.IsRequiredInspectionRequested);
     }
 
     [Fact]
@@ -187,10 +187,9 @@ public sealed class PresentlistTests
             [CreatePhase(start: arrive.AddHours(-1), arrive: arrive, present: present, isRepresentationRequested: true)]
         );
 
-        Assert.Throws<DomainException>(() => participation.ToggleInspection(true));
+        Assert.Throws<DomainException>(() => participation.ToggleInspection(true, DateTimeOffset.Now));
 
         Assert.False(participation.Phases.Current.IsRequiredInspectionRequested);
-        Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is InspectionRequired);
     }
 
     [Fact]
@@ -211,14 +210,13 @@ public sealed class PresentlistTests
             ]
         );
 
-        participation.ToggleInspection(true);
+        participation.ToggleInspection(true, DateTimeOffset.Now);
 
         Assert.True(participation.Phases.Current.IsRequiredInspectionRequested);
-        Assert.Contains(participation.DequeueDomainEvents(), x => x is InspectionRequired);
     }
 
     [Fact]
-    public void ToggleRepresentation_raises_representation_required_when_state_changes()
+    public void ToggleRepresentation_requests_the_representation_and_turning_it_off_withdraws_it()
     {
         var arrive = DateTimeOffset.Now.AddMinutes(-20);
         var present = arrive.AddMinutes(5);
@@ -227,23 +225,33 @@ public sealed class PresentlistTests
             [CreatePhase(start: arrive.AddHours(-1), arrive: arrive, present: present)]
         );
 
-        participation.ToggleRepresentation(true);
+        participation.ToggleRepresentation(true, DateTimeOffset.Now);
+        participation.ToggleRepresentation(true, DateTimeOffset.Now);
 
-        Assert.Contains(participation.DequeueDomainEvents(), x => x is RepresentationRequired);
+        Assert.True(participation.Phases.Current.IsRepresentRequested);
 
-        participation.ToggleRepresentation(true);
+        participation.ToggleRepresentation(false, DateTimeOffset.Now);
 
-        Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is RepresentationRequired);
+        Assert.False(participation.Phases.Current.IsRepresentRequested);
     }
 
     static Participation CreateParticipation(int number, IEnumerable<Phase> phases, Eliminated? eliminated = null)
     {
         var phaseList = phases.ToList();
-        var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
-        var horse = new Horse($"Horse {number}", null, null, number);
+        var country = new Country(TestId.Of(number), "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete($"Athlete {number}", null, country, null, null, TestId.Of(number));
+        var horse = new Horse($"Horse {number}", null, null, TestId.Of(number));
         var totalDistance = phaseList.Sum(x => x.Length);
-        var combination = new Combination(number, athlete, horse, null, $"{totalDistance:0.##}", null, null, number);
+        var combination = new Combination(
+            number,
+            athlete,
+            horse,
+            null,
+            $"{totalDistance:0.##}",
+            null,
+            null,
+            TestId.Of(number)
+        );
 
         return new Participation(
             ParticipationCategory.Senior,
@@ -251,7 +259,7 @@ public sealed class PresentlistTests
             combination,
             new PhaseCollection(phaseList),
             eliminated,
-            eventId: 1
+            eventId: TestId.Of(1)
         );
     }
 

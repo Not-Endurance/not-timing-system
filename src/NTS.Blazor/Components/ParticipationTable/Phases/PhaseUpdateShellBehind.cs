@@ -1,10 +1,10 @@
 using MudBlazor;
 using Not.Krud.Blazor.Components.Abstractions;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Blazor.Constants;
+using NoTiming.Ui.Constants;
+using NTS.Contracts.Core;
+using NTS.Contracts.Core.Models;
 
-namespace NTS.Blazor.Components.ParticipationTable.Phases;
+namespace NoTiming.Ui.Components.ParticipationTable.Phases;
 
 public abstract class PhaseUpdateShellBehind : KrudShell<PhaseUpdateModel>
 {

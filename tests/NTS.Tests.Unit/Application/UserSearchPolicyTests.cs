@@ -15,7 +15,7 @@ public sealed class UserSearchPolicyTests
         var user = new User(
             "ana@example.test",
             "Original Name",
-            id: 10,
+            id: TestId.Of(10),
             givenName: "Ana",
             surname: "Marinova",
             displayName: "Ana Display"
@@ -27,7 +27,7 @@ public sealed class UserSearchPolicyTests
     [Fact]
     public void IsMatch_searches_fallback_name()
     {
-        var user = new User("ana@example.test", "Original Name", id: 10);
+        var user = new User("ana@example.test", "Original Name", id: TestId.Of(10));
 
         Assert.True(UserSearchPolicy.IsMatch(user, "Original"));
     }
@@ -35,7 +35,7 @@ public sealed class UserSearchPolicyTests
     [Fact]
     public void IsMatch_rejects_unmatched_term()
     {
-        var user = new User("ana@example.test", "Original Name", id: 10);
+        var user = new User("ana@example.test", "Original Name", id: TestId.Of(10));
 
         Assert.False(UserSearchPolicy.IsMatch(user, "not-found"));
     }

@@ -1,0 +1,36 @@
+@using NoTiming.Ui.Components.Results
+@using Not.Blazor.Components.Print
+
+@inherits HandoutsPageBehind
+
+<NContent Title="@Handouts_string" IsLoading="@IsLoading" IsEmpty="@(!IsLoading && Documents.Count == 0)" EmptyMessage="@Handouts_list_empty_message_string" RightBarXS="2">
+
+    <Main>
+        @foreach (var document in Documents)
+        {
+            <ResultComponent @key="document.Id" Document="document" LeftLogo="@LeftLogo" RightLogo="@RightLogo" />
+        }
+    </Main>
+
+    <Rightbar>
+        <MudStack Spacing="2" data-testid="console-handouts-panel">
+            <NDivider Text="@Export_string" />
+
+            <NPrintPanel @bind-Scale="PrintFontScale"
+                         @bind-PaperFormat="PaperFormat"
+                         @bind-Orientation="Orientation"
+                         Actions="@PrintActions"
+                         Disabled="@(!CanPrint)"
+                         ConfigurePaperFormat
+                         ConfigureOrientation />
+
+            @if (CanChange)
+            {
+                <NDivider Text="@Manual_handout_strings" Class="mt-4" />
+
+                <HandoutForm />
+            }
+        </MudStack>
+    </Rightbar>
+
+</NContent>

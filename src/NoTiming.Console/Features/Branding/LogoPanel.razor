@@ -1,0 +1,37 @@
+@using Microsoft.AspNetCore.Components.Forms
+
+@inherits LogoPanelBehind
+
+<MudPaper Elevation="1" Class="pa-3" data-testid="@TestId">
+    <MudStack Spacing="2">
+
+        <MudText Typo="Typo.subtitle1">@Title</MudText>
+
+        @if (Logo != null)
+        {
+            <img src="@Logo.DataUrl" alt="@Title" data-testid="@($"{TestId}-image")" style="max-height:120px;max-width:100%;object-fit:contain;" />
+
+            @if (SourceText != null)
+            {
+                <MudText Typo="Typo.caption">@SourceText</MudText>
+            }
+        }
+        else
+        {
+            <MudText Typo="Typo.body2">@No_logo_string</MudText>
+        }
+
+        @if (CanEdit)
+        {
+            <MudStack Row Spacing="2" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                <InputFile OnChange="Choose" accept="@Accept" aria-label="@($"{Title}: {Choose_a_logo_string}")" />
+
+                @if (CanRemove)
+                {
+                    <NButtonSecondary Text="@RemoveText" OnClick="Remove" />
+                }
+            </MudStack>
+        }
+
+    </MudStack>
+</MudPaper>

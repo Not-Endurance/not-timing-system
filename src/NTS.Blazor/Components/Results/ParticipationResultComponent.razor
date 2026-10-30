@@ -1,4 +1,4 @@
-@using NTS.Blazor.Components.ParticipationTable
+@using NoTiming.Ui.Components.ParticipationTable
 
 @inherits ParticipationResultComponentBehind
 
@@ -92,5 +92,12 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    @@media print {
+        .results-row-header,
+        .results-row-identity {
+            column-gap: 0.5rem;
+        }
     }
 </style>

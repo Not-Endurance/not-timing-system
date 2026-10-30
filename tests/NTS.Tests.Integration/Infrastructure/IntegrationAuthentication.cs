@@ -1,6 +1,3 @@
-using System.Security.Claims;
-using Microsoft.AspNetCore.Components.Authorization;
-
 namespace NTS.Tests.Integration.Infrastructure;
 
 internal sealed record IntegrationUser
@@ -40,27 +37,4 @@ internal sealed record IntegrationUser
     public string? CountryRegion { get; }
     public string? Club { get; }
     public string? FeiId { get; }
-}
-
-internal sealed class IntegrationAuthenticationStateProvider : AuthenticationStateProvider
-{
-    readonly AuthenticationState _state;
-
-    public IntegrationAuthenticationStateProvider(IntegrationUser user)
-    {
-        var identity = new ClaimsIdentity(
-            [
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim("oid", user.UserIdentifier),
-                new Claim("name", user.DisplayName ?? user.Name),
-            ],
-            "IntegrationTest"
-        );
-        _state = new AuthenticationState(new ClaimsPrincipal(identity));
-    }
-
-    public override Task<AuthenticationState> GetAuthenticationStateAsync()
-    {
-        return Task.FromResult(_state);
-    }
 }

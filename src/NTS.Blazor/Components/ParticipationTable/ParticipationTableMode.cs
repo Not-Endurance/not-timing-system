@@ -1,4 +1,4 @@
-namespace NTS.Blazor.Components.ParticipationTable;
+namespace NoTiming.Ui.Components.ParticipationTable;
 
 public enum ParticipationTableMode
 {

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Style"
+  short_description: "Follow NTS C# ordering and formatting conventions."
+  default_prompt: "Use $code-style to keep NTS C# edits aligned with local ordering and formatting conventions."

@@ -6,7 +6,7 @@ public class User : Aggregate
         string? email,
         string? name,
         IEnumerable<string>? roles = null,
-        int? id = null,
+        Guid? id = null,
         string? givenName = null,
         string? middleName = null,
         string? surname = null,

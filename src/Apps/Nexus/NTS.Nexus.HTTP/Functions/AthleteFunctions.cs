@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Storage.Mongo;
-using NTS.Application.Contracts.Setup;
-using NTS.Application.Contracts.Setup.Models;
+using NTS.Contracts.Setup;
+using NTS.Contracts.Setup.Models;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -43,8 +43,8 @@ public class AthleteFunctions : CrudFunctions<AthleteModel>
 
     [Function("athletes-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "athletes/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "athletes/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Delete));
@@ -66,8 +66,8 @@ public class AthleteFunctions : CrudFunctions<AthleteModel>
 
     [Function("athletes-read")]
     public async Task<IActionResult> Read(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "athletes/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "athletes/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Read));

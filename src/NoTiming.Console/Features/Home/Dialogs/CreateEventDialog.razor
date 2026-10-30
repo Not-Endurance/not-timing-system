@@ -1,0 +1,21 @@
+@using Not.Blazor.Components.Input
+
+@inherits CreateEventDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <NTextField T="string" @bind-Value="Model.Name" Label="@Name_string" Immediate="true" Required="true" />
+
+            <NTextField T="string" @bind-Value="Model.Location" Label="@Location_string" Immediate="true" Required="true" />
+
+            <NTextField T="string" @bind-Value="Model.FeiShowId" Label="@FEI_Show_ID_string" HelperText="@FEI_Show_ID_helper_text_string" Immediate="true" />
+        </MudStack>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonPrimary Text="@Create_string" Disabled="@(!CanCreate)" OnClick="Create" />
+
+        <NButtonSecondary Text="@Cancel_string" OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

@@ -663,12 +663,6 @@
   <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
     <value>Setup configuration will not be deleted</value>
   </data>
-  <data name="Deactivate_Event_string" xml:space="preserve">
-    <value>Deactivate Event</value>
-  </data>
-  <data name="Deactivate_event_instructions_string" xml:space="preserve">
-    <value>This will mark the current event inactive and disconnect the dashboard. Event data will not be deleted and will remain available in Past Events.</value>
-  </data>
   <data name="Type_1338_to_enable_confirmation_string" xml:space="preserve">
     <value>Type 1338 to enable confirmation.</value>
   </data>
@@ -684,8 +678,14 @@
   <data name="Home_string" xml:space="preserve">
     <value>Home</value>
   </data>
-  <data name="Login_string" xml:space="preserve">
-    <value>Sign in</value>
+  <data name="Reload_string" xml:space="preserve">
+    <value>Reload</value>
+  </data>
+  <data name="Sorry_we_seem_to_have_fallen_off_the_horseback_string" xml:space="preserve">
+    <value>Sorry, we seem to have fallen off the horseback</value>
+  </data>
+  <data name="Try_to_Reload_in_order_to_proceed_string" xml:space="preserve">
+    <value>Try to Reload in order to proceed or click the button below to go to Home if the error is persistent.</value>
   </data>
   <data name="Snapshot_string" xml:space="preserve">
     <value>Snapshot</value>
@@ -699,17 +699,8 @@
   <data name="Participant_string" xml:space="preserve">
     <value>Participant</value>
   </data>
-  <data name="Login_page_string" xml:space="preserve">
-    <value>Sign-in</value>
-  </data>
   <data name="Snapshot_page_string" xml:space="preserve">
     <value>Snapshot</value>
-  </data>
-  <data name="Username_string" xml:space="preserve">
-    <value>User Name</value>
-  </data>
-  <data name="Password_string" xml:space="preserve">
-    <value>Password</value>
   </data>
   <data name="Send_snapshot_string" xml:space="preserve">
     <value>Send {0} snapshots to Judge as</value>
@@ -791,21 +782,6 @@
   </data>
   <data name="Bulgaria" xml:space="preserve">
     <value>Bulgaria</value>
-  </data>
-  <data name="Sign_in_to_continue_string" xml:space="preserve">
-    <value>Sign in to continue</value>
-  </data>
-  <data name="Profile_page_string" xml:space="preserve">
-    <value>Profile</value>
-  </data>
-  <data name="Access_denied_string" xml:space="preserve">
-    <value>This account doesn't have sufficient privileges.</value>
-  </data>
-  <data name="Try_another_account_string" xml:space="preserve">
-    <value>Try another account</value>
-  </data>
-  <data name="Access_denied_next_steps" xml:space="preserve">
-    <value>Please contact a system Admin or try another.</value>
   </data>
   <data name="Connect_string" xml:space="preserve">
     <value>Connect</value>
@@ -906,23 +882,11 @@
   <data name="Sorry_theres_nothing_at_this_address_string" xml:space="preserve">
     <value>Sorry, there's nothing at this address.</value>
   </data>
-  <data name="Sign_in_with_Microsoft_string" xml:space="preserve">
-    <value>Sign in with Microsoft</value>
-  </data>
-  <data name="This_page_redirects_to_Signin_string" xml:space="preserve">
-    <value>This page redirects to Signin.</value>
-  </data>
-  <data name="Signed_in_as__string" xml:space="preserve">
-    <value>Signed in as {0}</value>
-  </data>
-  <data name="You_have___privileges_string" xml:space="preserve">
-    <value>You have {0} privileges.</value>
+  <data name="Sign_In_string" xml:space="preserve">
+    <value>Sign In</value>
   </data>
   <data name="Sign_Out_string" xml:space="preserve">
     <value>Sign Out</value>
-  </data>
-  <data name="No_roles_assigned_string" xml:space="preserve">
-    <value>No roles assigned</value>
   </data>
   <data name="An_error_occurred_while_sending_snapshots_Please_try_again_string" xml:space="preserve">
     <value>An error occurred while sending snapshots. Please try again.</value>
@@ -996,8 +960,8 @@
   <data name="Validation_errors_string" xml:space="preserve">
     <value>Validation errors</value>
   </data>
-  <data name="Past_events_string" xml:space="preserve">
-    <value>Past events</value>
+  <data name="Historic_events_string" xml:space="preserve">
+    <value>Historic events</value>
   </data>
   <data name="FEI_ID_string" xml:space="preserve">
     <value>FEI Id</value>
@@ -1047,10 +1011,268 @@
   <data name="Name_in_English_string" xml:space="preserve">
     <value>Name in English</value>
   </data>
-  <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
-    <value>Is on time for Presentation/Inspection?</value>
-  </data>
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Are you sure you want to delete '{0}'?</value>
+  </data>
+  <data name="This_event_has_ended_string" xml:space="preserve">
+    <value>This Event has ended and cannot be changed.</value>
+  </data>
+  <data name="You_may_not_change_this_event_string" xml:space="preserve">
+    <value>You are not allowed to change this Event.</value>
+  </data>
+  <data name="Event_not_found_string" xml:space="preserve">
+    <value>Event not found.</value>
+  </data>
+  <data name="Not_available_for_historic_event_string" xml:space="preserve">
+    <value>This page is not available for an Event that has ended.</value>
+  </data>
+  <data name="Snapshots_kept_to_be_sent_again_string" xml:space="preserve">
+    <value>The Snapshots could not be sent. They are kept and are sent again until the server answers.</value>
+  </data>
+  <data name="Snapshots_waiting_to_be_sent_string" xml:space="preserve">
+    <value>Waiting to be sent: {0}. They are sent again until the server answers.</value>
+  </data>
+  <data name="Account_string" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="Federation_string" xml:space="preserve">
+    <value>Federation</value>
+  </data>
+  <data name="Passkeys_string" xml:space="preserve">
+    <value>Passkeys</value>
+  </data>
+  <data name="Cascading_Delete_string" xml:space="preserve">
+    <value>Delete with the related records</value>
+  </data>
+  <data name="Console_string" xml:space="preserve">
+    <value>Console</value>
+  </data>
+  <data name="Events_string" xml:space="preserve">
+    <value>Events</value>
+  </data>
+  <data name="Event_status_string" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Event_stage_unstarted_string" xml:space="preserve">
+    <value>Not started</value>
+  </data>
+  <data name="Event_stage_live_string" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="Event_stage_historic_string" xml:space="preserve">
+    <value>Ended</value>
+  </data>
+  <data name="Create_event_string" xml:space="preserve">
+    <value>New event</value>
+  </data>
+  <data name="No_events_to_run_string" xml:space="preserve">
+    <value>There is no Event for you to run yet.</value>
+  </data>
+  <data name="Results_string" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="Assign_main_operator_string" xml:space="preserve">
+    <value>Assign the Main Operator</value>
+  </data>
+  <data name="Hand_over_string" xml:space="preserve">
+    <value>Hand over</value>
+  </data>
+  <data name="Hand_over_event_string" xml:space="preserve">
+    <value>Hand the Event over</value>
+  </data>
+  <data name="Find_account_string" xml:space="preserve">
+    <value>Find an account by name (at least three letters)</value>
+  </data>
+  <data name="Main_operator_string" xml:space="preserve">
+    <value>Main Operator</value>
+  </data>
+  <data name="Main_operator_assigned_string" xml:space="preserve">
+    <value>The Main Operator was assigned.</value>
+  </data>
+  <data name="Event_handed_over_string" xml:space="preserve">
+    <value>The Event was handed over.</value>
+  </data>
+  <data name="Event_started_string" xml:space="preserve">
+    <value>The Event was started.</value>
+  </data>
+  <data name="Event_was_reset_string" xml:space="preserve">
+    <value>The Event was reset to its Setup.</value>
+  </data>
+  <data name="Close_string" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Competition_not_found_string" xml:space="preserve">
+    <value>Competition not found</value>
+  </data>
+  <data name="Event_not_yours_to_run_string" xml:space="preserve">
+    <value>Only the Main Operator of an Event opens its Setup.</value>
+  </data>
+  <data name="Access_string" xml:space="preserve">
+    <value>Access</value>
+  </data>
+  <data name="Access_description_string" xml:space="preserve">
+    <value>The people who may send Snapshots from the Event, linked by their exact email. An address that has no account is an invitation that waits until the person registers.</value>
+  </data>
+  <data name="Link_person_string" xml:space="preserve">
+    <value>Link a person</value>
+  </data>
+  <data name="Email_address_string" xml:space="preserve">
+    <value>Email address</value>
+  </data>
+  <data name="Pending_invitation_string" xml:space="preserve">
+    <value>Invitation pending</value>
+  </data>
+  <data name="Linked_string" xml:space="preserve">
+    <value>Linked</value>
+  </data>
+  <data name="Access_empty_string" xml:space="preserve">
+    <value>Nobody is linked yet.</value>
+  </data>
+  <data name="Person_linked_string" xml:space="preserve">
+    <value>The person was linked.</value>
+  </data>
+  <data name="Access_removed_string" xml:space="preserve">
+    <value>The access was ended.</value>
+  </data>
+  <data name="Linked_as_string" xml:space="preserve">
+    <value>Linked as</value>
+  </data>
+  <data name="Person_string" xml:space="preserve">
+    <value>Person</value>
+  </data>
+  <data name="Link_account_helper_string" xml:space="preserve">
+    <value>The exact address the person signs in with. If it has no account yet, the person is invited and gets the access when they register.</value>
+  </data>
+  <data name="Official_string" xml:space="preserve">
+    <value>Official</value>
+  </data>
+  <data name="Select_a_participation_string" xml:space="preserve">
+    <value>Select a Participation</value>
+  </data>
+  <data name="Participation_not_found_string" xml:space="preserve">
+    <value>The Participation was not found.</value>
+  </data>
+  <data name="Participation_changed_string" xml:space="preserve">
+    <value>The Participation was changed meanwhile and has been read again. What you typed is kept: look at it over what is there now and send it again.</value>
+  </data>
+  <data name="Time_recorded_string" xml:space="preserve">
+    <value>The time was recorded.</value>
+  </data>
+  <data name="Time_not_recorded_string" xml:space="preserve">
+    <value>The time was not recorded.</value>
+  </data>
+  <data name="Time_not_taken_string" xml:space="preserve">
+    <value>The time was recorded but not taken: {0}.</value>
+  </data>
+  <data name="Not_signed_in_string" xml:space="preserve">
+    <value>Nobody is signed in.</value>
+  </data>
+  <data name="Now_string" xml:space="preserve">
+    <value>Now</value>
+  </data>
+  <data name="Rankings_list_empty_message_string" xml:space="preserve">
+    <value>The Event has no Rankings.</value>
+  </data>
+  <data name="Handout_made_string" xml:space="preserve">
+    <value>A Handout was made for #{0}.</value>
+  </data>
+  <data name="Handout_not_made_string" xml:space="preserve">
+    <value>The Handout of #{0} was not made: {1}</value>
+  </data>
+  <data name="Startlist_empty_message_string" xml:space="preserve">
+    <value>No start has a time yet.</value>
+  </data>
+  <data name="Regional_rules_string" xml:space="preserve">
+    <value>Rules of the regional competitions</value>
+  </data>
+  <data name="Only_average_loop_speed_string" xml:space="preserve">
+    <value>Judge the speed of a loop on its average only</value>
+  </data>
+  <data name="Ranker_code_string" xml:space="preserve">
+    <value>Code of the regional ranker</value>
+  </data>
+  <data name="Ranker_code_hint_string" xml:space="preserve">
+    <value>Leave it empty for the ranking of the FEI.</value>
+  </data>
+  <data name="Rules_saved_string" xml:space="preserve">
+    <value>The rules were saved.</value>
+  </data>
+  <data name="Federation_not_yours_string" xml:space="preserve">
+    <value>Only an administrator of the federation edits it.</value>
+  </data>
+  <data name="Already_registered_string" xml:space="preserve">
+    <value>This looks like a row that is registered already:</value>
+  </data>
+  <data name="Same_name_string" xml:space="preserve">
+    <value>the same name</value>
+  </data>
+  <data name="Same_FEI_ID_string" xml:space="preserve">
+    <value>the same FEI ID</value>
+  </data>
+  <data name="Of_another_federation_string" xml:space="preserve">
+    <value>of another federation</value>
+  </data>
+  <data name="Logos_string" xml:space="preserve">
+    <value>Logos</value>
+  </data>
+  <data name="Left_logo_string" xml:space="preserve">
+    <value>Left logo</value>
+  </data>
+  <data name="Right_logo_string" xml:space="preserve">
+    <value>Right logo</value>
+  </data>
+  <data name="Choose_a_logo_string" xml:space="preserve">
+    <value>Choose an image</value>
+  </data>
+  <data name="Remove_logo_string" xml:space="preserve">
+    <value>Remove the logo</value>
+  </data>
+  <data name="Use_the_federations_logo_string" xml:space="preserve">
+    <value>Use the logo of the federation</value>
+  </data>
+  <data name="No_logo_string" xml:space="preserve">
+    <value>No logo</value>
+  </data>
+  <data name="Logo_of_the_federation_string" xml:space="preserve">
+    <value>The logo of the federation</value>
+  </data>
+  <data name="Logo_of_the_event_string" xml:space="preserve">
+    <value>The logo of this Event</value>
+  </data>
+  <data name="Logo_is_too_large_string" xml:space="preserve">
+    <value>A logo weighs at most {0} KiB.</value>
+  </data>
+  <data name="Logo_not_an_image_string" xml:space="preserve">
+    <value>Choose a PNG, JPEG, GIF or WebP image.</value>
+  </data>
+  <data name="Logo_saved_string" xml:space="preserve">
+    <value>The logo was saved.</value>
+  </data>
+  <data name="Logo_removed_string" xml:space="preserve">
+    <value>The logo was removed.</value>
+  </data>
+  <data name="Logos_hint_string" xml:space="preserve">
+    <value>PNG, JPEG, GIF or WebP, of up to {0} KiB, which go at the head of what is printed.</value>
+  </data>
+  <data name="Console_connected_string" xml:space="preserve">
+    <value>Connected to {0}</value>
+  </data>
+  <data name="Console_connecting_string" xml:space="preserve">
+    <value>Connecting to {0}…</value>
+  </data>
+  <data name="Console_disconnected_string" xml:space="preserve">
+    <value>Not connected to {0}</value>
+  </data>
+  <data name="Estimates_string" xml:space="preserve">
+    <value>Estimates</value>
+  </data>
+  <data name="FEI_string" xml:space="preserve">
+    <value>FEI</value>
+  </data>
+  <data name="Regional_string" xml:space="preserve">
+    <value>Regional</value>
+  </data>
+  <data name="Both_string" xml:space="preserve">
+    <value>Both</value>
   </data>
 </root>

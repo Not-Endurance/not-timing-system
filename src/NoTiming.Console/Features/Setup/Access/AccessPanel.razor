@@ -1,0 +1,57 @@
+@inherits AccessPanelBehind
+
+<MudPaper Elevation="0" Class="pa-4 mt-8" data-testid="console-access">
+
+    <MudStack Spacing="2">
+
+        <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+            <MudText Typo="Typo.h6">@Access_string</MudText>
+
+            @if (!ReadOnly)
+            {
+                <NButtonPrimary Text="@Link_person_string" StartIcon="@Icons.Material.Filled.Add" OnClick="Link" />
+            }
+        </MudStack>
+
+        <MudText Typo="Typo.body2">@Access_description_string</MudText>
+
+        @if (!IsLoading && Rows.Count == 0)
+        {
+            <MudText Typo="Typo.body1" data-testid="console-access-empty">@Access_empty_string</MudText>
+        }
+        else if (Rows.Count > 0)
+        {
+            <MudTable Items="@Rows" Dense Hover Breakpoint="Breakpoint.Sm" data-testid="console-grants">
+                <HeaderContent>
+                    <MudTh>@Linked_as_string</MudTh>
+                    <MudTh>@Person_string</MudTh>
+                    <MudTh></MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+
+                <RowTemplate>
+                    <MudTd DataLabel="@Linked_as_string">@KindText(context)</MudTd>
+                    <MudTd DataLabel="@Person_string">@PersonText(context)</MudTd>
+                    <MudTd>
+                        @if (context.IsPending)
+                        {
+                            <MudChip T="string" Size="Size.Small" Color="Color.Warning">@Pending_invitation_string</MudChip>
+                        }
+                        else
+                        {
+                            <MudChip T="string" Size="Size.Small" Color="Color.Success">@Linked_string</MudChip>
+                        }
+                    </MudTd>
+                    <MudTd>
+                        @if (!ReadOnly)
+                        {
+                            <NButtonDanger Text="@Delete_string" OnClick="() => Remove(context)" />
+                        }
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+
+    </MudStack>
+
+</MudPaper>

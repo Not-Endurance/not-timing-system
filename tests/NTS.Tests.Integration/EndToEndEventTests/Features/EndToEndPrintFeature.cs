@@ -11,9 +11,9 @@ using Not.Files;
 using Not.Krud.ServiceRegistration;
 using Not.Localization;
 using Not.Print;
-using NTS.Application.Contracts;
-using NTS.Application.Contracts.Pdf;
-using NTS.Blazor.Components.Results;
+using NoTiming.Ui.Components.Results;
+using NTS.Contracts;
+using NTS.Contracts.Pdf;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Tests.Integration.Drivers;
@@ -28,12 +28,12 @@ internal sealed class EndToEndPrintFeature : IDisposable
     const string HANDOUT_PAGE_MARGIN = "6mm 6mm 10mm 6mm";
     const string RANKLIST_PAGE_MARGIN = "10mm 10mm 12mm 10mm";
 
-    readonly NexusApiDriver _api;
+    readonly FunctionsApiDriver _api;
     readonly IStringLocalizer _localizer;
     readonly INHtmlComponentRenderer _renderer;
     readonly ServiceProvider _services;
 
-    public EndToEndPrintFeature(NexusApiDriver api)
+    public EndToEndPrintFeature(FunctionsApiDriver api)
     {
         _api = api;
         _services = CreateRendererServices();

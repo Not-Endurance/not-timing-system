@@ -1,15 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>false</AddRazorSupportForMvc>
+    <RootNamespace>NoTiming.Ui</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\nugets\Not.Krud\Not.Krud.csproj" />
-    <ProjectReference Include="..\NTS.Application.Contracts\NTS.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\nugets\Not.Blazor\Not.Blazor.csproj" />
+    <ProjectReference Include="..\NTS.Contracts\NTS.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

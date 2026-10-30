@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
 using Not.Krud.Blazor;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Blazor.Components.ParticipationTable.Phases;
+using NoTiming.Ui.Components.ParticipationTable.Phases;
+using NTS.Contracts.Core;
+using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 
-namespace NTS.Blazor.Components.ParticipationTable;
+namespace NoTiming.Ui.Components.ParticipationTable;
 
 public class ParticipationTableBehind : NComponent
 {
@@ -96,7 +96,7 @@ public class ParticipationTableBehind : NComponent
             return [];
         }
 
-        var anyRepresentation = phases.Any(x => x.IsReinspectionRequested);
+        var anyRepresentation = phases.Any(x => x.IsRepresentRequested);
         var anyRequiredInspection = phases.Any(x => x.IsRequiredInspectionRequested);
         var anyCompulsoryRequiredInspection = phases.Any(x => x.IsRequiredInspectionCompulsory);
 

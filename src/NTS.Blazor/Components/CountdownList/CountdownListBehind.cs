@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
 
-namespace NTS.Blazor.Components.CountdownList;
+namespace NoTiming.Ui.Components.CountdownList;
 
 public class CountdownListBehind<TItem> : NComponent, IDisposable
 {

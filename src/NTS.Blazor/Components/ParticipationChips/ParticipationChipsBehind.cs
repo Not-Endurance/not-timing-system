@@ -3,7 +3,7 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Aggregates;
 
-namespace NTS.Blazor.Components.ParticipationChips;
+namespace NoTiming.Ui.Components.ParticipationChips;
 
 public abstract class ParticipationChipsBehind : NStatefulComponent
 {

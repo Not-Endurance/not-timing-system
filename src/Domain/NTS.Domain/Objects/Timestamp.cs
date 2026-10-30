@@ -112,7 +112,7 @@ public sealed record Timestamp : IComparable<Timestamp>
 
     public static bool operator >=(Timestamp? left, Timestamp? right)
     {
-        return left?._stamp.TimeOfDay > right?._stamp.TimeOfDay;
+        return left?._stamp.TimeOfDay >= right?._stamp.TimeOfDay;
     }
 
     public static TimeInterval? operator -(Timestamp? left, Timestamp? right)
