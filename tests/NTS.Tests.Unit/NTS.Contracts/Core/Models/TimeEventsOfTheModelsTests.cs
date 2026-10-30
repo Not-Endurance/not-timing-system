@@ -3,6 +3,7 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
@@ -27,7 +28,7 @@ public sealed class TimeEventsOfTheModelsTests
     public void An_event_keeps_when_it_was_disabled_whichever_kind_it_is()
     {
         var disabled = RECORDED.AddMinutes(7);
-        TimeEvent[] events =
+        ParticipationEventBase[] events =
         [
             new Arrived(
                 TIME,

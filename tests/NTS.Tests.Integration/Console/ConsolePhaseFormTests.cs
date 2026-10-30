@@ -14,6 +14,7 @@ using NoTiming.Ui.Storage.Core.Repositories;
 using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Core;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;

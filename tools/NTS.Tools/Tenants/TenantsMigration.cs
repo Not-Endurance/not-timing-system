@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Not.Application.Environments;
 using Not.Storage.Mongo;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
@@ -113,6 +114,7 @@ public static class TenantsMigration
     sealed class Migration
     {
         readonly IMongoDatabase _database;
+        readonly IStorageEnvironment _environment;
         readonly TenantsOptions _options;
         readonly DateTimeOffset _now;
         readonly List<Account> _accounts = [];
@@ -129,6 +131,7 @@ public static class TenantsMigration
         public Migration(IMongoDatabase database, TenantsOptions options, DateTimeOffset now)
         {
             _database = database;
+            _environment = new MongoStorageEnvironment(database);
             _options = options;
             _now = now;
             Report = new TenantsReport(options.Apply);
@@ -152,7 +155,7 @@ public static class TenantsMigration
         /// <summary>Writes it, in an order that leaves a run that stopped to be finished by running it again.</summary>
         public async Task WriteAsync()
         {
-            await EnvironmentMarker.WriteAsync(_database, Report.MarkWith!, _now);
+            await _environment.WriteAsync(Report.MarkWith!, _now);
             await WriteTenantsAsync();
             await WriteAccountsAsync();
             await MakeIndexesAsync(x => x.Collection != TenantIndexes.GRANTS || x.Index.Options.Unique == true);
@@ -179,8 +182,8 @@ public static class TenantsMigration
 
         async Task ReadMarkerAsync()
         {
-            Report.MarkedAs = await EnvironmentMarker.ReadAsync(_database);
-            Report.MarkWith = EnvironmentMarker.Canonical(_options.Environment);
+            Report.MarkedAs = await _environment.ReadAsync();
+            Report.MarkWith = StorageEnvironmentNames.Canonical(_options.Environment);
             if (Report.MarkWith == null)
             {
                 Report.Refuse(

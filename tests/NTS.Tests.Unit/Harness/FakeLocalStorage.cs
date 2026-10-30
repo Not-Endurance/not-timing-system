@@ -30,17 +30,18 @@ internal sealed class FakeLocalStorage : IJSRuntime
 
         var arguments = args ?? [];
         Calls.Add((identifier, arguments));
-        var key = (string)arguments[0]!;
         switch (identifier)
         {
             case "localStorage.getItem":
-                return ValueTask.FromResult((TValue)(object?)_items.GetValueOrDefault(key)!);
+                return ValueTask.FromResult((TValue)(object?)_items.GetValueOrDefault((string)arguments[0]!)!);
             case "localStorage.setItem":
-                _items[key] = (string)arguments[1]!;
+                _items[(string)arguments[0]!] = (string)arguments[1]!;
                 break;
             case "localStorage.removeItem":
-                _items.Remove(key);
+                _items.Remove((string)arguments[0]!);
                 break;
+            case "localStorage.key":
+                return ValueTask.FromResult((TValue)(object?)_items.Keys.ElementAtOrDefault((int)arguments[0]!)!);
             default:
                 throw new NotSupportedException(identifier);
         }

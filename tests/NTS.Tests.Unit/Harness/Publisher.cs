@@ -14,6 +14,7 @@ using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using static NTS.Tests.Unit.Harness.ViewedEventFixtures;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 
 namespace NTS.Tests.Unit.Harness;
 

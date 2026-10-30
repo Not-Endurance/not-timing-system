@@ -5,6 +5,7 @@ using NoTiming.Api.Features.Branding;
 using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
+using NoTiming.Api.Features.Localhost;
 using NoTiming.Api.Features.Participants;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
@@ -45,9 +46,7 @@ internal static class ApiServices
         );
 
         services.AddAccount();
-#if DEBUG
-        services.AddLocalSignIn(configuration, environment);
-#endif
+        services.AddLocalhost(configuration, environment);
         services.AddSingleton<ProfileStore>();
         ApiMongo.Configure();
         services.AddSingleton<TenancyLog>();

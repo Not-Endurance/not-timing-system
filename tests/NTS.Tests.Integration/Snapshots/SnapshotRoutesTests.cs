@@ -11,6 +11,7 @@ using NoTiming.Api.Features.Reference;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Tests.Integration.Harness.Drivers;

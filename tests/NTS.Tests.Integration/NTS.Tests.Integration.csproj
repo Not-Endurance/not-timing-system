@@ -21,11 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.13" />
     <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Microsoft.Playwright" Version="1.60.0" />
-    <PackageReference Include="Testcontainers.MongoDb" Version="4.11.0" />
+    <PackageReference Include="Testcontainers.MongoDb" Version="4.16.0" />
     <!--
       Testcontainers 4.11.0 brings SSH.NET 2025.1.0, which has two high-severity advisories (GHSA-q939-rpr3-3284 and
       GHSA-mggc-4xg6-vcxf). 2026.0.0 is the first version that clears both. Nothing here uses SSH.NET itself.
@@ -55,6 +55,10 @@
   <ItemGroup>
     <Using Include="Xunit" />
     <Using Include="Not.Test" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

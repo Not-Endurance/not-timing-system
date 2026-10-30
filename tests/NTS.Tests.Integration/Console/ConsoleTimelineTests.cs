@@ -13,6 +13,7 @@ using NTS.Contracts.Core;
 using NTS.Contracts.Features.Console;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Objects;
 using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;

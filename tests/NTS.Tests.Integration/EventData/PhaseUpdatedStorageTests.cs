@@ -3,6 +3,7 @@ using NoTiming.Api.JsonApi;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Tests.Integration.Harness.Drivers;

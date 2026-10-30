@@ -238,10 +238,7 @@ public sealed class EventAccessTests : IClassFixture<MongoFixture>
     [InlineData("tenantId")]
     [InlineData("mainOperatorId")]
     [InlineData("id")]
-    [InlineData("competitions")]
-    public async Task A_new_Event_takes_nothing_but_its_name_location_and_FEI_show_so_it_cannot_be_given_a_Tenant_or_an_owner(
-        string member
-    )
+    public async Task A_new_Event_cannot_be_given_a_Tenant_or_an_owner_by_what_is_sent(string member)
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
@@ -252,7 +249,7 @@ public sealed class EventAccessTests : IClassFixture<MongoFixture>
         {
             ["name"] = "Ride",
             ["location"] = "Sofia",
-            [member] = member == "competitions" ? Array.Empty<object>() : other,
+            [member] = other,
         };
 
         var response = await root.Page.WriteAsync(

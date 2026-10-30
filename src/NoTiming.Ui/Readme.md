@@ -51,7 +51,7 @@ the size past it raises it on purpose, and raises the ceiling in the test, here 
   They arrive through `Not.Storage` and `Not.Application`, which the app uses for the repositories of its REST calls, so taking
   them out is a split of those projects and a task of its own.
 - The pages of the Console are not part of it (#646). `NoTiming.Console` is a Razor class library of pages and components under
-  `/console/...`, flagged `BlazorWebAssemblyLazyLoad` in this project, and `Features/Lazy/LazyRoutes` says that a path whose first
+  `/console/...`, flagged `BlazorWebAssemblyLazyLoad` in this project, and `Not.Blazor.Client`'s `Lazy/LazyRoutes` says that a path whose first
   segment is `console` needs `NoTiming.Console.wasm`, which the router fetches before it looks for a page (`WitnessBlazorRoot`).
   `UiFirstLoadBudgetTests` reads the lazy list from the boot configuration, leaves the Console out of the first load and fails
   if it is in it. A lazy assembly cannot be referenced by the app that loads it, so what the Console shares with the viewers

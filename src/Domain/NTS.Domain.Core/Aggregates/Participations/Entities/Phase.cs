@@ -1,13 +1,14 @@
 ﻿using Not.Domain.Exceptions;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
-using static NTS.Domain.Core.Aggregates.Participations.Entities.TimeEventOutcome;
+using static NTS.Domain.Core.Aggregates.Participations.Events.TimeEventOutcome;
 
 namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 public class Phase : Entity
 {
-    readonly List<TimeEvent> _events;
+    readonly List<ParticipationEventBase> _events;
 
     /// <summary>A Phase made with times: each of them is an accepted event of the manual method.</summary>
     public Phase(
@@ -52,7 +53,7 @@ public class Phase : Entity
         bool isFinal,
         TimeSpan? compulsoryThresholdSpan,
         Timestamp? startTime,
-        IEnumerable<TimeEvent> events,
+        IEnumerable<ParticipationEventBase> events,
         bool isRepresentationRequested,
         bool isRequiredInspectionRequested,
         bool isRequiredInspectionCompulsory,
@@ -89,7 +90,7 @@ public class Phase : Entity
     public Timestamp? StartTime { get; internal set; } // TODO: does it have to be nullable?
 
     /// <summary>Every time the Phase received, accepted or not, in the order they were recorded.</summary>
-    public IReadOnlyList<TimeEvent> Events { get; }
+    public IReadOnlyList<ParticipationEventBase> Events { get; }
 
     // The times are the latest accepted event that feeds each of them (ADR-0005)
     public Timestamp? ArriveTime => Shown(TimeSlot.Arrive);
@@ -340,7 +341,7 @@ public class Phase : Entity
     }
 
     /// <summary>Whether the Phase shows a time that this event gives: it is the latest accepted event that lists that time (ADR-0005).</summary>
-    public bool Shows(TimeEvent timeEvent)
+    public bool Shows(ParticipationEventBase timeEvent)
     {
         return timeEvent.Times.Any(x =>
             ReferenceEquals(_events.LastOrDefault(y => y.IsAccepted && y.Feeds(x.Slot)), timeEvent)
@@ -360,7 +361,11 @@ public class Phase : Entity
         return true;
     }
 
-    static IEnumerable<TimeEvent> EventsOfTimes(Timestamp? arriveTime, Timestamp? presentTime, Timestamp? representTime)
+    static IEnumerable<ParticipationEventBase> EventsOfTimes(
+        Timestamp? arriveTime,
+        Timestamp? presentTime,
+        Timestamp? representTime
+    )
     {
         (TimeSlot Slot, Timestamp? Time)[] times =
         [
@@ -372,7 +377,7 @@ public class Phase : Entity
     }
 
     /// <summary>An accepted event of the manual method, as the Phase form and a Phase made with times make it.</summary>
-    static TimeEvent Manual(TimeSlot slot, Timestamp time, DateTimeOffset? recordedAt, Guid? actorId)
+    static ParticipationEventBase Manual(TimeSlot slot, Timestamp time, DateTimeOffset? recordedAt, Guid? actorId)
     {
         return slot == TimeSlot.Arrive
             ? new Arrived(time, Accepted, SnapshotMethod.Manual, recordedAt, actorId)

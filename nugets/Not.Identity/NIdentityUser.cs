@@ -38,7 +38,7 @@ public class NIdentityUser
     public bool LockoutEnabled { get; set; }
 
     [BsonIgnoreIfNull]
-    [BsonRepresentation(BsonType.DateTime)]
+    [BsonRepresentation(BsonType.Document)]
     public DateTimeOffset? LockoutEnd { get; set; }
 
     public int AccessFailedCount { get; set; }

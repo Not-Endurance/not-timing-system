@@ -1,6 +1,7 @@
 using NTS.Contracts.Features.Console;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Enums;
 
 namespace NoTiming.Ui.Features.Console;
@@ -12,7 +13,7 @@ public static class TimelineWords
     /// The kind of time the event is for, and that it is an update of one when it is: "Arrive", "Present (update)"; an edit of
     /// the Phase form is told by its name, and its times by <see cref="TimesOf"/>.
     /// </summary>
-    public static string KindOf(TimeEvent timeEvent)
+    public static string KindOf(ParticipationEventBase timeEvent)
     {
         if (timeEvent is not SnapshotTimeEvent snapshot)
         {
@@ -24,7 +25,7 @@ public static class TimelineWords
     }
 
     /// <summary>The times the event lists; an edit of the Phase form says which time each is, because it lists several.</summary>
-    public static IReadOnlyList<TimelineTime> TimesOf(TimeEvent timeEvent)
+    public static IReadOnlyList<TimelineTime> TimesOf(ParticipationEventBase timeEvent)
     {
         var isNamed = timeEvent is not SnapshotTimeEvent;
         return

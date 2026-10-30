@@ -104,7 +104,7 @@ public sealed class ToolsProcessTests : IClassFixture<MongoFixture>
         Assert.Equal(1, refused.Code); // an apply that does not say which environment the database is
         Assert.Contains("Nothing was changed: refused.", refused.Output);
         Assert.Equal(0, marked.Code);
-        Assert.Equal("Staging", await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Equal("Staging", await new MongoStorageEnvironment(data.Database).ReadAsync());
         Assert.Equal(0, applied.Code);
         Assert.Contains("Applied.", applied.Output);
         foreach (var text in new[] { dry.Output, refused.Output, marked.Output, applied.Output })

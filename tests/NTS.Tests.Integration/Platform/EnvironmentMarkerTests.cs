@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Not.Application.Environments;
 using Not.Storage.Mongo;
 using NTS.Tests.Integration.Harness;
 
@@ -27,7 +28,7 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     {
         var database = NewDatabase();
 
-        Assert.Null(await EnvironmentMarker.ReadAsync(database));
+        Assert.Null(await new MongoStorageEnvironment(database).ReadAsync());
     }
 
     [Theory]
@@ -38,10 +39,10 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     {
         var database = NewDatabase();
 
-        var written = await EnvironmentMarker.WriteAsync(database, name, NOW);
+        var written = await new MongoStorageEnvironment(database).WriteAsync(name, NOW);
 
         Assert.True(written);
-        Assert.Equal(name, await EnvironmentMarker.ReadAsync(database));
+        Assert.Equal(name, await new MongoStorageEnvironment(database).ReadAsync());
     }
 
     [Fact]
@@ -49,7 +50,7 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     {
         var database = NewDatabase();
 
-        await EnvironmentMarker.WriteAsync(database, "Staging", NOW);
+        await new MongoStorageEnvironment(database).WriteAsync("Staging", NOW);
 
         var document = await database
             .GetCollection<BsonDocument>("environment")
@@ -67,9 +68,9 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     public async Task Writing_the_name_the_marker_has_already_changes_nothing_and_says_so()
     {
         var database = NewDatabase();
-        await EnvironmentMarker.WriteAsync(database, "Staging", NOW);
+        await new MongoStorageEnvironment(database).WriteAsync("Staging", NOW);
 
-        var written = await EnvironmentMarker.WriteAsync(database, "Staging", NOW.AddDays(1));
+        var written = await new MongoStorageEnvironment(database).WriteAsync("Staging", NOW.AddDays(1));
 
         Assert.False(written);
         var document = await database
@@ -86,14 +87,14 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     public async Task A_marker_is_not_changed_to_another_name(string existing, string other)
     {
         var database = NewDatabase();
-        await EnvironmentMarker.WriteAsync(database, existing, NOW);
+        await new MongoStorageEnvironment(database).WriteAsync(existing, NOW);
 
         var refused = await Assert.ThrowsAsync<EnvironmentMarkedException>(
-            () => EnvironmentMarker.WriteAsync(database, other, NOW)
+            () => new MongoStorageEnvironment(database).WriteAsync(other, NOW)
         );
 
         Assert.Equal(existing, refused.Existing);
-        Assert.Equal(existing, await EnvironmentMarker.ReadAsync(database));
+        Assert.Equal(existing, await new MongoStorageEnvironment(database).ReadAsync());
     }
 
     [Theory]
@@ -102,7 +103,7 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     [InlineData(" Development ", "Development")]
     public void A_name_is_known_in_any_case_and_comes_back_as_it_is_written(string typed, string canonical)
     {
-        Assert.Equal(canonical, EnvironmentMarker.Canonical(typed));
+        Assert.Equal(canonical, StorageEnvironmentNames.Canonical(typed));
     }
 
     [Theory]
@@ -113,7 +114,7 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     [InlineData("Test")]
     public void Anything_else_is_not_the_name_of_an_environment(string? typed)
     {
-        Assert.Null(EnvironmentMarker.Canonical(typed));
+        Assert.Null(StorageEnvironmentNames.Canonical(typed));
     }
 
     [Fact]
@@ -121,9 +122,11 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     {
         var database = NewDatabase();
 
-        await Assert.ThrowsAsync<ArgumentException>(() => EnvironmentMarker.WriteAsync(database, "Prod", NOW));
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => new MongoStorageEnvironment(database).WriteAsync("Prod", NOW)
+        );
 
-        Assert.Null(await EnvironmentMarker.ReadAsync(database));
+        Assert.Null(await new MongoStorageEnvironment(database).ReadAsync());
     }
 
     [Fact]
@@ -134,11 +137,11 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
             .GetCollection<BsonDocument>("environment")
             .InsertOneAsync(new BsonDocument { { "_id", "environment" }, { "Name", "Prod" } });
 
-        var read = await EnvironmentMarker.ReadAsync(database);
+        var read = await new MongoStorageEnvironment(database).ReadAsync();
 
         Assert.Equal("Prod", read); // what is there is told as it is, so that nobody takes the database for another one
         await Assert.ThrowsAsync<EnvironmentMarkedException>(
-            () => EnvironmentMarker.WriteAsync(database, "Staging", NOW)
+            () => new MongoStorageEnvironment(database).WriteAsync("Staging", NOW)
         );
     }
 
@@ -153,7 +156,7 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
         marker["_id"] = "environment";
         await database.GetCollection<BsonDocument>("environment").InsertOneAsync(marker);
 
-        Assert.Null(await EnvironmentMarker.ReadAsync(database));
+        Assert.Null(await new MongoStorageEnvironment(database).ReadAsync());
     }
 
     [Theory]
@@ -165,7 +168,7 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     [InlineData(null, false)]
     public void Production_is_told_in_any_case_and_only_by_its_name(string? name, bool isProduction)
     {
-        Assert.Equal(isProduction, EnvironmentMarker.IsProduction(name));
+        Assert.Equal(isProduction, StorageEnvironmentNames.IsProduction(name));
     }
 
     [Theory]
@@ -180,7 +183,7 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     [InlineData(null, false)]
     public void Only_Staging_and_Development_say_that_a_database_is_not_production(string? name, bool isNonProduction)
     {
-        Assert.Equal(isNonProduction, EnvironmentMarker.IsNonProduction(name));
+        Assert.Equal(isNonProduction, StorageEnvironmentNames.IsNonProduction(name));
     }
 
     [Fact]
@@ -189,11 +192,13 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
         var database = NewDatabase();
 
         var results = await Task.WhenAll(
-            Enumerable.Range(0, 6).Select(_ => Task.Run(() => EnvironmentMarker.WriteAsync(database, "Staging", NOW)))
+            Enumerable
+                .Range(0, 6)
+                .Select(_ => Task.Run(() => new MongoStorageEnvironment(database).WriteAsync("Staging", NOW)))
         );
 
         Assert.Equal(1, results.Count(x => x)); // one wrote it
-        Assert.Equal("Staging", await EnvironmentMarker.ReadAsync(database));
+        Assert.Equal("Staging", await new MongoStorageEnvironment(database).ReadAsync());
         Assert.Equal(
             1,
             await database.GetCollection<BsonDocument>("environment").CountDocumentsAsync(new BsonDocument())

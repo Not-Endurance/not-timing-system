@@ -4,7 +4,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Identity.Email;
 
 namespace NTS.Tests.Integration.Harness;
 

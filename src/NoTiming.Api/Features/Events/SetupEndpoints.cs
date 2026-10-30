@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Not.Identity;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Branding;
+using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
@@ -23,6 +24,8 @@ namespace NoTiming.Api.Features.Events;
 internal static class SetupEndpoints
 {
     const string CONFIGURE_EVENTS = "configure-events";
+    const int MAX_NAME_LENGTH = 100;
+    const int MAX_FEI_SHOW_ID_LENGTH = 20;
 
     public static IEndpointRouteBuilder MapSetups(this IEndpointRouteBuilder app)
     {
@@ -36,10 +39,10 @@ internal static class SetupEndpoints
 
     static ReferenceMembers<ConfigureEventModel> Members => SetupDocument.Members;
 
-    // The Event is made in the current Tenant of the account: nothing that is sent names another.
+    // The Event is made in the current Tenant of the account, with the Setup it is sent with: nothing that is sent names another.
     [Requires(Capability.CreateEvent, PlaceIn.CurrentTenant)]
     static async Task<IResult> PostConfigureEvents(
-        JsonApiBody<NewEventAttributes> body,
+        JsonApiBody<NewMembers> body,
         AccessContext access,
         TenantCollections collections,
         EventStore events,
@@ -48,22 +51,48 @@ internal static class SetupEndpoints
     )
     {
         var tenantId = access.Tenant.Id;
-        var attributes = body.Attributes;
-        var requested = body.Id is null ? (Guid?)null : Guid.Parse(body.Id);
-        var (id, created) = await events.CreateAsync(
-            tenantId,
-            requested,
-            attributes.NameText,
-            attributes.LocationText,
-            attributes.FeiShowIdText,
-            cancellationToken
-        );
-        if (!created)
+        var id = body.Id is null ? Guid.NewGuid() : Guid.Parse(body.Id);
+        var setup = new ConfigureEventModel
         {
-            // The same id again is the Event that was made. An Event of another Tenant with it is not told about.
-            var existing = await collections
-                .Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, tenantId)
-                .FindAsync(id, cancellationToken);
+            Competitions = [],
+            Officials = [],
+            Loops = [],
+            Combinations = [],
+        };
+        if (Members.Apply(setup, body.Attributes.Members ?? [], []) is { } malformed)
+        {
+            return malformed;
+        }
+
+        if (Unacceptable(setup) is { } unacceptable)
+        {
+            return unacceptable;
+        }
+
+        ReferenceRows.SetId(setup, id);
+        var setups = collections.Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, tenantId);
+        try
+        {
+            setup.Country ??= await events.CountryOfAsync(tenantId, cancellationToken);
+            if (ReferenceRows.Invalid<ConfigureEventModel, ConfigureEvent>(setup) is { } invalid)
+            {
+                return invalid;
+            }
+
+            if (await setups.InsertAsync(setup, cancellationToken))
+            {
+                log.EventCreated(access.User.Id, id, tenantId);
+                return JsonApiResults.Resource(
+                    StatusCodes.Status201Created,
+                    CONFIGURE_EVENTS,
+                    id.ToString(),
+                    Members.AttributesOf(setup),
+                    $"/api/{CONFIGURE_EVENTS}/{id}"
+                );
+            }
+
+            // The same id again is the Setup that was made. An Event of another Tenant with it is not told about.
+            var existing = await setups.FindAsync(id, cancellationToken);
             return existing is null
                 ? JsonApiResults.IdTaken()
                 : JsonApiResults.Resource(
@@ -73,21 +102,40 @@ internal static class SetupEndpoints
                     Members.AttributesOf(existing)
                 );
         }
+        catch (TenantCountryMissingException)
+        {
+            return EventsFailures.TenantCountryMissing.AsResult();
+        }
+    }
 
-        log.EventCreated(access.User.Id, id, tenantId);
-        return JsonApiResults.Resource(
-            StatusCodes.Status201Created,
-            CONFIGURE_EVENTS,
-            id.ToString(),
-            new
-            {
-                name = attributes.NameText,
-                location = attributes.LocationText,
-                feiShowId = attributes.FeiShowIdText,
-                tenantId,
-            },
-            $"/api/{CONFIGURE_EVENTS}/{id}"
-        );
+    /// <summary>
+    /// What an Event needs whatever else it is made with: a name and a location of one line each, and a FEI show ID that
+    /// is no longer than one can be. What is accepted is put into the Setup trimmed.
+    /// </summary>
+    static IResult? Unacceptable(ConfigureEventModel setup)
+    {
+        var name = setup.Name?.Trim();
+        if (string.IsNullOrEmpty(name) || !OneLineText.IsValid(name, MAX_NAME_LENGTH))
+        {
+            return EventsFailures.InvalidName.AsResult();
+        }
+
+        var location = setup.Location?.Trim();
+        if (string.IsNullOrEmpty(location) || !OneLineText.IsValid(location, MAX_NAME_LENGTH))
+        {
+            return EventsFailures.InvalidLocation.AsResult();
+        }
+
+        var feiShowId = string.IsNullOrWhiteSpace(setup.FeiShowId) ? null : setup.FeiShowId.Trim();
+        if (feiShowId != null && !OneLineText.IsValid(feiShowId, MAX_FEI_SHOW_ID_LENGTH))
+        {
+            return EventsFailures.InvalidFeiShowId.AsResult();
+        }
+
+        setup.Name = name;
+        setup.Location = location;
+        setup.FeiShowId = feiShowId;
+        return null;
     }
 
     [Requires(Capability.SignedIn)]

@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NoTiming.Api.Features.Reference;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Objects;
 using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;

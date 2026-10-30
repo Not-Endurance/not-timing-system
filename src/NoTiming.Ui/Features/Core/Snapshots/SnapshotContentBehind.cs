@@ -24,18 +24,6 @@ public class SnapshotContentBehind : EventPageBehind
         await Observe(SnapshotService);
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await Task.Delay(TimeSpan.FromSeconds(1));
-            if (EventId == null)
-            {
-                await BlazorSocketService.EnsureConnected();
-            }
-        }
-    }
-
     protected Task MoveToSnapshot(Participation? participation)
     {
         try
