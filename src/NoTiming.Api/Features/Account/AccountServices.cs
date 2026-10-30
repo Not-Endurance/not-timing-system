@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Not.Application.Environments;
 using Not.Identity;
 using Not.Identity.Email;
+using Not.Storage.Mongo;
 using NoTiming.Api.JsonApi;
 
 namespace NoTiming.Api.Features.Account;
@@ -22,10 +25,13 @@ internal static class AccountServices
             ConnectionStringOf(provider.GetRequiredService<IConfiguration>())
         ));
         services.AddSingleton<IEmailSender>(CreateEmailSender);
-        services.AddSingleton<IEmailOutbox>(provider =>
-            provider.GetRequiredService<IEmailSender>() as IEmailOutbox
-            ?? throw new InvalidOperationException("The email sender keeps no outbox: set Email:Sender to Outbox.")
-        );
+
+        // What the database says it is (#607): the commands and the routes that must never touch production look here.
+        services.AddSingleton<IStorageEnvironment>(provider =>
+        {
+            var database = provider.GetRequiredService<IOptions<NIdentityOptions>>().Value.Database;
+            return new MongoStorageEnvironment(provider.GetRequiredService<IMongoClient>().GetDatabase(database));
+        });
 
         services.AddDataProtection().SetApplicationName(APPLICATION_NAME);
         services.AddSingleton(AccountText.Load());
@@ -88,11 +94,10 @@ internal static class AccountServices
         return sender switch
         {
             "Brevo" => CreateBrevoSender(configuration),
-            "Console" => ActivatorUtilities.CreateInstance<ConsoleEmailSender>(provider),
-            "Outbox" => new OutboxEmailSender(),
+            "Console" => ActivatorUtilities.CreateInstance<LocalhostEmailSender>(provider),
             null => new UnconfiguredEmailSender(),
             _ => throw new InvalidOperationException(
-                $"The email sender '{sender}' is not known: use Brevo, Console or Outbox."
+                $"The email sender '{sender}' is not known: use Brevo or Console."
             ),
         };
     }

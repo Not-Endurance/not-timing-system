@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using Not.Domain.Exceptions;
 using NoTiming.Api.Features.Live;
 using NoTiming.Ui.Features.Account;

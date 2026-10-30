@@ -15,6 +15,26 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
 
+## Issue body structure
+
+Every issue an agent creates (spec, ticket, bug, chore) uses these three sections in this order, whichever skill publishes it. A skill's own template (Problem Statement / Solution / User Stories, What to build / Acceptance criteria, ...) is not dropped: it becomes the content of `## Details`.
+
+1. `## Overview` - a few sentences: the problem and the solution.
+2. `## Verification` - a `- [ ]` checklist of what a human checks on Staging once this is deployed. Observable behaviour only (what to open or do, and what should be seen), not test names. Write `N/A - not deployable (<reason>)` when nothing can be observed on Staging.
+3. `## Details` - technical instructions plus any other sections the work needs (user stories, implementation and testing decisions, acceptance criteria, blocked-by, out of scope).
+
+Wayfinder maps and their decision tickets keep their own structure.
+
+## Closing issues
+
+Implemented work is closed by merging a PR into the repository's default branch. Every commit and PR that implements an issue carries a closing keyword:
+
+- Commit message: a `Closes #<n>` line before the Co-Authored-By trailer.
+- PR description: `Closes #<n>` for each issue the PR completes. Repeat the keyword per issue: `Closes #1, closes #2`. `Closes #1, #2` only closes the first.
+- Only issues the work completes, never follow-up tickets mentioned in the body. Close a parent spec only when the PR completes its last ticket.
+- GitHub acts on the keyword only when the PR merges into the default branch. A PR into another branch (e.g. a stacked branch) closes nothing, so repeat the keywords in the PR that lands on the default branch.
+- If the work has no issue, omit the keyword.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_

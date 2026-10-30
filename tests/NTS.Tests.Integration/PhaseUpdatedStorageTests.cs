@@ -1,4 +1,5 @@
 using MongoDB.Bson;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using Newtonsoft.Json;
 using Not.Serialization.JSON;
 using NoTiming.Api.JsonApi;

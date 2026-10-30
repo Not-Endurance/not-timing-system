@@ -1,4 +1,5 @@
 using MongoDB.Bson;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using Not.Domain.Exceptions;
 using Not.Notify;
 using NoTiming.Api.Features.Reference;

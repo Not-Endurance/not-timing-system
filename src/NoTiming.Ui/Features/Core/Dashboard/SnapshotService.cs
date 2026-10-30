@@ -1,9 +1,12 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
+using Not.Application.CRUD.Ports;
+using Not.Async;
 using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Notify;
+using NoTiming.Ui.Storage.Browser;
 using NTS.Application.UserSession;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Account;
@@ -18,11 +21,9 @@ using NTS.Domain.Objects;
 namespace NoTiming.Ui.Features.Core.Dashboard;
 
 /// <summary>
-/// The snapshot page's service: the Participations that are still to be timed are a view over the store (ADR-0006),
-/// and the person's selection, the timestamps they capture and the history of what they sent are its own. It keeps the
-/// numbers of the selected Participations, never the Participations. A group that was sent and not answered is the
-/// device's until the server answers (#645, ADR-0013): it is kept before it is sent, with its id, and sent again as the same
-/// group after longer and longer, whatever happens to the page, so that a lost answer never records a time twice.
+/// The snapshot page's service: the Participations that are still to be timed are a view over the store (ADR-0006), and the
+/// person's selection, the timestamps they capture and the history of what they sent are its own. What was sent and is not answered
+/// for good waits in <see cref="WaitingGroups"/> (#645, ADR-0013), and is sent again until the server answers.
 /// </summary>
 public class SnapshotService
     : NStatefulService,
@@ -31,28 +32,23 @@ public class SnapshotService
         INotificationHandler<EventDisconnected>,
         IScoped
 {
-    static readonly TimeSpan FIRST_RESEND = TimeSpan.FromSeconds(5);
-    static readonly TimeSpan LONGEST_WAIT = TimeSpan.FromSeconds(60);
-
     readonly IAccountSession _account;
+    readonly IDurableRepository<DurableSnapshotGroup> _groups;
     readonly List<SnapshotGroup> _history = [];
     readonly INotifier _notifier;
     readonly INtsSocketContext _socketContext;
     readonly IParticipationStore _store;
     readonly ISnapshotPublisher _snapshotPublisher;
-    readonly ISnapshotResendTimer _timer;
-    readonly IUnansweredSnapshots _unansweredSnapshots;
-    readonly object _snapshotSelectionPersistenceLock = new();
     readonly List<Snapshot> _snapshots = [];
-    readonly SemaphoreSlim _sending = new(1, 1);
+    readonly WaitingGroups _waiting;
+    readonly SelectionSaver _selections;
+    readonly Gate _sending = new();
     readonly HashSet<SnapshotGroup> _withoutId = [];
     readonly CancellationTokenSource _stopped = new();
     readonly IWitnessUserSession _userSessionService;
     IReadOnlyList<Participation> _participations = [];
     IReadOnlyList<Participation> _participationsToSnapshot = [];
     Task _resending = Task.CompletedTask;
-    Task _snapshotSelectionPersistence = Task.CompletedTask;
-    WaitingGroup? _unanswered;
 
     public SnapshotService(
         INtsSocketContext socketContext,
@@ -60,19 +56,19 @@ public class SnapshotService
         IWitnessUserSession userSessionService,
         ISnapshotPublisher snapshotPublisher,
         IAccountSession account,
-        IUnansweredSnapshots unansweredSnapshots,
-        ISnapshotResendTimer timer,
+        IDurableRepository<DurableSnapshotGroup> groups,
         INotifier notifier
     )
     {
         _socketContext = socketContext;
         _store = store;
         _userSessionService = userSessionService;
-        _snapshotPublisher = snapshotPublisher;
         _account = account;
-        _unansweredSnapshots = unansweredSnapshots;
-        _timer = timer;
+        _groups = groups;
         _notifier = notifier;
+        _snapshotPublisher = snapshotPublisher;
+        _waiting = new WaitingGroups(account, groups, snapshotPublisher);
+        _selections = new SelectionSaver(userSessionService);
         Observe(store, Rebuild);
     }
 
@@ -81,7 +77,11 @@ public class SnapshotService
     public IReadOnlyList<Snapshot> Snapshots => _snapshots;
     public IReadOnlyList<SnapshotGroup> History => _history;
 
-    public SnapshotGroup? Unanswered => _unanswered is { CanBeSentAgain: true } waiting ? waiting.Group : null;
+    /// <summary>The first group that waits to be sent again; none when nothing waits.</summary>
+    public SnapshotGroup? Unanswered => Waiting.FirstOrDefault();
+
+    /// <summary>Every group that waits to be sent again, in the order they were made.</summary>
+    public IReadOnlyList<SnapshotGroup> Waiting => _waiting.Waiting;
 
     /// <summary>Completes when no group is being sent again.</summary>
     public Task Resending => _resending;
@@ -145,7 +145,7 @@ public class SnapshotService
                 ruleset: participation.Competition.Ruleset
             )
         );
-        QueueSnapshotSelectionPersistence();
+        SaveSelections();
         Rebuild();
     }
 
@@ -159,7 +159,7 @@ public class SnapshotService
         }
 
         FlushSnapshots([snapshot.Number]);
-        QueueSnapshotSelectionPersistence();
+        SaveSelections();
         Rebuild();
     }
 
@@ -176,8 +176,11 @@ public class SnapshotService
                     return false;
                 }
 
-                var (snapshotGroup, receipts) = await SendAsync(view.Event.Id, readySnapshots, snapshotType);
-                return await Settle(view, snapshotGroup, receipts, snapshotType);
+                var group =
+                    _waiting.RepeatOf(view.Event.Id, readySnapshots, snapshotType)
+                    ?? new SnapshotGroup(readySnapshots, snapshotType);
+                var receipts = await _waiting.Send(view.Event.Id, group);
+                return await Settle(view, group, receipts, snapshotType);
             }
         );
     }
@@ -190,16 +193,51 @@ public class SnapshotService
             view,
             async () =>
             {
-                var (_, receipts) = await SendAsync(
-                    view.Event.Id,
-                    [.. snapshotGroup.Entries.Select(CopySnapshot)],
-                    snapshotType
-                );
+                var snapshots = snapshotGroup.Entries.Select(CopySnapshot).ToList();
+                if (snapshots.Count == 0)
+                {
+                    return true;
+                }
+
+                var group =
+                    _waiting.RepeatOf(view.Event.Id, snapshots, snapshotType)
+                    ?? new SnapshotGroup(snapshots, snapshotType);
+                var receipts = await _waiting.Send(view.Event.Id, group);
+                await _waiting.Release(view.Event.Id, group, receipts);
                 await AskAgainWhenRefused(receipts);
-                RefuseWhenNotRecorded(view, receipts);
+                SnapshotReceipts.RefuseWhenNotRecorded(view, receipts);
                 return true;
             }
         );
+    }
+
+    public void Resume(IViewedEvent view)
+    {
+        if (CanResend(view))
+        {
+            StartResending(view);
+        }
+    }
+
+    public void UpdateTimestamp(Snapshot snapshot, Timestamp timestamp)
+    {
+        GuardHelper.ThrowIfDefault(snapshot);
+        GuardHelper.ThrowIfDefault(timestamp);
+
+        var existingSnapshot = _snapshots.FirstOrDefault(x => x.Number == snapshot.Number);
+        if (existingSnapshot == null)
+        {
+            return;
+        }
+
+        existingSnapshot.Timestamp = timestamp;
+        SaveSelections();
+        EmitChanged();
+    }
+
+    public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
+    {
+        await ReloadState();
     }
 
     public bool CanUpdate(SnapshotGroup group, Snapshot entry)
@@ -231,7 +269,7 @@ public class SnapshotService
                     _stopped.Token
                 );
                 await AskAgainWhenRefused([receipt]);
-                RefuseWhenNotRecorded(view, [receipt]);
+                SnapshotReceipts.RefuseWhenNotRecorded(view, [receipt]);
                 if (!receipt.IsAccepted)
                 {
                     throw new DomainException(
@@ -247,38 +285,9 @@ public class SnapshotService
         );
     }
 
-    public void Resume(IViewedEvent view)
-    {
-        if (CanResend(view))
-        {
-            StartResending(view);
-        }
-    }
-
-    public void UpdateTimestamp(Snapshot snapshot, Timestamp timestamp)
-    {
-        GuardHelper.ThrowIfDefault(snapshot);
-        GuardHelper.ThrowIfDefault(timestamp);
-
-        var existingSnapshot = _snapshots.FirstOrDefault(x => x.Number == snapshot.Number);
-        if (existingSnapshot == null)
-        {
-            return;
-        }
-
-        existingSnapshot.Timestamp = timestamp;
-        QueueSnapshotSelectionPersistence();
-        EmitChanged();
-    }
-
-    public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
-    {
-        await ReloadState();
-    }
-
     public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
     {
-        _unanswered = null;
+        _waiting.Clear();
         _history.Clear();
         _withoutId.Clear();
         _snapshots.Clear();
@@ -288,40 +297,64 @@ public class SnapshotService
         return Task.CompletedTask;
     }
 
-    static bool IsRecorded(IReadOnlyList<SnapshotReceipt> receipts, Guid id)
-    {
-        return receipts.Any(x => x.Id == id && x.IsRecorded);
-    }
-
-    static bool IsSame(IEnumerable<Snapshot> sent, IReadOnlyList<Snapshot> snapshots)
-    {
-        var before = sent.ToList();
-        return before.Count == snapshots.Count
-            && before.Zip(snapshots, (x, y) => x.Number == y.Number && x.Timestamp == y.Timestamp).All(same => same);
-    }
-
     /// <summary>
-    /// The person is told why the first Snapshot that was not recorded was not: the Api's own words. The view is told the code,
-    /// which says to a view of a Live Event that the Event has ended when it has (#631).
+    /// Sends every group of the Event that waits again, in the order they were made, for as long as the view that started the
+    /// retries may send. A group the server then refuses is said to the person once and is not sent again. A failure to reach the
+    /// server is not a stop: the next round tries again. Reports true when no group waits any longer.
     /// </summary>
-    static void RefuseWhenNotRecorded(IViewedEvent view, IReadOnlyList<SnapshotReceipt> receipts)
+    async Task<bool> ResendRound(IViewedEvent view, CancellationToken cancellationToken)
     {
-        if (receipts.FirstOrDefault(x => !x.IsRecorded) is { } failed)
+        await _sending.WaitToEnter(cancellationToken);
+        try
         {
-            view.Refused(failed.ErrorCode);
-            throw new DomainException(failed.ErrorMessage ?? failed.ErrorCode ?? "The Snapshot was not recorded.");
+            // What was true when the wait began may not be now: a group is answered, or the person may no longer send it.
+            // Each group is read as it is when its turn comes: a group that an earlier send changed or answered is sent as that.
+            foreach (var id in _waiting.IdsWaitingFor(view.Event.Id))
+            {
+                if (!view.CanWrite)
+                {
+                    break;
+                }
+
+                await ResendOne(view, id, cancellationToken);
+            }
         }
+        finally
+        {
+            _sending.Exit();
+        }
+
+        return !CanResend(view);
     }
 
     /// <summary>
-    /// Whether the server not recording a Snapshot is only for now: it could not be reached or answered badly (5xx, or no
-    /// status), asked for time (408, 429) or said to send it again (a Participation changed by too many at once). Anything
-    /// else, such as a person who may not or an Event that has ended, is its answer, and the same request gets the same one.
+    /// Sends one waiting group again. A failure that is not the server's answer, such as a request that timed out, leaves the group
+    /// waiting for the next round.
     /// </summary>
-    static bool IsOnlyForNow(SnapshotReceipt notRecorded)
+    async Task ResendOne(IViewedEvent view, Guid id, CancellationToken cancellationToken)
     {
-        return notRecorded.Status is 0 or 408 or 429 or >= 500
-            || string.Equals(notRecorded.ErrorCode, "participation-busy", StringComparison.Ordinal);
+        if (_waiting.Find(id) is not { } waiting)
+        {
+            return;
+        }
+
+        try
+        {
+            var receipts = await _waiting.Send(waiting.EventId, waiting.Group);
+            await Settle(view, waiting.Group, receipts, waiting.Group.Type);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (DomainException ex)
+        {
+            _notifier.Warn(ex.Message);
+        }
+        catch (Exception)
+        {
+            // The server was not reached again: the next round.
+        }
     }
 
     /// <summary>
@@ -330,7 +363,7 @@ public class SnapshotService
     /// </summary>
     async Task<bool> Sending(IViewedEvent view, Func<Task<bool>> send)
     {
-        await _sending.WaitAsync();
+        await _sending.WaitToEnter();
         try
         {
             return await send();
@@ -342,7 +375,7 @@ public class SnapshotService
                 StartResending(view);
             }
 
-            _sending.Release();
+            _sending.Exit();
         }
     }
 
@@ -357,21 +390,43 @@ public class SnapshotService
         SnapshotType snapshotType
     )
     {
-        var recorded = snapshotGroup.Entries.Where(x => IsRecorded(receipts, snapshotGroup.IdOf(x))).ToList();
+        var recorded = snapshotGroup
+            .Entries.Where(x => SnapshotReceipts.IsRecorded(receipts, snapshotGroup.IdOf(x)))
+            .ToList();
         if (recorded.Count > 0)
         {
             var sent = new SnapshotGroup(recorded, snapshotType, snapshotGroup.Id);
-            await DrainSnapshotSelectionPersistence();
+            await _selections.Saved;
             await KeepInHistory(sent);
 
             _history.Add(sent);
             FlushSnapshots(recorded.Select(x => x.Number).ToHashSet());
+            await _waiting.Release(view.Event.Id, snapshotGroup, receipts);
             Rebuild();
         }
 
         await AskAgainWhenRefused(receipts);
-        RefuseWhenNotRecorded(view, receipts);
+        SnapshotReceipts.RefuseWhenNotRecorded(view, receipts);
         return recorded.Count > 0;
+    }
+
+    /// <summary>The group of the history that was sent last as that kind of time for the start number: the one whose entry can be corrected.</summary>
+    SnapshotGroup? LatestOf(int number, SnapshotType type)
+    {
+        return _history.LastOrDefault(x => x.Type == type && x.Entries.Any(y => y.Number == number));
+    }
+
+    /// <summary>The time the server took is what the history that is kept shows too; one that cannot be kept is shown by this page still.</summary>
+    async Task KeepTimeInHistory(SnapshotGroup group, Snapshot entry)
+    {
+        try
+        {
+            await _userSessionService.UpdateSnapshotInHistory(group.Id, entry.Number, entry.Timestamp!);
+        }
+        catch
+        {
+            // The server has the time, which is what matters; the history of this page shows it as it is held in memory.
+        }
     }
 
     /// <summary>
@@ -387,193 +442,69 @@ public class SnapshotService
     }
 
     /// <summary>
-    /// Sends the Snapshots as a group and says what came of it. The group is kept on the device before it goes, so that it is
-    /// sent again from there if the page is lost meanwhile. A group that was sent and is not known to have been recorded,
-    /// because the request failed or the server recorded none of it, is sent again as the same group, with the same ids, when
-    /// the same Snapshots are sent as the same kind: what the server did record, and whose answer was lost, comes back with
-    /// its first outcome and is not recorded twice (ADR-0013). Anything else is a new gesture, with new ids.
-    /// </summary>
-    async Task<(SnapshotGroup Group, IReadOnlyList<SnapshotReceipt> Receipts)> SendAsync(
-        Guid eventId,
-        IReadOnlyList<Snapshot> snapshots,
-        SnapshotType snapshotType
-    )
-    {
-        var group =
-            _unanswered is { } before
-            && before.EventId == eventId
-            && before.Group.Type == snapshotType
-            && IsSame(before.Group.Entries, snapshots)
-                ? before.Group
-                : new SnapshotGroup(snapshots, snapshotType);
-        await Keep(eventId, group);
-        try
-        {
-            var receipts = await _snapshotPublisher.PublishSnapshotsAsync(eventId, group);
-            await Answered(eventId, group, receipts);
-            return (group, receipts);
-        }
-        catch (Exception ex) when (ex is not DomainException)
-        {
-            _unanswered = new WaitingGroup(eventId, group, true);
-            throw;
-        }
-    }
-
-    /// <summary>
-    /// The group that no answer has come to waits, and is sent again when what came was only for now; the server recording
-    /// any of it, or refusing it, is its answer, and the group is the device's no more.
-    /// </summary>
-    async Task Answered(Guid eventId, SnapshotGroup group, IReadOnlyList<SnapshotReceipt> receipts)
-    {
-        if (receipts.Any(x => x.IsRecorded))
-        {
-            _unanswered = null;
-            await Forget(eventId);
-            return;
-        }
-
-        var onlyForNow = receipts.Any(IsOnlyForNow);
-        _unanswered = new WaitingGroup(eventId, group, onlyForNow);
-        if (!onlyForNow)
-        {
-            await Forget(eventId);
-        }
-    }
-
-    /// <summary>
-    /// Whether a group that can be sent again waits for the Event the view shows and the person may send it: a group is only
-    /// sent on the authority of the Event it is of, and not while the person may not.
+    /// Whether a group that waits for the Event the view shows may be sent: a group is only sent on the authority of the Event it is of,
+    /// and not while the person may not.
     /// </summary>
     bool CanResend(IViewedEvent view)
     {
-        return _unanswered is { CanBeSentAgain: true } waiting && waiting.EventId == view.Event.Id && view.CanWrite;
+        return view.CanWrite && _waiting.HasWaitingFor(view.Event.Id);
     }
 
+    /// <summary>
+    /// Starts the loop that sends the waiting groups again, on the authority of the view it starts with: a loop that is running keeps
+    /// the view it began with, so that the group of another Event is not sent by it.
+    /// </summary>
     void StartResending(IViewedEvent view)
     {
         if (_resending.IsCompleted)
         {
-            _resending = ResendUntilAnswered(view);
+            _resending = _groups.RetryDurably(() => CanResend(view), token => ResendRound(view, token), _stopped.Token);
         }
     }
 
     /// <summary>
-    /// Sends the group that waits again after a while, and after longer and longer (up to a minute), for as long as it can be
-    /// sent and the person may send it. A group the server then refuses is said to the person once and is not sent again.
-    /// </summary>
-    async Task ResendUntilAnswered(IViewedEvent view)
-    {
-        var wait = FIRST_RESEND;
-        while (!_stopped.IsCancellationRequested && CanResend(view))
-        {
-            try
-            {
-                await _timer.Wait(wait, _stopped.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-
-            wait = TimeSpan.FromTicks(Math.Min(wait.Ticks * 2, LONGEST_WAIT.Ticks));
-            try
-            {
-                await ResendAsync(view);
-            }
-            catch (DomainException ex)
-            {
-                _notifier.Warn(ex.Message);
-            }
-            catch (OperationCanceledException) when (_stopped.IsCancellationRequested)
-            {
-                return;
-            }
-            catch (Exception)
-            {
-                // The server was not reached again: the next round.
-            }
-        }
-    }
-
-    async Task ResendAsync(IViewedEvent view)
-    {
-        await _sending.WaitAsync(_stopped.Token);
-        try
-        {
-            // What was true when the wait began may not be now: the group is answered, or the person may no longer send it.
-            if (!CanResend(view))
-            {
-                return;
-            }
-
-            var waiting = _unanswered!;
-            var (group, receipts) = await SendAsync(
-                waiting.EventId,
-                [.. waiting.Group.Entries.Select(CopySnapshot)],
-                waiting.Group.Type
-            );
-            await Settle(view, group, receipts, group.Type);
-        }
-        finally
-        {
-            _sending.Release();
-        }
-    }
-
-    /// <summary>
-    /// The group the device kept for the person and the Event, if there is one, selected again with the times it was made
-    /// with. What the page holds of the same Event stays when the device holds nothing, as a storage that cannot be written
-    /// keeps nothing and the group is then sent from the page for as long as the page is open.
+    /// The groups the device kept for the person and the Event are selected again with the times they were made with. A group that is
+    /// already here is not added twice, and the page goes on with what the session holds when nothing can be read.
     /// </summary>
     async Task RestoreUnanswered()
     {
         await _account.Load();
-        if (_account.Current is not { } person || _socketContext.Event is not { } selected)
+        if (_socketContext.Event is not { } selected)
         {
-            _unanswered = null;
+            _waiting.Clear();
             return;
         }
 
-        if (_unanswered is { } held && held.EventId != selected.Id)
+        foreach (var group in await _waiting.Restore(selected.Id))
         {
-            _unanswered = null;
-        }
-
-        if (await _unansweredSnapshots.Read(person.Id, selected.Id) is not { } kept)
-        {
-            return;
-        }
-
-        _unanswered = new WaitingGroup(selected.Id, kept, true);
-        foreach (var entry in kept.Entries)
-        {
-            // What is sent is what was kept: the time it was captured at takes the place of what the session had of it.
-            _snapshots.RemoveAll(x => x.Number == entry.Number);
-            _snapshots.Add(CopySnapshot(entry));
+            foreach (var entry in group.Entries)
+            {
+                // What is sent is what was kept: the time it was captured at takes the place of what the session had of it.
+                _snapshots.RemoveAll(x => x.Number == entry.Number);
+                _snapshots.Add(CopySnapshot(entry));
+            }
         }
     }
 
-    async Task Keep(Guid eventId, SnapshotGroup group)
+    void SaveSelections()
     {
-        if (_account.Current is { } person)
-        {
-            await _unansweredSnapshots.Keep(person.Id, eventId, group);
-        }
+        _selections.Save(_snapshots.Select(CopySnapshot).ToArray());
     }
 
-    async Task Forget(Guid eventId)
+    /// <summary>
+    /// The person's own record of what they sent is a convenience, and the server already has the Snapshots: a record that
+    /// cannot be kept (the host failed, the session ended) does not undo what was sent, or leave it selected to be sent twice.
+    /// </summary>
+    async Task KeepInHistory(SnapshotGroup sent)
     {
-        if (_account.Current is { } person)
+        try
         {
-            await _unansweredSnapshots.Forget(person.Id, eventId);
+            await _userSessionService.AppendSnapshot(sent);
         }
-    }
-
-    /// <summary>The group of the history that was sent last as that kind of time for the start number: the one whose entry can be corrected.</summary>
-    SnapshotGroup? LatestOf(int number, SnapshotType type)
-    {
-        return _history.LastOrDefault(x => x.Type == type && x.Entries.Any(y => y.Number == number));
+        catch
+        {
+            // The history of this page still shows it, as it is held in memory.
+        }
     }
 
     void FlushSnapshots(HashSet<int> participationNumbers)
@@ -621,98 +552,6 @@ public class SnapshotService
         }
     }
 
-    void QueueSnapshotSelectionPersistence()
-    {
-        var snapshots = _snapshots.Select(CopySnapshot).ToArray();
-
-        lock (_snapshotSelectionPersistenceLock)
-        {
-            _snapshotSelectionPersistence = PersistSnapshotSelectionsAfter(_snapshotSelectionPersistence, snapshots);
-        }
-    }
-
-    async Task PersistSnapshotSelectionsAfter(Task previous, IReadOnlyCollection<Snapshot> snapshots)
-    {
-        await Task.Yield();
-
-        try
-        {
-            await previous;
-        }
-        catch
-        {
-            // Previous selection persistence is intentionally best effort.
-        }
-
-        try
-        {
-            await _userSessionService.ReplaceSnapshotSelections(snapshots);
-        }
-        catch
-        {
-            // Snapshot selection persistence must not block witness timing flow.
-        }
-    }
-
-    /// <summary>
-    /// The person's own record of what they sent is a convenience, and the server already has the Snapshots: a record that
-    /// cannot be kept (the host failed, the session ended) does not undo what was sent, or leave it selected to be sent twice.
-    /// </summary>
-    async Task KeepInHistory(SnapshotGroup sent)
-    {
-        try
-        {
-            await _userSessionService.AppendSnapshot(sent);
-        }
-        catch
-        {
-            // The history of this page still shows it, as it is held in memory.
-        }
-    }
-
-    /// <summary>The time the server took is what the history that is kept shows too; one that cannot be kept is shown by this page still.</summary>
-    async Task KeepTimeInHistory(SnapshotGroup group, Snapshot entry)
-    {
-        try
-        {
-            await _userSessionService.UpdateSnapshotInHistory(group.Id, entry.Number, entry.Timestamp!);
-        }
-        catch
-        {
-            // The server has the time, which is what matters; the history of this page shows it as it is held in memory.
-        }
-    }
-
-    async Task DrainSnapshotSelectionPersistence()
-    {
-        while (true)
-        {
-            var persistence = GetSnapshotSelectionPersistence();
-
-            try
-            {
-                await persistence;
-            }
-            catch
-            {
-                // Background persistence failures are intentionally ignored.
-            }
-
-            if (ReferenceEquals(persistence, GetSnapshotSelectionPersistence()))
-            {
-                return;
-            }
-        }
-    }
-
-    Task GetSnapshotSelectionPersistence()
-    {
-        lock (_snapshotSelectionPersistenceLock)
-        {
-            return _snapshotSelectionPersistence;
-        }
-    }
-
     static Snapshot CopySnapshot(Snapshot snapshot)
     {
         return new Snapshot(
@@ -722,20 +561,5 @@ public class SnapshotService
             snapshot.Timestamp == null ? null : Timestamp.Copy(snapshot.Timestamp),
             snapshot.Ruleset
         );
-    }
-
-    /// <summary>The group that was sent and not answered, and whether the server may answer it yet: only when what came was for now.</summary>
-    sealed class WaitingGroup
-    {
-        public WaitingGroup(Guid eventId, SnapshotGroup group, bool canBeSentAgain)
-        {
-            EventId = eventId;
-            Group = group;
-            CanBeSentAgain = canBeSentAgain;
-        }
-
-        public Guid EventId { get; }
-        public SnapshotGroup Group { get; }
-        public bool CanBeSentAgain { get; }
     }
 }

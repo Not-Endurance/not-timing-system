@@ -64,7 +64,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         var report = await StagingSeed.Run(data.Database, Seed(), NOW);
 
         Assert.True(report.Applied);
-        Assert.Equal("Staging", await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Equal("Staging", await new MongoStorageEnvironment(data.Database).ReadAsync());
         var bulgaria = await data.Collection("countries").Find(new BsonDocument("IsoCode", "BG")).SingleAsync();
         Assert.Equal("Bulgaria", bulgaria["Name"].AsString);
         var tenant = await data.Collection("tenants").Find(new BsonDocument("_id", "country-bg")).SingleAsync();
@@ -374,7 +374,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
     public async Task A_database_that_is_marked_Production_is_refused_and_nothing_is_changed()
     {
         var data = NewData();
-        await EnvironmentMarker.WriteAsync(data.Database, "Production", NOW);
+        await new MongoStorageEnvironment(data.Database).WriteAsync("Production", NOW);
         var before = await data.AllAsync();
 
         var report = await StagingSeed.Run(data.Database, Seed(environment: null), NOW);
@@ -399,10 +399,10 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         Assert.True(unnamed.Refused);
         Assert.Contains(unnamed.Refusals, x => x.Contains("--environment"));
         Assert.True(unknown.Refused);
-        Assert.Null(await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Null(await new MongoStorageEnvironment(data.Database).ReadAsync());
         Assert.Empty(await data.AllAsync());
 
-        await EnvironmentMarker.WriteAsync(data.Database, "Staging", NOW);
+        await new MongoStorageEnvironment(data.Database).WriteAsync("Staging", NOW);
         var before = await data.AllAsync();
         var misspelt = await StagingSeed.Run(data.Database, Seed(environment: "Prod"), NOW); // a marked database does not excuse it
         Assert.True(misspelt.Refused);
@@ -452,14 +452,14 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         Assert.Contains(unnamed.Refusals, x => x.Contains(marker));
         Assert.True(named.Refused);
         Assert.Equal(before, await data.AllAsync());
-        Assert.Equal(marker, await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Equal(marker, await new MongoStorageEnvironment(data.Database).ReadAsync());
     }
 
     [Fact]
     public async Task A_database_marked_as_the_other_non_production_environment_is_refused_and_one_that_says_the_same_is_seeded()
     {
         var data = NewData();
-        await EnvironmentMarker.WriteAsync(data.Database, "Development", NOW);
+        await new MongoStorageEnvironment(data.Database).WriteAsync("Development", NOW);
 
         var other = await StagingSeed.Run(data.Database, Seed(environment: "Staging"), NOW);
         var same = await StagingSeed.Run(data.Database, Seed(environment: "development"), NOW);
@@ -469,7 +469,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         Assert.Contains(other.Refusals, x => x.Contains("Development"));
         Assert.True(same.Applied);
         Assert.True(unnamed.Applied); // the marker says what it is
-        Assert.Equal("Development", await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Equal("Development", await new MongoStorageEnvironment(data.Database).ReadAsync());
     }
 
     [Theory]

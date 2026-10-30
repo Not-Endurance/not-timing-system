@@ -2,6 +2,8 @@ using System.Net.Mail;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using Not.Application.Environments;
+using Not.Storage;
 using Not.Storage.Mongo;
 using NTS.Application.Factories;
 using NTS.Contracts.Setup.Models;
@@ -62,6 +64,7 @@ public static class StagingSeed
     sealed class Seeding
     {
         readonly IMongoDatabase _database;
+        readonly IStorageEnvironment _environment;
         readonly StagingSeedOptions _options;
         readonly DateTimeOffset _now;
         readonly List<Person> _people = [];
@@ -79,6 +82,7 @@ public static class StagingSeed
         public Seeding(IMongoDatabase database, StagingSeedOptions options, DateTimeOffset now)
         {
             _database = database;
+            _environment = new MongoStorageEnvironment(database);
             _options = options;
             _now = now;
             Report = new StagingSeedReport(options.Apply);
@@ -105,7 +109,7 @@ public static class StagingSeed
         {
             if (Report.MarkWith != null)
             {
-                await EnvironmentMarker.WriteAsync(_database, Report.MarkWith, _now);
+                await _environment.WriteAsync(Report.MarkWith, _now);
             }
 
             if (_country != null)
@@ -165,14 +169,14 @@ public static class StagingSeed
 
         async Task ReadMarkerAsync()
         {
-            Report.MarkedAs = await EnvironmentMarker.ReadAsync(_database);
-            var named = EnvironmentMarker.Canonical(_options.Environment);
+            Report.MarkedAs = await _environment.ReadAsync();
+            var named = StorageEnvironmentNames.Canonical(_options.Environment);
             if (!string.IsNullOrWhiteSpace(_options.Environment) && named == null)
             {
                 Report.Refuse($"'{_options.Environment}' is not an environment: use Staging or Development.");
             }
 
-            if (EnvironmentMarker.IsProduction(Report.MarkedAs) || EnvironmentMarker.IsProduction(named))
+            if (StorageEnvironmentNames.IsProduction(Report.MarkedAs) || StorageEnvironmentNames.IsProduction(named))
             {
                 Report.Refuse("The database is marked Production, and nothing is seeded into production.");
                 return;
@@ -180,7 +184,7 @@ public static class StagingSeed
 
             if (Report.MarkedAs != null)
             {
-                if (!EnvironmentMarker.IsNonProduction(Report.MarkedAs))
+                if (!StorageEnvironmentNames.IsNonProduction(Report.MarkedAs))
                 {
                     Report.Refuse(
                         $"The database says it is '{Report.MarkedAs}', which is not Staging or Development, and nothing is seeded into a database that does not say it is one: remove the document of the environment collection by hand if it is wrong."

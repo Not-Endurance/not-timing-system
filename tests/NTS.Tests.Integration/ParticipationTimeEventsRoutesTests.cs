@@ -1,3 +1,4 @@
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using System.Net;
 using System.Text.Json;
 using MongoDB.Bson;

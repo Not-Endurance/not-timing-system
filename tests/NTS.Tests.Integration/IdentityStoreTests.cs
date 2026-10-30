@@ -281,6 +281,22 @@ public sealed class IdentityStoreTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task The_expiry_indexes_of_sessions_and_challenges_stay_on_the_stored_names_other_tools_know()
+    {
+        await using var store = await StoreAsync();
+        var challenges = store.Sessions.Database.GetCollection<BsonDocument>("auth_challenges");
+
+        // ADR-0014: the properties are ExpiresAtUtc, the stored field and the index keep their names.
+        var sessionExpiry = await IndexNamed(store.Sessions, "sessions_expiry");
+        var challengeExpiry = await IndexNamed(challenges, "challenges_expiry");
+
+        Assert.Equal(new BsonDocument("ExpiresAt", 1), sessionExpiry["key"]);
+        Assert.Equal(0, sessionExpiry["expireAfterSeconds"].ToInt32());
+        Assert.Equal(new BsonDocument("ExpiresAt", 1), challengeExpiry["key"]);
+        Assert.Equal(0, challengeExpiry["expireAfterSeconds"].ToInt32());
+    }
+
+    [Fact]
     public async Task Starting_again_changes_nothing_and_duplicate_emails_stop_the_host_with_a_way_out()
     {
         await using var store = await StoreAsync();
@@ -324,5 +340,11 @@ public sealed class IdentityStoreTests : IClassFixture<MongoFixture>
     Task<IdentityStoreHarness> StoreAsync()
     {
         return IdentityStoreHarness.CreateAsync(_mongo);
+    }
+
+    static async Task<BsonDocument> IndexNamed(IMongoCollection<BsonDocument> collection, string name)
+    {
+        var indexes = await (await collection.Indexes.ListAsync()).ToListAsync();
+        return indexes.Single(x => x["name"].AsString == name);
     }
 }

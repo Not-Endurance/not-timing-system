@@ -1,3 +1,4 @@
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Microsoft.Playwright;

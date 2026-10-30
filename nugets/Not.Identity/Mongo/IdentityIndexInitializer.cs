@@ -108,7 +108,7 @@ public sealed class IdentityIndexInitializer : IHostedService
         await sessions.Indexes.CreateManyAsync(
             [
                 new CreateIndexModel<SessionDocument>(
-                    Builders<SessionDocument>.IndexKeys.Ascending(x => x.ExpiresAt),
+                    Builders<SessionDocument>.IndexKeys.Ascending(x => x.ExpiresAtUtc),
                     new CreateIndexOptions { Name = "sessions_expiry", ExpireAfter = TimeSpan.Zero }
                 ),
                 new CreateIndexModel<SessionDocument>(
@@ -128,7 +128,7 @@ public sealed class IdentityIndexInitializer : IHostedService
         await challenges.Indexes.CreateManyAsync(
             [
                 new CreateIndexModel<CodeChallenge>(
-                    Builders<CodeChallenge>.IndexKeys.Ascending(x => x.ExpiresAt),
+                    Builders<CodeChallenge>.IndexKeys.Ascending(x => x.ExpiresAtUtc),
                     new CreateIndexOptions { Name = "challenges_expiry", ExpireAfter = TimeSpan.Zero }
                 ),
                 new CreateIndexModel<CodeChallenge>(

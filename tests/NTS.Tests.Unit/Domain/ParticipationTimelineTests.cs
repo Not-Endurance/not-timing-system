@@ -1,3 +1,4 @@
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using Not.Domain.Exceptions;
 using Not.Exceptions;
 using NTS.Domain.Aggregates;
@@ -625,7 +626,7 @@ public sealed class ParticipationTimelineTests
         Assert.Null(edit.DisabledAt);
     }
 
-    static TimeEvent Process(Participation participation, Snapshot snapshot)
+    static ParticipationEventBase Process(Participation participation, Snapshot snapshot)
     {
         return participation.Process(snapshot, ACTOR, RECORDED);
     }

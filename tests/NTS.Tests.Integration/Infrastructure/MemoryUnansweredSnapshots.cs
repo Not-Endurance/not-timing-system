@@ -1,3 +1,5 @@
+// Commented out with IUnansweredSnapshots (#645, ADR-0013): the durable store replaces it, and the integration tests are reworked in a separate session.
+/*
 using System.Collections.Concurrent;
 using NoTiming.Ui.Features.Core.Dashboard;
 using NTS.Domain.Core.Objects.Snapshots;
@@ -34,3 +36,4 @@ internal sealed class MemoryUnansweredSnapshots : IUnansweredSnapshots
         return Task.CompletedTask;
     }
 }
+*/
