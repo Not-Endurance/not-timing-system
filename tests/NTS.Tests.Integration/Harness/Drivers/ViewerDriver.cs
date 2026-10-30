@@ -20,6 +20,8 @@ using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Tests.Integration.Harness;
+using Not.Blazor.Client.Browser;
+using Microsoft.JSInterop;
 
 namespace NTS.Tests.Integration.Harness.Drivers;
 
@@ -44,17 +46,18 @@ internal sealed class ViewerDriver : IAsyncDisposable
     readonly SessionCookies _cookies = new();
     readonly NtsIntegrationFixture? _fixture;
     readonly string _clientName;
+    readonly MemoryLocalStorage _browser;
 
     /// <param name="user">
     /// Must be null: the Witness is a visitor until a person is signed in at the Api, which is done by
     /// <see cref="SignedInAsync"/> or, on a driver made with the fixture, by <see cref="SignIn"/>.
     /// </param>
-    /// <param name="unanswered">What the browser of the Witness keeps of a group that was sent and not answered: another Witness given the same stands for the page being opened again.</param>
+    /// <param name="browser">What the browser of the Witness keeps of a group that was sent and not answered: another Witness given the same stands for the page being opened again.</param>
     public ViewerDriver(
         Uri apiBaseUrl,
         IntegrationUser? user,
         string clientName,
-        MemoryUnansweredSnapshots? unanswered = null
+        MemoryLocalStorage? browser = null
     )
     {
         if (user != null)
@@ -66,12 +69,13 @@ internal sealed class ViewerDriver : IAsyncDisposable
         }
 
         _clientName = clientName;
-        _unanswered = unanswered ?? new MemoryUnansweredSnapshots();
+        _browser = browser ?? new MemoryLocalStorage();
         var configuration = CreateConfiguration(apiBaseUrl, ApplicationConstants.LIVE_HUB, clientName);
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
+        services.AddSingleton<ILocalStorage>(new BrowserLocalStorage(_browser));
 
         // The resources are reached at the Api, as the Ui does where its page came from.
         services.Configure<JsonApiSettings>(settings =>
@@ -92,8 +96,8 @@ internal sealed class ViewerDriver : IAsyncDisposable
     }
 
     /// <summary>A Witness of the Api of the fixture, as a visitor, who can sign a person in later.</summary>
-    public ViewerDriver(NtsIntegrationFixture fixture, string clientName, MemoryUnansweredSnapshots? unanswered = null)
-        : this(fixture.ApiBaseUrl, null, clientName, unanswered)
+    public ViewerDriver(NtsIntegrationFixture fixture, string clientName, MemoryLocalStorage? browser = null)
+        : this(fixture.ApiBaseUrl, null, clientName, browser)
     {
         _fixture = fixture;
     }

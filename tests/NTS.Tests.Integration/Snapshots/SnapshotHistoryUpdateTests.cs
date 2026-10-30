@@ -19,6 +19,8 @@ using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
 using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Harness.TenancySeed;
+using Not.Blazor.Client.Browser;
+using NoTiming.Ui.Storage.Browser;
 
 namespace NTS.Tests.Integration;
 
@@ -47,7 +49,7 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
     {
         var (api, official, eventId, ids) = await SceneAsync(1);
         await using var host = api;
-        var kept = new MemoryUnansweredSnapshots();
+        var kept = new MemoryLocalStorage();
         await using var page = await Page.OpenAsync(api, official, eventId, kept);
         await SendAsync(page, 1, ARRIVE);
         var group = Assert.Single(page.Service.History);
@@ -80,7 +82,7 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
     {
         var (api, official, eventId, ids) = await SceneAsync(1);
         await using var host = api;
-        var kept = new MemoryUnansweredSnapshots();
+        var kept = new MemoryLocalStorage();
         await using var page = await Page.OpenAsync(api, official, eventId, kept);
         await SendAsync(page, 1, ARRIVE);
         var group = Assert.Single(page.Service.History);
@@ -107,7 +109,7 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
     {
         var (api, official, eventId, _) = await SceneAsync(1);
         await using var host = api;
-        await using var writer = await Page.OpenAsync(api, official, eventId, new MemoryUnansweredSnapshots());
+        await using var writer = await Page.OpenAsync(api, official, eventId, new MemoryLocalStorage());
         await SendAsync(writer, 1, ARRIVE);
         var group = Assert.Single(writer.Service.History);
         var entry = Assert.Single(group.Entries);
@@ -115,7 +117,7 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
             api,
             official,
             eventId,
-            new MemoryUnansweredSnapshots(),
+            new MemoryLocalStorage(),
             canWrite: false
         );
 
@@ -193,7 +195,7 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
             ApiFactory api,
             Person person,
             Guid eventId,
-            MemoryUnansweredSnapshots kept,
+            MemoryLocalStorage kept,
             bool canWrite = true
         )
         {
@@ -213,8 +215,12 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
                 sessions,
                 new SnapshotApiPublisher(json),
                 account,
-                kept,
-                new SnapshotResendTimer(),
+                new BrowserDurableRepository<DurableSnapshotGroup>(
+                    new BrowserLocalStorage(kept),
+                    new TaskDelay(),
+                    DurableSnapshotGroup.KEY_PREFIX,
+                    DurableSnapshotGroup.Options
+                ),
                 new Quiet()
             );
             await service.Load();

@@ -24,6 +24,8 @@ using NTS.Domain.Objects;
 using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
 using static NTS.Tests.Integration.Harness.TenancySeed;
+using Not.Blazor.Client.Browser;
+using NoTiming.Ui.Storage.Browser;
 
 namespace NTS.Tests.Integration;
 
@@ -290,8 +292,12 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
                 sessions,
                 new SnapshotApiPublisher(json),
                 account,
-                new MemoryUnansweredSnapshots(),
-                new SnapshotResendTimer(),
+                new BrowserDurableRepository<DurableSnapshotGroup>(
+                    new BrowserLocalStorage(new MemoryLocalStorage()),
+                    new TaskDelay(),
+                    DurableSnapshotGroup.KEY_PREFIX,
+                    DurableSnapshotGroup.Options
+                ),
                 new Quiet()
             );
             await service.Load();

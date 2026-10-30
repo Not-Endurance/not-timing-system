@@ -5,6 +5,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
+using NoTiming.Api.Features.Localhost;
 using NTS.Tests.Integration.Harness;
 using static NTS.Tests.Integration.LocalSignInHarness;
 
@@ -121,7 +122,7 @@ public sealed class LocalSignInTests : IClassFixture<SharedApiFixture>
 
         Assert.Equal(HttpStatusCode.NotFound, post.StatusCode);
         Assert.DoesNotContain("sign-in-as-page", await page.Content.ReadAsStringAsync());
-        Assert.Empty(api.Services.GetServices<HostPublicEndpoints>());
+        Assert.Empty(api.Services.GetServices<LocalhostPublicEndpoints>());
     }
 
     [Fact]
@@ -204,7 +205,7 @@ public sealed class LocalSignInTests : IClassFixture<SharedApiFixture>
 
         Assert.Equal(HttpStatusCode.NotFound, post.StatusCode);
         Assert.DoesNotContain("sign-in-as-page", await page.Content.ReadAsStringAsync());
-        Assert.Empty(api.Services.GetServices<HostPublicEndpoints>());
+        Assert.Empty(api.Services.GetServices<LocalhostPublicEndpoints>());
     }
 
     [Fact]
@@ -311,7 +312,7 @@ public sealed class LocalSignInTests : IClassFixture<SharedApiFixture>
         var email = UserSeed.NewEmail("local");
         await using var api = ApiOf(email);
 
-        var entries = api.Services.GetRequiredService<HostPublicEndpoints>().Entries;
+        var entries = api.Services.GetRequiredService<LocalhostPublicEndpoints>().Entries;
 
         Assert.Equal(
             ["sign-in GET,HEAD dev/sign-in-as", "sign-in POST api/dev/sessions"],

@@ -57,10 +57,10 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<SharedApiFixture>
     [Fact]
     public async Task A_Tenant_Root_makes_an_Event_with_everything_its_Setup_holds_in_one_request()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        await using var api = new ApiFactory(_shared.MongoConnectionString);
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var id = Guid.NewGuid();
         var sent = ConfigureEventModel.From(SetupFactory.Full(id, "Full Setup"));
 
@@ -74,14 +74,13 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<SharedApiFixture>
         )!;
         received.Id = id;
         received.TenantId = sent.TenantId;
-        received.MainOperatorId = sent.MainOperatorId;
         Assert.Equal(
             JsonSerializer.Serialize(sent, JsonApiResults.Options),
             JsonSerializer.Serialize(received, JsonApiResults.Options)
         );
-        var stored = (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!;
+        var stored = (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, id))!;
         Assert.Equal(tenant, stored["TenantId"].AsString);
-        Assert.Equal(root.Id, stored["MainOperatorId"].AsGuid);
+        Assert.False(stored.Contains("MainOperatorId")); // no Main Operator: Root runs the Event, and Console Operators are grants
         Assert.Single(stored["Competitions"].AsBsonArray);
         Assert.Equal(2, stored["Loops"].AsBsonArray.Count);
     }
@@ -89,10 +88,10 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<SharedApiFixture>
     [Fact]
     public async Task A_Setup_the_domain_does_not_accept_is_422_when_an_Event_is_made_with_it_and_none_is_made()
     {
-        await using var api = new ApiFactory(_mongo.ConnectionString);
+        await using var api = new ApiFactory(_shared.MongoConnectionString);
         using var client = ApiClients.Of(api);
-        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var id = Guid.NewGuid();
         var attributes = AttributesOf(ConfigureEventModel.From(SetupFactory.Full(id, "Twin loops")));
         var loops = JsonNode.Parse(attributes["loops"].GetRawText())!.AsArray();
@@ -105,7 +104,7 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<SharedApiFixture>
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.Equal("invalid-attribute", await ErrorCodeAsync(response));
-        Assert.Null(await EventSeed.SetupOfAsync(_mongo.ConnectionString, id));
+        Assert.Null(await EventSeed.SetupOfAsync(_shared.MongoConnectionString, id));
     }
 
     [Fact]

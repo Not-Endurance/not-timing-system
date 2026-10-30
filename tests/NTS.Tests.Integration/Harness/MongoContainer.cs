@@ -62,7 +62,7 @@ internal sealed class MongoContainer : IAsyncDisposable
 
     static async Task ReleaseAsync(MongoDbContainer container)
     {
-        using var docker = new DockerClientConfiguration().CreateClient();
+        using var docker = new DockerClientBuilder().Build();
 
         IReadOnlyList<string> volumes;
         try

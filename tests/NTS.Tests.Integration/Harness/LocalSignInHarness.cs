@@ -43,11 +43,11 @@ internal static class LocalSignInHarness
     {
         var database = new MongoClient(connectionString).GetDatabase(MongoLease.DatabaseNameOf(connectionString));
         await database
-            .GetCollection<BsonDocument>(EnvironmentMarker.COLLECTION)
+            .GetCollection<BsonDocument>(MongoStorageEnvironment.COLLECTION)
             .DeleteManyAsync(FilterDefinition<BsonDocument>.Empty);
         if (name != null)
         {
-            await EnvironmentMarker.WriteAsync(database, name, DateTimeOffset.UtcNow);
+            await new MongoStorageEnvironment(database).WriteAsync(name, DateTimeOffset.UtcNow);
         }
     }
 
@@ -57,8 +57,8 @@ internal static class LocalSignInHarness
         await SetMarkerAsync(connectionString, null);
         await new MongoClient(connectionString)
             .GetDatabase(MongoLease.DatabaseNameOf(connectionString))
-            .GetCollection<BsonDocument>(EnvironmentMarker.COLLECTION)
-            .InsertOneAsync(new BsonDocument { { "_id", EnvironmentMarker.ID }, { "Name", name } });
+            .GetCollection<BsonDocument>(MongoStorageEnvironment.COLLECTION)
+            .InsertOneAsync(new BsonDocument { { "_id", MongoStorageEnvironment.ID }, { "Name", name } });
     }
 
     public static Task<HttpResponseMessage> SignInAsAsync(
