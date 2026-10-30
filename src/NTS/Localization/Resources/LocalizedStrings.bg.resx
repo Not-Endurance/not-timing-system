@@ -1380,4 +1380,16 @@
   <data name="Nothing_found_string" xml:space="preserve">
     <value>Не е намерено нищо</value>
   </data>
+  <data name="Estimates_string" xml:space="preserve">
+    <value>Прогнози</value>
+  </data>
+  <data name="FEI_string" xml:space="preserve">
+    <value>FEI</value>
+  </data>
+  <data name="Regional_string" xml:space="preserve">
+    <value>Регионални</value>
+  </data>
+  <data name="Both_string" xml:space="preserve">
+    <value>Двете</value>
+  </data>
 </root>

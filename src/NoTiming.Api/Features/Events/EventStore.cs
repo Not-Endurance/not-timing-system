@@ -2,6 +2,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Tenancy;
+using NTS.Contracts.Shared.Models;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
 
@@ -69,51 +70,15 @@ internal sealed class EventStore
     }
 
     /// <summary>
-    /// Makes an Event in the Tenant: a Setup with a name and a location, the country of the Tenant, nothing configured yet,
-    /// and the account that makes it as its Main Operator, with the id the client made for it or one of the server's.
-    /// Created is false when an Event with the id is there already, whoever's it is.
+    /// The country of the Tenant, which an Event made in it has unless it is made with another. No Event is made in a
+    /// Tenant whose country is not among the countries.
     /// </summary>
-    public async Task<(Guid Id, bool Created)> CreateAsync(
-        string tenantId,
-        Guid? requestedId,
-        Guid mainOperator,
-        string name,
-        string location,
-        string? feiShowId,
-        CancellationToken cancellationToken
-    )
+    public async Task<CountryModel> CountryOfAsync(string tenantId, CancellationToken cancellationToken)
     {
         var country =
             (await _countries.AllAsync(cancellationToken)).FirstOrDefault(x => Tenant.ForCountry(x).Id == tenantId)
             ?? throw new TenantCountryMissingException(tenantId);
-        var id = requestedId ?? Guid.NewGuid();
-        var document = new BsonDocument
-        {
-            { "_id", BsonGuids.Binary(id) },
-            { "Name", name },
-            { "Location", location },
-            { "Country", CountryDocument(country) },
-            { "MainOperatorId", BsonGuids.Binary(mainOperator) },
-            { "Competitions", new BsonArray() },
-            { "Officials", new BsonArray() },
-            { "Operators", new BsonArray() },
-            { "Loops", new BsonArray() },
-            { "Combinations", new BsonArray() },
-        };
-        if (feiShowId != null)
-        {
-            document["FeiShowId"] = feiShowId;
-        }
-
-        try
-        {
-            await _tenants.Of(TenantOwned.CONFIGURE_EVENTS, tenantId).InsertAsync(document, cancellationToken);
-            return (id, true);
-        }
-        catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-        {
-            return (id, false);
-        }
+        return CountryModel.From(country);
     }
 
     /// <summary>
@@ -201,28 +166,5 @@ internal sealed class EventStore
     static BsonDocument IdsOf(IEnumerable<Guid> ids)
     {
         return new BsonDocument("_id", new BsonDocument("$in", new BsonArray(ids.Select(BsonGuids.Binary))));
-    }
-
-    /// <summary>The country as the Setup embeds it: the fields of a country document, with the constant Tenant of the countries.</summary>
-    static BsonDocument CountryDocument(Country country)
-    {
-        var document = new BsonDocument
-        {
-            { "_id", BsonGuids.Binary(country.Id) },
-            { TenantOwned.TENANT_ID, Tenant.LEGACY_ID },
-            { "Name", country.Name },
-            { "IsoCode", country.IsoCode },
-        };
-        if (country.NfCode != null)
-        {
-            document["NfCode"] = country.NfCode;
-        }
-
-        if (country.Locale != null)
-        {
-            document["Locale"] = country.Locale;
-        }
-
-        return document;
     }
 }

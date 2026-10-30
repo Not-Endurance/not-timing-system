@@ -1,6 +1,7 @@
 using Not.Blazor.Components.Abstractions;
 using NoTiming.Ui.Features.Socket;
 using NTS.Contracts.Features.Access;
+using NTS.Contracts.Socket;
 
 namespace NoTiming.Ui.Features.Home;
 
@@ -23,6 +24,9 @@ public class HomeContentBehind : NStatefulComponent
     [Inject]
     BlazorSocketService BlazorSocketService { get; set; } = default!;
 
+    [Inject]
+    INtsSocketService SocketService { get; set; } = default!;
+
     protected override async Task OnInitializedAsync()
     {
         await Observe(AccessState);
@@ -42,7 +46,7 @@ public class HomeContentBehind : NStatefulComponent
             return;
         }
 
-        Navigator.NavigateTo(WitnessAccessPolicy.ResolveHomeRoute(AccessState.AccessLevel));
+        Navigator.NavigateTo(WitnessAccessPolicy.ResolveHomeRoute(AccessState.AccessLevel, SocketService.Event?.Id));
     }
 
     public override void Dispose()

@@ -42,7 +42,6 @@ internal sealed class ViewerDriver : IAsyncDisposable
     readonly IParticipationContext _participationContext;
     readonly IWitnessAccessContext _accessContext;
     readonly SessionCookies _cookies = new();
-    readonly MemoryUnansweredSnapshots _unanswered;
     readonly NtsIntegrationFixture? _fixture;
     readonly string _clientName;
 
@@ -85,7 +84,6 @@ internal sealed class ViewerDriver : IAsyncDisposable
         // A browser sends the session cookie of the page's own host on every request, and keeps what the app asks it to keep;
         // a program has to send the cookie itself, and keeps what a Witness keeps in memory.
         services.AddHttpClient(nameof(JsonApiClient)).AddHttpMessageHandler(() => new SessionCookieHandler(_cookies));
-        services.Replace(ServiceDescriptor.Singleton<IUnansweredSnapshots>(_unanswered));
 
         _provider = services.BuildServiceProvider();
         _socketService = _provider.GetRequiredService<INtsSocketService>();
@@ -101,9 +99,6 @@ internal sealed class ViewerDriver : IAsyncDisposable
     }
 
     public WitnessAccessLevel AccessLevel => _accessContext.AccessLevel;
-
-    /// <summary>What the browser of this Witness keeps of a group that was sent and not answered.</summary>
-    public MemoryUnansweredSnapshots Unanswered => _unanswered;
 
     public T GetRequiredService<T>()
         where T : notnull

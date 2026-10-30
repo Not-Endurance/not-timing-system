@@ -1,4 +1,5 @@
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
@@ -11,7 +12,7 @@ namespace NTS.Contracts.Core.Models;
 /// </summary>
 public class TimeEventModel
 {
-    public static TimeEventModel MapFrom(TimeEvent timeEvent)
+    public static TimeEventModel MapFrom(ParticipationEventBase timeEvent)
     {
         return new TimeEventModel
         {
@@ -47,7 +48,7 @@ public class TimeEventModel
     /// <summary>When the Main Operator disabled the event; none while it is not disabled.</summary>
     public DateTimeOffset? DisabledAt { get; init; }
 
-    public TimeEvent MapToEntity()
+    public ParticipationEventBase MapToEntity()
     {
         if (Kind == TimeEventKind.PhaseUpdated)
         {
@@ -99,7 +100,7 @@ public class TimeEventModel
         };
     }
 
-    static TimeEventKind KindOf(TimeEvent timeEvent)
+    static TimeEventKind KindOf(ParticipationEventBase timeEvent)
     {
         return timeEvent switch
         {

@@ -28,6 +28,11 @@ public class Gate : IDisposable
         return _semaphore.WaitAsync();
     }
 
+    public Task WaitToEnter(CancellationToken cancellationToken)
+    {
+        return _semaphore.WaitAsync(cancellationToken);
+    }
+
     public void Exit()
     {
         _semaphore.Release();

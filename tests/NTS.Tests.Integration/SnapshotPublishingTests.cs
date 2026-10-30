@@ -4,6 +4,7 @@ using NoTiming.Ui.Features.Core.Dashboard;
 using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;

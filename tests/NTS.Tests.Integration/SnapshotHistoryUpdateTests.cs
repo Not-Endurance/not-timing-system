@@ -11,6 +11,7 @@ using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Core;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;

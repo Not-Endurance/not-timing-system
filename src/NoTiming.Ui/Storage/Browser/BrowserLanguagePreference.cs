@@ -1,5 +1,6 @@
 using System.Globalization;
 using Microsoft.JSInterop;
+using Not.Blazor.Client.Browser;
 using Not.Injection;
 using NoTiming.Ui.Features.Account;
 
@@ -13,14 +14,12 @@ namespace NoTiming.Ui.Storage.Browser;
 public sealed class BrowserLanguagePreference : ILanguagePreference, IScoped
 {
     const string KEY = "nts.language";
-    const string GET_ITEM = "localStorage.getItem";
-    const string SET_ITEM = "localStorage.setItem";
 
-    readonly IJSRuntime _browser;
+    readonly ILocalStorage _storage;
 
-    public BrowserLanguagePreference(IJSRuntime browser)
+    public BrowserLanguagePreference(ILocalStorage storage)
     {
-        _browser = browser;
+        _storage = storage;
     }
 
     public string Current => Languages.CodeOf(CultureInfo.CurrentUICulture);
@@ -30,7 +29,7 @@ public sealed class BrowserLanguagePreference : ILanguagePreference, IScoped
         string? stored;
         try
         {
-            stored = await _browser.InvokeAsync<string?>(GET_ITEM, KEY);
+            stored = await _storage.GetItem(KEY);
         }
         catch (Exception ex) when (ex is JSException or InvalidOperationException)
         {
@@ -52,6 +51,6 @@ public sealed class BrowserLanguagePreference : ILanguagePreference, IScoped
     public async Task Choose(string code)
     {
         var chosen = Languages.Chosen(code) ?? throw new ArgumentException("The app is not written in that language.");
-        await _browser.InvokeVoidAsync(SET_ITEM, KEY, chosen);
+        await _storage.SetItem(KEY, chosen);
     }
 }
