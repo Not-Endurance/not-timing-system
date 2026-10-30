@@ -6,25 +6,30 @@ public record ArrivelistEntry : ValueObject
         int number,
         string athleteName,
         string horseName,
-        Timestamp? fastest,
-        Timestamp? average,
-        Timestamp? slowest
+        ArrivalEstimates fei,
+        ArrivalEstimates regional
     )
     {
         Number = number;
         AthleteName = athleteName;
         HorseName = horseName;
-        Fast = fastest;
-        Average = average;
-        Slow = slowest;
+        Fei = fei;
+        Regional = regional;
     }
 
-    internal Timestamp? SortEstimate => Fast ?? Average ?? Slow;
+    internal Timestamp? SortEstimate => Fei.SortEstimate;
 
     public int Number { get; }
     public string AthleteName { get; }
     public string HorseName { get; }
-    public Timestamp? Fast { get; }
-    public Timestamp? Average { get; }
-    public Timestamp? Slow { get; }
+
+    /// <summary>
+    /// Estimates on the FEI model - cumulative distance over cumulative interval, recovery included.
+    /// </summary>
+    public ArrivalEstimates Fei { get; }
+
+    /// <summary>
+    /// Estimates on the Regional model - the active loop alone, recovery and ride history excluded.
+    /// </summary>
+    public ArrivalEstimates Regional { get; }
 }

@@ -2,6 +2,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Tenancy;
+using NTS.Contracts.Shared.Models;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
 
@@ -66,71 +67,101 @@ internal sealed class EventStore
     }
 
     /// <summary>
-    /// Makes an Event in the Tenant: a Setup with a name and a location, the country of the Tenant and nothing configured
-    /// yet, with the id the client made for it or one of the server's. Created is false when an Event with the id is there
-    /// already, whoever's it is.
+    /// The country of the Tenant, which an Event made in it has unless it is made with another. No Event is made in a
+    /// Tenant whose country is not among the countries.
     /// </summary>
-    public async Task<(Guid Id, bool Created)> CreateAsync(
-        string tenantId,
-        Guid? requestedId,
-        string name,
-        string location,
-        string? feiShowId,
-        CancellationToken cancellationToken
-    )
+    public async Task<CountryModel> CountryOfAsync(string tenantId, CancellationToken cancellationToken)
     {
         var country =
             (await _countries.AllAsync(cancellationToken)).FirstOrDefault(x => Tenant.ForCountry(x).Id == tenantId)
             ?? throw new TenantCountryMissingException(tenantId);
-        var id = requestedId ?? Guid.NewGuid();
-        var document = new BsonDocument
-        {
-            { "_id", BsonGuids.Binary(id) },
-            { "Name", name },
-            { "Location", location },
-            { "Country", CountryDocument(country) },
-            { "Competitions", new BsonArray() },
-            { "Officials", new BsonArray() },
-            { "Operators", new BsonArray() },
-            { "Loops", new BsonArray() },
-            { "Combinations", new BsonArray() },
-        };
-        if (feiShowId != null)
-        {
-            document["FeiShowId"] = feiShowId;
-        }
-
-        try
-        {
-            await _tenants.Of(TenantOwned.CONFIGURE_EVENTS, tenantId).InsertAsync(document, cancellationToken);
-            return (id, true);
-        }
-        catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-        {
-            return (id, false);
-        }
+        return CountryModel.From(country);
     }
 
-    /// <summary>The country as the Setup embeds it: the fields of a country document, with the constant Tenant of the countries.</summary>
-    static BsonDocument CountryDocument(Country country)
+    /// <summary>
+    /// Puts the account in as the Main Operator of an Event that has not started, in its Setup. False when the Event is
+    /// not there any more.
+    /// </summary>
+    public Task<bool> AssignMainOperatorAsync(EventRecord record, Guid account, CancellationToken cancellationToken)
     {
-        var document = new BsonDocument
+        return SetMainOperatorAsync(TenantOwned.CONFIGURE_EVENTS, record, account, cancellationToken);
+    }
+
+    /// <summary>
+    /// The ids of the Events of the Tenant that the account runs now: the ones it was made the Main Operator of that have
+    /// not started, and the started ones it holds. A started Event is the Core's, so what the Setup says of its Main
+    /// Operator does not count once it has started, as the reads across Tenants have it.
+    /// </summary>
+    public async Task<IReadOnlyList<Guid>> RunByAsync(
+        string? tenantId,
+        Guid account,
+        CancellationToken cancellationToken
+    )
+    {
+        var mine = new BsonDocument("MainOperatorId", BsonGuids.Binary(account));
+        var cores = _tenants.Of(TenantOwned.EVENT_INFORMATIONS, tenantId);
+        var configured = await _tenants
+            .Of(TenantOwned.CONFIGURE_EVENTS, tenantId)
+            .FindIdsAsync(mine, cancellationToken);
+        var held = await cores.FindIdsAsync(mine, cancellationToken);
+        var started = configured.Count == 0 ? [] : await cores.FindIdsAsync(IdsOf(configured), cancellationToken);
+        return [.. configured.Except(started).Union(held)];
+    }
+
+    /// <summary>
+    /// The Main Operator that each of the Events has now, for those of the ids that have started: it is the Core's, which a
+    /// hand-over changes and the Setup does not know.
+    /// </summary>
+    public async Task<IReadOnlyDictionary<Guid, Guid?>> StartedOperatorsAsync(
+        string? tenantId,
+        IReadOnlyCollection<Guid> ids,
+        CancellationToken cancellationToken
+    )
+    {
+        var operators = new Dictionary<Guid, Guid?>();
+        if (ids.Count == 0)
         {
-            { "_id", BsonGuids.Binary(country.Id) },
-            { TenantOwned.TENANT_ID, Tenant.LEGACY_ID },
-            { "Name", country.Name },
-            { "IsoCode", country.IsoCode },
-        };
-        if (country.NfCode != null)
-        {
-            document["NfCode"] = country.NfCode;
+            return operators;
         }
 
-        if (country.Locale != null)
+        var cores = await _tenants
+            .Of(TenantOwned.EVENT_INFORMATIONS, tenantId)
+            .FindAsync(IdsOf(ids), cancellationToken);
+        foreach (var core in cores)
         {
-            document["Locale"] = country.Locale;
+            if (BsonGuids.Of(core, "_id") is { } id)
+            {
+                operators[id] = BsonGuids.Of(core, "MainOperatorId");
+            }
         }
 
-        return document;
+        return operators;
+    }
+
+    /// <summary>Puts the account in as the Main Operator of an Event that is Live, in its Core document.</summary>
+    public Task<bool> HandOverAsync(EventRecord record, Guid account, CancellationToken cancellationToken)
+    {
+        return SetMainOperatorAsync(TenantOwned.EVENT_INFORMATIONS, record, account, cancellationToken);
+    }
+
+    Task<bool> SetMainOperatorAsync(
+        string collection,
+        EventRecord record,
+        Guid account,
+        CancellationToken cancellationToken
+    )
+    {
+        return _tenants
+            .Of(collection, record.TenantId)
+            .UpdateAsync(
+                new BsonDocument("_id", BsonGuids.Binary(record.Id)),
+                Builders<BsonDocument>.Update.Set("MainOperatorId", BsonGuids.Binary(account)),
+                cancellationToken
+            );
+    }
+
+    static BsonDocument IdsOf(IEnumerable<Guid> ids)
+    {
+        return new BsonDocument("_id", new BsonDocument("$in", new BsonArray(ids.Select(BsonGuids.Binary))));
     }
 }

@@ -4,11 +4,6 @@ public static class Routes
 {
     const string EVENT_ID_SEGMENT = "{eventId:guid}";
     public const string HOME = "/";
-    public const string SNAPSHOT_PAGE = "/snapshot";
-    public const string STARTLIST_PAGE = "/startlist";
-    public const string ARRIVELIST_PAGE = "/arrivelist";
-    public const string PRESENTLIST_PAGE = "/presentlist";
-    public const string PERFORMANCE_PAGE = "/performance";
     public const string EVENT_SNAPSHOT_PAGE = $"/events/{EVENT_ID_SEGMENT}/snapshot";
     public const string EVENT_STARTLIST_PAGE = $"/events/{EVENT_ID_SEGMENT}/startlist";
     public const string EVENT_ARRIVELIST_PAGE = $"/events/{EVENT_ID_SEGMENT}/arrivelist";
@@ -23,8 +18,7 @@ public static class Routes
 
     /// <summary>
     /// The address of a page of an Event, which the route names (#630, ADR-0007): the route of the page with the Event's id
-    /// in it. The pages with no Event in their address are the same pages for the Live Event the app follows, which the
-    /// bookmarks of the viewers of old point to.
+    /// in it.
     /// </summary>
     public static string Of(string eventPage, Guid eventId)
     {

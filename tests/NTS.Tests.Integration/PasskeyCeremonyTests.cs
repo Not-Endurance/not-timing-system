@@ -6,7 +6,6 @@ using Microsoft.Playwright;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Not.Identity;
-using Not.Identity.Email;
 using NoTiming.Api.Features.Account;
 using NTS.Tests.Integration.Infrastructure;
 

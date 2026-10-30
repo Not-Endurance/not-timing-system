@@ -6,6 +6,7 @@ using NoTiming.Api.Features.Branding;
 using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
+using NoTiming.Api.Features.Localhost;
 using NoTiming.Api.Features.Participants;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
@@ -60,9 +61,7 @@ internal static class ApiPipeline
         // The routes that declare what they need are mapped through the group the endpoint filter is on (ADR-0012, #671).
         var guarded = app.MapGroup(string.Empty).AddEndpointFilter<AccessFilter>();
         guarded.MapAccount();
-#if DEBUG
-        app.MapLocalSignIn();
-#endif
+        app.MapLocalhost();
         guarded.MapProfile();
         guarded.MapTenancy();
         guarded.MapBranding();
@@ -110,7 +109,7 @@ internal static class ApiPipeline
 
         // Fail closed: a route of the Api that is neither public nor declares what it needs does not let the host start.
 #if DEBUG
-        var hostEntries = app.Services.GetService<HostPublicEndpoints>()?.Entries;
+        var hostEntries = app.Services.GetService<LocalhostPublicEndpoints>()?.Entries;
 #else
         IEnumerable<PublicEndpoint>? hostEntries = null;
 #endif

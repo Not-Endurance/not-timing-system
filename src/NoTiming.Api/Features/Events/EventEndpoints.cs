@@ -1,27 +1,31 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
-using Not.Identity;
-using NoTiming.Api.Features.Access;
-using NoTiming.Api.Features.Profile;
-using NoTiming.Api.Features.Tenancy;
-using NoTiming.Api.JsonApi;
 using NTS.Contracts.Setup.Models;
 using NTS.Domain.Access;
+using NTS.Domain.Setup.Aggregates;
+using NoTiming.Api.Features.Access;
+using NoTiming.Api.Features.Profile;
+using NoTiming.Api.Features.Reference;
+using NoTiming.Api.Features.Tenancy;
+using NoTiming.Api.JsonApi;
+using Not.Identity;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace NoTiming.Api.Features.Events;
 
 /// <summary>
 /// Creating an Event, and what a person may do about one (#643, ADR-0012). Root makes an Event in the Tenant it is acting
-/// in and runs it, or assigns Console Operators to run it (<c>/api/console-operators</c>). What a person may do about an
-/// Event is told by <c>GET /api/events/{id}/capabilities</c> from the same policy that refuses it. The Event is made with a
-/// name and a location and nothing else: it cannot be given a Tenant by what is sent, and the rest of its Setup is the
-/// Setup's own routes.
+/// in, with its Setup in one request, as a change of the Setup names it: the members it may name are the ones it is made
+/// with. Console Operators run it, assigned after it (<c>/api/console-operators</c>). What a person may do about an Event is
+/// told by <c>GET /api/events/{id}/capabilities</c> from the same policy that refuses it. The Event cannot be given a Tenant
+/// by what is sent.
 /// </summary>
 internal static class EventEndpoints
 {
     const string CONFIGURE_EVENTS = "configure-events";
     const string CAPABILITIES = "capabilities";
+    const int MAX_NAME_LENGTH = 100;
+    const int MAX_FEI_SHOW_ID_LENGTH = 20;
 
     public static IEndpointRouteBuilder MapEvents(this IEndpointRouteBuilder app)
     {
@@ -30,10 +34,10 @@ internal static class EventEndpoints
         return app;
     }
 
-    // The Event is made in the current Tenant of the account: nothing that is sent names another.
+    // The Event is made in the current Tenant of the account, with the Setup it is sent with: nothing that is sent names another.
     [Requires(Capability.CreateEvent, PlaceIn.CurrentTenant)]
     static async Task<IResult> Create(
-        JsonApiBody<NewEventAttributes> body,
+        JsonApiBody<NewMembers> body,
         AccessContext access,
         TenantCollections collections,
         EventStore events,
@@ -42,22 +46,48 @@ internal static class EventEndpoints
     )
     {
         var tenantId = access.Tenant.Id;
-        var attributes = body.Attributes;
-        var requested = body.Id is null ? (Guid?)null : Guid.Parse(body.Id);
-        var (id, created) = await events.CreateAsync(
-            tenantId,
-            requested,
-            attributes.NameText,
-            attributes.LocationText,
-            attributes.FeiShowIdText,
-            cancellationToken
-        );
-        if (!created)
+        var setup = new ConfigureEventModel
         {
+            Competitions = [],
+            Officials = [],
+            Loops = [],
+            Combinations = [],
+        };
+        if (SetupEndpoints.Members.Apply(setup, body.Attributes.Members ?? [], []) is { } malformed)
+        {
+            return malformed;
+        }
+
+        if (Unacceptable(setup) is { } unacceptable)
+        {
+            return unacceptable;
+        }
+
+        var id = body.Id is null ? Guid.NewGuid() : Guid.Parse(body.Id);
+        setup.Id = id;
+        var setups = collections.Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, tenantId);
+        try
+        {
+            setup.Country ??= await events.CountryOfAsync(tenantId, cancellationToken);
+            if (ReferenceEndpoints.Invalid<ConfigureEventModel, ConfigureEvent>(setup) is { } invalid)
+            {
+                return invalid;
+            }
+
+            if (await setups.InsertAsync(setup, cancellationToken))
+            {
+                log.EventCreated(access.User.Id, id, tenantId);
+                return JsonApiResults.Resource(
+                    StatusCodes.Status201Created,
+                    CONFIGURE_EVENTS,
+                    id.ToString(),
+                    SetupEndpoints.Members.AttributesOf(setup),
+                    $"/api/{CONFIGURE_EVENTS}/{id}"
+                );
+            }
+
             // The same id again is the Event that was made. An Event of another Tenant with it is not told about.
-            var existing = await collections
-                .Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, tenantId)
-                .FindAsync(id, cancellationToken);
+            var existing = await setups.FindAsync(id, cancellationToken);
             return existing is null
                 ? JsonApiResults.IdTaken()
                 : JsonApiResults.Resource(
@@ -67,21 +97,56 @@ internal static class EventEndpoints
                     SetupEndpoints.Members.AttributesOf(existing)
                 );
         }
+        catch (TenantCountryMissingException)
+        {
+            return JsonApiResults.Error(
+                StatusCodes.Status409Conflict,
+                "tenant-country-missing",
+                "The country of the Tenant is not among the countries, so no Event can be made in it."
+            );
+        }
+    }
 
-        log.EventCreated(access.User.Id, id, tenantId);
-        return JsonApiResults.Resource(
-            StatusCodes.Status201Created,
-            CONFIGURE_EVENTS,
-            id.ToString(),
-            new
-            {
-                name = attributes.NameText,
-                location = attributes.LocationText,
-                feiShowId = attributes.FeiShowIdText,
-                tenantId,
-            },
-            $"/api/{CONFIGURE_EVENTS}/{id}"
-        );
+    /// <summary>
+    /// What an Event needs whatever else it is made with: a name and a location of one line each, and a FEI show ID that
+    /// is no longer than one can be. What is accepted is put into the Setup trimmed.
+    /// </summary>
+    static IResult? Unacceptable(ConfigureEventModel setup)
+    {
+        var name = setup.Name?.Trim();
+        if (string.IsNullOrEmpty(name) || !OneLineText.IsValid(name, MAX_NAME_LENGTH))
+        {
+            return JsonApiResults.Error(
+                StatusCodes.Status400BadRequest,
+                "invalid-name",
+                "An Event needs a name of one line of at most 100 characters."
+            );
+        }
+
+        var location = setup.Location?.Trim();
+        if (string.IsNullOrEmpty(location) || !OneLineText.IsValid(location, MAX_NAME_LENGTH))
+        {
+            return JsonApiResults.Error(
+                StatusCodes.Status400BadRequest,
+                "invalid-location",
+                "An Event needs a location of one line of at most 100 characters."
+            );
+        }
+
+        var feiShowId = string.IsNullOrWhiteSpace(setup.FeiShowId) ? null : setup.FeiShowId.Trim();
+        if (feiShowId != null && !OneLineText.IsValid(feiShowId, MAX_FEI_SHOW_ID_LENGTH))
+        {
+            return JsonApiResults.Error(
+                StatusCodes.Status400BadRequest,
+                "invalid-fei-show-id",
+                "An FEI show ID is at most 20 characters of one line."
+            );
+        }
+
+        setup.Name = name;
+        setup.Location = location;
+        setup.FeiShowId = feiShowId;
+        return null;
     }
 
     // What a person may do about an Event is the policy's own answer, so that a screen and the server cannot differ.
@@ -115,77 +180,5 @@ internal static class EventEndpoints
                 canCreateEvents = AccessPolicy.Decide(Capability.CreateEvent, inTheTenant, tenant).IsAllowed,
             }
         );
-    }
-}
-
-/// <summary>
-/// What a new Event is made of: a name, a location and optionally an FEI show ID, and the id of the Setup the client made.
-/// A member that is not one of these is kept, to be refused.
-/// </summary>
-internal sealed class NewEventAttributes : IResourceAttributes
-{
-    const int MAX_NAME_LENGTH = 100;
-    const int MAX_FEI_SHOW_ID_LENGTH = 20;
-
-    public static string? ResourceType => "configure-events";
-
-    public static DocumentIds Ids => DocumentIds.OptionalGuid;
-
-    public string? Name { get; set; }
-    public string? Location { get; set; }
-    public string? FeiShowId { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Others { get; set; }
-
-    /// <summary>The name, once the attributes are valid.</summary>
-    [JsonIgnore]
-    public string NameText => Name!.Trim();
-
-    /// <summary>The location, once the attributes are valid.</summary>
-    [JsonIgnore]
-    public string LocationText => Location!.Trim();
-
-    /// <summary>The FEI show ID, once the attributes are valid; none when there is none.</summary>
-    [JsonIgnore]
-    public string? FeiShowIdText => string.IsNullOrWhiteSpace(FeiShowId) ? null : FeiShowId.Trim();
-
-    public JsonApiFailure? Invalid()
-    {
-        if (Others is { Count: > 0 })
-        {
-            return new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "unsupported-attribute",
-                "An Event is made with a name, a location and optionally an FEI show ID, and with nothing else.",
-                string.Join(", ", Others.Keys)
-            );
-        }
-
-        if (string.IsNullOrEmpty(Name?.Trim()) || !OneLineText.IsValid(NameText, MAX_NAME_LENGTH))
-        {
-            return new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "invalid-name",
-                "An Event needs a name of one line of at most 100 characters."
-            );
-        }
-
-        if (string.IsNullOrEmpty(Location?.Trim()) || !OneLineText.IsValid(LocationText, MAX_NAME_LENGTH))
-        {
-            return new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "invalid-location",
-                "An Event needs a location of one line of at most 100 characters."
-            );
-        }
-
-        return FeiShowIdText != null && !OneLineText.IsValid(FeiShowIdText, MAX_FEI_SHOW_ID_LENGTH)
-            ? new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "invalid-fei-show-id",
-                "An FEI show ID is at most 20 characters of one line."
-            )
-            : null;
     }
 }

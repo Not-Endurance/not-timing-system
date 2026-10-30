@@ -61,7 +61,7 @@ public sealed class EnvironmentToolsTests : IClassFixture<MongoFixture>
 
         Assert.Equal(0, code);
         Assert.Contains("Applied.", output);
-        Assert.Equal("Development", await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Equal("Development", await new MongoStorageEnvironment(data.Database).ReadAsync());
         Assert.Equal(4, await data.Collection("users").CountDocumentsAsync(new BsonDocument()));
         var setup = await data.Collection("configure_events").Find(FilterDefinition<BsonDocument>.Empty).SingleAsync();
         Assert.Equal("Spring Ride", setup["Name"].AsString);
@@ -82,7 +82,7 @@ public sealed class EnvironmentToolsTests : IClassFixture<MongoFixture>
     public async Task The_seed_is_refused_for_a_database_that_is_marked_Production_with_a_status_that_tells_so()
     {
         var data = NewData();
-        await EnvironmentMarker.WriteAsync(data.Database, "Production", NOW);
+        await new MongoStorageEnvironment(data.Database).WriteAsync("Production", NOW);
 
         var (code, output, _) = await SeedAsync(data, "--apply", "--environment", "Staging");
 
@@ -159,7 +159,7 @@ public sealed class EnvironmentToolsTests : IClassFixture<MongoFixture>
 
         Assert.Equal(0, code);
         Assert.Contains("Would mark the database as Production.", output);
-        Assert.Null(await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Null(await new MongoStorageEnvironment(data.Database).ReadAsync());
     }
 
     [Fact]
@@ -172,7 +172,7 @@ public sealed class EnvironmentToolsTests : IClassFixture<MongoFixture>
 
         Assert.Equal(0, code);
         Assert.Contains("The database is marked Production.", output);
-        Assert.Equal("Production", await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Equal("Production", await new MongoStorageEnvironment(data.Database).ReadAsync());
         Assert.Equal(0, again);
         Assert.Contains("nothing to do", repeated);
     }
@@ -181,7 +181,7 @@ public sealed class EnvironmentToolsTests : IClassFixture<MongoFixture>
     public async Task A_marker_is_not_changed_to_another_name_and_a_name_that_is_not_an_environment_is_refused()
     {
         var data = NewData();
-        await EnvironmentMarker.WriteAsync(data.Database, "Production", NOW);
+        await new MongoStorageEnvironment(data.Database).WriteAsync("Production", NOW);
 
         var (conflict, _, conflictError) = await MarkAsync(data, "--apply", "--environment", "Staging");
         var (unknown, _, unknownError) = await MarkAsync(data, "--apply", "--environment", "Prod");
@@ -190,7 +190,7 @@ public sealed class EnvironmentToolsTests : IClassFixture<MongoFixture>
         Assert.Contains("Production", conflictError);
         Assert.Equal(1, unknown);
         Assert.Contains("not an environment", unknownError);
-        Assert.Equal("Production", await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Equal("Production", await new MongoStorageEnvironment(data.Database).ReadAsync());
     }
 
     [Theory]

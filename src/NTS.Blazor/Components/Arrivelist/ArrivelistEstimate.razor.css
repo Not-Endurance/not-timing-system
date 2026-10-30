@@ -1,0 +1,10 @@
+.arrivelist-estimate {
+    min-width: 0;
+}
+
+.arrivelist-estimate-label {
+    margin-right: 0.35rem;
+    opacity: 0.65;
+    text-transform: uppercase;
+    font-size: 0.7em;
+}

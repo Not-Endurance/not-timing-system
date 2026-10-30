@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using NoTiming.Api.JsonApi;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 
 namespace NoTiming.Api.Features.Snapshots;
 
