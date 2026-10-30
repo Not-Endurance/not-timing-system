@@ -1,0 +1,17 @@
+@attribute [Route(HORSE_PAGE)]
+@inherits HorseContentBehind
+
+<NContent Title="@Configure_Horse_string" IsEmpty="Model == null">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="@(() => GoBack())" />
+            </MudStack>
+
+            <HorseShell Model="Model" ReadOnly="@ReadOnly" />
+        </MudStack>
+    </Main>
+
+</NContent>

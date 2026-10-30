@@ -1,0 +1,40 @@
+@using NTS.Domain.Setup.Aggregates.ConfigureEvents
+@using NoTiming.Console.Features.Setup.Participations
+@using NoTiming.Console.Features.Setup.Phases
+@using Not.Krud.Blazor.Components
+
+@attribute [Route(COMPETITION_PAGE)]
+@inherits CompetitionContentBehind
+
+<NContent Title="@Configure_Competition_string" IsEmpty="Model == null">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="@(() => GoBack())" />
+            </MudStack>
+
+            <CompetitionShell Model="Model" ReadOnly="@ReadOnly">
+
+                <AdditionalContent>
+
+                    <NGrid Spacing="8">
+                        <MudItem xs="12" md="6">
+                            <KrudList T="Phase" TModel="PhaseFormModel" TShell="PhaseShell" Name="@Phases_string"
+                                      UpdateRoute="@PhaseRoute" ReadOnly="@ReadOnly" />
+                        </MudItem>
+
+                        <MudItem xs="12" md="6">
+                            <KrudList T="Participation" TModel="ParticipationFormModel" TShell="ParticipationShell" Name="@Participations_string"
+                                      UpdateRoute="@ParticipationRoute" ReadOnly="@ReadOnly" />
+                        </MudItem>
+                    </NGrid>
+
+                </AdditionalContent>
+
+            </CompetitionShell>
+        </MudStack>
+    </Main>
+
+</NContent>

@@ -1,0 +1,9 @@
+@using Not.Blazor.Components.Input
+
+@inherits RequestsPanelBehind
+
+<MudStack Class="@Class" data-testid="console-requests-panel">
+    <NSwitch Label="@Representation_string" Value="@IsRepresentRequested" ValueChanged="RequestRepresentation" />
+
+    <NSwitch Label="@Required_Inspection_string" Value="@IsInspectionRequested" ValueChanged="RequestInspection" />
+</MudStack>

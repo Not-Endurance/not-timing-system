@@ -57,6 +57,11 @@ public abstract class EventView : NStatefulService, IViewedEvent
         return Participations.FirstOrDefault(x => x.Id == id);
     }
 
+    public Task Refresh()
+    {
+        return ReloadState();
+    }
+
     public ResultsDocument CreateDocument(Ranking ranking)
     {
         return new ResultsDocument(new Result(ranking, Participations, Event.RegionalRules), Event, Officials);

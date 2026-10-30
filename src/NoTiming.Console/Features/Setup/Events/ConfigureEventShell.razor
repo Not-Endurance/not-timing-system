@@ -1,0 +1,19 @@
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+
+@inherits ConfigureEventShellBehind
+
+<KrudForm Shell="this" AdditionalContent="AdditionalContent" DisableBack>
+    <FormFields>
+        <NTextField @bind-Value="Model.Location" For="() => Model.Location" Label="@Location_string" />
+
+        <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+
+        @* The country of an Event is the country of its Tenant: it is shown, and not chosen. *@
+        <NTextField Value="@Model.Country?.Name" ReadOnly="true" Label="@Country_string" />
+
+        <NParagraph Content="@Locate_FEI_Show_data_instructions_string" Class="mt-8 mb-2" />
+
+        <NTextField @bind-Value="Model.FeiShowId" For="() => Model.FeiShowId" Label="@FEI_Show_ID_string" HelperText="@FEI_Show_ID_helper_text_string" />
+    </FormFields>
+</KrudForm>

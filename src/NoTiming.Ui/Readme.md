@@ -34,7 +34,8 @@ address overrides it locally.
 A visitor downloads the app to read a startlist, so its size is measured on what is delivered: `UiFirstLoadBudgetTests`
 publishes the Ui for Release and sums the Brotli files that the Api serves (a debug build is several times larger and says
 nothing about it). When it was written down the app was **8.29 MB over 180 files** (6.8 MB of assemblies, 0.9 MB of runtime,
-0.3 MB of globalization data, 0.2 MB of scripts and styles), and the budget is a **ceiling of 9 MB**. A change that raises
+0.3 MB of globalization data, 0.2 MB of scripts and styles), and with the Console's services and its text in three languages
+(#646) it is **8.37 MB over 183 files**; the budget is a **ceiling of 9 MB**. A change that raises
 the size past it raises it on purpose, and raises the ceiling in the test, here and in the ticket.
 
 - `BlazorWebAssemblyLoadAllGlobalizationData` is on. A person who chooses Bulgarian or Turkish changes the culture of the app
@@ -44,8 +45,12 @@ the size past it raises it on purpose, and raises the ceiling in the test, here 
   MB: Core, Edm, the Api's and the model builder), AngleSharp and the Razor language (printing, 0.55 MB) and XML (0.36 MB).
   They arrive through `Not.Storage` and `Not.Application`, which the app uses for the repositories of its REST calls, so taking
   them out is a split of those projects and a task of its own.
-- The pages of the Console are not part of it. `Not.Blazor.Client`'s `Lazy/LazyRoutes` says which paths belong to an assembly that is fetched
-  when a person goes there, and the router fetches it before it looks for a page (`WitnessBlazorRoot`). Nothing is lazy today.
-  The Console (#646) fills the seam: it adds `["console"] = ["NoTiming.Console.wasm"]` to `LazyRoutes.Assemblies`, and the
-  file as a `<BlazorWebAssemblyLazyLoad Include="NoTiming.Console.wasm" />` item in `NoTiming.Ui.csproj`; no code of the router
-  changes.
+- The pages of the Console are not part of it (#646). `NoTiming.Console` is a Razor class library of pages and components under
+  `/console/...`, flagged `BlazorWebAssemblyLazyLoad` in this project, and `Not.Blazor.Client`'s `Lazy/LazyRoutes` says that a path whose first
+  segment is `console` needs `NoTiming.Console.wasm`, which the router fetches before it looks for a page (`WitnessBlazorRoot`).
+  `UiFirstLoadBudgetTests` reads the lazy list from the boot configuration, leaves the Console out of the first load and fails
+  if it is in it. A lazy assembly cannot be referenced by the app that loads it, so what the Console shares with the viewers
+  lives below both, in `NTS.Blazor` (the components, the routes of the viewers' pages), and the Console's own services are in
+  this project with their ports in `NTS.Contracts`: the container is built before the Console is fetched, so a service the
+  Console's pages inject has to be registered here, the usual way. The Console itself holds pages, components, forms, and what
+  has no dependency on the container (the FEI export).

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Localization;
 using Not.Localization;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
+using NoTiming.Api.Features.Branding;
 using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
@@ -60,6 +61,7 @@ internal static class ApiPipeline
         app.MapLocalhost();
         app.MapProfile();
         app.MapTenancy();
+        app.MapBranding();
         app.MapEvents();
         app.MapEventResources();
         app.MapHistoricEventRedirects();

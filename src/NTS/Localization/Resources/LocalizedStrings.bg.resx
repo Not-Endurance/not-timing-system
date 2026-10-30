@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1043,6 +1043,228 @@
   </data>
   <data name="Cascading_Delete_string" xml:space="preserve">
     <value>Изтрий със свързаните записи</value>
+  </data>
+  <data name="Console_string" xml:space="preserve">
+    <value>Конзола</value>
+  </data>
+  <data name="Events_string" xml:space="preserve">
+    <value>Събития</value>
+  </data>
+  <data name="Event_status_string" xml:space="preserve">
+    <value>Състояние</value>
+  </data>
+  <data name="Event_stage_unstarted_string" xml:space="preserve">
+    <value>Не е стартирано</value>
+  </data>
+  <data name="Event_stage_live_string" xml:space="preserve">
+    <value>На живо</value>
+  </data>
+  <data name="Event_stage_historic_string" xml:space="preserve">
+    <value>Приключило</value>
+  </data>
+  <data name="Create_event_string" xml:space="preserve">
+    <value>Ново събитие</value>
+  </data>
+  <data name="No_events_to_run_string" xml:space="preserve">
+    <value>Все още няма събитие, което да ръководите.</value>
+  </data>
+  <data name="Results_string" xml:space="preserve">
+    <value>Резултати</value>
+  </data>
+  <data name="Assign_main_operator_string" xml:space="preserve">
+    <value>Назначаване на главен оператор</value>
+  </data>
+  <data name="Hand_over_string" xml:space="preserve">
+    <value>Предаване</value>
+  </data>
+  <data name="Hand_over_event_string" xml:space="preserve">
+    <value>Предаване на събитието</value>
+  </data>
+  <data name="Find_account_string" xml:space="preserve">
+    <value>Намерете профил по име (поне три букви)</value>
+  </data>
+  <data name="Main_operator_string" xml:space="preserve">
+    <value>Главен оператор</value>
+  </data>
+  <data name="Main_operator_assigned_string" xml:space="preserve">
+    <value>Главният оператор е назначен.</value>
+  </data>
+  <data name="Event_handed_over_string" xml:space="preserve">
+    <value>Събитието е предадено.</value>
+  </data>
+  <data name="Event_started_string" xml:space="preserve">
+    <value>Събитието е стартирано.</value>
+  </data>
+  <data name="Event_was_reset_string" xml:space="preserve">
+    <value>Събитието е върнато към настройката си.</value>
+  </data>
+  <data name="Close_string" xml:space="preserve">
+    <value>Затвори</value>
+  </data>
+  <data name="Competition_not_found_string" xml:space="preserve">
+    <value>Състезанието не е намерено</value>
+  </data>
+  <data name="Event_not_yours_to_run_string" xml:space="preserve">
+    <value>Само главният оператор на събитието отваря неговата настройка.</value>
+  </data>
+  <data name="Access_string" xml:space="preserve">
+    <value>Достъп</value>
+  </data>
+  <data name="Access_description_string" xml:space="preserve">
+    <value>Хората, които могат да изпращат засичания от събитието, свързани с точния си имейл. Адрес без профил е покана, която чака човекът да се регистрира.</value>
+  </data>
+  <data name="Link_person_string" xml:space="preserve">
+    <value>Свържи човек</value>
+  </data>
+  <data name="Email_address_string" xml:space="preserve">
+    <value>Имейл адрес</value>
+  </data>
+  <data name="Pending_invitation_string" xml:space="preserve">
+    <value>Чака регистрация</value>
+  </data>
+  <data name="Linked_string" xml:space="preserve">
+    <value>Свързан</value>
+  </data>
+  <data name="Access_empty_string" xml:space="preserve">
+    <value>Все още няма свързани хора.</value>
+  </data>
+  <data name="Person_linked_string" xml:space="preserve">
+    <value>Човекът е свързан.</value>
+  </data>
+  <data name="Access_removed_string" xml:space="preserve">
+    <value>Достъпът е прекратен.</value>
+  </data>
+  <data name="Linked_as_string" xml:space="preserve">
+    <value>Свързан като</value>
+  </data>
+  <data name="Person_string" xml:space="preserve">
+    <value>Човек</value>
+  </data>
+  <data name="Link_account_helper_string" xml:space="preserve">
+    <value>Точният адрес, с който човекът влиза. Ако още няма профил, човекът е поканен и получава достъп, когато се регистрира.</value>
+  </data>
+  <data name="Official_string" xml:space="preserve">
+    <value>Официално лице</value>
+  </data>
+  <data name="Select_a_participation_string" xml:space="preserve">
+    <value>Изберете участник</value>
+  </data>
+  <data name="Participation_not_found_string" xml:space="preserve">
+    <value>Участникът не е намерен.</value>
+  </data>
+  <data name="Participation_changed_string" xml:space="preserve">
+    <value>Участникът е променен междувременно и е прочетен отново. Въведеното е запазено: прегледайте го върху текущото състояние и го изпратете отново.</value>
+  </data>
+  <data name="Time_recorded_string" xml:space="preserve">
+    <value>Времето е записано.</value>
+  </data>
+  <data name="Time_not_recorded_string" xml:space="preserve">
+    <value>Времето не е записано.</value>
+  </data>
+  <data name="Time_not_taken_string" xml:space="preserve">
+    <value>Времето е записано, но не е прието: {0}.</value>
+  </data>
+  <data name="Not_signed_in_string" xml:space="preserve">
+    <value>Никой не е влязъл.</value>
+  </data>
+  <data name="Now_string" xml:space="preserve">
+    <value>Сега</value>
+  </data>
+  <data name="Rankings_list_empty_message_string" xml:space="preserve">
+    <value>Събитието няма класирания.</value>
+  </data>
+  <data name="Select_participation_to_add_string" xml:space="preserve">
+    <value>Изберете участник за добавяне</value>
+  </data>
+  <data name="Handout_made_string" xml:space="preserve">
+    <value>Създадена е разпечатка за #{0}.</value>
+  </data>
+  <data name="Handout_not_made_string" xml:space="preserve">
+    <value>Разпечатката за #{0} не беше създадена: {1}</value>
+  </data>
+  <data name="Startlist_empty_message_string" xml:space="preserve">
+    <value>Все още няма старт с определено време.</value>
+  </data>
+  <data name="Regional_rules_string" xml:space="preserve">
+    <value>Правила на регионалните състезания</value>
+  </data>
+  <data name="Only_average_loop_speed_string" xml:space="preserve">
+    <value>Скоростта на кръга се оценява само по средната</value>
+  </data>
+  <data name="Ranker_code_string" xml:space="preserve">
+    <value>Код на регионалния класиращ</value>
+  </data>
+  <data name="Ranker_code_hint_string" xml:space="preserve">
+    <value>Оставете го празно за класирането на FEI.</value>
+  </data>
+  <data name="Rules_saved_string" xml:space="preserve">
+    <value>Правилата бяха запазени.</value>
+  </data>
+  <data name="Federation_not_yours_string" xml:space="preserve">
+    <value>Само администратор на федерацията я редактира.</value>
+  </data>
+  <data name="Already_registered_string" xml:space="preserve">
+    <value>Това изглежда като вече регистриран запис:</value>
+  </data>
+  <data name="Same_name_string" xml:space="preserve">
+    <value>същото име</value>
+  </data>
+  <data name="Same_FEI_ID_string" xml:space="preserve">
+    <value>същият FEI ID</value>
+  </data>
+  <data name="Of_another_federation_string" xml:space="preserve">
+    <value>на друга федерация</value>
+  </data>
+  <data name="Logos_string" xml:space="preserve">
+    <value>Лога</value>
+  </data>
+  <data name="Left_logo_string" xml:space="preserve">
+    <value>Ляво лого</value>
+  </data>
+  <data name="Right_logo_string" xml:space="preserve">
+    <value>Дясно лого</value>
+  </data>
+  <data name="Choose_a_logo_string" xml:space="preserve">
+    <value>Избери изображение</value>
+  </data>
+  <data name="Remove_logo_string" xml:space="preserve">
+    <value>Премахни логото</value>
+  </data>
+  <data name="Use_the_federations_logo_string" xml:space="preserve">
+    <value>Използвай логото на федерацията</value>
+  </data>
+  <data name="No_logo_string" xml:space="preserve">
+    <value>Няма лого</value>
+  </data>
+  <data name="Logo_of_the_federation_string" xml:space="preserve">
+    <value>Логото на федерацията</value>
+  </data>
+  <data name="Logo_of_the_event_string" xml:space="preserve">
+    <value>Логото на това събитие</value>
+  </data>
+  <data name="Logo_is_too_large_string" xml:space="preserve">
+    <value>Логото тежи най-много {0} KiB.</value>
+  </data>
+  <data name="Logo_not_an_image_string" xml:space="preserve">
+    <value>Изберете изображение PNG, JPEG, GIF или WebP.</value>
+  </data>
+  <data name="Logo_saved_string" xml:space="preserve">
+    <value>Логото беше запазено.</value>
+  </data>
+  <data name="Logo_removed_string" xml:space="preserve">
+    <value>Логото беше премахнато.</value>
+  </data>
+  <data name="Logos_hint_string" xml:space="preserve">
+    <value>PNG, JPEG, GIF или WebP, до {0} KiB, които се слагат най-горе на отпечатаното.</value>
+  </data>
+  <data name="Console_connected_string" xml:space="preserve">
+    <value>Свързан със събитие: {0}</value>
+  </data>
+  <data name="Console_connecting_string" xml:space="preserve">
+    <value>Свързване със събитие: {0}…</value>
+  </data>
+  <data name="Console_disconnected_string" xml:space="preserve">
+    <value>Няма връзка със събитие: {0}</value>
   </data>
   <data name="Estimates_string" xml:space="preserve">
     <value>Прогнози</value>

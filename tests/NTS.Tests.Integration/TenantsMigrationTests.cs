@@ -30,6 +30,7 @@ public sealed class TenantsMigrationTests : IClassFixture<MongoFixture>
         "event_rankings",
         "event_handouts",
         "event_grants",
+        "brandings",
     ];
 
     readonly MongoFixture _mongo;

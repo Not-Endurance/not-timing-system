@@ -1,4 +1,5 @@
 using Not.Blazor.Client.Lazy;
+using NoTiming.Console;
 
 namespace NTS.Tests.Unit.Application;
 
@@ -50,6 +51,22 @@ public sealed class LazyRoutesTests
     public void A_path_that_is_not_under_a_prefix_needs_nothing_and_a_prefix_is_a_whole_segment(string path)
     {
         Assert.Empty(LazyRoutes.NeededBy(path, TABLE));
+    }
+
+    [Fact]
+    public void The_Console_is_the_assembly_that_is_fetched_when_a_person_goes_to_its_pages()
+    {
+        var file = typeof(ConsoleRoutes).Assembly.GetName().Name + ".wasm";
+
+        Assert.Equal([file], LazyRoutes.NeededBy("/" + ConsoleRoutes.FIRST_SEGMENT, LazyRoutes.Assemblies));
+        Assert.Equal(
+            [file],
+            LazyRoutes.NeededBy("console/events/3f2504e0-4f89-41d3-9a0c-0305e82c3301/setup", LazyRoutes.Assemblies)
+        );
+        Assert.Empty(
+            LazyRoutes.NeededBy("events/3f2504e0-4f89-41d3-9a0c-0305e82c3301/startlist", LazyRoutes.Assemblies)
+        );
+        Assert.Empty(LazyRoutes.NeededBy("consoles", LazyRoutes.Assemblies));
     }
 
     [Fact]

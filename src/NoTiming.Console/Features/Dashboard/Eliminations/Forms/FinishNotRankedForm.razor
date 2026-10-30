@@ -1,0 +1,9 @@
+@using Not.Blazor.Components.Input
+
+@inherits FinishNotRankedFormBehind
+
+<EliminationForm SubmitSafe="FinishNotRankedSafe">
+
+    <NTextField @bind-Value="Reason" Label="@Reason_string" Class="mt-4" />
+
+</EliminationForm>

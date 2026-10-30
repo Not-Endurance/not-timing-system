@@ -24,6 +24,7 @@ internal static class TenantOwned
     public const string EVENT_PARTICIPATIONS = "event_participations";
     public const string EVENT_RANKINGS = "event_rankings";
     public const string EVENT_HANDOUTS = "event_handouts";
+    public const string BRANDINGS = "brandings";
 
     /// <summary>What an Event makes when it starts and keeps while it runs: its documents, each with the id of the Event.</summary>
     public static IReadOnlyList<string> OfAnEvent { get; } =
@@ -42,6 +43,7 @@ internal static class TenantOwned
             EVENT_RANKINGS,
             EVENT_HANDOUTS,
             EVENT_GRANTS,
+            BRANDINGS,
         ];
 }
 

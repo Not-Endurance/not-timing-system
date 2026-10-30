@@ -1,0 +1,13 @@
+@inherits SameRowsAlertBehind
+
+@if (Rows.Count > 0)
+{
+    <MudAlert Severity="Severity.Warning" Class="mt-4" data-testid="console-same-rows">
+        <MudText Typo="Typo.body2">@Already_registered_string</MudText>
+
+        @foreach (var row in Rows)
+        {
+            <MudText Typo="Typo.body2">• @TextOf(row)</MudText>
+        }
+    </MudAlert>
+}

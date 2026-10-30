@@ -67,7 +67,7 @@ _Avoid_: Permission, role assignment, invite
 How a Tenant's Regional competitions are judged: whether the speed of a loop is judged on the average only, and which ranker applies. A Tenant Root sets them on the Tenant, and an Event copies them when it starts, so what an Event was judged by never changes when the Tenant edits them. An Event that started without any is judged by the FEI's rules.
 
 **Capabilities**:
-What the caller may do about an Event, or in a Tenant, told by the same access policy that refuses the action: `canSnapshot`, `isMainOperator`, `canHandOver`, `canAssignMainOperator`, `canCreateEvents` for an Event. A screen shows controls from these and never works them out for itself.
+What the caller may do about an Event, or in a Tenant, told by the same access policy that refuses the action: `canSnapshot`, `isMainOperator`, `canHandOver`, `canAssignMainOperator`, `canConfigure`, `canEditSetup`, `canEditData`, `canLinkAccounts`, `canEditBranding`, `canReset` for an Event; `canCreateEvents`, `canEditRules`, `canEditBranding`, `canEditRegistry` for a Tenant. A screen shows controls from these and never works them out for itself.
 
 ### Data
 
@@ -113,6 +113,10 @@ The placings of a Ranking. While the Event is Live they are derived from its Par
 
 **Handout**:
 The printable sheet of one Combination's times, produced for it after each Phase. It is a live view of the Participation, not a snapshot: it prints the times as they stand then.
+
+**Logos**:
+The two images at the head of every document an Event prints, one at the left and one at the right. A Tenant Root keeps the Tenant's own, and the Main Operator of an Event may put its own in place of either until the Event ends; a place the Event has none for is printed with the Tenant's. An image is a PNG, JPEG, GIF or WebP of at most 512 KiB, kept by the server, so that every browser that prints the Event's documents prints the same.
+_Avoid_: Branding (the name of the Api's resource, not of the thing), letterhead
 
 > **Write access is not "Official".** Snapshot writes are granted to an Official whose role is one of {Steward, ChiefSteward, GroundJury, GroundJuryPresident}, **or** to any Operator. "Official" alone is not the boundary.
 

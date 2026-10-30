@@ -31,6 +31,15 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
 
     protected T Aggregate => (T)_graph!.Root!.Value!;
 
+    /// <summary>
+    /// Completes when what was changed in the graph has been saved: a change is saved after the call that made it returns, so
+    /// a page that reads the aggregate again waits for this first, or it reads what was stored before the change.
+    /// </summary>
+    public Task Settled()
+    {
+        return _coalescedCommit.WhenIdle();
+    }
+
     public void SetParent(object aggregate)
     {
         GuardHelper.ThrowIfDefault(_graph?.Root);

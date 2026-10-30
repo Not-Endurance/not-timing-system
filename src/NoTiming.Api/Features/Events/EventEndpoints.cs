@@ -335,6 +335,12 @@ internal static class EventEndpoints
                 canHandOver = AccessPolicy.Decide(Capability.HandOverMainOperator, caller, scope).IsAllowed,
                 canAssignMainOperator = AccessPolicy.Decide(Capability.AssignMainOperator, caller, scope).IsAllowed,
                 canCreateEvents = AccessPolicy.Decide(Capability.CreateEvent, caller, tenant).IsAllowed,
+                canConfigure = AccessPolicy.Decide(Capability.ConfigureEvent, caller, scope).IsAllowed,
+                canEditSetup = AccessPolicy.Decide(Capability.EditSetup, caller, scope).IsAllowed,
+                canEditData = AccessPolicy.Decide(Capability.EditEventData, caller, scope).IsAllowed,
+                canLinkAccounts = AccessPolicy.Decide(Capability.LinkAccounts, caller, scope).IsAllowed,
+                canEditBranding = AccessPolicy.Decide(Capability.EditEventBranding, caller, scope).IsAllowed,
+                canReset = AccessPolicy.Decide(Capability.ResetEvent, caller, scope).IsAllowed,
             }
         );
     }

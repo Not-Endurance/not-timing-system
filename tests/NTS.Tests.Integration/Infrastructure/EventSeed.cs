@@ -84,16 +84,46 @@ internal static class EventSeed
         string mongoConnectionString,
         string tenant,
         Guid? mainOperator,
-        string name = "Full Setup"
+        string name = "Full Setup",
+        bool startNumberInTwoCompetitions = false,
+        bool eachHasAnother = true
     )
     {
         ApiMongo.Configure();
         var id = Guid.NewGuid();
-        var model = ConfigureEventModel.From(SetupFactory.Full(id, name));
+        var model = ConfigureEventModel.From(
+            SetupFactory.Full(
+                id,
+                name,
+                startNumberInTwoCompetitions: startNumberInTwoCompetitions,
+                eachHasAnother: eachHasAnother
+            )
+        );
         model.TenantId = tenant;
         model.MainOperatorId = mainOperator;
         await Setups(mongoConnectionString).InsertOneAsync(model.ToBsonDocument());
         return id;
+    }
+
+    /// <summary>
+    /// The Setup of an Event that exists, made whole: what a person configures after making an Event, which a test of the whole way
+    /// has no need to do by hand. Its competition starts at the time given (<see cref="SetupFactory.Full"/>).
+    /// </summary>
+    public static async Task MakeWholeAsync(
+        string mongoConnectionString,
+        string tenant,
+        Guid id,
+        Guid? mainOperator,
+        string name,
+        DateTimeOffset start
+    )
+    {
+        ApiMongo.Configure();
+        var model = ConfigureEventModel.From(SetupFactory.Full(id, name, start));
+        model.TenantId = tenant;
+        model.MainOperatorId = mainOperator;
+        await Setups(mongoConnectionString)
+            .ReplaceOneAsync(new BsonDocument("_id", Binary(id)), model.ToBsonDocument());
     }
 
     /// <summary>How many documents of the collection an Event has: what it made when it started.</summary>

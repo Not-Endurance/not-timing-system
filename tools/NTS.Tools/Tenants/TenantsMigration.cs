@@ -63,6 +63,7 @@ public static class TenantsMigration
             "event_rankings",
             "event_handouts",
             TenantIndexes.GRANTS,
+            "brandings", // made by the Console (#646): there is none from before Tenants to stamp
         ];
 
     /// <summary>The Officials a Setup links to a user by email, with their role.</summary>

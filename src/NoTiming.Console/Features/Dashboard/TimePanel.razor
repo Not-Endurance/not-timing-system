@@ -1,0 +1,15 @@
+@inherits TimePanelBehind
+
+<MudStack Class="@Class" data-testid="console-time-panel">
+    <MudStack Row AlignItems="AlignItems.Center">
+        <MudTextField @bind-Value="Input" Label="@Time_string" Mask="TimeMask" />
+
+        <MudIconButton Icon="@Icons.Material.Outlined.Timer" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Now" aria-label="@Now_string" />
+    </MudStack>
+
+    <MudStack Row Justify="Justify.FlexEnd">
+        <NButtonPrimary Text="@Arrive_string" OnClick="Arrive" />
+
+        <NButtonSecondary Text="@Presentation_string" OnClick="Present" />
+    </MudStack>
+</MudStack>

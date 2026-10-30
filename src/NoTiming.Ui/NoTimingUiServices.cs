@@ -1,5 +1,7 @@
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Not.Application.HTTP;
+using NoTiming.Ui.Features.Console;
 using NoTiming.Ui.Storage;
 using NTS.Contracts;
 
@@ -14,7 +16,11 @@ public static class NoTimingUiServices
         Assembly rootAssembly
     )
     {
+        services.TryAddSingleton(TimeProvider.System); // the clock of the device, which the server's clock is measured against
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
+        services.AddTransient<ConsoleParticipationWrites>(); // not a repository of the app: the dashboard's writes (#646)
+        services.AddTransient<ConsoleRankingWrites>(); // and the Rankings the Console makes
+        services.AddTransient<ConsoleHandoutWrites>(); // and its Handouts
 
         // The families that moved to the Api are reached where the page came from, which is the Api (ADR-0011), and not
         // where the legacy host is: the one is the page's own address and the other is a setting.

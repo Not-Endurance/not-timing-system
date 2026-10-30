@@ -1,0 +1,40 @@
+@using NoTiming.Ui.Components.Results
+
+@inherits StartlistDocumentComponentBehind
+
+@if (Document != null)
+{
+    <div class="print-document print-document-startlist">
+        <section class="results-print-section">
+            <ResultHeaderComponent Header="Document.Header" LeftLogo="@LeftLogo" RightLogo="@RightLogo" />
+
+            <MudStack Spacing="2" AlignItems="AlignItems.Center" Class="startlist-title">
+                <NHeadline2 Content="@Startlist_string" />
+            </MudStack>
+
+            @foreach (var stage in Document.Stages)
+            {
+                <div class="startlist-stage print-avoid-break">
+                    <MudText Typo="Typo.h6" Class="startlist-stage-title">@($"{Stage_string} {stage.Number}")</MudText>
+
+                    <NTable Headings="@Headings" Items="stage.Starters" />
+                </div>
+            }
+        </section>
+    </div>
+}
+
+<style>
+    .startlist-title {
+        margin: 8px 0;
+    }
+
+    .startlist-stage {
+        width: 100%;
+        margin-bottom: 12px;
+    }
+
+    .startlist-stage-title {
+        font-weight: normal !important;
+    }
+</style>

@@ -4,15 +4,20 @@ namespace NoTiming.Ui.Features.Account;
 
 /// <summary>
 /// What a page asks of the person (#645, ADR-0001, ADR-0012). Everything that only shows is public, so a visitor has all of
-/// it; the pages that send Snapshots and the profile are for a person who is signed in; and only sending Snapshots waits for
-/// a complete profile, as gating the read-only pages would leave a person who is signed in with less than a visitor. The
-/// host decides what a person may do whatever the page shows, so this is what is offered and not what is allowed.
+/// it; the pages that send Snapshots, the profile and the Console (#646: every path under <c>console</c>) are for a person
+/// who is signed in; and only sending Snapshots waits for a complete profile, as gating the read-only pages would leave a
+/// person who is signed in with less than a visitor. The host decides what a person may do whatever the page shows, and the
+/// Console's pages ask it what the person may do about the Event they open, so this is what is offered and not what is allowed.
 /// </summary>
 public static class WitnessRoutePolicy
 {
     public static RouteAccess AccessTo(CurrentAccount? account, string relativePath)
     {
-        if (!IsSnapshotPage(relativePath) && !IsRouteOf(Routes.PROFILE_PAGE, relativePath))
+        if (
+            !IsSnapshotPage(relativePath)
+            && !IsRouteOf(Routes.PROFILE_PAGE, relativePath)
+            && !IsConsolePage(relativePath)
+        )
         {
             return RouteAccess.Open;
         }
@@ -23,6 +28,12 @@ public static class WitnessRoutePolicy
         }
 
         return !account.ProfileComplete && IsSnapshotPage(relativePath) ? RouteAccess.Profile : RouteAccess.Open;
+    }
+
+    /// <summary>Whether the address is under the Console: its first segment, whatever the case (<c>consoles</c> is not the Console).</summary>
+    static bool IsConsolePage(string relativePath)
+    {
+        return string.Equals(Segments(relativePath).FirstOrDefault(), "console", StringComparison.OrdinalIgnoreCase);
     }
 
     static bool IsSnapshotPage(string relativePath)
