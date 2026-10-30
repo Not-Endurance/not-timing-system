@@ -1,7 +1,7 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Components.Routing;
+using Not.Blazor.Client.Lazy;
 using Not.Blazor.Components.Abstractions;
-using NoTiming.Ui.Features.Lazy;
 
 namespace NoTiming.Ui;
 

@@ -2,6 +2,7 @@ using Not.Domain.Exceptions;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
@@ -92,7 +93,7 @@ public class Participation : Aggregate, IEventScoped
         Phases.Select(phase);
         if (Eliminated == null)
         {
-            Reevaluate(phase, outBefore);
+            ReEvaluate(phase, outBefore);
         }
         return recorded;
     }
@@ -141,7 +142,7 @@ public class Participation : Aggregate, IEventScoped
         Phases.Select(phase);
         if (Eliminated == null || IsMadeByEvaluation(Eliminated))
         {
-            Reevaluate(phase, outBefore);
+            ReEvaluate(phase, outBefore);
         }
 
         return update;
@@ -163,7 +164,7 @@ public class Participation : Aggregate, IEventScoped
             return false;
         }
 
-        Reevaluate(phase, outBefore);
+        ReEvaluate(phase, outBefore);
         return true;
     }
 
@@ -247,7 +248,7 @@ public class Participation : Aggregate, IEventScoped
             phase.CheckCompulsoryThreshold();
         }
 
-        Reevaluate([.. touched.Select(x => (x.Phase, x.OutBefore))]);
+        ReEvaluate([.. touched.Select(x => (x.Phase, x.OutBefore))]);
     }
 
     /// <summary>
@@ -332,7 +333,7 @@ public class Participation : Aggregate, IEventScoped
     /// eliminated for time when the recovery is over the limit, or restored when it no longer is, the Phase after it starting
     /// when it is out, in place when its Out time moved, and the completion announced once when the Phase is complete.
     /// </summary>
-    void Reevaluate(Phase phase, Timestamp? outBefore)
+    void ReEvaluate(Phase phase, Timestamp? outBefore)
     {
         if (phase.ViolatesRecoveryTime())
         {
@@ -362,7 +363,7 @@ public class Participation : Aggregate, IEventScoped
     /// Phase at all is, so that a Phase that is fine does not undo what another one calls for. The Phases that changed and are
     /// complete start the ones after them when their Out time moved, and are announced once each.
     /// </summary>
-    void Reevaluate(IReadOnlyList<(Phase Phase, Timestamp? OutBefore)> changed)
+    void ReEvaluate(IReadOnlyList<(Phase Phase, Timestamp? OutBefore)> changed)
     {
         if (Eliminated != null && !IsMadeByEvaluation(Eliminated))
         {
@@ -396,7 +397,7 @@ public class Participation : Aggregate, IEventScoped
         }
     }
 
-    TimeEvent TimeEventOf(Guid id)
+    ParticipationEventBase TimeEventOf(Guid id)
     {
         return Phases.SelectMany(x => x.Events).FirstOrDefault(x => x.Id == id)
             ?? throw new DomainException(Time_event_changed_string);

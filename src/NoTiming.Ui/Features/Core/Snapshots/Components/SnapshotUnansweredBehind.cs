@@ -17,7 +17,7 @@ public class SnapshotUnansweredBehind : NStatefulComponent
     [CascadingParameter]
     IViewedEvent View { get; set; } = default!;
 
-    protected int Count => SnapshotService.Unanswered?.Entries.Count() ?? 0;
+    protected int Count => SnapshotService.Waiting.Sum(x => x.Entries.Count());
 
     protected override async Task OnInitializedAsync()
     {

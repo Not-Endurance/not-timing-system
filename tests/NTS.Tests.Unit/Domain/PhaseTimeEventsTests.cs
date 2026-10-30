@@ -1,4 +1,5 @@
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
@@ -129,7 +130,7 @@ public sealed class PhaseTimeEventsTests
         Assert.Equal([false, true], phase.Events.OfType<Presented>().Select(x => x.IsRepresent).ToArray());
     }
 
-    static Phase Phase(IEnumerable<TimeEvent> events)
+    static Phase Phase(IEnumerable<ParticipationEventBase> events)
     {
         return new Phase(
             "",

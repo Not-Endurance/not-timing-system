@@ -20,6 +20,9 @@ public interface ISnapshotService : IStatefulService
     /// </summary>
     SnapshotGroup? Unanswered { get; }
 
+    /// <summary>Every group that waits to be sent again, in the order they were made; empty when nothing waits.</summary>
+    IReadOnlyList<SnapshotGroup> Waiting { get; }
+
     /// <summary>
     /// Sends the group that waits again, and again after longer and longer, as long as the person may send it and until the
     /// server answers: the page that shows the Event asks for it when it opens, as the group may have been kept by a page

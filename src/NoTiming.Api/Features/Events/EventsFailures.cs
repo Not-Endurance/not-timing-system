@@ -33,13 +33,6 @@ internal static class EventsFailures
             "An Event does not start after its last day."
         );
 
-    public static JsonApiFailure NewEventUnsupportedAttribute { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "unsupported-attribute",
-            "An Event is made with a name, a location and optionally an FEI show ID, and with nothing else."
-        );
-
     public static JsonApiFailure InvalidName { get; } =
         new(
             StatusCodes.Status400BadRequest,

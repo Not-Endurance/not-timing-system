@@ -48,7 +48,7 @@ public sealed class TenantsMigrationToolTests : IClassFixture<MongoFixture>
         Assert.Equal(0, code);
         Assert.Contains("Applying tenants migration.", output);
         Assert.Contains("Applied.", output);
-        Assert.Equal("Staging", await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Equal("Staging", await new MongoStorageEnvironment(data.Database).ReadAsync());
         Assert.Equal("country-bg", (await data.ManyAsync("users")).Single()["HomeTenantId"].AsString);
     }
 

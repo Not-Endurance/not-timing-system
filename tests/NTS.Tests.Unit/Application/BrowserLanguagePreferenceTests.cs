@@ -1,4 +1,5 @@
 using Microsoft.JSInterop;
+using Not.Blazor.Client.Browser;
 using NoTiming.Ui.Storage.Browser;
 
 namespace NTS.Tests.Unit.Application;
@@ -18,7 +19,7 @@ public sealed class BrowserLanguagePreferenceTests
     {
         var browser = new FakeLocalStorage();
 
-        await new BrowserLanguagePreference(browser).Choose(chosen);
+        await new BrowserLanguagePreference(new BrowserLocalStorage(browser)).Choose(chosen);
 
         var call = Assert.Single(browser.Calls);
         Assert.Equal("localStorage.setItem", call.Identifier);
@@ -34,7 +35,9 @@ public sealed class BrowserLanguagePreferenceTests
     {
         var browser = new FakeLocalStorage();
 
-        await Assert.ThrowsAsync<ArgumentException>(() => new BrowserLanguagePreference(browser).Choose(chosen));
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => new BrowserLanguagePreference(new BrowserLocalStorage(browser)).Choose(chosen)
+        );
 
         Assert.Empty(browser.Calls);
     }
@@ -44,6 +47,8 @@ public sealed class BrowserLanguagePreferenceTests
     {
         var browser = new FakeLocalStorage { Fails = new JSException("The quota has been exceeded.") };
 
-        await Assert.ThrowsAsync<JSException>(() => new BrowserLanguagePreference(browser).Choose("bg"));
+        await Assert.ThrowsAsync<JSException>(
+            () => new BrowserLanguagePreference(new BrowserLocalStorage(browser)).Choose("bg")
+        );
     }
 }

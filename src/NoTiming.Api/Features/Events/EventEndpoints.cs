@@ -32,6 +32,8 @@ internal static class EventEndpoints
 {
     const string EVENTS = "events";
     const string CAPABILITIES = "capabilities";
+    const int MAX_NAME_LENGTH = 100;
+    const int MAX_FEI_SHOW_ID_LENGTH = 20;
 
     public static IEndpointRouteBuilder MapEvents(this IEndpointRouteBuilder app)
     {

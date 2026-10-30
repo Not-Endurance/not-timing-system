@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using Not.Application.Environments;
 using Not.Storage.Mongo;
 
 namespace NTS.Tools.EnvironmentMarking;
@@ -28,17 +29,19 @@ public static class MarkEnvironmentTool
             return options.IsValid ? 0 : 1;
         }
 
-        var name = EnvironmentMarker.Canonical(options.Environment);
+        var name = StorageEnvironmentNames.Canonical(options.Environment);
         if (name == null)
         {
             error.WriteLine(
-                $"'{options.Environment}' is not an environment: use {string.Join(", ", EnvironmentMarker.Names)}."
+                $"'{options.Environment}' is not an environment: use {string.Join(", ", StorageEnvironmentNames.Names)}."
             );
             return 1;
         }
 
-        var database = new MongoClient(options.ConnectionString).GetDatabase(options.Database);
-        var existing = await EnvironmentMarker.ReadAsync(database);
+        IStorageEnvironment environment = new MongoStorageEnvironment(
+            new MongoClient(options.ConnectionString).GetDatabase(options.Database)
+        );
+        var existing = await environment.ReadAsync();
         if (existing != null)
         {
             if (string.Equals(existing, name, StringComparison.Ordinal))
@@ -60,7 +63,7 @@ public static class MarkEnvironmentTool
             return 0;
         }
 
-        await EnvironmentMarker.WriteAsync(database, name, now ?? TimeProvider.System.GetUtcNow());
+        await environment.WriteAsync(name, now ?? TimeProvider.System.GetUtcNow());
         output.WriteLine($"The database is marked {name}.");
         return 0;
     }

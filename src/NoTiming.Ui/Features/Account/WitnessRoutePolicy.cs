@@ -43,7 +43,7 @@ public static class WitnessRoutePolicy
 
     static bool IsSnapshotPage(string relativePath)
     {
-        return IsRouteOf(Routes.SNAPSHOT_PAGE, relativePath) || IsRouteOf(Routes.EVENT_SNAPSHOT_PAGE, relativePath);
+        return IsRouteOf(Routes.EVENT_SNAPSHOT_PAGE, relativePath);
     }
 
     /// <summary>

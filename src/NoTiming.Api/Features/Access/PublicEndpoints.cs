@@ -38,13 +38,13 @@ internal sealed class PublicEndpoint
 internal static class PublicEndpoints
 {
     /// <summary>
-    /// How the route is reached; protected for any that the list does not name. A host that has endpoints of its own, which a
-    /// Debug build has for the local sign in as, says them as <paramref name="hostEntries"/>: a deployed host has none.
+    /// How the route is reached; protected for any that the list does not name. The localhost bypass of a Debug build in
+    /// Development adds endpoints of its own, which are <paramref name="localhostEntries"/>: a deployed host has none.
     /// </summary>
     public static EndpointAccess AccessOf(
         string method,
         string? routePattern,
-        IEnumerable<PublicEndpoint>? hostEntries = null
+        IEnumerable<PublicEndpoint>? localhostEntries = null
     )
     {
         if (routePattern == null)
@@ -52,7 +52,7 @@ internal static class PublicEndpoints
             return EndpointAccess.Protected;
         }
 
-        return All.Concat(hostEntries ?? []).FirstOrDefault(x => x.Matches(method, routePattern))?.Access
+        return All.Concat(localhostEntries ?? []).FirstOrDefault(x => x.Matches(method, routePattern))?.Access
             ?? EndpointAccess.Protected;
     }
 

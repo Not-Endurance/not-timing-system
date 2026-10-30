@@ -447,6 +447,12 @@ namespace NTS.Localization
         public static string Horses_helper_string => LocalizeString(nameof(Horses_helper_string));
         public static string Competition_string => LocalizeString(nameof(Competition_string));
         public static string Nothing_found_string => LocalizeString(nameof(Nothing_found_string));
+        public static string Is_on_time_for_Presentation_Inspection_string =>
+            LocalizeString(nameof(Is_on_time_for_Presentation_Inspection_string));
+        public static string Estimates_string => LocalizeString(nameof(Estimates_string));
+        public static string FEI_string => LocalizeString(nameof(FEI_string));
+        public static string Regional_string => LocalizeString(nameof(Regional_string));
+        public static string Both_string => LocalizeString(nameof(Both_string));
     }
 }
 #pragma warning restore NA0004

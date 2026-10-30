@@ -4,6 +4,7 @@ using NoTiming.Api.Features.Branding;
 using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
+using NoTiming.Api.Features.Localhost;
 using NoTiming.Api.Features.Participants;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
@@ -33,9 +34,7 @@ internal static class ApiEndpoints
         guarded.MapRegistrations();
         guarded.MapPasskeys();
         guarded.MapMe();
-#if DEBUG
-        app.MapLocalSignIn();
-#endif
+app.MapLocalhost();
         guarded.MapProfile();
         guarded.MapTenants();
         guarded.MapBranding();
@@ -61,7 +60,7 @@ internal static class ApiEndpoints
 
         // Fail closed: a route of the Api that is neither public nor declares what it needs does not let the host start.
 #if DEBUG
-        var hostEntries = app.Services.GetService<HostPublicEndpoints>()?.Entries;
+        var hostEntries = app.Services.GetService<LocalhostPublicEndpoints>()?.Entries;
 #else
         IEnumerable<PublicEndpoint>? hostEntries = null;
 #endif

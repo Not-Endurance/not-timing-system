@@ -1,0 +1,31 @@
+@using MudBlazor
+
+@inherits ArrivelistEstimateBehind
+
+@* Single wrapper element - in the narrow-screen card layout the surrounding cell is a flex row, so
+   two unwrapped lines would sit side by side instead of stacking. *@
+<div class="arrivelist-estimate">
+
+    @if (ShowFei)
+    {
+        <MudText Typo="Typo.caption" Color="@TextColor" Class="countdown-list-nowrap">
+            @if (ShowLabels)
+            {
+                <span class="arrivelist-estimate-label">@FEI_string</span>
+            }
+            @FeiEstimate
+        </MudText>
+    }
+
+    @if (ShowRegional)
+    {
+        <MudText Typo="Typo.caption" Color="@TextColor" Class="countdown-list-nowrap">
+            @if (ShowLabels)
+            {
+                <span class="arrivelist-estimate-label">@Regional_string</span>
+            }
+            @RegionalEstimate
+        </MudText>
+    }
+
+</div>

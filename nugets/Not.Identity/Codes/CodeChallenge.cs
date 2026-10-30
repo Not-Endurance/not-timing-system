@@ -18,12 +18,14 @@ internal sealed class CodeChallenge
 
     public int Attempts { get; set; }
 
+    [BsonElement("CreatedAt")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
 
     /// <summary>The TTL index deletes the document once this has passed.</summary>
+    [BsonElement("ExpiresAt")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-    public DateTime ExpiresAt { get; set; }
+    public DateTime ExpiresAtUtc { get; set; }
 
     [BsonIgnoreIfNull]
     public BsonDocument? Pending { get; set; }

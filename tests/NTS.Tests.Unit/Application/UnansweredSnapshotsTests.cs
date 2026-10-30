@@ -9,6 +9,7 @@ using NTS.Contracts.Features.Snapshots;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
@@ -112,6 +113,93 @@ public sealed class UnansweredSnapshotsTests
         Assert.Equal([5, 10, 20, 40, 60, 60, 60], rig.Timer.Spans.Select(x => (int)x.TotalSeconds));
         Assert.Equal(8, rig.Publisher.Published.Count);
         Assert.Single(rig.Publisher.Published.Select(x => x.Id).Distinct()); // one group, the whole time
+        Assert.Null(rig.Service.Unanswered);
+        Assert.Single(rig.Service.History);
+    }
+
+    [Fact]
+    public async Task Each_group_sent_while_the_api_is_down_is_kept_and_all_of_them_are_sent_once_it_answers()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1), ParticipationFixtures.Active(2));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        using var view = await rig.ViewAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+        rig.Capture(2);
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+
+        Assert.Equal(2, rig.Kept.Count); // one entry for each group, so neither overwrites the other
+
+        rig.Publisher.Fail = null;
+        rig.Timer.Elapse();
+        await rig.Resent(rig.Service);
+
+        Assert.Equal(0, rig.Kept.Count);
+        Assert.Empty(rig.Service.Waiting);
+        Assert.Equal(2, rig.Service.History.Count);
+        Assert.Equal([2], rig.Publisher.Published.Last().Entries.Select(x => x.Number).ToArray()); // 1 was recorded by the first group
+    }
+
+    [Fact]
+    public async Task A_group_that_is_recorded_takes_its_Snapshots_out_of_the_groups_that_wait()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1), ParticipationFixtures.Active(2));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        using var view = await rig.ViewAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+        rig.Capture(2);
+        rig.Publisher.Fail = null;
+
+        await rig.Service.Publish(view, SnapshotType.Arrive); // 1 and 2, as one new group
+
+        Assert.Equal([1, 2], rig.Publisher.Published.Last().Entries.Select(x => x.Number).ToArray());
+        Assert.Equal(0, rig.Kept.Count); // the group of 1 waited for nothing but 1, which is recorded now, so it is forgotten
+        Assert.Empty(rig.Service.Waiting);
+    }
+
+    [Fact]
+    public async Task Every_kept_group_is_selected_again_and_sent_after_the_page_was_lost()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1), ParticipationFixtures.Active(2));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        using var view = await rig.ViewAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+        rig.Capture(2);
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+
+        var service = await rig.ReloadAsync();
+        Assert.Equal([1, 2], service.Snapshots.Select(x => x.Number).OrderBy(x => x).ToArray());
+
+        rig.Publisher.Fail = null;
+        using var reopened = await rig.ViewAsync();
+        service.Resume(reopened);
+        await Eventually(() => rig.Timer.IsWaiting);
+        rig.Timer.Elapse();
+        await rig.Resent(service);
+
+        Assert.Equal(0, rig.Kept.Count);
+        Assert.Equal(2, service.History.Count);
+    }
+
+    [Fact]
+    public async Task A_send_that_times_out_during_a_resend_is_tried_again_and_does_not_end_the_resends()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        using var view = await rig.ViewAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+
+        rig.Publisher.Fail = new TaskCanceledException("The Api did not answer in time.");
+        rig.Timer.Elapse();
+        await Eventually(() => rig.Timer.Spans.Count == 2); // the resend timed out, and the app waits again
+
+        rig.Publisher.Fail = null;
+        rig.Timer.Elapse();
+        await rig.Resent(rig.Service);
+
         Assert.Null(rig.Service.Unanswered);
         Assert.Single(rig.Service.History);
     }
@@ -333,12 +421,14 @@ public sealed class UnansweredSnapshotsTests
         using var other = await rig.ViewOfAnotherEventAsync();
         await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(other, SnapshotType.Arrive)); // now it is the other's that waits
         var sent = rig.Publisher.Published.Count;
+        var first = rig.Service.Waiting.First(); // the group made for the first Event, which is the one this page sends again
         rig.Publisher.Fail = null;
 
         rig.Timer.Elapse(); // the wait of the page of the first Event is over
         await rig.Resent(rig.Service);
 
-        Assert.Equal(sent, rig.Publisher.Published.Count);
+        Assert.Equal(sent + 1, rig.Publisher.Published.Count); // the group of the first Event, and not the group of the other Event
+        Assert.Equal(first.Id, rig.Publisher.Published.Last().Id);
     }
 
     [Fact]
@@ -523,12 +613,13 @@ public sealed class UnansweredSnapshotsTests
             _repository = new ControlledParticipationRepository(participations);
             _store = new ParticipationStore(_repository, _socket);
             Service = null!;
+            Kept = new DurableStore(Timer);
         }
 
         public SnapshotService Service { get; private set; }
         public NoSession Session { get; } = new();
         public Publisher Publisher { get; } = new();
-        public InMemoryUnansweredSnapshots Kept { get; } = new();
+        public DurableStore Kept { get; }
         public StepTimer Timer { get; } = new();
         public FakeAccount Account { get; } = new(TestId.Of(1));
         public RecordingNotifier Notifier { get; } = new();
@@ -537,7 +628,7 @@ public sealed class UnansweredSnapshotsTests
         public async Task<SnapshotService> ReloadAsync()
         {
             Service?.Dispose();
-            Service = new SnapshotService(_socket, _store, Session, Publisher, Account, Kept, Timer, Notifier);
+            Service = new SnapshotService(_socket, _store, Session, Publisher, Account, Kept.Repository, Notifier);
             await Service.Load();
             return Service;
         }

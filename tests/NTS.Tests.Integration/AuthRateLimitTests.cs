@@ -1,7 +1,6 @@
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
-using Not.Identity.Email;
 using NTS.Tests.Integration.Infrastructure;
 
 namespace NTS.Tests.Integration;
