@@ -29,7 +29,7 @@ internal static class SetupEndpoints
 
     public static IEndpointRouteBuilder MapSetups(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/configure-events", PostConfigureEvents);
+        app.MapPost("/api/configure-events", PostConfigureEvents).WithMetadata(new ResourceAttribute(CONFIGURE_EVENTS));
         app.MapGet("/api/configure-events", GetConfigureEvents);
         app.MapGet("/api/configure-events/{id}", GetConfigureEventsById);
         app.MapPatch("/api/configure-events/{id}", PatchConfigureEventsById);
