@@ -1,6 +1,6 @@
 using Not.Application.DomainEvents;
 using Not.Application.HTTP;
-using Not.Storage.REST;
+using Not.Blazor.Client.REST;
 using NTS.Contracts.Setup;
 using NTS.Contracts.Setup.Models;
 using NTS.Domain.Setup.Aggregates;
@@ -18,20 +18,15 @@ public class ConfigureEventApiRepository : JsonApiRepository<ConfigureEvent, Con
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
     public ConfigureEventApiRepository(JsonApiClient client, IDomainEventDispatcher domainEventDispatcher)
-        : base("configure-events", client, "mainOperatorId")
+        : base("configure-events", client)
     {
         _domainEventDispatcher = domainEventDispatcher;
     }
 
-    protected override async Task<bool> UpdateCore(ConfigureEvent item)
+    public override async Task Update(ConfigureEvent item)
     {
-        var updated = await base.UpdateCore(item);
-        if (updated)
-        {
-            await DispatchUpdated(item);
-        }
-
-        return updated;
+        await base.Update(item);
+        await DispatchUpdated(item);
     }
 
     Task DispatchUpdated(ConfigureEvent item)

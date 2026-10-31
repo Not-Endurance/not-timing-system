@@ -1,5 +1,5 @@
 ﻿using Not.Application.HTTP;
-using Not.Storage.REST;
+using Not.Blazor.Client.REST;
 using NTS.Contracts.Shared.Models;
 using NTS.Domain.Aggregates;
 

@@ -1,4 +1,5 @@
 using System.Net;
+using Not.Application.HTTP;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -152,31 +153,24 @@ public sealed class EventEndedWritesTests : IClassFixture<MongoFixture>
 
         read.Withdraw();
         await asConsoleOperator.Update(read);
-        var whileLive = asConsoleOperator.LastError;
         staleRead.Retire();
-        await asConsoleOperator.Update(staleRead);
-        var stale = asConsoleOperator.LastError;
+        var stale = await Assert.ThrowsAsync<JsonApiException>(() => asConsoleOperator.Update(staleRead));
         readByMember.Retire();
-        await asMember.Update(readByMember);
-        var notTheirs = asMember.LastError;
+        var notTheirs = await Assert.ThrowsAsync<JsonApiException>(() => asMember.Update(readByMember));
 
         time.Advance(LENGTH);
         var afterTheEnd = (await asConsoleOperator.Read(participation.Id))!; // reads are never refused
         afterTheEnd.Restore();
-        await asConsoleOperator.Update(afterTheEnd);
-        var updated = asConsoleOperator.LastError;
-        await asConsoleOperator.Delete(participation.Id);
-        var deleted = asConsoleOperator.LastError;
-        await asConsoleOperator.Create(Created(eventId));
-        var created = asConsoleOperator.LastError;
+        var updated = await Assert.ThrowsAsync<JsonApiException>(() => asConsoleOperator.Update(afterTheEnd));
+        var deleted = await Assert.ThrowsAsync<JsonApiException>(() => asConsoleOperator.Delete(participation.Id));
+        var created = await Assert.ThrowsAsync<JsonApiException>(() => asConsoleOperator.Create(Created(eventId)));
 
-        Assert.Null(whileLive);
-        Assert.Equal("participation-changed", stale?.Code);
-        Assert.Equal("not-console-operator", notTheirs?.Code);
+        Assert.Equal("participation-changed", stale.Code);
+        Assert.Equal("not-console-operator", notTheirs.Code);
         foreach (var refused in new[] { updated, deleted, created })
         {
-            Assert.Equal("event-ended", refused?.Code);
-            Assert.Equal((int)HttpStatusCode.Conflict, refused?.Status);
+            Assert.Equal("event-ended", refused.Code);
+            Assert.Equal(HttpStatusCode.Conflict, refused.Response.Status);
         }
 
         var stored = (await StoredAsync(participation.Collection, eventId)).Single();

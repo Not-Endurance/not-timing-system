@@ -1,7 +1,7 @@
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Injection;
-using Not.Storage.REST;
+using Not.Blazor.Client.REST;
 using NTS.Contracts.Features.Participants;
 using NTS.Domain.Core.Aggregates;
 
@@ -33,10 +33,10 @@ public interface IParticipationHistory
     Task<IReadOnlyList<ParticipantName>> HorsesRiddenBy(Guid athleteId, CancellationToken ct);
 
     /// <summary>
-    /// A Participation with its Phases, as the Results show it: none when it is not there, and a read that failed says so, which
-    /// is not the same: the person has been told by then, and the Participation may still be there.
+    /// A Participation with its Phases, as the Results show it: none when it is not there. A read that did not come is a
+    /// <c>RepositoryException</c>, and the Participation may still be there.
     /// </summary>
-    Task<RowRead<Participation>> ParticipationOf(Guid id);
+    Task<Participation?> ParticipationOf(Guid id);
 }
 
 public class ParticipantService : IParticipantSearch, IParticipationHistory, IScoped
@@ -136,11 +136,9 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
         }
     }
 
-    public async Task<RowRead<Participation>> ParticipationOf(Guid id)
+    public async Task<Participation?> ParticipationOf(Guid id)
     {
-        return _participations is IRowReader<Participation> reader
-            ? await reader.Find(id)
-            : new RowRead<Participation>(await _participations.Read(id), failed: false);
+        return await _participations.Read(id);
     }
 
     async Task<ParticipantSearchAnswer> Ask(

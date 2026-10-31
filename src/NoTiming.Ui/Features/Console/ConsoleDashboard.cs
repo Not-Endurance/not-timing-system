@@ -1,3 +1,4 @@
+using Not.Application.CRUD.Ports;
 using Not.Application.Behinds.Adapters;
 using Not.Domain.Exceptions;
 using Not.Injection;
@@ -270,8 +271,16 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
             throw;
         }
 
-        await _writes.Update(participation);
-        var refused = _writes.LastError;
+        RepositoryException? refused = null;
+        try
+        {
+            await _writes.Update(participation);
+        }
+        catch (RepositoryException error)
+        {
+            refused = error;
+        }
+
         await _store.Refresh(id); // the version that was written, or what is stored when the Api would not
         EmitChanged();
         if (refused != null)

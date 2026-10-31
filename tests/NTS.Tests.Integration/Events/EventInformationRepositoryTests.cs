@@ -1,3 +1,4 @@
+using Not.Application.HTTP;
 using System.Net;
 using System.Text;
 using Microsoft.Extensions.Time.Testing;
@@ -55,7 +56,6 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
         Assert.Equal(tenant, liveEvents.Single(x => x.Id == live).TenantId);
         Assert.Contains(requests.Asked, x => x.Contains("/api/events/live?"));
         Assert.Contains(requests.Asked, x => x.Contains("/api/events/historic?") && x.Contains("sort=-endDay"));
-        Assert.Null(events.LastError);
     }
 
     [Fact]
@@ -83,7 +83,6 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
         Assert.Equal(tenant, started.TenantId);
         Assert.Contains(await events.ReadLive(), x => x.Id == id);
         Assert.Contains($"POST /api/events", requests.Asked);
-        Assert.Null(events.LastError);
     }
 
     [Fact]
@@ -102,13 +101,12 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
         );
         var asMember = new EventInformationApiRepository(JsonApiClients.Of(api, member, out _), new SocketOf(null));
 
-        var invalid = await Assert.ThrowsAsync<DomainException>(() => asConsoleOperator.Start(empty));
-        var invalidCode = asConsoleOperator.LastError?.Code;
-        var refused = await Assert.ThrowsAsync<DomainException>(() => asMember.Start(full));
+        var invalid = await Assert.ThrowsAsync<JsonApiException>(() => asConsoleOperator.Start(empty));
+        var refused = await Assert.ThrowsAsync<JsonApiException>(() => asMember.Start(full));
 
         Assert.False(string.IsNullOrWhiteSpace(invalid.Message));
-        Assert.Equal("invalid-setup", invalidCode);
-        Assert.Equal("not-console-operator", asMember.LastError?.Code);
+        Assert.Equal("invalid-setup", invalid.Code);
+        Assert.Equal("not-console-operator", refused.Code);
         Assert.False(string.IsNullOrWhiteSpace(refused.Message));
         Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, empty));
         Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, full));
@@ -159,7 +157,6 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
 
         await events.Update(changed);
 
-        Assert.Null(events.LastError);
         var stored = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
         Assert.Equal("Renamed By The Ui", stored["Name"].AsString);
         Assert.Equal("Plovdiv", stored["Location"].AsString);
@@ -187,7 +184,6 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
 
         await events.Reset();
 
-        Assert.Null(events.LastError);
         Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
         Assert.DoesNotContain(await events.ReadLive(), x => x.Id == id);
         Assert.NotNull(await EventSeed.SetupOfAsync(_mongo.ConnectionString, id));
@@ -209,7 +205,6 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
         await events.Reset();
 
         Assert.Empty(requests.Asked);
-        Assert.Null(events.LastError);
         Assert.NotNull(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
     }
 

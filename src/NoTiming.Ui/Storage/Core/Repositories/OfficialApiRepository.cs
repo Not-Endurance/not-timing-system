@@ -13,8 +13,8 @@ namespace NoTiming.Ui.Storage.Core.Repositories;
 public class OfficialApiRepository : EventDataApiRepository<Official, OfficialModel>
 {
     protected OfficialApiRepository(JsonApiClient client, IRepositoryScopeFactory<Official> scopeFactory)
-        : base("officials", client, scopeFactory, "userId") { }
+        : base("officials", client, scopeFactory) { }
 
     public OfficialApiRepository(JsonApiClient client)
-        : base("officials", client, null, "userId") { }
+        : base("officials", client, null) { }
 }

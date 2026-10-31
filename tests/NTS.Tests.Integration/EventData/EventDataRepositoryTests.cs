@@ -1,3 +1,5 @@
+using Not.Application.CRUD.Ports;
+using Not.Application.HTTP;
 using System.Net;
 using System.Text;
 using NoTiming.Ui.Features.Access;
@@ -49,13 +51,13 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
         );
 
         var all = (await participations.ReadMany()).ToList();
-        var narrowed = (await participations.ReadMany(x => x.Combination.Number > 1)).ToList();
+        var refused = await Assert.ThrowsAsync<RepositoryException>(() => participations.ReadMany(x => x.Combination.Number > 1));
         var one = await participations.Read(first.Id);
 
         Assert.Equal(new[] { first.Id, second.Id }.Order(), all.Select(x => x.Id).Order());
         Assert.Equal(3, all.Single(x => x.Id == first.Id).Version);
         Assert.Equal(0, all.Single(x => x.Id == second.Id).Version);
-        Assert.Equal([second.Id], narrowed.Select(x => x.Id));
+        Assert.Equal(RepositoryErrorKind.Refused, refused.Kind); // a comparison the Api does not read is refused, never read in full
         Assert.Equal(3, one!.Version);
         Assert.Equal(START.AddHours(1), one.Phases[0].Events.Single().Times.Single().Time);
         var lists = requests
@@ -63,7 +65,6 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
             .Where(x => x.StartsWith("GET /api/participations?", StringComparison.Ordinal));
         Assert.All(lists, x => Assert.Contains($"eventId eq {eventId}", x));
         Assert.Contains(requests.Asked, x => x == $"GET /api/participations/{first.Id}");
-        Assert.Null(participations.LastError);
     }
 
     [Fact]
@@ -83,13 +84,10 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
         var officials = new OfficialApiRepository(JsonApiClients.Of(api, null, out _));
 
         var ofTheEvent = (await officials.ReadMany(x => x.EventId == eventId)).ToList();
-        var error = officials.LastError;
-        var unnamed = (await officials.ReadMany()).ToList();
+        var unnamed = await Assert.ThrowsAsync<JsonApiException>(() => officials.ReadMany());
 
         Assert.Equal([mine.Id], ofTheEvent.Select(x => x.Id));
-        Assert.Null(error);
-        Assert.Empty(unnamed); // the Api answers no list that does not say whose
-        Assert.Equal("event-required", officials.LastError?.Code);
+        Assert.Equal("event-required", unnamed.Code); // the Api answers no list that does not say whose
     }
 
     [Fact]
@@ -119,15 +117,13 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
         var taken = (
             await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_participations", participation.Id)
         )!;
-        var error = participations.LastError;
         staleRead.Retire();
-        await participations.Update(staleRead);
+        var stale = await Assert.ThrowsAsync<JsonApiException>(() => participations.Update(staleRead));
 
-        Assert.Null(error);
         Assert.Equal(3, taken["Version"].AsInt32);
         Assert.Equal("WD", taken["Eliminated"]["Code"].AsString);
         Assert.Equal(eventId, taken["EventId"].AsGuid);
-        Assert.Equal("participation-changed", participations.LastError?.Code);
+        Assert.Equal("participation-changed", stale.Code);
         var stored = (
             await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_participations", participation.Id)
         )!;
@@ -157,9 +153,9 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
         var read = (await asMember.Read(participation.Id))!;
 
         read.Withdraw();
-        await asMember.Update(read);
+        var refused = await Assert.ThrowsAsync<JsonApiException>(() => asMember.Update(read));
 
-        Assert.Equal("not-console-operator", asMember.LastError?.Code);
+        Assert.Equal("not-console-operator", refused.Code);
         Assert.False(
             (
                 await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_participations", participation.Id)
@@ -201,7 +197,6 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
         Assert.Equal("CEI 2*", read!.Name);
         Assert.Equal([participation.Id], read.Entries.Select(x => x.ParticipationId));
         Assert.Null(await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_rankings", ranking.Id));
-        Assert.Null(rankings.LastError);
         Assert.Equal(
             [
                 "POST /api/rankings",
@@ -234,7 +229,6 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
 
         await officials.Create(linked);
 
-        Assert.Null(officials.LastError);
         var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "event_officials", linked.Id))!;
         Assert.Equal("Integration Official", stored["Name"].AsString);
         Assert.False(stored.Contains("UserId"));
@@ -290,10 +284,9 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
             ),
         };
 
-        var list = (await participations.ReadMany()).ToList();
+        var refused = await Assert.ThrowsAsync<JsonApiException>(() => participations.ReadMany());
 
-        Assert.Empty(list);
-        Assert.Equal("unexpected", participations.LastError?.Code);
+        Assert.Equal("unexpected", refused.Code);
     }
 
     [Fact]
@@ -365,7 +358,7 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
     }
 
     [Fact]
-    public async Task A_filter_the_Api_cannot_be_asked_for_is_applied_to_what_the_Event_has_and_not_to_what_the_Tenant_has()
+    public async Task A_filter_the_Api_cannot_be_asked_for_is_refused_and_not_applied_to_what_the_Tenant_has()
     {
         var api = _shared.Api;
         var tenant = await TenantAsync(_shared.MongoConnectionString);
@@ -384,13 +377,10 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
             new EventScopeFactory<Official>(new SelectedEvent(eventId))
         );
 
-        var stewards = (await officials.ReadMany(x => x.Role == OfficialRole.Steward)).ToList();
+        var refused = await Assert.ThrowsAsync<RepositoryException>(() => officials.ReadMany(x => x.Role == OfficialRole.Steward));
 
-        Assert.Equal([steward.Id], stewards.Select(x => x.Id)); // an enum is not written for the Api: the repository filters
-        var lists = requests.Asked.Select(Uri.UnescapeDataString).ToList();
-        Assert.All(lists, x => Assert.Contains($"eventId eq {eventId}", x));
-        Assert.DoesNotContain(lists, x => x.Contains("role", StringComparison.OrdinalIgnoreCase));
-        Assert.Null(officials.LastError);
+        Assert.Equal(RepositoryErrorKind.Refused, refused.Kind); // an enum is not written for the Api, so the list is refused
+        Assert.Empty(requests.Asked.Where(x => x.Contains("role", StringComparison.OrdinalIgnoreCase)));
     }
 
     [Fact]

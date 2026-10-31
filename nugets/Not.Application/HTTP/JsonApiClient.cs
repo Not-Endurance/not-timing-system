@@ -153,6 +153,9 @@ public class JsonApiClient
     /// <summary>The options this client reads and writes documents with: those of its settings.</summary>
     public JsonSerializerOptions Json => _settings.Json;
 
+    /// <summary>The codes of a conflict the Api says to try again later, as the settings name them.</summary>
+    public IReadOnlySet<string> UnavailableCodes => _settings.UnavailableCodes;
+
     public async Task<JsonApiResponse> Send(
         HttpMethod method,
         string endpoint,
