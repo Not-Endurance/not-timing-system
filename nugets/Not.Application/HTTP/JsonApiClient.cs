@@ -26,6 +26,12 @@ public class JsonApiSettings
     /// them is an unavailable failure, not a refusal (ADR-0017).
     /// </summary>
     public HashSet<string> UnavailableCodes { get; } = [];
+
+    /// <summary>
+    /// What a document is read and written with: camelCase members, enums as their names, and a null written as null, which
+    /// on a change takes the member away (ADR-0017).
+    /// </summary>
+    public JsonSerializerOptions Json { get; set; } = JsonApiClient.WriteOptions;
 }
 
 /// <summary>One of the errors of a JSON:API response: the status and the stable code a client branches on, and what a person reads.</summary>
@@ -144,6 +150,9 @@ public class JsonApiClient
     /// </summary>
     public static JsonSerializerOptions WriteOptions { get; } = CreateOptions(JsonIgnoreCondition.Never);
 
+    /// <summary>The options this client reads and writes documents with: those of its settings.</summary>
+    public JsonSerializerOptions Json => _settings.Json;
+
     public async Task<JsonApiResponse> Send(
         HttpMethod method,
         string endpoint,
@@ -189,44 +198,37 @@ public class JsonApiClient
     /// A list of a collection, or any route that answers with one: its filter, its sort and one page of it, as the rest-api
     /// skill names them. A route that is not a list is asked with no query.
     /// </summary>
-    public Task<JsonApiResponse> Get(
-        string path,
-        string? filter = null,
-        string? sort = null,
-        int? pageSize = null,
-        int? pageNumber = null,
-        CancellationToken cancellationToken = default
-    )
+    public Task<JsonApiResponse> Get(string path, ListQuery? query = null, CancellationToken cancellationToken = default)
     {
-        var query = new List<string>();
-        if (filter != null)
+        var parameters = new List<string>();
+        if (query?.Filter is { } filter)
         {
-            query.Add($"filter={Uri.EscapeDataString(filter)}");
+            parameters.Add($"filter={Uri.EscapeDataString(filter)}");
         }
 
-        if (sort != null)
+        if (query?.Sort is { } sort)
         {
-            query.Add($"sort={Uri.EscapeDataString(sort)}");
+            parameters.Add($"sort={Uri.EscapeDataString(sort)}");
         }
 
-        if (pageSize != null)
+        if (query?.PageSize is { } size)
         {
-            query.Add($"page[size]={pageSize}");
+            parameters.Add($"page[size]={size}");
         }
 
-        if (pageNumber != null)
+        if (query?.PageNumber is { } number)
         {
-            query.Add($"page[number]={pageNumber}");
+            parameters.Add($"page[number]={number}");
         }
 
-        var endpoint = query.Count == 0 ? path : $"{path}?{string.Join('&', query)}";
+        var endpoint = parameters.Count == 0 ? path : $"{path}?{string.Join('&', parameters)}";
         return Send(HttpMethod.Get, endpoint, null, cancellationToken);
     }
 
     /// <summary>One resource of a collection, by its id.</summary>
     public Task<JsonApiResponse> GetOne(string collection, Guid id, CancellationToken cancellationToken = default)
     {
-        return Send(HttpMethod.Get, $"{collection}/{id}", null, cancellationToken);
+        return Send(HttpMethod.Get, ItemPath(collection, id), null, cancellationToken);
     }
 
     /// <summary>Makes a resource of a collection. The id the model holds is the id of the document, when it holds one.</summary>
@@ -249,7 +251,7 @@ public class JsonApiClient
     {
         return Send(
             HttpMethod.Patch,
-            $"{collection}/{id}",
+            ItemPath(collection, id),
             ResourceDocument(collection, model, id, meta),
             cancellationToken
         );
@@ -258,18 +260,23 @@ public class JsonApiClient
     /// <summary>Removes a resource of a collection, by its id.</summary>
     public Task<JsonApiResponse> Delete(string collection, Guid id, CancellationToken cancellationToken = default)
     {
-        return Send(HttpMethod.Delete, $"{collection}/{id}", null, cancellationToken);
+        return Send(HttpMethod.Delete, ItemPath(collection, id), null, cancellationToken);
+    }
+
+    static string ItemPath(string collection, Guid id)
+    {
+        return $"{collection}/{id}";
     }
 
     /// <summary>
     /// The document of one resource: its type is the collection, its id is the one given or else the one the model holds,
     /// and every other member of the model is an attribute. The id is never an attribute, and a null is written as null.
     /// </summary>
-    static JsonElement ResourceDocument(string type, object model, Guid? id, JsonObject? meta)
+    JsonElement ResourceDocument(string collection, object model, Guid? id, JsonObject? meta)
     {
         var attributes = new JsonObject();
         Guid? modelId = null;
-        foreach (var member in JsonSerializer.SerializeToElement(model, WriteOptions).EnumerateObject())
+        foreach (var member in JsonSerializer.SerializeToElement(model, Json).EnumerateObject())
         {
             if (member.Name == "id")
             {
@@ -281,7 +288,7 @@ public class JsonApiClient
             }
         }
 
-        var data = new JsonObject { ["type"] = type };
+        var data = new JsonObject { ["type"] = collection };
         if ((id ?? modelId) is { } documentId && documentId != Guid.Empty)
         {
             data["id"] = documentId.ToString();

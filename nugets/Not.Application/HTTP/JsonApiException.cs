@@ -11,7 +11,11 @@ namespace Not.Application.HTTP;
 public class JsonApiException : RepositoryException
 {
     public JsonApiException(JsonApiResponse response, IReadOnlySet<string> unavailableCodes)
-        : base(KindOf(response, unavailableCodes), response.Error?.Message ?? response.Status.ToString(), response.Error?.Code)
+        : base(
+            KindOf(response, unavailableCodes),
+            response.Error?.Message ?? response.Status.ToString(),
+            response.Error?.Code
+        )
     {
         Response = response;
     }

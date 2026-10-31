@@ -21,7 +21,9 @@ public sealed class JsonApiClientTests
     {
         var transport = new FakeJsonApi();
 
-        await Client(transport).Get("athletes", filter: $"eventId eq {AN_EVENT}", sort: "-name", pageSize: 500, pageNumber: 2);
+        var query = new ListQuery(filter: $"eventId eq {AN_EVENT}", sort: "-name", pageSize: 500, pageNumber: 2);
+
+        await Client(transport).Get("athletes", query);
 
         Assert.Equal(
             $"/api/athletes?filter=eventId eq {AN_EVENT}&sort=-name&page[size]=500&page[number]=2",
@@ -60,7 +62,8 @@ public sealed class JsonApiClientTests
 
         await Client(transport).Post("athletes", new ResourceSample(AN_ATHLETE, "Ana", null));
 
-        var attributes = JsonDocument.Parse(transport.Requests.Single().Body!).RootElement.GetProperty("data").GetProperty("attributes");
+        var document = JsonDocument.Parse(transport.Requests.Single().Body!).RootElement;
+        var attributes = document.GetProperty("data").GetProperty("attributes");
         Assert.Equal(JsonValueKind.Null, attributes.GetProperty("note").ValueKind);
     }
 
@@ -136,7 +139,8 @@ public sealed class JsonApiClientTests
     [Fact]
     public async Task A_row_that_is_not_there_is_an_answer_and_not_an_error_of_the_transport()
     {
-        var transport = new FakeJsonApi(_ => Json(HttpStatusCode.NotFound, Errors("not-found", "There is no such row.")));
+        var transport = new FakeJsonApi(_ =>
+            Json(HttpStatusCode.NotFound, Errors("not-found", "There is no such row.")));
 
         var response = await Client(transport).GetOne("athletes", AN_ATHLETE);
 
@@ -164,6 +168,20 @@ public sealed class JsonApiClientTests
         var transport = new FakeJsonApi(_ => throw new HttpRequestException("The server did not answer."));
 
         await Assert.ThrowsAsync<HttpRequestException>(() => Client(transport).GetOne("athletes", AN_ATHLETE));
+    }
+
+    [Fact]
+    public async Task A_document_is_written_with_the_options_the_settings_hold()
+    {
+        var transport = new FakeJsonApi();
+        var settings = new JsonApiSettings { Url = "https://api.test/api" };
+        settings.Json = new JsonSerializerOptions(JsonSerializerDefaults.Web) { PropertyNamingPolicy = null };
+
+        await new JsonApiClient(new FakeHttpClientFactory(transport), Options.Create(settings))
+            .Post("athletes", new ResourceSample(AN_ATHLETE, "Ana", null));
+
+        var document = JsonDocument.Parse(transport.Requests.Single().Body!).RootElement;
+        Assert.Equal("Ana", document.GetProperty("data").GetProperty("attributes").GetProperty("Name").GetString());
     }
 
     static JsonApiClient Client(FakeJsonApi transport, Dictionary<string, string>? writeHeaders = null)
