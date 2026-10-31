@@ -250,8 +250,8 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
         var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, name: "Ana Petrova");
         var cookie = new JsonApiClients.Cookie(null);
         var json = JsonApiClients.WithCookie(api, cookie, out _);
-        using var account = new AccountSession(json);
-        using var profile = new WitnessProfileContext(account, new CountryApiRepository(json), json);
+        using var account = new AccountSession(new AccountApiRepository(json));
+        using var profile = new WitnessProfileContext(account, new CountryApiRepository(json), new AccountApiRepository(json));
         await profile.Load();
         Assert.Null(profile.Profile); // the app booted as a visitor
 
@@ -281,8 +281,8 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
     static UiOfAPerson Open(ApiFactory api, TenancySeed.Person? person, out JsonApiClients.Requests asked)
     {
         var json = JsonApiClients.Of(api, person, out asked);
-        var account = new AccountSession(json);
-        return new UiOfAPerson(account, new WitnessProfileContext(account, new CountryApiRepository(json), json));
+        var account = new AccountSession(new AccountApiRepository(json));
+        return new UiOfAPerson(account, new WitnessProfileContext(account, new CountryApiRepository(json), new AccountApiRepository(json)));
     }
 
     async Task AddCountryAsync(string name, string iso, string nf, string idStartsWith)

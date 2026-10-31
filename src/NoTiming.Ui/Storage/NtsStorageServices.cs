@@ -46,6 +46,18 @@ public static class NtsStorageServices
             _services.AddTransient<IRepository<Horse>, HorseApiRepository>();
             _services.AddTransient<IRepository<Athlete>, AthleteApiRepository>();
             _services.AddTransient<IRepository<ConfigureEvent>, ConfigureEventApiRepository>();
+            _services.AddTransient<ConfigureEventApiRepository>();
+            _services.AddTransient<EventGrantApiRepository>();
+            _services.AddTransient<ConsoleOperatorApiRepository>();
+            _services.AddTransient<UserSessionApiRepository>();
+            _services.AddTransient<TenantApiRepository>();
+            _services.AddTransient<BrandingApiRepository>();
+            _services.AddTransient<AccountApiRepository>();
+            _services.AddTransient<ParticipationApiRepository>();
+            _services.AddTransient<AthleteApiRepository>();
+            _services.AddTransient<HorseApiRepository>();
+            _services.AddTransient<ClubApiRepository>();
+            _services.AddTransient<TimeEventActorApiRepository>();
 
             AddEventScopedRepository<Participation, ParticipationEventScopedApiRepository>();
             AddEventScopedRepository<Ranking, RankingEventScopedApiRepository>();

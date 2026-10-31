@@ -493,13 +493,13 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
             var dashboard = new ConsoleDashboard(
                 store,
                 new ConsoleParticipationWrites(json),
-                new ServerClock(json, TimeProvider.System),
-                new AccountSession(json),
+                new ServerClock(new AccountApiRepository(json), TimeProvider.System),
+                new AccountSession(new AccountApiRepository(json)),
                 new SnapshotApiPublisher(json)
             );
             await dashboard.Show(new StubViewedEvent(store, selected.Event!, true));
             dashboard.Selected = dashboard.Participations.Single();
-            return new Tab(dashboard, new ConsoleTimeline(dashboard, json), store, requests);
+            return new Tab(dashboard, new ConsoleTimeline(dashboard, new TimeEventActorApiRepository(json)), store, requests);
         }
 
         Tab(

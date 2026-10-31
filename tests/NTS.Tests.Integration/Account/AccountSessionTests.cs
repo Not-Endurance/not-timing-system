@@ -4,6 +4,7 @@ using NoTiming.Ui.Features.Account;
 using NTS.Contracts;
 using NTS.Contracts.Features.Account;
 using NTS.Tests.Integration.Harness;
+using NoTiming.Ui.Storage.REST;
 
 namespace NTS.Tests.Integration;
 
@@ -25,7 +26,7 @@ public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
     public async Task A_visitor_who_has_not_signed_in_is_nobody()
     {
         var api = _shared.Api;
-        using var session = new AccountSession(JsonApiClients.Of(api, null, out var asked));
+        using var session = new AccountSession(new AccountApiRepository(JsonApiClients.Of(api, null, out var asked)));
 
         await session.Load();
 
@@ -50,7 +51,7 @@ public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
             new Dictionary<string, string[]> { [home] = ["tenant-root"], [other] = [] },
             name: "Ana Petrova"
         );
-        using var session = new AccountSession(JsonApiClients.Of(api, person, out _));
+        using var session = new AccountSession(new AccountApiRepository(JsonApiClients.Of(api, person, out _)));
 
         await session.Load();
 
@@ -74,7 +75,7 @@ public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
         var api = _shared.Api;
         using var client = api.CreateClient();
         var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, null, isDeveloper: true);
-        using var session = new AccountSession(JsonApiClients.Of(api, person, out _));
+        using var session = new AccountSession(new AccountApiRepository(JsonApiClients.Of(api, person, out _)));
 
         await session.Load();
 
@@ -89,7 +90,7 @@ public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
         using var client = api.CreateClient();
         var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home);
-        using var session = new AccountSession(JsonApiClients.Of(api, person, out _));
+        using var session = new AccountSession(new AccountApiRepository(JsonApiClients.Of(api, person, out _)));
         await session.Load();
         Assert.True(session.IsSignedIn);
         await person.Page.DeleteAsync("/api/sessions/current"); // signed out on another device
@@ -107,7 +108,7 @@ public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
         using var client = api.CreateClient();
         var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home);
-        using var session = new AccountSession(JsonApiClients.Of(api, person, out var asked));
+        using var session = new AccountSession(new AccountApiRepository(JsonApiClients.Of(api, person, out var asked)));
         await session.Load();
         var told = 0;
         session.ObservableEvent.Subscribe(() => told++);
@@ -118,7 +119,7 @@ public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
         Assert.False(session.IsSignedIn);
         Assert.True(told > 0);
         Assert.Contains("DELETE /api/sessions/current", asked.Asked);
-        using var after = new AccountSession(JsonApiClients.Of(api, person, out _));
+        using var after = new AccountSession(new AccountApiRepository(JsonApiClients.Of(api, person, out _)));
         await after.Load();
         Assert.Null(after.Current); // the cookie no longer signs in: the host ended the session
     }
@@ -138,7 +139,7 @@ public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
             home,
             new Dictionary<string, string[]> { [other] = [] }
         );
-        using var session = new AccountSession(JsonApiClients.Of(api, person, out _));
+        using var session = new AccountSession(new AccountApiRepository(JsonApiClients.Of(api, person, out _)));
         await session.Load();
         var told = 0;
         session.ObservableEvent.Subscribe(() => told++);
@@ -161,7 +162,7 @@ public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
     public async Task A_host_that_cannot_be_reached_leaves_the_account_unknown_and_is_asked_again_on_the_next_load()
     {
         var host = new Down();
-        using var session = new AccountSession(host.Client());
+        using var session = new AccountSession(new AccountApiRepository(host.Client()));
 
         await session.Load();
         var whileDown = (session.Current, session.IsKnown);
@@ -177,7 +178,7 @@ public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
     public async Task A_host_that_answers_with_a_failure_is_not_a_visitor_and_is_asked_again_on_the_next_load()
     {
         var api = _shared.Api;
-        using var session = new AccountSession(JsonApiClients.Of(api, null, out var asked));
+        using var session = new AccountSession(new AccountApiRepository(JsonApiClients.Of(api, null, out var asked)));
         asked.Answer = _ => new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError);
 
         await session.Load();

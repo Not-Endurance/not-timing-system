@@ -1,5 +1,6 @@
-using Not.Application.HTTP;
+using Not.Application.CRUD.Ports;
 using Not.Injection;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Core;
 
 namespace NoTiming.Ui.Features.Core;
@@ -11,13 +12,13 @@ namespace NoTiming.Ui.Features.Core;
 /// </summary>
 public class ServerClock : IServerClock, IScoped
 {
-    readonly JsonApiClient _api;
+    readonly AccountApiRepository _account;
     readonly TimeProvider _time;
     TimeSpan _difference = TimeSpan.Zero;
 
-    public ServerClock(JsonApiClient api, TimeProvider time)
+    public ServerClock(AccountApiRepository account, TimeProvider time)
     {
-        _api = api;
+        _account = account;
         _time = time;
     }
 
@@ -28,14 +29,14 @@ public class ServerClock : IServerClock, IScoped
         try
         {
             var asked = _time.GetUtcNow();
-            var response = await _api.Send(HttpMethod.Get, "me"); // any answer carries the time, a refusal too
+            var said = await _account.ServerTime(); // any answer carries the time, a refusal too
             var answered = _time.GetUtcNow();
-            if (response.ServerTime is { } said)
+            if (said is { } instant)
             {
-                _difference = said - (asked + (answered - asked) / 2);
+                _difference = instant - (asked + (answered - asked) / 2);
             }
         }
-        catch (HttpRequestException)
+        catch (RepositoryException)
         {
             // The server could not be reached: the clock of the device is what there is.
         }

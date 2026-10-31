@@ -64,13 +64,46 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
     /// Every resource of a named view of the collection, read a page at a time, in the order asked for (<c>-endDay</c> is the
     /// last day first): <c>events/live</c> is the view <c>live</c> of <c>events</c>.
     /// </summary>
-    protected Task<IEnumerable<T>> ReadView(string view, string? sort = null)
+    protected async Task<IEnumerable<T>> ReadView(string view, string? sort = null)
     {
-        return ReadPages($"{Collection}/{view}", new ListQuery(sort: sort));
+        return (await ResourcesOf($"{Collection}/{view}", new ListQuery(sort: sort))).Select(x => EntityOf(x)).OfType<T>();
+    }
+
+    /// <summary>
+    /// One page of a route of the collection that answers with a list of rows, such as <c>athletes/all-tenants</c>: the rows,
+    /// and whether another page follows.
+    /// </summary>
+    protected async Task<(IReadOnlyList<JsonElement> Rows, bool HasNext)> PageOf(
+        string route,
+        ListQuery query,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var response = await Taken(Client.Get(route, query, cancellationToken));
+        return ([.. response.Document!.Value.GetProperty("data").EnumerateArray()], response.HasNextPage);
+    }
+
+    /// <summary>
+    /// The rows of the collection that are <paramref name="filter"/> within the scope, in the order asked for, as the models
+    /// that the Api answers with: the members that the entity does not hold (such as the name of an account) are read too.
+    /// </summary>
+    protected async Task<IReadOnlyList<TModel>> ModelsWithin(
+        Expression<Func<T, bool>>? filter = null,
+        string? sort = null
+    )
+    {
+        var resources = await ResourcesWithin(filter, sort);
+        return [.. resources.Select(x => ModelOf(x)).OfType<TModel>()];
     }
 
     /// <summary>The resource of a document the Api answered with, as the entity it is.</summary>
     protected T? EntityOf(JsonElement? resource)
+    {
+        return ModelOf(resource)?.MapToEntity();
+    }
+
+    /// <summary>The resource of a document the Api answered with, as the model it is: its attributes, its id and its meta.</summary>
+    protected TModel? ModelOf(JsonElement? resource)
     {
         if (resource is not { ValueKind: JsonValueKind.Object } data)
         {
@@ -95,35 +128,28 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
             ReadMeta(model, meta);
         }
 
-        return model.MapToEntity();
+        return model;
+    }
+
+    /// <summary>The <c>data</c> of an answer that succeeded: the resource it is about.</summary>
+    protected static JsonElement ResourceOf(JsonApiResponse response)
+    {
+        return response.Document!.Value.GetProperty("data");
     }
 
     /// <summary>
     /// The answer of a request the Api took. A refusal is thrown with what the Api said, and a request that got no answer is
     /// unavailable.
     /// </summary>
-    protected async Task<JsonApiResponse> Taken(Task<JsonApiResponse> request)
+    protected Task<JsonApiResponse> Taken(Task<JsonApiResponse> request)
     {
-        var response = await Reached(request);
-        return response.IsSuccess ? response : throw new JsonApiException(response, Client.UnavailableCodes);
+        return JsonApiAnswers.Taken(request, Client.UnavailableCodes);
     }
 
     /// <summary>The answer of a request, whatever it says; a request that got no answer is unavailable.</summary>
-    protected static async Task<JsonApiResponse> Reached(Task<JsonApiResponse> request)
+    protected static Task<JsonApiResponse> Reached(Task<JsonApiResponse> request)
     {
-        try
-        {
-            return await request;
-        }
-        catch (HttpRequestException ex)
-        {
-            throw new RepositoryException(
-                RepositoryErrorKind.Unavailable,
-                NStrings.Cannot_connect_to_server_string,
-                null,
-                ex
-            );
-        }
+        return JsonApiAnswers.Reached(request);
     }
 
     public virtual async Task Create(T item)
@@ -186,17 +212,17 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
             throw new JsonApiException(response, Client.UnavailableCodes);
         }
 
-        return EntityOf(response.Document?.GetProperty("data"));
+        return EntityOf(ResourceOf(response));
     }
 
     public virtual async Task<IEnumerable<T>> ReadMany()
     {
-        return await ReadWithin(null);
+        return (await ResourcesWithin(null, null)).Select(x => EntityOf(x)).OfType<T>();
     }
 
     public virtual async Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
-        return await ReadWithin(filter);
+        return (await ResourcesWithin(filter, null)).Select(x => EntityOf(x)).OfType<T>();
     }
 
     /// <summary>The members a change sends: those of the model, without the ones the Api refuses a change to name.</summary>
@@ -211,8 +237,7 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
         return members;
     }
 
-
-    async Task<IEnumerable<T>> ReadWithin(Expression<Func<T, bool>>? filter)
+    async Task<IReadOnlyList<JsonElement>> ResourcesWithin(Expression<Func<T, bool>>? filter, string? sort)
     {
         var scope = _scopeFactory?.Create().Filter;
         var filters = Filters(scope, filter);
@@ -224,7 +249,7 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
             );
         }
 
-        return await ReadPages(Collection, new ListQuery(filter: parameters.GetValueOrDefault("$filter")));
+        return await ResourcesOf(Collection, new ListQuery(parameters.GetValueOrDefault("$filter"), sort));
     }
 
     static Expression<Func<T, bool>>[] Filters(Expression<Func<T, bool>>? scope, Expression<Func<T, bool>>? filter)
@@ -233,21 +258,20 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
     }
 
     /// <summary>
-    /// Every row of a list, a page at a time, until the Api says there is no next page. A list that is still going on after
-    /// the most pages the repository reads is not read to its end, and is refused rather than cut short.
+    /// Every resource of a list, a page at a time, until the Api says there is no next page. A list that is still going on
+    /// after the most pages the repository reads is not read to its end, and is refused rather than cut short.
     /// </summary>
-    async Task<IEnumerable<T>> ReadPages(string path, ListQuery query)
+    async Task<IReadOnlyList<JsonElement>> ResourcesOf(string path, ListQuery query)
     {
-        var items = new List<T>();
+        var resources = new List<JsonElement>();
         var paged = new ListQuery(query.Filter, query.Sort, PAGE_SIZE);
         for (var number = 1; number <= MAX_PAGES; number++)
         {
             var response = await Taken(Client.Get(path, paged.OnPage(number)));
-            var rows = response.Document!.Value.GetProperty("data").EnumerateArray();
-            items.AddRange(rows.Select(x => EntityOf(x)).OfType<T>());
+            resources.AddRange(response.Document!.Value.GetProperty("data").EnumerateArray());
             if (!response.HasNextPage)
             {
-                return items;
+                return resources;
             }
         }
 

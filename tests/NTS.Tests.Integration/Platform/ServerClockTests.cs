@@ -1,6 +1,7 @@
 using System.Net;
 using NoTiming.Ui.Features.Core;
 using NTS.Tests.Integration.Harness;
+using NoTiming.Ui.Storage.REST;
 
 namespace NTS.Tests.Integration;
 
@@ -25,7 +26,7 @@ public sealed class ServerClockTests : IClassFixture<SharedApiFixture>
         var api = _shared.Api;
         var json = JsonApiClients.WithCookie(api, new JsonApiClients.Cookie(null), out var requests);
         requests.Answer = _ => Said(DEVICE.AddMinutes(5));
-        var clock = new ServerClock(json, new Fixed(DEVICE));
+        var clock = new ServerClock(new AccountApiRepository(json), new Fixed(DEVICE));
 
         var before = clock.Now;
         await clock.Synchronise();
@@ -45,7 +46,7 @@ public sealed class ServerClockTests : IClassFixture<SharedApiFixture>
             device.Advance(TimeSpan.FromSeconds(10)); // the request is out for ten seconds
             return Said(DEVICE.AddSeconds(5)); // and the server said it was five seconds past the moment it was asked
         };
-        var clock = new ServerClock(json, device);
+        var clock = new ServerClock(new AccountApiRepository(json), device);
 
         await clock.Synchronise();
 
@@ -58,7 +59,7 @@ public sealed class ServerClockTests : IClassFixture<SharedApiFixture>
     {
         var api = _shared.Api;
         var json = JsonApiClients.WithCookie(api, new JsonApiClients.Cookie(null), out var requests);
-        var clock = new ServerClock(json, new Fixed(DEVICE));
+        var clock = new ServerClock(new AccountApiRepository(json), new Fixed(DEVICE));
 
         requests.Answer = _ => new HttpResponseMessage(HttpStatusCode.Unauthorized); // an answer with no time in it
         await clock.Synchronise();

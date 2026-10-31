@@ -12,7 +12,8 @@ using NTS.Domain;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.ConfigureEvents;
-using static NoTiming.Ui.Features.Console.ApiAnswers;
+using static NoTiming.Ui.Features.Console.JsonAttributes;
+using NoTiming.Ui.Storage.REST;
 
 namespace NoTiming.Ui.Features.Console.Setup;
 
@@ -31,9 +32,9 @@ public class ConsoleLookups : IConsoleLookups, IScoped
     readonly IAccountSession _account;
     readonly JsonApiClient _api;
     readonly IRepository<Country> _countries;
-    readonly IRepository<Athlete> _athletes;
-    readonly IRepository<Horse> _horses;
-    readonly IRepository<Club> _clubs;
+    readonly AthleteApiRepository _athletes;
+    readonly HorseApiRepository _horses;
+    readonly ClubApiRepository _clubs;
     readonly IRepository<Loop> _loops;
     readonly IRepository<Combination> _combinations;
     IReadOnlyList<Country>? _read;
@@ -42,9 +43,9 @@ public class ConsoleLookups : IConsoleLookups, IScoped
         IAccountSession account,
         JsonApiClient api,
         IRepository<Country> countries,
-        IRepository<Athlete> athletes,
-        IRepository<Horse> horses,
-        IRepository<Club> clubs,
+        AthleteApiRepository athletes,
+        HorseApiRepository horses,
+        ClubApiRepository clubs,
         IRepository<Loop> loops,
         IRepository<Combination> combinations
     )
@@ -77,7 +78,7 @@ public class ConsoleLookups : IConsoleLookups, IScoped
     public async Task<IReadOnlyList<Club>> SearchClubs(string term)
     {
         var own = (await _clubs.ReadMany()).Where(x => string.IsNullOrWhiteSpace(term) || x.Name.NContains(term));
-        var elsewhere = await OtherTenants("clubs", term, match => new Club(match.Name, match.Id));
+        var elsewhere = await OtherTenants(query => Rows(_clubs.SearchAllTenants(query)), term, match => new Club(match.Name, match.Id));
         return Merged(own, elsewhere);
     }
 
@@ -87,7 +88,7 @@ public class ConsoleLookups : IConsoleLookups, IScoped
         var fallback = await TenantCountry();
         var countries = await Countries();
         var elsewhere = await OtherTenants(
-            "athletes",
+            query => Rows(_athletes.SearchAllTenants(query)),
             term,
             match =>
             {
@@ -103,7 +104,7 @@ public class ConsoleLookups : IConsoleLookups, IScoped
     {
         var own = Named(await _horses.ReadMany(), term);
         var elsewhere = await OtherTenants(
-            "horses",
+            query => Rows(_horses.SearchAllTenants(query)),
             term,
             match => new Horse(match.Name, match.NameEnglish, match.FeiId, match.Id)
         );
@@ -158,7 +159,11 @@ public class ConsoleLookups : IConsoleLookups, IScoped
     /// not take (a limit that was reached) or cannot answer finds nothing: it is a help to the person who is typing, and the
     /// Tenant's own rows are there without it.
     /// </summary>
-    async Task<IReadOnlyList<T>> OtherTenants<T>(string registry, string term, Func<Match, T> entityOf)
+    async Task<IReadOnlyList<T>> OtherTenants<T>(
+        Func<ListQuery, Task<IReadOnlyList<JsonElement>>> search,
+        string term,
+        Func<Match, T> entityOf
+    )
     {
         if (!ParticipantService.IsSearchable(term))
         {
@@ -168,15 +173,10 @@ public class ConsoleLookups : IConsoleLookups, IScoped
         try
         {
             var words = string.Join(' ', ParticipantService.WordsOf(term));
-            var filter = Uri.EscapeDataString($"contains(name,'{words.Replace("'", "''")}')");
-            var response = await _api.Send(HttpMethod.Get, $"{registry}/{ALL_TENANTS}?filter={filter}");
-            if (!response.IsSuccess)
-            {
-                return [];
-            }
+            var rows = await search(new ListQuery(filter: $"contains(name,'{words.Replace("'", "''")}')"));
 
             var found = new List<T>();
-            foreach (var resource in response.Document!.Value.GetProperty("data").EnumerateArray())
+            foreach (var resource in rows)
             {
                 if (MatchOf(resource) is not { } match)
                 {
@@ -195,10 +195,17 @@ public class ConsoleLookups : IConsoleLookups, IScoped
 
             return found;
         }
-        catch (HttpRequestException)
+        catch (RepositoryException)
         {
+            // A search the Api does not take (a limit that was reached) or cannot answer finds nothing: it is a help to the
+            // person who is typing, and the Tenant's own rows are there without it.
             return [];
         }
+    }
+
+    static async Task<IReadOnlyList<JsonElement>> Rows(Task<(IReadOnlyList<JsonElement> Rows, bool HasNext)> page)
+    {
+        return (await page).Rows;
     }
 
     static Match? MatchOf(JsonElement resource)

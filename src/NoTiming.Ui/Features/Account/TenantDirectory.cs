@@ -1,7 +1,6 @@
-using System.Net;
-using System.Text.Json;
-using Not.Application.HTTP;
+using Not.Application.CRUD.Ports;
 using Not.Injection;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Account;
 
 namespace NoTiming.Ui.Features.Account;
@@ -32,13 +31,13 @@ public interface ITenantDirectory
 public class TenantDirectory : ITenantDirectory, IScoped
 {
     readonly IAccountSession _account;
-    readonly JsonApiClient _api;
+    readonly TenantApiRepository _tenants;
     readonly Dictionary<string, string> _names = [];
 
-    public TenantDirectory(IAccountSession account, JsonApiClient api)
+    public TenantDirectory(IAccountSession account, TenantApiRepository tenants)
     {
         _account = account;
-        _api = api;
+        _tenants = tenants;
     }
 
     public async Task<IReadOnlyList<TenantOption>> OptionsOfTheAccount()
@@ -71,24 +70,20 @@ public class TenantDirectory : ITenantDirectory, IScoped
 
         try
         {
-            var response = await _api.Send(HttpMethod.Get, $"tenants/{Uri.EscapeDataString(id)}");
-            if (response is { IsSuccess: true, Document: { } document })
-            {
-                var attributes = document.GetProperty("data").GetProperty("attributes");
-                if (attributes.TryGetProperty("name", out var name) && name.ValueKind == JsonValueKind.String)
-                {
-                    return _names[id] = name.GetString()!;
-                }
-            }
-
-            if (response.Status == HttpStatusCode.NotFound)
+            var tenant = await _tenants.Read(id);
+            if (tenant == null)
             {
                 return _names[id] = id;
             }
+
+            if (!string.IsNullOrEmpty(tenant.Name))
+            {
+                return _names[id] = tenant.Name;
+            }
         }
-        catch (HttpRequestException)
+        catch (RepositoryException)
         {
-            // The Api could not be reached: the key stands in for the name until it is asked again.
+            // The Api could not be asked, or refused: the key stands in for the name until it is asked again.
         }
 
         return id;

@@ -523,8 +523,8 @@ public sealed class ConsoleDashboardTests : IClassFixture<SharedApiFixture>
             var dashboard = new ConsoleDashboard(
                 store,
                 new ConsoleParticipationWrites(json),
-                clock ?? new ServerClock(json, TimeProvider.System),
-                new AccountSession(json),
+                clock ?? new ServerClock(new AccountApiRepository(json), TimeProvider.System),
+                new AccountSession(new AccountApiRepository(json)),
                 new SnapshotApiPublisher(json)
             );
             await dashboard.Show(new StubViewedEvent(store, selected.Event!, canWrite));

@@ -10,6 +10,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Tests.Integration.Harness;
+using NoTiming.Ui.Storage.REST;
 
 namespace NTS.Tests.Integration;
 
@@ -629,7 +630,7 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
     )
     {
         var json = JsonApiClients.Of(api, person, out asked);
-        return new ParticipantService(json, new ParticipationApiRepository(json), time ?? TimeProvider.System);
+        return new ParticipantService(new ParticipationApiRepository(json), new AthleteApiRepository(json), new HorseApiRepository(json), time ?? TimeProvider.System);
     }
 
     static (ParticipantKind, Guid, string) Of(ParticipantName name)

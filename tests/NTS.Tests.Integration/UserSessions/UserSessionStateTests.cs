@@ -7,6 +7,7 @@ using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Tests.Integration.Harness;
+using NoTiming.Ui.Storage.REST;
 
 namespace NTS.Tests.Integration;
 
@@ -341,8 +342,8 @@ public sealed class UserSessionStateTests : IClassFixture<SharedApiFixture>
     static Tab Open(ApiFactory api, TenancySeed.Person? person, out JsonApiClients.Requests asked)
     {
         var json = JsonApiClients.Of(api, person, out asked);
-        var account = new AccountSession(json);
-        return new Tab(account, new WitnessUserSessionService(account, json));
+        var account = new AccountSession(new AccountApiRepository(json));
+        return new Tab(account, new WitnessUserSessionService(account, new UserSessionApiRepository(json)));
     }
 
     /// <summary>The Events that the person has kept something for, as the Api lists them for the person.</summary>

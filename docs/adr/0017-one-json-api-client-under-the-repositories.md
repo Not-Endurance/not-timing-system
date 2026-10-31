@@ -1,12 +1,12 @@
 # One JSON:API client does all JSON:API work, and the Ui reaches the Api only through repositories
 
-Status: proposed
+Status: accepted
 
 The Ui reached the Api through a transport that returned untyped JSON. Each caller built documents, paths, pages and filters by hand and read the answers by hand. `JsonApiRepository` did that work once for the repositories, but it tells a person of a failure itself, turns a failed list into an empty one, and keeps the last error as state. This decision moves all JSON:API work into `JsonApiClient`, gives every failure one type, and makes the repositories the only way the Ui reaches the Api (ADR-0008).
 
 ## What follows from it
 
-**The client does the JSON:API work.** `JsonApiClient` (`Not.Application/HTTP`) builds every document, path, page and filter, sends the media type and the write headers, and reads every answer. Its methods are named for the HTTP method: `Get` (a list, with a query), `GetOne` (one row by id), `Post`, `Patch` and `Delete`. An action or a view (`events/live`, the hand-over action, `me`) is the same method with a relative path. The client returns each answer as a value: its status, its document, and its error with the code. It throws only when no answer came. Its JSON options are set on `JsonApiSettings`, and a null is written as null.
+**The client does the JSON:API work.** `JsonApiClient` (`Not.Application/HTTP`) builds every document, path, page and filter, sends the media type and the write headers, and reads every answer. Its methods are named for the HTTP method: `Get` (a list, with a query), `GetOne` (one row by id), `Post`, `Patch` and `Delete`. An action or a view (`events/live`, the hand-over action, `me`) is the same method with a relative path. The client returns each answer as a value: its status, its document, and its error with the code. It throws only when no answer came. Its JSON options are set on `JsonApiSettings`, and a null is written as null. A bulk action sends several resources as one document of many (`PostMany`), and a list that runs over several pages is read whole by `GetAll`, which refuses one that runs past the pages a caller allows. A resource whose route is not `collection/{id}` is written with `Patch(path, type, id, model)`: a singleton has no id, and a row whose id is text (a Tenant) keeps its text.
 
 **Repositories are the only way in.** A service calls a repository and never the client. `JsonApiRepository` (in `Not.Blazor.Client`, the browser-side package) is the one implementation over the client. There is one repository per resource. It takes the ports the resource has (`ICreate`, `IRead`, `IReadMany`, `IUpdate`, `IDelete`), and an operation beyond them is a method on it. A singleton, such as `me`, `me/profile` or a branding under its owner, is a method on the nearest resource repository. The repository gives the client the collection name and the model, and nothing else.
 
@@ -17,7 +17,7 @@ The Ui reached the Api through a transport that returned untyped JSON. Each call
 - `NotAllowed`: 401 or 403. The account is asked again.
 - `Refused`: any other answer. The same request gets the same answer.
 
-`JsonApiException`, a subtype of `RepositoryException`, carries the `JsonApiResponse`: status, headers, document, `Location`, error and server time. The repository throws it for every answer that refused a request. A request that got no answer is an `Unavailable`, with the transport exception inside it. A missing row is not an error: `Read` returns null, and deleting a missing row succeeds.
+`JsonApiException`, a subtype of `RepositoryException`, carries the `JsonApiResponse`: status, headers, document, `Location`, error and server time. The repository throws it for every answer that refused a request. A request that got no answer is an `Unavailable`, with the transport exception inside it. A missing row is not an error: `Read` returns null, and deleting a missing row succeeds. The status of an answer is read by the caller that needs it, through the same `JsonApiAnswers` the repositories use.
 
 A component catches the exception in one of its safe methods and passes it to `Handle`. A `NotAllowed` answer asks the account again in one place, which both `Handle` and the background resend of Snapshots use.
 
@@ -46,5 +46,9 @@ A component catches the exception in one of its safe methods and passes it to `H
 ADR-0008's client paragraph is amended in place, as it is still proposed, and its clause on members the endpoint does not take is removed. `docs/agents/shared-packages.md` changes its rows for `Not.Storage` (Mongo only) and `Not.Blazor.Client` (the JSON:API repositories). The Ui no longer references `Not.Storage`, so `MongoDB.Driver` and the OData packages leave its first load, and the first-load test measures the difference.
 
 `IRowReader<T>`, `RowRead<T>` and `HttpCache<T>` are removed. `ParticipationStore` catches `RepositoryException` and skips the change, as it skipped a failed read before. The Warn toast that a failed read showed in the store goes with it.
+
+The Console's services turn a `RepositoryException` into a `DomainException` with its words (`ApiRefusals`), since its forms show a domain error and keep what was typed; a request that got no answer is said the same way.
+
+Some resources are read as models rather than entities. A grant and a Console Operator carry the display name and whether the grant is pending, which the Api answers and the entity does not hold, and the Api does not answer the Tenant of a grant, so a grant read from it cannot be rebuilt as an entity: its `MapToEntity` is for a grant that is written with its Tenant. A Tenant is keyed by text (ADR-0002), so `TenantApiRepository` reads and changes it at its path. A user session is an entity with its snapshot state; its owner is the account the Api finds it by, and the entity does not hold it.
 
 The MongoDB repositories are out of scope here. When they are next changed, they throw `RepositoryException` with the same three kinds.

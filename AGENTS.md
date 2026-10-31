@@ -209,6 +209,12 @@ Overall average: **60-90% token reduction** on common development operations.
 3. A handler is named from its method and route (`GET /api/me/profile` is `GetMeProfile`, a parameter is `By<Param>`, no `Async`), so a route that is not plain CRUD says what it is in its URL. Only PATCH changes a resource. The routes a family makes from a lambda are not held to it. `EndpointNamesTests` fails a handler that is named otherwise; ADR-0015 has the rule.
 4. A request type is in `<Resource>Requests.cs`, and the status, code and title of an answer are a property of the feature's `<Feature>Failures` (`.With(detail)` for what is wrong this time): a handler holds no code string. Nothing but `ApiEndpoints` calls an endpoint class.
 
+## Clients
+
+- The Ui reaches the Api only through a repository: a service calls its repository, the repository calls `JsonApiClient`, and nothing else builds a URL, a document or a page (ADR-0017).
+- A repository throws `RepositoryException`. A route that is not a row of a collection is a method on the nearest repository, and a change names only what it changes.
+- The shape of the requests and of the answers is in `.claude/skills/rest-api/SKILL.md`.
+
 ## Agent skills
 
 ### Issue tracker

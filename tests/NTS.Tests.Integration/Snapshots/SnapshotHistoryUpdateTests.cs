@@ -206,8 +206,8 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
                 new EventScopeFactory<Participation>(selected)
             );
             var store = new ParticipationStore(repository);
-            var account = new AccountSession(json);
-            var sessions = new WitnessUserSessionService(account, json);
+            var account = new AccountSession(new AccountApiRepository(json));
+            var sessions = new WitnessUserSessionService(account, new UserSessionApiRepository(json));
             await sessions.SetEventId(eventId);
             var service = new SnapshotService(
                 selected,

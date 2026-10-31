@@ -428,10 +428,10 @@ public sealed class ConsoleEventsTests : IClassFixture<SharedApiFixture>
     static Opened Open(ApiFactory api, Person person, out JsonApiClients.Requests requests)
     {
         var json = JsonApiClients.Of(api, person, out requests);
-        var account = new AccountSession(json);
+        var account = new AccountSession(new AccountApiRepository(json));
         var setups = new ConfigureEventApiRepository(json, new NoDispatcher());
         var events = new EventInformationApiRepository(json, new SelectedEvent(null));
-        return new Opened(account, new ConsoleEvents(account, setups, events, json));
+        return new Opened(account, new ConsoleEvents(account, setups, events, new ConsoleOperatorApiRepository(json), new AccountApiRepository(json), new TenantApiRepository(json)));
     }
 
     sealed class Opened : IDisposable

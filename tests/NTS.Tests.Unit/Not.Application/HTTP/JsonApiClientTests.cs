@@ -184,6 +184,124 @@ public sealed class JsonApiClientTests
         Assert.Equal("Ana", document.GetProperty("data").GetProperty("attributes").GetProperty("Name").GetString());
     }
 
+    [Fact]
+    public async Task A_change_at_a_path_sends_the_type_and_the_id_it_is_given()
+    {
+        var transport = new FakeJsonApi();
+
+        await Client(transport).Patch("me/profile", "profiles", "9f1c", new ResourceSample(AN_ATHLETE, "Ana", null));
+
+        var request = transport.Requests.Single();
+        var document = JsonDocument.Parse(request.Body!).RootElement.GetProperty("data");
+        Assert.Equal(HttpMethod.Patch, request.Method);
+        Assert.Equal("/api/me/profile", request.Url);
+        Assert.Equal("profiles", document.GetProperty("type").GetString());
+        Assert.Equal("9f1c", document.GetProperty("id").GetString());
+    }
+
+    [Fact]
+    public async Task A_row_whose_id_is_text_keeps_the_text_of_its_id()
+    {
+        var transport = new FakeJsonApi();
+
+        await Client(transport).Patch("tenants/country-bg", "tenants", "country-bg", new ResourceSample(AN_ATHLETE, "Bg", null));
+
+        var document = JsonDocument.Parse(transport.Requests.Single().Body!).RootElement.GetProperty("data");
+        Assert.Equal("country-bg", document.GetProperty("id").GetString());
+    }
+
+    [Fact]
+    public async Task An_action_is_posted_to_its_path_with_no_document()
+    {
+        var transport = new FakeJsonApi();
+
+        await Client(transport).Post($"athletes/{AN_ATHLETE}/link");
+
+        var request = transport.Requests.Single();
+        Assert.Equal(HttpMethod.Post, request.Method);
+        Assert.Equal($"/api/athletes/{AN_ATHLETE}/link", request.Url);
+        Assert.Null(request.Body);
+    }
+
+    [Fact]
+    public async Task An_item_that_is_not_addressed_by_a_collection_is_deleted_at_its_path_with_no_document()
+    {
+        var transport = new FakeJsonApi();
+
+        await Client(transport).Delete("sessions/current");
+
+        var request = transport.Requests.Single();
+        Assert.Equal(HttpMethod.Delete, request.Method);
+        Assert.Equal("/api/sessions/current", request.Url);
+        Assert.Null(request.Body);
+    }
+
+    [Fact]
+    public async Task A_list_is_read_a_page_at_a_time_until_the_Api_says_there_is_no_next_page()
+    {
+        var first = Guid.NewGuid();
+        var second = Guid.NewGuid();
+        var third = Guid.NewGuid();
+        var transport = new FakeJsonApi(request =>
+            request.RequestUri!.ToString().Contains("page[number]=1")
+                ? Page(new[] { first, second }, hasNext: true)
+                : Page(new[] { third }, hasNext: false)
+        );
+
+        var rows = await Client(transport).GetAll("athletes", new ListQuery(pageSize: 2), maxPages: 5);
+
+        Assert.Equal(2, transport.Requests.Count);
+        Assert.Equal(new[] { first, second, third }, rows.Select(x => Guid.Parse(x.GetProperty("id").GetString()!)));
+    }
+
+    [Fact]
+    public async Task A_list_that_goes_on_beyond_the_pages_asked_for_is_refused_and_not_cut_short()
+    {
+        var transport = new FakeJsonApi(_ => Page(new[] { Guid.NewGuid() }, hasNext: true));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Client(transport).GetAll("athletes", new ListQuery(pageSize: 1), maxPages: 2)
+        );
+        Assert.Equal(2, transport.Requests.Count);
+    }
+
+    [Fact]
+    public async Task A_page_that_is_refused_is_thrown_with_what_the_Api_said()
+    {
+        var transport = new FakeJsonApi(_ => Json(HttpStatusCode.Forbidden, Errors("not-yours", "Not for you.")));
+
+        var refused = await Assert.ThrowsAsync<JsonApiException>(() =>
+            Client(transport).GetAll("athletes", new ListQuery(pageSize: 2), maxPages: 2)
+        );
+        Assert.Equal("not-yours", refused.Response.Error!.Code);
+    }
+
+    [Fact]
+    public async Task Several_resources_are_posted_to_an_action_as_one_document_of_many()
+    {
+        var transport = new FakeJsonApi();
+        var first = Guid.NewGuid();
+        var second = Guid.NewGuid();
+
+        await Client(transport)
+            .PostMany(
+                "snapshots/actions/send-group",
+                new[]
+                {
+                    ("snapshots", first.ToString(), (object)new ResourceSample(first, "First", null)),
+                    ("snapshots", second.ToString(), (object)new ResourceSample(second, "Second", null)),
+                }
+            );
+
+        var request = transport.Requests.Single();
+        var data = JsonDocument.Parse(request.Body!).RootElement.GetProperty("data");
+        Assert.Equal(HttpMethod.Post, request.Method);
+        Assert.Equal("/api/snapshots/actions/send-group", request.Url);
+        Assert.Equal(JsonValueKind.Array, data.ValueKind);
+        Assert.Equal(new[] { first.ToString(), second.ToString() }, data.EnumerateArray().Select(x => x.GetProperty("id").GetString()!));
+        Assert.All(data.EnumerateArray(), x => Assert.Equal("snapshots", x.GetProperty("type").GetString()));
+    }
+
     static JsonApiClient Client(FakeJsonApi transport, Dictionary<string, string>? writeHeaders = null)
     {
         var settings = new JsonApiSettings { Url = "https://api.test/api" };
@@ -193,6 +311,17 @@ public sealed class JsonApiClientTests
         }
 
         return new JsonApiClient(new FakeHttpClientFactory(transport), Options.Create(settings));
+    }
+
+    /// <summary>A page of athletes, with the link to the next one when another page follows.</summary>
+    static HttpResponseMessage Page(IEnumerable<Guid> ids, bool hasNext)
+    {
+        var rows = string.Join(
+            ",",
+            ids.Select(id => "{\"type\":\"athletes\",\"id\":\"" + id + "\",\"attributes\":{\"name\":\"Ana\"}}")
+        );
+        var links = hasNext ? ",\"links\":{\"next\":\"/api/athletes?page[number]=2\"}" : "";
+        return Json(HttpStatusCode.OK, "{\"data\":[" + rows + "]" + links + "}");
     }
 
     static HttpResponseMessage Json(HttpStatusCode status, string body)

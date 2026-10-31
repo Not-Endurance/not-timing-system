@@ -6,7 +6,6 @@ using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain.Access;
 using NTS.Domain.Enums;
 using NTS.Tests.Integration.Harness;
-using static NoTiming.Ui.Features.Console.ApiAnswers;
 using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Harness.TenancySeed;
 
@@ -81,12 +80,12 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<SharedApiFixtur
         }
 
         ui.Requests.Asked.Clear();
-        var pages = await AcceptedPages(
-            ui.Get<JsonApiClient>(),
-            $"event-grants?filter={Uri.EscapeDataString($"eventId eq {id}")}",
-            x => Guid.Parse(x.GetProperty("id").GetString()!),
-            pageSize: 2
-        );
+        var pages = (
+            await ui.Get<JsonApiClient>()
+                .GetAll("event-grants", new ListQuery(filter: $"eventId eq {id}", pageSize: 2), maxPages: 20)
+        )
+            .Select(x => Guid.Parse(x.GetProperty("id").GetString()!))
+            .ToList();
         var asked = ui.Requests.Asked.Select(Unescaped).ToList();
         ui.Requests.Asked.Clear();
         var listed = await grants.List(id);

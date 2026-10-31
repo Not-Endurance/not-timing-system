@@ -293,8 +293,8 @@ public sealed class ProfileLinksTests : IClassFixture<SharedApiFixture>
     static UiOfAPerson Open(ApiFactory api, TenancySeed.Person? person, out JsonApiClients.Requests asked)
     {
         var json = JsonApiClients.Of(api, person, out asked);
-        var account = new AccountSession(json);
-        return new UiOfAPerson(account, new WitnessProfileContext(account, new CountryApiRepository(json), json));
+        var account = new AccountSession(new AccountApiRepository(json));
+        return new UiOfAPerson(account, new WitnessProfileContext(account, new CountryApiRepository(json), new AccountApiRepository(json)));
     }
 
     sealed class UiOfAPerson : IDisposable

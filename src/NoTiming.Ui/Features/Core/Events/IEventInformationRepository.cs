@@ -1,4 +1,5 @@
 using Not.Application.CRUD.Ports;
+using NTS.Contracts.Access.Models;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Ui.Features.Core.Events;
@@ -7,6 +8,12 @@ public interface IEventInformationRepository : IRepository<EventInformation>
 {
     Task<IEnumerable<EventInformation>> ReadLive();
     Task<IEnumerable<EventInformation>> ReadHistoric();
+
+    /// <summary>What the person may do about the Event, as the Api says for them: its stage, its level and its actions.</summary>
+    Task<EventCapabilitiesModel> CapabilitiesOf(Guid eventId);
+
+    /// <summary>Removes the Event with what it made and what was kept for it, as the Api does for a Console Operator's reset.</summary>
+    Task Remove(Guid eventId);
 
     /// <summary>
     /// Starts the Event from its Setup: the Event is the Core document made from the Setup, with the copies it keeps and

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using NoTiming.Ui.Storage.REST;
@@ -19,4 +20,23 @@ public class ParticipationApiRepository : EventDataApiRepository<Participation, 
 
     public ParticipationApiRepository(JsonApiClient client)
         : base("participations", client, null) { }
+
+    /// <summary>
+    /// One page of the Participations of an Athlete or of a Horse, the history of the Athlete or the Horse (#604): the rows, and
+    /// whether another page follows.
+    /// </summary>
+    public Task<(IReadOnlyList<JsonElement> Rows, bool HasNext)> HistoryOf(
+        string member,
+        Guid id,
+        int size,
+        int number,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return PageOf(
+            "participations/history",
+            new ListQuery(filter: $"{member} eq {id}", pageSize: size, pageNumber: number),
+            cancellationToken
+        );
+    }
 }

@@ -23,6 +23,13 @@ public class ConfigureEventApiRepository : JsonApiRepository<ConfigureEvent, Con
         _domainEventDispatcher = domainEventDispatcher;
     }
 
+    /// <summary>Makes a Setup with what it holds, in the Tenant the caller acts in. The Api answers with the id it made.</summary>
+    public async Task<Guid> Make(ConfigureEventDraft draft)
+    {
+        var response = await Taken(Client.Post(Collection, draft));
+        return Guid.Parse(ResourceOf(response).GetProperty("id").GetString()!);
+    }
+
     public override async Task Update(ConfigureEvent item)
     {
         await base.Update(item);
@@ -38,4 +45,12 @@ public class ConfigureEventApiRepository : JsonApiRepository<ConfigureEvent, Con
 
         return _domainEventDispatcher.Dispatch(new ConfigureEventUpdated(item.Id));
     }
+}
+
+/// <summary>What a Setup is made with: its name, its location and the FEI show id, when it has one. The Api makes the rest.</summary>
+public class ConfigureEventDraft
+{
+    public string Name { get; set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
+    public string? FeiShowId { get; set; }
 }

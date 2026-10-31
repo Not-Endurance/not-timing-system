@@ -13,6 +13,7 @@ using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
 using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Harness.TenancySeed;
+using NoTiming.Ui.Storage.REST;
 
 namespace NTS.Tests.Integration;
 
@@ -192,8 +193,8 @@ public sealed class ConsoleBrandingTests : IClassFixture<SharedApiFixture>
         var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var json = JsonApiClients.Of(api, root, out var requests);
-        var account = new AccountSession(json);
-        var branding = new ConsoleBranding(json, new ConsoleTenant(account, json), new Notifier());
+        var account = new AccountSession(new AccountApiRepository(json));
+        var branding = new ConsoleBranding(new BrandingApiRepository(json), new ConsoleTenant(account, new TenantApiRepository(json)), new Notifier());
 
         var notAnImage = await Assert.ThrowsAsync<DomainException>(
             () => branding.SetOfTenant(LogoPosition.Left, "image/svg+xml", PNG)
@@ -228,7 +229,7 @@ public sealed class ConsoleBrandingTests : IClassFixture<SharedApiFixture>
         var notifier = new Notifier();
         var warned = new List<string>();
         notifier.Warned.Subscribe(warned.Add);
-        var branding = new ConsoleBranding(json, new ConsoleTenant(new AccountSession(json), json), notifier);
+        var branding = new ConsoleBranding(new BrandingApiRepository(json), new ConsoleTenant(new AccountSession(new AccountApiRepository(json)), new TenantApiRepository(json)), notifier);
         await branding.Show(
             new StubViewedEvent(new NoParticipations(), IntegrationPayloadFactory.EventInformation(eventId))
         );

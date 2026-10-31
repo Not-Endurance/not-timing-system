@@ -1,5 +1,6 @@
 using NoTiming.Ui.Features.Account;
 using NTS.Tests.Integration.Harness;
+using NoTiming.Ui.Storage.REST;
 
 namespace NTS.Tests.Integration;
 
@@ -115,8 +116,8 @@ public sealed class TenantDirectoryTests : IClassFixture<SharedApiFixture>
     static Ui Open(ApiFactory api, TenancySeed.Person? person, out JsonApiClients.Requests asked)
     {
         var json = JsonApiClients.Of(api, person, out asked);
-        var account = new AccountSession(json);
-        return new Ui(account, new TenantDirectory(account, json));
+        var account = new AccountSession(new AccountApiRepository(json));
+        return new Ui(account, new TenantDirectory(account, new TenantApiRepository(json)));
     }
 
     sealed class Ui : IDisposable

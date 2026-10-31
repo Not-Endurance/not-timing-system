@@ -1,8 +1,10 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Not.Application.HTTP;
 using Not.Blazor.Client.REST;
 using Not.Exceptions;
 using NoTiming.Ui.Features.Core.Events;
+using NTS.Contracts.Access.Models;
 using NTS.Contracts.Core.Models;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
@@ -48,6 +50,22 @@ public class EventInformationApiRepository
         var response = await Taken(Client.Post(Collection, new JsonObject { ["id"] = configureEventId.ToString() }));
         return EntityOf(response.Document?.GetProperty("data"))
             ?? throw GuardHelper.Exception("Event start returned no event payload.");
+    }
+
+    /// <summary>What the person may do about the Event, as the Api says for them: its stage, its level and its actions.</summary>
+    public async Task<EventCapabilitiesModel> CapabilitiesOf(Guid eventId)
+    {
+        var response = await Taken(Client.Get($"events/{eventId}/capabilities"));
+        return JsonSerializer.Deserialize<EventCapabilitiesModel>(
+            ResourceOf(response).GetProperty("attributes").GetRawText(),
+            Client.Json
+        )!;
+    }
+
+    /// <summary>Removes the Event with what it made and what was kept for it.</summary>
+    public async Task Remove(Guid eventId)
+    {
+        await Delete(eventId);
     }
 
     /// <summary>

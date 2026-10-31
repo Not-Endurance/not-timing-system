@@ -3,7 +3,7 @@ using Not.Domain.Exceptions;
 using Not.Injection;
 using NoTiming.Ui.Features.Core;
 using NTS.Contracts.Features.Console;
-using static NoTiming.Ui.Features.Console.ApiAnswers;
+using NoTiming.Ui.Storage.REST;
 
 namespace NoTiming.Ui.Features.Console;
 
@@ -16,12 +16,12 @@ namespace NoTiming.Ui.Features.Console;
 public class ConsoleTimeline : IConsoleTimeline, IScoped
 {
     readonly IConsoleDashboard _dashboard;
-    readonly JsonApiClient _api;
+    readonly TimeEventActorApiRepository _actors;
 
-    public ConsoleTimeline(IConsoleDashboard dashboard, JsonApiClient api)
+    public ConsoleTimeline(IConsoleDashboard dashboard, TimeEventActorApiRepository actors)
     {
         _dashboard = dashboard;
-        _api = api;
+        _actors = actors;
     }
 
     public async Task<IReadOnlyList<TimelinePhase>> Read()
@@ -58,16 +58,6 @@ public class ConsoleTimeline : IConsoleTimeline, IScoped
 
     async Task<IReadOnlyDictionary<Guid, string>> NamesOf(Guid eventId)
     {
-        var filter = Uri.EscapeDataString($"eventId eq {eventId}");
-        var actors = await AcceptedPages(
-            _api,
-            $"time-event-actors?filter={filter}",
-            x =>
-                (
-                    Id: Guid.TryParse(x.GetProperty("id").GetString(), out var id) ? id : (Guid?)null,
-                    Name: Text(x.GetProperty("attributes"), "displayName") ?? string.Empty
-                )
-        );
-        return actors.Where(x => x.Id != null).ToDictionary(x => x.Id!.Value, x => x.Name);
+        return await ApiRefusals.Answered(() => _actors.NamesOf(eventId));
     }
 }

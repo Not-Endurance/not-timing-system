@@ -397,9 +397,9 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
             DateTimeOffset.UtcNow
         );
         var json = JsonApiClients.Of(api, consoleOperator, out var requests);
-        using var account = new AccountSession(json);
+        using var account = new AccountSession(new AccountApiRepository(json));
         await account.Load();
-        using var context = new WitnessAccessContext(new SelectedEvent(eventId), account, json);
+        using var context = new WitnessAccessContext(new SelectedEvent(eventId), account, new EventInformationApiRepository(json, new SelectedEvent(eventId)));
         requests.Answer = _ => throw new HttpRequestException("The Api is down.");
 
         await context.Load();
@@ -414,8 +414,8 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
     async Task<WitnessSays> WhatIsSaidAsync(ApiFactory api, Person? person, Guid? eventId)
     {
         var json = JsonApiClients.Of(api, person, out _);
-        using var account = new AccountSession(json);
-        using var context = new WitnessAccessContext(new SelectedEvent(eventId), account, json);
+        using var account = new AccountSession(new AccountApiRepository(json));
+        using var context = new WitnessAccessContext(new SelectedEvent(eventId), account, new EventInformationApiRepository(json, new SelectedEvent(eventId)));
 
         await context.Load();
 
