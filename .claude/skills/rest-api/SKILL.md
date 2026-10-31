@@ -36,8 +36,8 @@ Write each of these once and let every handler rely on it.
 
 ## Clients
 
-- A client repository maps the repository calls onto the routes: a list is a GET with `filter`, `sort` and `page[...]` (it pages through until `links.next` is gone), a create is a POST, a change a PATCH, a removal a DELETE. Nothing else builds a URL.
-- It sends the media type on `Content-Type` and `Accept`, writes a member that is null as null (on a PATCH that takes the member away), reads the error `code` and gives it to the caller instead of swallowing the failure, and sends the version it was based on where a resource has one.
+- The JSON:API work of a client is in `JsonApiClient` (ADR-0017), the only code that builds a URL, a document or a page. A list is a `Get` with `filter`, `sort` and `page[...]`, which pages through until `links.next` is gone; a create is a `Post`, a change a `Patch`, a removal a `Delete`; an action or a view is one of them with a relative path.
+- It sends the media type on `Content-Type` and `Accept`, writes a member that is null as null (on a PATCH that takes the member away), reads the error `code` into its answer instead of swallowing the failure, and sends the version it was based on where a resource has one.
 - An id the client makes is a Guid, sent as the id of the resource, so that a request sent again is the same request.
 
 ## Done

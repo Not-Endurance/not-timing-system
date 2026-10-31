@@ -8,9 +8,9 @@ Every route of the Functions API returns a `Result<T>` envelope, turns a domain 
 
 **Resources move one at a time.** The Functions project serves whatever has not moved. ADR-0003 still decides the host and the anonymous route group; ADR-0007 needs the events resource first, then participations, rankings and handouts.
 
-**The client gets a JSON:API variant.** `Not.Storage`'s `ApiRepository` grows a variant that a resource opts into. `Result<T>` disappears per resource as it moves, and the client's request handling reads the error `code` instead of swallowing the failure.
+**The client gets a JSON:API variant.** The JSON:API work is `JsonApiClient` (`Not.Application/HTTP`), and the repository over it is `JsonApiRepository` (ADR-0017); `ApiRepository` no longer exists. `Result<T>` disappears per resource as it moves, and the client reads the error `code` instead of swallowing the failure.
 
-**One grammar for filtering.** `filter=eventId eq 3f2504e0-4f89-41d3-9a0c-0305e82c3301` (a Guid literal, unquoted) is parsed by `Microsoft.AspNetCore.OData` and applied to Mongo LINQ, as `$filter` is today. The client's `ODataApiFilterAdapter` stays; it silently fetches everything when it meets an expression it cannot translate and has no tests, so each resource that depends on it gets tests first.
+**One grammar for filtering.** `filter=eventId eq 3f2504e0-4f89-41d3-9a0c-0305e82c3301` (a Guid literal, unquoted) is parsed by `Microsoft.AspNetCore.OData` and applied to Mongo LINQ, as `$filter` is today. The client's `ODataApiFilterAdapter` stays. It writes equality, `and` and `contains`, the operators the Api reads, and refuses any other expression rather than fetching everything and filtering here (ADR-0017).
 
 **Domain errors become statuses.** A rule violation is 422, a conflict with the current state (`event-ended`) is 409, a malformed request or filter is 400, a missing item is 404, each with an error `code`.
 
