@@ -62,13 +62,8 @@ internal sealed class ReferenceMembers<TModel>
     /// </summary>
     public IResult? Apply(TModel model, IReadOnlyDictionary<string, JsonElement> members, List<PropertyInfo> named)
     {
-        var unknown = members.Keys.Where(x => !_writable.ContainsKey(x)).ToList();
-        if (unknown.Count > 0)
-        {
-            return JsonApiFailures.UnsupportedAttribute.With(string.Join(", ", unknown)).AsResult();
-        }
-
-        foreach (var (name, value) in members)
+        // A member that is not one of the resource's, or that the server alone sets, is not taken: it is ignored (ADR-0017).
+        foreach (var (name, value) in members.Where(x => _writable.ContainsKey(x.Key)))
         {
             var property = _writable[name];
             try

@@ -92,8 +92,8 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         Assert.Equal("not-console-operator", await ErrorCodeAsync(tooLittle));
         Assert.Equal(HttpStatusCode.Conflict, tooLate.StatusCode);
         Assert.Equal("event-ended", await ErrorCodeAsync(tooLate));
-        Assert.Equal(HttpStatusCode.BadRequest, content.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(content));
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, content.StatusCode); // a member a start does not take is ignored: the Setup is judged as it is
+        Assert.Equal("invalid-setup", await ErrorCodeAsync(content));
     }
 
     [Fact]
@@ -208,8 +208,7 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         Assert.Equal("event-ended", await ErrorCodeAsync(tooLate));
         Assert.Equal(HttpStatusCode.Conflict, mismatched.StatusCode);
         Assert.Equal("id-mismatch", await ErrorCodeAsync(mismatched));
-        Assert.Equal(HttpStatusCode.BadRequest, content.StatusCode); // the members are checked against the row, last
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(content));
+        Assert.Equal(HttpStatusCode.OK, content.StatusCode); // a member the Api does not take is ignored: a change of nothing changes nothing
         Assert.Equal(HttpStatusCode.OK, changed.StatusCode);
     }
 
@@ -286,8 +285,7 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         Assert.Equal("malformed-request", await ErrorCodeAsync(namedTwice));
         Assert.Equal(HttpStatusCode.BadRequest, badId.StatusCode);
         Assert.Equal("invalid-id", await ErrorCodeAsync(badId));
-        Assert.Equal(HttpStatusCode.BadRequest, badContent.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(badContent));
+        Assert.Equal(HttpStatusCode.Created, badContent.StatusCode); // a member the Api does not take is ignored
         Assert.Equal(HttpStatusCode.Created, made.StatusCode);
     }
 
@@ -426,8 +424,8 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
             scene.ConsoleOperator,
             HttpMethod.Post,
             "/api/clubs",
-            new { nothing = "else" },
-            club.ToString()
+            new { name = "Sofia Riders", nothing = "else" },
+            Guid.NewGuid().ToString()
         );
         var made = await WriteClubAsync(
             scene.ConsoleOperator,
@@ -472,8 +470,7 @@ public sealed class PlaceOrderTests : IClassFixture<MongoFixture>
         Assert.Equal("not-console-operator", await ErrorCodeAsync(tooLittle));
         Assert.Equal(HttpStatusCode.BadRequest, notAnId.StatusCode);
         Assert.Equal("invalid-id", await ErrorCodeAsync(notAnId));
-        Assert.Equal(HttpStatusCode.BadRequest, content.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(content));
+        Assert.Equal(HttpStatusCode.Created, content.StatusCode); // a member the Api does not take is ignored
         Assert.Equal(HttpStatusCode.Created, made.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, changedWithoutTheLevel.StatusCode); // before the row is looked for

@@ -43,7 +43,7 @@ internal sealed class BrandingChange : MemberAttributes, IResourceAttributes
             var position = PositionOf(name);
             if (position is null)
             {
-                return (changes, BrandingFailures.UnsupportedAttribute.With($"{LEFT}, {RIGHT}"));
+                continue; // a member that is not a position is not one the Api takes: it is ignored (ADR-0017)
             }
 
             if (changes.ContainsKey(position.Value))

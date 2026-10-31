@@ -10,17 +10,10 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NoTiming.Api.Features.Events;
 
-/// <summary>An Event is started from its Setup and takes nothing else: the document names the Setup by its id and carries no member.</summary>
+/// <summary>An Event is started from its Setup: the document names the Setup by its id, and any member it carries is ignored.</summary>
 internal sealed class EventStart : MemberAttributes, IResourceAttributes
 {
     public static string? ResourceType => "events";
-
-    public override JsonApiFailure? Invalid()
-    {
-        return Members is { Count: > 0 } named
-            ? EventsFailures.EventStartUnsupportedAttribute.With(string.Join(", ", named.Keys))
-            : null;
-    }
 }
 
 /// <summary>The members a change of an Event names. Its id, when the document gives one, is the one of the route.</summary>

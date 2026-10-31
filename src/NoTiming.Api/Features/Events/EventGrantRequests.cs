@@ -37,11 +37,6 @@ internal sealed class GrantAttributes : IResourceAttributes, INamesEvent
 
     public JsonApiFailure? Invalid()
     {
-        if (Others is { Count: > 0 })
-        {
-            return EventsFailures.EventGrantUnsupportedAttribute.With(string.Join(", ", Others.Keys));
-        }
-
         var kind = Kind?.Trim().ToLowerInvariant();
         if (kind is not ("operator" or "official"))
         {

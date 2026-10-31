@@ -43,11 +43,6 @@ internal sealed class SnapshotUpdateAttributes : IResourceAttributes
 
     public JsonApiFailure? Invalid()
     {
-        if (SnapshotRequest.Unsupported(Others) is { } unsupported)
-        {
-            return unsupported;
-        }
-
         return Time is null
             ? SnapshotRequest.Invalid("Say the time the Snapshot should have had: an instant with its offset.")
             : null;
@@ -94,11 +89,6 @@ internal sealed class SnapshotRequest
     /// <summary>What is wrong with the members of a Snapshot, none when they are valid.</summary>
     public static JsonApiFailure? Problem(SnapshotAttributes attributes)
     {
-        if (Unsupported(attributes.Others) is { } unsupported)
-        {
-            return unsupported;
-        }
-
         if (!Guid.TryParse(attributes.EventId, out var eventId) || eventId == Guid.Empty)
         {
             return SnapshotFailures.EventRequired;
@@ -116,14 +106,6 @@ internal sealed class SnapshotRequest
 
         return attributes.Time is null
             ? Invalid("Say the time the Snapshot was captured: an instant with its offset.")
-            : null;
-    }
-
-    /// <summary>The refusal of a member that is not one of the resource's, none when there is none.</summary>
-    public static JsonApiFailure? Unsupported(Dictionary<string, JsonElement>? others)
-    {
-        return others is { Count: > 0 }
-            ? JsonApiFailures.UnsupportedAttribute.With(string.Join(", ", others.Keys))
             : null;
     }
 

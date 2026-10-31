@@ -192,8 +192,7 @@ public sealed class TenantRolesTests : IClassFixture<SharedApiFixture>
         var onTheAccount = await person.Page.WriteAsync(HttpMethod.Patch, "/api/me", "accounts", attributes);
         var onTheProfile = await person.Page.WriteAsync(HttpMethod.Patch, "/api/me/profile", "profiles", attributes);
 
-        Assert.Equal(HttpStatusCode.BadRequest, onTheAccount.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(onTheAccount));
+        Assert.Equal(HttpStatusCode.OK, onTheAccount.StatusCode); // a member the Api does not take is ignored
         Assert.Equal(before, await StoredAsync(person.Email)); // the profile edit may succeed and ignore it: nothing changed
         Assert.True(onTheProfile.StatusCode is HttpStatusCode.OK or HttpStatusCode.BadRequest);
     }
@@ -416,8 +415,7 @@ public sealed class TenantRolesTests : IClassFixture<SharedApiFixture>
             }
         );
 
-        Assert.Equal(HttpStatusCode.BadRequest, renamed.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(renamed));
+        Assert.Equal(HttpStatusCode.OK, renamed.StatusCode); // what the Tenant may not take is ignored, and nothing of it changed
         Assert.Equal(before, await StoredTenantAsync(tenant));
     }
 

@@ -382,7 +382,7 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<SharedApiFixture>
     [InlineData("mainOperatorId")]
     [InlineData("id")]
     [InlineData("bogus")]
-    public async Task A_change_cannot_give_a_Setup_a_Tenant_an_owner_or_a_member_it_does_not_have(string member)
+    public async Task A_change_takes_what_it_may_name_and_a_Setup_keeps_its_Tenant_whatever_else_it_names(string member)
     {
         var api = _shared.Api;
         using var client = ApiClients.Of(api);
@@ -396,9 +396,10 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<SharedApiFixture>
             new Dictionary<string, object> { ["name"] = "Taken", [member] = Guid.NewGuid() }
         );
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(response));
-        Assert.Equal("Original", (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, id))!["Name"].AsString);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode); // a member the Api does not take is ignored, and the name is taken
+        var stored = (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, id))!;
+        Assert.Equal("Taken", stored["Name"].AsString);
+        Assert.Equal(tenant, stored["TenantId"].AsString);
     }
 
     [Theory]

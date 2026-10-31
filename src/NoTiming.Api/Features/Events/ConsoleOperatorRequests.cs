@@ -21,11 +21,6 @@ internal sealed class ConsoleOperatorAttributes : IResourceAttributes, INamesEve
 
     public JsonApiFailure? Invalid()
     {
-        if (Others is { Count: > 0 })
-        {
-            return EventsFailures.ConsoleOperatorUnsupportedAttribute.With(string.Join(", ", Others.Keys));
-        }
-
         if ((Email == null) == (AccountId == null))
         {
             return EventsFailures.PersonNotNamedOnce;
