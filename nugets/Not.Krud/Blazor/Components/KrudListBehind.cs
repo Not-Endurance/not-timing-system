@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Not.Application.CRUD.Ports;
 using Not.Async.Extensions;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
@@ -131,23 +132,34 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
 
     protected async Task DeleteSafe(T entity)
     {
-        var impact = await Service.PreviewDelete(entity);
-        if (impact.HasUsages)
+        try
         {
-            if (!await KrudDialogs.ShowCascadingDeleteConfirmation(impact))
+            var impact = await Service.PreviewDelete(entity);
+            if (impact.HasUsages)
             {
-                return;
+                if (!await KrudDialogs.ShowCascadingDeleteConfirmation(impact))
+                {
+                    return;
+                }
+                await Service.DeleteCascade(entity);
             }
-            await Service.DeleteCascade(entity);
+            else
+            {
+                if (!await KrudDialogs.ShowDeleteConfirmation(entity.ToString()))
+                {
+                    return;
+                }
+                await Service.Delete(entity);
+            }
         }
-        else
+        catch (RepositoryException refused)
         {
-            if (!await KrudDialogs.ShowDeleteConfirmation(entity.ToString()))
-            {
-                return;
-            }
-            await Service.Delete(entity);
+            // The Api refused the delete (a row that another row still names, say): the row stays in the list, and the
+            // person is told what the Api said (ADR-0017).
+            Handle(refused);
+            return;
         }
+
         await ReadAgain();
     }
 
