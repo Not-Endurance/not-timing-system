@@ -180,12 +180,12 @@ public class JsonApiClient
 
         if (query?.PageSize is { } size)
         {
-            parameters.Add($"page[size]={size}");
+            parameters.Add($"{Uri.EscapeDataString("page[size]")}={size}");
         }
 
         if (query?.PageNumber is { } number)
         {
-            parameters.Add($"page[number]={number}");
+            parameters.Add($"{Uri.EscapeDataString("page[number]")}={number}");
         }
 
         var endpoint = parameters.Count == 0 ? path : $"{path}?{string.Join('&', parameters)}";

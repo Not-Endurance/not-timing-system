@@ -243,7 +243,7 @@ public sealed class JsonApiClientTests
         var second = Guid.NewGuid();
         var third = Guid.NewGuid();
         var transport = new FakeJsonApi(request =>
-            request.RequestUri!.ToString().Contains("page[number]=1")
+            request.RequestUri!.ToString().Contains("page%5Bnumber%5D=1")
                 ? Page(new[] { first, second }, hasNext: true)
                 : Page(new[] { third }, hasNext: false)
         );
