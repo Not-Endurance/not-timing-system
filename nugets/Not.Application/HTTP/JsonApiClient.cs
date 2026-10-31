@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 
@@ -19,6 +20,12 @@ public class JsonApiSettings
 
     /// <summary>The headers a write carries, which the Api asks for on every write of a signed-in caller.</summary>
     public Dictionary<string, string> WriteHeaders { get; } = [];
+
+    /// <summary>
+    /// The codes of a conflict that the Api says to try again later, such as <c>participation-busy</c>. An answer with one of
+    /// them is an unavailable failure, not a refusal (ADR-0017).
+    /// </summary>
+    public HashSet<string> UnavailableCodes { get; } = [];
 }
 
 /// <summary>One of the errors of a JSON:API response: the status and the stable code a client branches on, and what a person reads.</summary>
@@ -59,7 +66,8 @@ public class JsonApiResponse
         JsonElement? document,
         string? location,
         JsonApiError? error,
-        DateTimeOffset? serverTime = null
+        DateTimeOffset? serverTime = null,
+        IReadOnlyDictionary<string, string>? headers = null
     )
     {
         Status = status;
@@ -67,6 +75,7 @@ public class JsonApiResponse
         Location = location;
         Error = error;
         ServerTime = serverTime;
+        Headers = headers ?? new Dictionary<string, string>();
     }
 
     public HttpStatusCode Status { get; }
@@ -88,6 +97,9 @@ public class JsonApiResponse
 
     /// <summary>The time the server said it was when it answered (the <c>Date</c> header, to the second), when it said.</summary>
     public DateTimeOffset? ServerTime { get; }
+
+    /// <summary>The headers of the answer, with the values of each joined by a comma: <c>Retry-After</c> says when to ask again.</summary>
+    public IReadOnlyDictionary<string, string> Headers { get; }
 
     /// <summary>The first error of a response that failed, or one made of its status when the body said none.</summary>
     public JsonApiError? Error { get; }
@@ -168,8 +180,131 @@ public class JsonApiClient
             parsed,
             response.Headers.Location?.OriginalString,
             response.IsSuccessStatusCode ? null : ErrorOf(response.StatusCode, parsed),
-            response.Headers.Date
+            response.Headers.Date,
+            HeadersOf(response)
         );
+    }
+
+    /// <summary>
+    /// A list of a collection, or any route that answers with one: its filter, its sort and one page of it, as the rest-api
+    /// skill names them. A route that is not a list is asked with no query.
+    /// </summary>
+    public Task<JsonApiResponse> Get(
+        string path,
+        string? filter = null,
+        string? sort = null,
+        int? pageSize = null,
+        int? pageNumber = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var query = new List<string>();
+        if (filter != null)
+        {
+            query.Add($"filter={Uri.EscapeDataString(filter)}");
+        }
+
+        if (sort != null)
+        {
+            query.Add($"sort={Uri.EscapeDataString(sort)}");
+        }
+
+        if (pageSize != null)
+        {
+            query.Add($"page[size]={pageSize}");
+        }
+
+        if (pageNumber != null)
+        {
+            query.Add($"page[number]={pageNumber}");
+        }
+
+        var endpoint = query.Count == 0 ? path : $"{path}?{string.Join('&', query)}";
+        return Send(HttpMethod.Get, endpoint, null, cancellationToken);
+    }
+
+    /// <summary>One resource of a collection, by its id.</summary>
+    public Task<JsonApiResponse> GetOne(string collection, Guid id, CancellationToken cancellationToken = default)
+    {
+        return Send(HttpMethod.Get, $"{collection}/{id}", null, cancellationToken);
+    }
+
+    /// <summary>Makes a resource of a collection. The id the model holds is the id of the document, when it holds one.</summary>
+    public Task<JsonApiResponse> Post(string collection, object model, CancellationToken cancellationToken = default)
+    {
+        return Send(HttpMethod.Post, collection, ResourceDocument(collection, model, null, null), cancellationToken);
+    }
+
+    /// <summary>
+    /// Changes the members of a resource that the model holds. <paramref name="meta"/> carries what the change is based on,
+    /// such as the version of a resource that counts its writes.
+    /// </summary>
+    public Task<JsonApiResponse> Patch(
+        string collection,
+        Guid id,
+        object model,
+        JsonObject? meta = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return Send(
+            HttpMethod.Patch,
+            $"{collection}/{id}",
+            ResourceDocument(collection, model, id, meta),
+            cancellationToken
+        );
+    }
+
+    /// <summary>Removes a resource of a collection, by its id.</summary>
+    public Task<JsonApiResponse> Delete(string collection, Guid id, CancellationToken cancellationToken = default)
+    {
+        return Send(HttpMethod.Delete, $"{collection}/{id}", null, cancellationToken);
+    }
+
+    /// <summary>
+    /// The document of one resource: its type is the collection, its id is the one given or else the one the model holds,
+    /// and every other member of the model is an attribute. The id is never an attribute, and a null is written as null.
+    /// </summary>
+    static JsonElement ResourceDocument(string type, object model, Guid? id, JsonObject? meta)
+    {
+        var attributes = new JsonObject();
+        Guid? modelId = null;
+        foreach (var member in JsonSerializer.SerializeToElement(model, WriteOptions).EnumerateObject())
+        {
+            if (member.Name == "id")
+            {
+                modelId = Guid.TryParse(member.Value.GetString(), out var parsed) ? parsed : null;
+            }
+            else
+            {
+                attributes[member.Name] = JsonNode.Parse(member.Value.GetRawText());
+            }
+        }
+
+        var data = new JsonObject { ["type"] = type };
+        if ((id ?? modelId) is { } documentId && documentId != Guid.Empty)
+        {
+            data["id"] = documentId.ToString();
+        }
+
+        data["attributes"] = attributes;
+        if (meta != null)
+        {
+            data["meta"] = meta;
+        }
+
+        return JsonSerializer.SerializeToElement(new JsonObject { ["data"] = data });
+    }
+
+    static IReadOnlyDictionary<string, string> HeadersOf(HttpResponseMessage response)
+    {
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var header in response.Headers.Concat(response.Content.Headers))
+        {
+            headers[header.Key] = string.Join(", ", header.Value);
+        }
+
+        return headers;
     }
 
     Uri BuildUrl(string endpoint)
