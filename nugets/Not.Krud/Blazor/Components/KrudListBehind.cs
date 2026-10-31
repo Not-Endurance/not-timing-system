@@ -9,6 +9,7 @@ using Not.Exceptions;
 using Not.Krud.Abstractions;
 using Not.Krud.Blazor.Components.Abstractions;
 using Not.Krud.Models;
+using Not.Notify;
 
 namespace Not.Krud.Blazor.Components;
 
@@ -25,6 +26,9 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
 
     [Inject]
     KrudDialogService<TModel, TShell> KrudDialogs { get; set; } = default!;
+
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
 
     [Inject]
     IEnumerable<IKrudNodeSetter> ParentContexts { get; set; } = default!;
@@ -156,7 +160,7 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
         {
             // The Api refused the delete (a row that another row still names, say): the row stays in the list, and the
             // person is told what the Api said (ADR-0017).
-            Handle(refused);
+            Notifier.Warn(refused.Message);
             return;
         }
 
