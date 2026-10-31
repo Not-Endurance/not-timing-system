@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
 using Not.Identity;
+using Not.Identity.Email;
 
 namespace NTS.Tests.Integration.Harness;
 
@@ -168,6 +169,12 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
                 services.PostConfigure<NIdentityOptions>(options => options.Database = _database);
             }
 
+            // The factory asks for the outbox sender, which the Api does not build: the host gets the test's own, so a test
+            // reads the mail it was sent (ADR-0016).
+            services.RemoveAll<IEmailSender>();
+            services.AddSingleton<OutboxEmailSender>();
+            services.AddSingleton<IEmailSender>(p => p.GetRequiredService<OutboxEmailSender>());
+            services.AddSingleton<IEmailOutbox>(p => p.GetRequiredService<OutboxEmailSender>());
             _configureServices?.Invoke(services);
         });
     }
