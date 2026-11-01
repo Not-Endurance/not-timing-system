@@ -12,7 +12,7 @@ using NTS.Domain;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.ConfigureEvents;
-using static NoTiming.Ui.Features.Console.JsonAttributes;
+using static Not.Blazor.Client.REST.JsonAttributes;
 using NoTiming.Ui.Storage.REST;
 
 namespace NoTiming.Ui.Features.Console.Setup;
@@ -27,10 +27,7 @@ namespace NoTiming.Ui.Features.Console.Setup;
 /// </summary>
 public class ConsoleLookups : IConsoleLookups, IScoped
 {
-    const string ALL_TENANTS = "all-tenants";
-
     readonly IAccountSession _account;
-    readonly JsonApiClient _api;
     readonly IRepository<Country> _countries;
     readonly AthleteApiRepository _athletes;
     readonly HorseApiRepository _horses;
@@ -41,7 +38,6 @@ public class ConsoleLookups : IConsoleLookups, IScoped
 
     public ConsoleLookups(
         IAccountSession account,
-        JsonApiClient api,
         IRepository<Country> countries,
         AthleteApiRepository athletes,
         HorseApiRepository horses,
@@ -51,7 +47,6 @@ public class ConsoleLookups : IConsoleLookups, IScoped
     )
     {
         _account = account;
-        _api = api;
         _countries = countries;
         _athletes = athletes;
         _horses = horses;

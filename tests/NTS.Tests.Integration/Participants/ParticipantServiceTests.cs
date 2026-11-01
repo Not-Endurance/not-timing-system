@@ -97,6 +97,7 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
             x =>
             {
                 Assert.StartsWith("GET /api/horses/all-tenants?filter=", x, StringComparison.Ordinal);
+                Assert.Contains("&sort=name", x, StringComparison.Ordinal);
             }
         );
     }

@@ -1,4 +1,4 @@
-﻿using Not.Domain.Abstractions;
+using Not.Domain.Abstractions;
 using NTS.Domain.Enums;
 
 namespace NTS.Domain.Access;

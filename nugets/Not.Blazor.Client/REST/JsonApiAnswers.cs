@@ -13,11 +13,17 @@ namespace Not.Blazor.Client.REST;
 public static class JsonApiAnswers
 {
     /// <summary>The answer of a request, whatever it says; a request that got no answer is unavailable.</summary>
-    public static async Task<JsonApiResponse> Reached(Task<JsonApiResponse> request)
+    public static Task<JsonApiResponse> Reached(Task<JsonApiResponse> request)
+    {
+        return Reached(() => request);
+    }
+
+    /// <summary>The answer of a request, whatever it says: a request that got no answer is unavailable, with the transport exception inside it.</summary>
+    public static async Task<T> Reached<T>(Func<Task<T>> request)
     {
         try
         {
-            return await request;
+            return await request();
         }
         catch (HttpRequestException ex)
         {

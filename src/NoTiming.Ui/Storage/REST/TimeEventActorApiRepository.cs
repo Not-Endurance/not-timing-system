@@ -1,5 +1,6 @@
-using System.Text.Json;
 using Not.Application.HTTP;
+using Not.Blazor.Client.REST;
+using static Not.Blazor.Client.REST.JsonAttributes;
 
 namespace NoTiming.Ui.Storage.REST;
 
@@ -21,10 +22,12 @@ public class TimeEventActorApiRepository
 
     public async Task<IReadOnlyDictionary<Guid, string>> NamesOf(Guid eventId)
     {
-        var actors = await _client.GetAll(
-            "time-event-actors",
-            new ListQuery(filter: $"eventId eq {eventId}", pageSize: PAGE_SIZE),
-            MAX_PAGES
+        var actors = await JsonApiAnswers.Reached(() =>
+            _client.GetAll(
+                "time-event-actors",
+                new ListQuery(filter: $"eventId eq {eventId}", pageSize: PAGE_SIZE),
+                MAX_PAGES
+            )
         );
         return actors
             .Select(x => (
@@ -33,12 +36,5 @@ public class TimeEventActorApiRepository
             ))
             .Where(x => x.Id != null)
             .ToDictionary(x => x.Id!.Value, x => x.Name);
-    }
-
-    static string? Text(JsonElement attributes, string member)
-    {
-        return attributes.TryGetProperty(member, out var value) && value.ValueKind == JsonValueKind.String
-            ? value.GetString()
-            : null;
     }
 }

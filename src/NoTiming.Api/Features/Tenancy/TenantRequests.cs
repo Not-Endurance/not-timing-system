@@ -79,8 +79,6 @@ internal sealed class TenantChange : MemberAttributes, IResourceAttributes
 
     public override JsonApiFailure? Invalid()
     {
-        var members = Members ?? [];
-
         // What is named is valid whatever the Tenant has now: only the members that are not named come from it.
         return Rules is { } named && Merge(new RegionalRules(false, null), named) is null
             ? TenancyFailures.InvalidRules

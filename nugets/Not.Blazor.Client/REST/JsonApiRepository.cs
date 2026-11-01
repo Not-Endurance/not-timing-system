@@ -263,6 +263,6 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
     /// </summary>
     async Task<IReadOnlyList<JsonElement>> ResourcesOf(string path, ListQuery query)
     {
-        return await Client.GetAll(path, new ListQuery(query.Filter, query.Sort, PAGE_SIZE), MAX_PAGES);
+        return await JsonApiAnswers.Reached(() => Client.GetAll(path, new ListQuery(query.Filter, query.Sort, PAGE_SIZE), MAX_PAGES));
     }
 }

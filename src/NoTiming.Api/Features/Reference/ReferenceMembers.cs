@@ -11,8 +11,8 @@ namespace NoTiming.Api.Features.Reference;
 /// the document are its members in camelCase, without the id, which is the resource's own. A member the server owns,
 /// such as the Tenant, is shown and cannot be written, and one the resource keeps to itself, such as
 /// the account an Athlete is linked to, is neither shown nor written, so that a document read can be sent back as it is
-/// after the id and what the server owns are taken out. A document that names a member the resource has not is refused,
-/// whatever it says, so nothing it names is ignored without telling.
+/// after the id and what the server owns are taken out. A member the resource does not take is ignored (ADR-0017), so a
+/// write names what it changes and the Api keeps the rest.
 /// </summary>
 internal sealed class ReferenceMembers<TModel>
     where TModel : class, new()
@@ -57,8 +57,8 @@ internal sealed class ReferenceMembers<TModel>
 
     /// <summary>
     /// Puts the members a document names into the model, each as the type of the member it is. A refusal is returned when
-    /// the document names a member that cannot be written or gives one a value of another type, and then nothing of the
-    /// model is to be used.
+    /// the document gives a member a value of another type, and then nothing of the model is to be used. A member the
+    /// resource does not take is ignored (ADR-0017).
     /// </summary>
     public IResult? Apply(TModel model, IReadOnlyDictionary<string, JsonElement> members, List<PropertyInfo> named)
     {

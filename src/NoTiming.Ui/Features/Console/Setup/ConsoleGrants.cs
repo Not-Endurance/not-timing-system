@@ -54,7 +54,7 @@ public class ConsoleGrants : IConsoleGrants, ITransient
             Id = grant.Id,
             Kind = grant.Kind,
             Role = grant.OfficialRole,
-            IsPending = grant.Pending,
+            IsPending = grant.IsPending,
             DisplayName = grant.DisplayName,
             Email = grant.Email ?? string.Empty,
         };

@@ -6,7 +6,7 @@ using NTS.Domain.Enums;
 
 namespace NoTiming.Api.Features.Snapshots;
 
-/// <summary>What a device says about a Snapshot it sends: where it was captured and when. A member that is not one of these is kept, to be refused.</summary>
+/// <summary>What a device says about a Snapshot it sends: where it was captured and when. A member that is not one of these is ignored (ADR-0017).</summary>
 internal sealed class SnapshotAttributes : IResourceAttributes, INamesEvent
 {
     public static string? ResourceType => SnapshotDocuments.TYPE;
@@ -20,16 +20,13 @@ internal sealed class SnapshotAttributes : IResourceAttributes, INamesEvent
     public string? Kind { get; set; }
     public DateTimeOffset? Time { get; set; }
 
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Others { get; set; }
-
     public JsonApiFailure? Invalid()
     {
         return SnapshotRequest.Problem(this);
     }
 }
 
-/// <summary>What an Official says in an Update of a Snapshot they sent: the time it should have had. A member that is not that is kept, to be refused.</summary>
+/// <summary>What an Official says in an Update of a Snapshot they sent: the time it should have had. A member that is not that is ignored (ADR-0017).</summary>
 internal sealed class SnapshotUpdateAttributes : IResourceAttributes
 {
     public static string? ResourceType => SnapshotDocuments.TYPE;
@@ -37,9 +34,6 @@ internal sealed class SnapshotUpdateAttributes : IResourceAttributes
     public static DocumentIds Ids => DocumentIds.MatchesRoute;
 
     public DateTimeOffset? Time { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Others { get; set; }
 
     public JsonApiFailure? Invalid()
     {

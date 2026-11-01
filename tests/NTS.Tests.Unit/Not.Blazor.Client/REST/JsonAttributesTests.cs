@@ -1,9 +1,9 @@
 using System.Text.Json;
-using NoTiming.Ui.Features.Console;
+using Not.Blazor.Client.REST;
 
-namespace NTS.Tests.Unit.NoTiming.Ui.Features.Console;
+namespace NTS.Tests.Unit.Not.Blazor.Client.REST;
 
-/// <summary>What the Console reads of the attributes the Api answered: a flag is true only when the Api says true, and a text is a string.</summary>
+/// <summary>What a client reads of the attributes the Api answered: a flag is true only when the Api says true, and a text is a string.</summary>
 public sealed class JsonAttributesTests
 {
     [Theory]

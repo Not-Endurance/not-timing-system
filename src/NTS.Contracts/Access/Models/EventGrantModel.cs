@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Not.Krud.Abstractions;
 using NTS.Domain.Access;
 using NTS.Domain.Enums;
@@ -20,7 +21,8 @@ public class EventGrantModel : IKrudModel<EventGrant>
     public string? Email { get; set; }
     public Guid? AccountId { get; set; }
     public string? DisplayName { get; set; }
-    public bool Pending { get; set; }
+    [JsonPropertyName("pending")]
+    public bool IsPending { get; set; }
 
     public void MapFrom(EventGrant grant)
     {
@@ -31,7 +33,7 @@ public class EventGrantModel : IKrudModel<EventGrant>
         OfficialRole = grant.OfficialRole;
         Email = grant.Email;
         AccountId = grant.AccountId;
-        Pending = grant.IsPending;
+        IsPending = grant.IsPending;
     }
 
     public EventGrant MapToEntity()

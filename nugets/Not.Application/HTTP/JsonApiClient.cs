@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
@@ -16,6 +16,8 @@ namespace Not.Application.HTTP;
 /// </summary>
 public class JsonApiSettings
 {
+    static readonly JsonSerializerOptions SharedDefaults = Defaults();
+
     /// <summary>The address of the resources, up to and including the prefix of the routes: <c>https://host/api</c>.</summary>
     public string? Url { get; set; }
 
@@ -32,7 +34,7 @@ public class JsonApiSettings
     /// What a document is read and written with: camelCase members, enums as their names, and a null written as null, which
     /// on a change takes the member away (ADR-0017).
     /// </summary>
-    public JsonSerializerOptions Json { get; set; } = Defaults();
+    public JsonSerializerOptions Json { get; set; } = SharedDefaults;
 
     /// <summary>
     /// camelCase members, enums as their names, and a null written as null: on a change null is a member taken away, and

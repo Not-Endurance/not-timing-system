@@ -9,7 +9,7 @@ using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Console;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
-using static NoTiming.Ui.Features.Console.JsonAttributes;
+using static Not.Blazor.Client.REST.JsonAttributes;
 
 namespace NoTiming.Ui.Features.Console;
 
@@ -123,7 +123,7 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
                 x.Id,
                 x.DisplayName ?? string.Empty,
                 x.Email ?? string.Empty,
-                x.Pending
+                x.IsPending
             )),
         ];
     }

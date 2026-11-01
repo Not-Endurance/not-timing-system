@@ -1,8 +1,8 @@
 using System.Text.Json;
 
-namespace NoTiming.Ui.Features.Console;
+namespace Not.Blazor.Client.REST;
 
-/// <summary>What the Console reads of the attributes of a resource the Api answered: a flag that is true only when the Api says so, and a text.</summary>
+/// <summary>What a client reads of the attributes of a resource the Api answered: a flag that is true only when the Api says so, and a text.</summary>
 public static class JsonAttributes
 {
     public static bool Flag(JsonElement attributes, string member)
