@@ -74,7 +74,6 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<MongoFixture>
         )!;
         received.Id = id;
         received.TenantId = sent.TenantId;
-        received.MainOperatorId = sent.MainOperatorId;
         Assert.Equal(
             JsonSerializer.Serialize(sent, JsonApiResults.Options),
             JsonSerializer.Serialize(received, JsonApiResults.Options)

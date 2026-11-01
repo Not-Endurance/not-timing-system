@@ -49,13 +49,7 @@ internal sealed class ViewerDriver : IAsyncDisposable
     /// Must be null: the Witness is a visitor until a person is signed in at the Api, which is done by
     /// <see cref="SignedInAsync"/> or, on a driver made with the fixture, by <see cref="SignIn"/>.
     /// </param>
-    /// <param name="unanswered">What the browser of the Witness keeps of a group that was sent and not answered: another Witness given the same stands for the page being opened again.</param>
-    public ViewerDriver(
-        Uri apiBaseUrl,
-        IntegrationUser? user,
-        string clientName,
-        MemoryUnansweredSnapshots? unanswered = null
-    )
+    public ViewerDriver(Uri apiBaseUrl, IntegrationUser? user, string clientName)
     {
         if (user != null)
         {
@@ -66,7 +60,6 @@ internal sealed class ViewerDriver : IAsyncDisposable
         }
 
         _clientName = clientName;
-        _unanswered = unanswered ?? new MemoryUnansweredSnapshots();
         var configuration = CreateConfiguration(apiBaseUrl, ApplicationConstants.LIVE_HUB, clientName);
         var services = new ServiceCollection();
 
@@ -92,8 +85,8 @@ internal sealed class ViewerDriver : IAsyncDisposable
     }
 
     /// <summary>A Witness of the Api of the fixture, as a visitor, who can sign a person in later.</summary>
-    public ViewerDriver(NtsIntegrationFixture fixture, string clientName, MemoryUnansweredSnapshots? unanswered = null)
-        : this(fixture.ApiBaseUrl, null, clientName, unanswered)
+    public ViewerDriver(NtsIntegrationFixture fixture, string clientName)
+        : this(fixture.ApiBaseUrl, null, clientName)
     {
         _fixture = fixture;
     }
