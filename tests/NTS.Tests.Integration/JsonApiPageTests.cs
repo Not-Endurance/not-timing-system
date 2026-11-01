@@ -52,7 +52,10 @@ public sealed class JsonApiPageTests
         Assert.Equal(400, status);
         var error = body.GetProperty("errors")[0];
         Assert.Equal("invalid-page", error.GetProperty("code").GetString());
-        Assert.Equal("A page is a number of at least 1 and a size of 1 to 500.", error.GetProperty("title").GetString());
+        Assert.Equal(
+            "A page is a number of at least 1 and a size of 1 to 500.",
+            error.GetProperty("title").GetString()
+        );
     }
 
     [Fact]
@@ -74,7 +77,10 @@ public sealed class JsonApiPageTests
         Assert.Equal(2, body.GetProperty("meta").GetProperty("page").GetProperty("size").GetInt32());
         Assert.Equal(2, body.GetProperty("meta").GetProperty("page").GetProperty("number").GetInt32());
         var links = body.GetProperty("links");
-        Assert.Equal("/api/things?filter=eventId eq 1&page[size]=2&page[number]=2", links.GetProperty("self").GetString());
+        Assert.Equal(
+            "/api/things?filter=eventId eq 1&page[size]=2&page[number]=2",
+            links.GetProperty("self").GetString()
+        );
         Assert.Equal(
             "/api/things?filter=eventId%20eq%201&page%5Bsize%5D=2&page%5Bnumber%5D=3",
             links.GetProperty("next").GetString()
@@ -91,7 +97,14 @@ public sealed class JsonApiPageTests
     {
         var request = RequestOf("/api/things", "?page[number]=3");
 
-        var page = JsonApiResults.Page("things", [("a", new { name = "A" })], request, size: 100, number: 3, hasNext: false);
+        var page = JsonApiResults.Page(
+            "things",
+            [("a", new { name = "A" })],
+            request,
+            size: 100,
+            number: 3,
+            hasNext: false
+        );
 
         var (_, body) = await RunAsync(page);
         Assert.False(body.GetProperty("links").TryGetProperty("next", out _));

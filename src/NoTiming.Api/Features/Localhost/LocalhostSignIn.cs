@@ -70,10 +70,10 @@ internal static class LocalhostSignIn
     }
 
     public static IReadOnlyList<PublicEndpoint> Endpoints { get; } =
-    [
-        new PublicEndpoint(EndpointAccess.SignIn, "GET,HEAD", PAGE),
-        new PublicEndpoint(EndpointAccess.SignIn, "POST", SESSIONS),
-    ];
+        [
+            new PublicEndpoint(EndpointAccess.SignIn, "GET,HEAD", PAGE),
+            new PublicEndpoint(EndpointAccess.SignIn, "POST", SESSIONS),
+        ];
 
     static async Task<IResult> PostDevSessions(
         HttpContext context,

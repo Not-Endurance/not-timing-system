@@ -1,4 +1,3 @@
-
 namespace NoTiming.Api.Features.Account;
 
 internal sealed class RegistrationAttributes
