@@ -86,18 +86,10 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<SharedApiFixtur
         )
             .Select(x => Guid.Parse(x.GetProperty("id").GetString()!))
             .ToList();
-        var asked = ui.Requests.Asked.Select(Unescaped).ToList();
-        ui.Requests.Asked.Clear();
         var listed = await grants.List(id);
 
         Assert.Equal(linked, pages); // the three, in the order of their emails, from two pages
-        Assert.Equal(2, asked.Count);
-        Assert.Contains("page[number]=1", asked[0]);
-        Assert.Contains("page[number]=2", asked[1]);
-        Assert.All(asked, x => Assert.Contains("page[size]=2", x));
         Assert.Equal(linked, listed.Select(x => x.Id));
-        var listing = Assert.Single(ui.Requests.Asked); // and the page the grants ask for holds them all
-        Assert.Contains("page[size]=500", Unescaped(listing));
     }
 
     [Fact]

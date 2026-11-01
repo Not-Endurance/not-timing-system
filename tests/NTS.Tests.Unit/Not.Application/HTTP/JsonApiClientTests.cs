@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using Not.Application.CRUD.Ports;
 using Microsoft.Extensions.Options;
 using Not.Application.HTTP;
 using NTS.Tests.Unit.Harness;
@@ -243,7 +244,7 @@ public sealed class JsonApiClientTests
         var second = Guid.NewGuid();
         var third = Guid.NewGuid();
         var transport = new FakeJsonApi(request =>
-            request.RequestUri!.ToString().Contains("page%5Bnumber%5D=1")
+            request.RequestUri!.ToString().Contains("page[number]=1")
                 ? Page(new[] { first, second }, hasNext: true)
                 : Page(new[] { third }, hasNext: false)
         );
@@ -259,7 +260,7 @@ public sealed class JsonApiClientTests
     {
         var transport = new FakeJsonApi(_ => Page(new[] { Guid.NewGuid() }, hasNext: true));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        await Assert.ThrowsAsync<RepositoryException>(() =>
             Client(transport).GetAll("athletes", new ListQuery(pageSize: 1), maxPages: 2)
         );
         Assert.Equal(2, transport.Requests.Count);

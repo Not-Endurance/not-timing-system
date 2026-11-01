@@ -602,7 +602,7 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
         await Expect(page.GetByTestId("my-athlete")).ToBeVisibleAsync(Loaded());
         var failing = true;
         await page.RouteAsync(
-            new Regex(@"/api/participations/history\?filter=athleteId[^&]*&page%5Bsize%5D=20&"), // the list, and not the Horses that the Athlete has ridden
+            new Regex(@"/api/participations/history\?filter=athleteId[^&]*&page(?:%5B|\[)size(?:%5D|\])=20&"), // the list, and not the Horses that the Athlete has ridden
             async route =>
             {
                 if (failing)
@@ -671,7 +671,7 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
         await Expect(page.GetByTestId("my-athlete")).ToBeVisibleAsync(Loaded());
         var failing = true;
         await page.RouteAsync(
-            new Regex(@"/api/participations/history\?filter=athleteId[^&]*&page%5Bsize%5D=20&"),
+            new Regex(@"/api/participations/history\?filter=athleteId[^&]*&page(?:%5B|\[)size(?:%5D|\])=20&"),
             async route =>
             {
                 if (failing)

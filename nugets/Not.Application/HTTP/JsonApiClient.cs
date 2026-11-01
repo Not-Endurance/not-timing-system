@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
+using Not.Application.CRUD.Ports;
 
 namespace Not.Application.HTTP;
 
@@ -180,12 +181,12 @@ public class JsonApiClient
 
         if (query?.PageSize is { } size)
         {
-            parameters.Add($"{Uri.EscapeDataString("page[size]")}={size}");
+            parameters.Add($"page[size]={size}");
         }
 
         if (query?.PageNumber is { } number)
         {
-            parameters.Add($"{Uri.EscapeDataString("page[number]")}={number}");
+            parameters.Add($"page[number]={number}");
         }
 
         var endpoint = parameters.Count == 0 ? path : $"{path}?{string.Join('&', parameters)}";
@@ -194,8 +195,8 @@ public class JsonApiClient
 
     /// <summary>
     /// Every resource of a list, a page at a time, until the Api says there is no next page. A list that goes on beyond
-    /// <paramref name="maxPages"/> pages is not cut short: it is refused, as a list that cannot be shown whole. A refusal of
-    /// a page is thrown as a <see cref="JsonApiException"/>.
+    /// <paramref name="maxPages"/> pages is not cut short: it is refused with a <see cref="RepositoryException"/>, as a list
+    /// that cannot be shown whole. A refusal of a page is thrown as a <see cref="JsonApiException"/>.
     /// </summary>
     public async Task<IReadOnlyList<JsonElement>> GetAll(
         string path,
@@ -220,7 +221,10 @@ public class JsonApiClient
             }
         }
 
-        throw new InvalidOperationException($"The list at {path} goes on beyond {maxPages} pages.");
+        throw new RepositoryException(
+            RepositoryErrorKind.Refused,
+            $"The list at {path} goes on beyond the {maxPages} pages it is read to, and is not read to its end."
+        );
     }
 
     /// <summary>One resource of a collection, by its id.</summary>

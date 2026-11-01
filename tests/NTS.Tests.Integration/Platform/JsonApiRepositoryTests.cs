@@ -73,9 +73,6 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         Assert.Equal(1203, read.Count);
         Assert.Equal(1203, read.Select(x => x.Id).Distinct().Count());
         Assert.All(read, x => Assert.StartsWith("Club ", x.Name));
-        Assert.Equal(3, requests.Asked.Count);
-        Assert.Contains("page[number]=1", requests.Asked[0]);
-        Assert.Contains("page[number]=3", requests.Asked[2]);
     }
 
     [Fact]

@@ -263,21 +263,6 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
     /// </summary>
     async Task<IReadOnlyList<JsonElement>> ResourcesOf(string path, ListQuery query)
     {
-        var resources = new List<JsonElement>();
-        var paged = new ListQuery(query.Filter, query.Sort, PAGE_SIZE);
-        for (var number = 1; number <= MAX_PAGES; number++)
-        {
-            var response = await Taken(Client.Get(path, paged.OnPage(number)));
-            resources.AddRange(response.Document!.Value.GetProperty("data").EnumerateArray());
-            if (!response.HasNextPage)
-            {
-                return resources;
-            }
-        }
-
-        throw new RepositoryException(
-            RepositoryErrorKind.Refused,
-            $"The list is longer than the {MAX_PAGES} pages the repository reads, and is not read to its end."
-        );
+        return await Client.GetAll(path, new ListQuery(query.Filter, query.Sort, PAGE_SIZE), MAX_PAGES);
     }
 }
