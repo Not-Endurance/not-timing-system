@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
 using Not.Identity;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
+using NTS.Domain.Access;
 
 namespace NoTiming.Api.Features.Account;
 
@@ -35,7 +37,7 @@ internal static class AccountEndpoints
         app.MapGet("/account/passkeys", AccountPages.Passkeys);
         app.MapPasskeys();
 
-        app.MapGet("/api/me", GetMe).RequireAuthorization();
+        app.MapGet("/api/me", GetMe);
         return app;
     }
 
@@ -162,10 +164,10 @@ internal static class AccountEndpoints
         return Results.NoContent();
     }
 
-    static async Task<IResult> GetMe(HttpContext context, UserManager<NIdentityUser> users)
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    static IResult GetMe(AccessContext access)
     {
-        var user = await users.GetUserAsync(context.User);
-        return user is null ? JsonApiResults.NotSignedIn() : MeResource.Of(user, StatusCodes.Status200OK);
+        return MeResource.Of(access.User, StatusCodes.Status200OK);
     }
 
     /// <summary>

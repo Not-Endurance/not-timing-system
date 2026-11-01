@@ -9,7 +9,7 @@ namespace NoTiming.Api.Features.Tenancy;
 /// Creates the indexes the tenancy of #643 depends on when the host starts. One grant is one person in one place, and a
 /// unique index says it for requests that race (a missing role of an Operator is a value like any other, so two Operators
 /// of the same email cannot be linked to an Event twice). The others are the lookups: the grants of an account on an
-/// Event, the invitations that wait for an email, the Events a Main Operator runs, and the accounts of a Tenant, and the two
+/// Event, the invitations that wait for an email, the Events a Console Operator runs, and the accounts of a Tenant, and the two
 /// that a Snapshot is recorded by (#644): the Participation of an Event with a start number, and the Participation that
 /// holds a time event, which is how a Snapshot sent again, or Updated, is found by its id. The history of a Participant (#638)
 /// finds the Participations that copy a row of the registry by the id of the row, whatever Tenant they are in, so each of the
@@ -44,22 +44,11 @@ internal sealed class TenancyIndexes : IHostedService
                     unique: true
                 ),
                 Index("grants_of_an_account_on_an_event", new BsonDocument { { "EventId", 1 }, { "AccountId", 1 } }),
+                Index("grants_of_an_account_by_kind", new BsonDocument { { "AccountId", 1 }, { "Kind", 1 } }),
                 Index("grants_waiting_for_an_email", new BsonDocument { { "Email", 1 }, { "AccountId", 1 } }),
             ],
             cancellationToken
         );
-        await database
-            .GetCollection<BsonDocument>(TenantOwned.CONFIGURE_EVENTS)
-            .Indexes.CreateOneAsync(
-                Index("events_by_main_operator", new BsonDocument("MainOperatorId", 1)),
-                cancellationToken: cancellationToken
-            );
-        await database
-            .GetCollection<BsonDocument>(TenantOwned.EVENT_INFORMATIONS)
-            .Indexes.CreateOneAsync(
-                Index("events_by_main_operator", new BsonDocument("MainOperatorId", 1)),
-                cancellationToken: cancellationToken
-            );
         await database
             .GetCollection<BsonDocument>(TenantOwned.EVENT_PARTICIPATIONS)
             .Indexes.CreateManyAsync(

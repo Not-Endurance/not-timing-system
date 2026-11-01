@@ -12,8 +12,8 @@ namespace NoTiming.Ui.Storage.Core.Repositories;
 /// <summary>
 /// The Events as the Api serves them (#628): the <c>events</c> resource of ADR-0007 and ADR-0008. The Live Events and the
 /// Historic Events are its two named collections, which anybody reads; an Event is started from its Setup, which is the
-/// Main Operator's, and what the Api keeps (who runs the Event, the rules the Tenant had when it started) is read and never
-/// sent. Whether an Event is Live is the Api's rule and the clock of its host: nothing here stores or asks a flag.
+/// Console Operator's or Root's, and what the Api keeps (the Tenant, the rules the Tenant had when it started) is read and
+/// never sent. Whether an Event is Live is the Api's rule and the clock of its host: nothing here stores or asks a flag.
 /// </summary>
 public class EventInformationApiRepository
     : JsonApiRepository<EventInformation, EventInformationModel>,
@@ -43,7 +43,7 @@ public class EventInformationApiRepository
     /// Starts the Event from its Setup: the document names the Setup and no member, because an Event is started and takes
     /// nothing else. What the Api refuses is thrown with what it says, and its code is in
     /// <see cref="JsonApiRepository{T, TModel}.LastError"/>: <c>invalid-setup</c> and <c>incomplete-fei-configuration</c> say
-    /// what is missing, <c>not-main-operator</c> that the caller does not run the Event.
+    /// what is missing, <c>not-console-operator</c> that the caller does not run the Event.
     /// </summary>
     public async Task<EventInformation> Start(Guid configureEventId)
     {
@@ -63,7 +63,7 @@ public class EventInformationApiRepository
     }
 
     /// <summary>
-    /// Resets the currently selected Event to its Setup: the Main Operator's, while the Event is Live. It removes the Event
+    /// Resets the currently selected Event to its Setup: the Console Operator's, while the Event is Live. It removes the Event
     /// together with what it made and what was kept for it, so it no longer appears among the Live Events.
     /// </summary>
     public async Task Reset()

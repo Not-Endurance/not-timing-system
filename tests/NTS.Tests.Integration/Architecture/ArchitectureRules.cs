@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace NTS.Tests.Integration.Architecture;
 
 /// <summary>
@@ -27,6 +29,46 @@ internal static class ArchitectureRules
         "Microsoft.NET.Sdk.Functions",
     ];
     static readonly string[] RETIRED_PROJECTS = ["NTS.Application", "NTS.Storage", "NTS.Client", "Not.Server"];
+    static readonly string FILTER = "src/NoTiming.Api/Features/Access/AccessFilter.cs";
+    static readonly string[] MAY_ASK_THE_POLICY =
+    [
+        FILTER,
+        "src/NoTiming.Api/Features/Access/StandingReader.cs", // where a caller stands, for the filter and for the places below
+        "src/NoTiming.Api/Features/Events/EventEndpoints.cs", // what a person may do about an Event: its capabilities
+        "src/NoTiming.Api/Features/Tenancy/TenantEndpoints.cs", // what a person may do in a Tenant: its capabilities
+        "src/NoTiming.Api/Features/EventData/TimeEventViewers.cs", // whether a read shows how the times were recorded
+        "src/NoTiming.Api/Features/Tenancy/CrossTenantReads.cs", // the second guard behind the reads that reach across Tenants
+    ];
+    static readonly Regex ASKS_THE_POLICY = new(
+        @"AccessPolicy\.Decide\(|\.DecideAt(Event|Tenant|Platform)Async\(|\.GetUserAsync\(",
+        RegexOptions.Compiled
+    );
+
+    /// <summary>
+    /// What a caller may do is asked of the policy by the endpoint filter, and by no handler (ADR-0012, #671): a route declares what
+    /// it needs with <c>[Requires]</c> and takes the caller from the context the filter filled. The sources of the Api that ask
+    /// the policy or read the session are the filter and the few places that do not authorize a request: the capabilities, what a
+    /// read of times shows, and the reads that reach across Tenants, which ask again as a second guard. A rule about a filter that
+    /// the repository lacks throws, so that it cannot hold for the want of something to look at.
+    /// </summary>
+    public static IReadOnlyList<string> OnlyTheFilterAndThePlacesThatTellAskThePolicy(
+        IReadOnlyList<(string Path, string Text)> sources
+    )
+    {
+        if (!sources.Any(x => x.Path == FILTER))
+        {
+            throw new InvalidOperationException("The repository has no endpoint filter.");
+        }
+
+        return
+        [
+            .. sources
+                .Where(x => !MAY_ASK_THE_POLICY.Contains(x.Path) && ASKS_THE_POLICY.IsMatch(x.Text))
+                .Select(x =>
+                    $"{x.Path} asks the policy or reads the session, and only the endpoint filter and the places that tell do: declare what the route needs with [Requires]."
+                ),
+        ];
+    }
 
     /// <summary>The Ui is what the browser runs and the Api serves it: the Ui never references the Api, directly or through a project it references.</summary>
     public static IReadOnlyList<string> UiNeverReferencesApi(ProjectGraph graph)

@@ -63,17 +63,31 @@ internal sealed class EventGrantStore
                 throw new GrantLimitReachedException(MAX_GRANTS_PER_EVENT);
             }
 
-            var made =
-                kind == GrantKind.Operator
-                    ? EventGrant.ForOperator(Guid.NewGuid(), record.Id, record.TenantId, normalized, accountId)
-                    : EventGrant.ForOfficial(
-                        Guid.NewGuid(),
-                        record.Id,
-                        record.TenantId,
-                        role!.Value,
-                        normalized,
-                        accountId
-                    );
+            var made = kind switch
+            {
+                GrantKind.Operator => EventGrant.ForOperator(
+                    Guid.NewGuid(),
+                    record.Id,
+                    record.TenantId,
+                    normalized,
+                    accountId
+                ),
+                GrantKind.ConsoleOperator => EventGrant.ForConsoleOperator(
+                    Guid.NewGuid(),
+                    record.Id,
+                    record.TenantId,
+                    normalized,
+                    accountId
+                ),
+                _ => EventGrant.ForOfficial(
+                    Guid.NewGuid(),
+                    record.Id,
+                    record.TenantId,
+                    role!.Value,
+                    normalized,
+                    accountId
+                ),
+            };
             try
             {
                 await grants.InsertAsync(GrantDocuments.ToDocument(made), cancellationToken);
@@ -106,21 +120,28 @@ internal sealed class EventGrantStore
     }
 
     /// <summary>
-    /// A page of the grants of the Event, in the order of their emails (the other way round when it is asked) and then of their
-    /// ids, so that none is twice or missing between two pages; and whether another page follows.
+    /// A page of the Console Operators of the Event, or of its other grants, in the order of their emails (the other way round
+    /// when it is asked) and then of their ids, so that none is twice or missing between two pages; and whether another page
+    /// follows.
     /// </summary>
     public async Task<(IReadOnlyList<EventGrant> Grants, bool HasMore)> ListAsync(
         EventRecord record,
+        bool consoleOperators,
         bool descending,
         int skip,
         int size,
         CancellationToken cancellationToken
     )
     {
+        var kind = nameof(GrantKind.ConsoleOperator);
         var documents = await _tenants
             .Of(TenantOwned.EVENT_GRANTS, record.TenantId)
             .FindPageAsync(
-                new BsonDocument(GrantDocuments.EVENT_ID, BsonGuids.Binary(record.Id)),
+                new BsonDocument
+                {
+                    { GrantDocuments.EVENT_ID, BsonGuids.Binary(record.Id) },
+                    { GrantDocuments.KIND, consoleOperators ? kind : new BsonDocument("$ne", kind) },
+                },
                 new BsonDocument { { GrantDocuments.EMAIL, descending ? -1 : 1 }, { "_id", 1 } },
                 skip,
                 size + 1,
@@ -129,8 +150,12 @@ internal sealed class EventGrantStore
         return ([.. documents.Take(size).Select(GrantDocuments.ToGrant).OfType<EventGrant>()], documents.Count > size);
     }
 
-    /// <summary>What the account has been granted on the Event: the grants that are its own, and nothing from a pending one.</summary>
-    public async Task<CallerGrants> GrantsOfAsync(EventRecord record, Guid account, CancellationToken cancellationToken)
+    /// <summary>What the account has been granted on the Event: the grants that are its own, and none of a pending one.</summary>
+    public async Task<IReadOnlyList<EventGrant>> GrantsOfAsync(
+        EventRecord record,
+        Guid account,
+        CancellationToken cancellationToken
+    )
     {
         var documents = await _tenants
             .Of(TenantOwned.EVENT_GRANTS, record.TenantId)
@@ -142,7 +167,30 @@ internal sealed class EventGrantStore
                 },
                 cancellationToken
             );
-        return CallerGrants.Of(documents.Select(GrantDocuments.ToGrant).OfType<EventGrant>());
+        return [.. documents.Select(GrantDocuments.ToGrant).OfType<EventGrant>()];
+    }
+
+    /// <summary>
+    /// The ids of the Events of the Tenant that the account is a Console Operator of, whether they have started or ended. A
+    /// grant that is pending is no one's.
+    /// </summary>
+    public async Task<IReadOnlyList<Guid>> EventsRunByAsync(
+        string? tenantId,
+        Guid account,
+        CancellationToken cancellationToken
+    )
+    {
+        var documents = await _tenants
+            .Of(TenantOwned.EVENT_GRANTS, tenantId)
+            .FindAsync(
+                new BsonDocument
+                {
+                    { GrantDocuments.ACCOUNT_ID, BsonGuids.Binary(account) },
+                    { GrantDocuments.KIND, nameof(GrantKind.ConsoleOperator) },
+                },
+                cancellationToken
+            );
+        return [.. documents.Select(x => BsonGuids.Of(x, GrantDocuments.EVENT_ID)).OfType<Guid>().Distinct()];
     }
 
     /// <summary>The grant with the id, wherever it is, to learn the Event it belongs to. None when there is none.</summary>

@@ -25,15 +25,15 @@ public sealed class ConsoleNavigationBrowserTests : IClassFixture<ApiHostFixture
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        var eventId = await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "The Cup");
-        await EventSeed.StartAsync(mongo, eventId, tenant, mainOperator.Id, DateTimeOffset.UtcNow.AddDays(1));
-        await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "A first Event"); // another Event, listed before it: the row of buttons is the one of the Event the page is of
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var eventId = await EventSeed.SetupAsync(mongo, tenant, consoleOperator.Id, "The Cup");
+        await EventSeed.StartAsync(mongo, eventId, tenant, consoleOperator.Id, DateTimeOffset.UtcNow.AddDays(1));
+        await EventSeed.SetupAsync(mongo, tenant, consoleOperator.Id, "A first Event"); // another Event, listed before it: the row of buttons is the one of the Event the page is of
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
         await page.GotoAsync(device.Url("/sign-in"));
-        await SignInOnTheHostPagesAsync(_host, page, mainOperator.Email);
+        await SignInOnTheHostPagesAsync(_host, page, consoleOperator.Email);
         await page.WaitForURLAsync(new Regex(@"^[^?#]*/$"), new() { Timeout = PATIENCE });
 
         // the drawer of a signed-in person has the Console
@@ -77,12 +77,12 @@ public sealed class ConsoleNavigationBrowserTests : IClassFixture<ApiHostFixture
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        var eventId = await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "Not yet");
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var eventId = await EventSeed.SetupAsync(mongo, tenant, consoleOperator.Id, "Not yet");
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator.Email, $"/console/events/{eventId}/setup");
+        await SignInAndOpenAsync(_host, device, consoleOperator.Email, $"/console/events/{eventId}/setup");
 
         var navigation = page.GetByTestId("console-event-navigation");
         await Expect(navigation.GetByRole(AriaRole.Button, new() { Name = "Setup", Exact = true }))
@@ -95,12 +95,12 @@ public sealed class ConsoleNavigationBrowserTests : IClassFixture<ApiHostFixture
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        var eventId = await EventSeed.HistoricAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var eventId = await EventSeed.HistoricAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator.Email, "/console");
+        await SignInAndOpenAsync(_host, device, consoleOperator.Email, "/console");
 
         await page.GetByRole(AriaRole.Button, new() { Name = "Results", Exact = true }).ClickAsync();
 

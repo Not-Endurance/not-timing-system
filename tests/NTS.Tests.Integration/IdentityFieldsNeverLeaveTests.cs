@@ -51,7 +51,7 @@ public sealed class IdentityFieldsNeverLeaveTests : IClassFixture<MongoFixture>
         var credential = new byte[] { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 12 };
         var person = await AccountWithEverythingAsync(tenant, marker, stamp, credential);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var athlete = await RegistrySeed.AthleteAsync(
             _mongo.ConnectionString,
             tenant,
@@ -65,7 +65,12 @@ public sealed class IdentityFieldsNeverLeaveTests : IClassFixture<MongoFixture>
                 { "Name", $"Marker {marker}" },
             }
         );
-        var eventId = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, $"Event {marker}");
+        var eventId = await EventSeed.SetupAsync(
+            _mongo.ConnectionString,
+            tenant,
+            consoleOperator.Id,
+            $"Event {marker}"
+        );
         await EventSeed.GrantAsync(_mongo.ConnectionString, tenant, eventId, "Operator", null, person.Email, person.Id);
         var secrets = new[] { stamp, Convert.ToBase64String(credential), Base64Url(credential) };
 
@@ -87,8 +92,8 @@ public sealed class IdentityFieldsNeverLeaveTests : IClassFixture<MongoFixture>
         };
         foreach (var route in routes)
         {
-            // The grants of an Event are the Main Operator's to see; every other route here is the Tenant Root's.
-            var reader = route.StartsWith("/api/event-grants", StringComparison.Ordinal) ? mainOperator : root;
+            // The grants of an Event are a Console Operator's to see; every other route here is the Tenant Root's.
+            var reader = route.StartsWith("/api/event-grants", StringComparison.Ordinal) ? consoleOperator : root;
             var response = await reader.Page.GetAsync(route);
             var body = await response.Content.ReadAsStringAsync();
             Assert.True(response.StatusCode == HttpStatusCode.OK, $"{route} answered {response.StatusCode}");

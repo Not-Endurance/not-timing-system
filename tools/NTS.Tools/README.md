@@ -16,7 +16,7 @@ dotnet run --project tools/NTS.Tools -- <command> [options]
 | `migrate-tenants` | Turns the data of before Tenants into the data of Tenants, and marks the database with the environment it is (below). |
 | `migrate-identities` | A dry run that groups the copies of every Athlete and Horse into the identities they are, and writes a report and a file of decisions for the owner; with `--apply` it converts every id to a Guid, merges the identities, finalises the Rankings of the Events that have ended and verifies (below). |
 | `mark-environment` | Says which environment a database is: Production, Staging or Development (below). |
-| `seed-staging` | Makes a Tenant Root, a Main Operator, Officials, Operators and a Live Event on a staging database (below). |
+| `seed-staging` | Makes a Tenant Root, a Console Operator, Officials, Operators and a Live Event on a staging database (below). |
 | `seed-tenant-root` | Makes an account a Tenant Root of a Tenant, which makes the Tenant operational (below). |
 | `grant-developer` | Makes an account the Developer (below). |
 
@@ -161,7 +161,7 @@ dotnet run --project tools/NTS.Tools -- grant-developer --connection-string <mon
 What only the Developer does, and only by command (ADR-0012): no route of the Api gives a role, so there is no way for anyone who is signed in to become a Tenant Root or the Developer except by being named here. Like the migrations, they are a dry run unless given `--apply`, and what they print names neither the connection string nor anything an account keeps.
 
 - **`seed-tenant-root`** adds the role `tenant-root` to the Membership of the account in the Tenant (an id such as `country-bg`), or a Membership that has it when the account has none there. A Tenant becomes operational, able to hold Events, when it has a Tenant Root, and not before: nobody can create an Event in a Tenant that has none, the Developer included. The Tenant is made when the first person of its country registers, so it has to exist already, and so does the account, which is found by its exact email in any case: the person registers first, and the command is run after. Another Tenant Root of the same Tenant is another run with another email; a Tenant Root cannot make one.
-- **`grant-developer`** sets `IsDeveloper` on the account. The Developer holds every right across Tenants except acting as the Main Operator of a Live Event, and belongs to no Tenant.
+- **`grant-developer`** sets `IsDeveloper` on the account. The Developer holds every right across Tenants (Root everywhere), and belongs to no Tenant.
 
 Both are idempotent: they change one thing of the user document in one atomic update, so running one twice changes nothing and nothing else of the account is touched. Running either on a hosted database is the owner's step, with the connection string supplied on the command line and never kept in a file; the exact commands for staging are in the hand-off of the checkpoint that needs them.
 
@@ -178,7 +178,7 @@ A marker is never changed to another name. Marking a database that says another 
 ## migrate-tenants
 
 ```powershell
-dotnet run --project tools/NTS.Tools -- migrate-tenants --connection-string <mongo> --environment <Production|Staging|Development> [--database nts] [--main-operator <exact email>] [--apply]
+dotnet run --project tools/NTS.Tools -- migrate-tenants --connection-string <mongo> --environment <Production|Staging|Development> [--database nts] [--apply]
 ```
 
 ADR-0012 gives every document a real Tenant and every account a home Tenant and Memberships. Before it, every document carried the constant `"nts"`, and the accounts were the `users` documents the Functions API wrote. This command moves the data to the new shape. It reads everything first, then writes in an order that leaves a run that stopped to be finished by running it again, and each step writes only what is not there yet. Documents are read and written as they are stored, so what the command knows nothing of in them is kept.
@@ -188,7 +188,7 @@ ADR-0012 gives every document a real Tenant and every account a home Tenant and 
 - **A home Tenant**, and a Membership in it, is given to every account that has none, from the country its profile names (`CountryRegion`, matched by name, ISO code or NF code in any case, against the countries in the order the Api lists them). An account whose profile names no country that has an ISO code is left without one until the person picks a country.
 - **The Tenants** that are placed in are made (`country-bg`, and `country-<iso>` for another country), and Bulgaria's gets the rules the legacy hosts applied (`OnlyAverageLoopSpeed`). A Tenant that exists is completed in what it lacks and nothing else.
 - **The data is stamped.** Every document of a collection a Tenant owns (`athletes`, `horses`, `clubs`, `configure_events`, `event_informations`, `event_officials`, `event_operators`, `event_participations`, `event_rankings`, `event_handouts`, `event_grants`) that has no Tenant, or only the constant, gets `country-bg`.
-- **Every Event that is not yet Historic gets a Main Operator** (ADR-0012): the one its documents name already, or else the account of `--main-operator` when one is given, or else the only Tenant Root of its Tenant. A Historic Event gets none. An Event whose Tenant has no Tenant Root, or more than one, and that was not given an account to take, waits (see the cutover). An Event whose last day is not a date cannot be told from a Historic one and is taken to be over, and is listed.
+- **Nobody is assigned to run an Event** (ADR-0012): Root runs an Event until Root assigns a Console Operator, so no Event waits for a Tenant Root to be seeded. An Event whose last day is not a date cannot be told from a Historic one and is taken to be over, and is listed.
 - **The Officials and Operators that were linked by email** of every Event that is not yet Historic become grants: the grant of the account when the email has one, and a pending invitation by email otherwise. What a Historic Event links gives nothing, as nobody records on one, and is left in its documents.
 - **The state a person kept** (`event_user_sessions`) is keyed by the account the person is, where the stored owner is an email that an account has. An owner that is anything else, such as the object id of an Entra account, is left as it is and counted: nothing maps it.
 - **The settings collection** (`settings`) is dropped, as ADR-0012 deletes the aggregate, and **the indexes** the hosts make when they start are made first (the unique ones on the accounts, the codes and the grants), so that a unique index that fails on the data fails here, with this report beside it, and not as a host that does not start.
@@ -212,9 +212,7 @@ tenants: 2 to make (country-bg, country-ro), 0 to complete ()
 athletes: 1204 documents to stamp with country-bg
 horses: 1311 documents to stamp with country-bg
 event_informations: 14 documents to stamp with country-bg
-Events that are not Historic: 2, 0 to give a Main Operator, 2 waiting
-  country-bg has no Tenant Root: seed one with seed-tenant-root and run again, or name the account with --main-operator.
-  event 3f2504e0-4f89-41d3-9a0c-0305e82c3301: no Main Operator yet
+Events that are not Historic: 2, which nobody is assigned to run
 Started Events whose last day is not a date: 0, taken to be over
 event_grants: 14 to make (3 pending invitations), 0 copies name an account that is not there
 event_user_sessions: 31 to key by the account, 9 that stay as they are
@@ -229,9 +227,8 @@ An apply refuses, writes nothing and exits with 1 while any of these holds; a dr
 - **The database is marked as another environment** than the one named. A marker is never changed.
 - **Two accounts share an email**, whatever the case and the spaces. One person cannot be told from another, and the unique index on the email would fail. The ids are listed; resolve the accounts and run it again.
 - **There is no Bulgaria (ISO code `BG`) among the countries**, so the Tenant everything is stamped with cannot be made.
-- **`--main-operator` names an email that no account has.** The account has to exist, so that it can be signed in as.
 
-What does not stop an apply is listed too, to be looked at: accounts with no email (left as they are), documents whose id is not a standard UUID (below), countries with no ISO code (no Tenant is made for them), Events that wait for a Main Operator, and Officials or Operators that name an account that is not there (no grant is made).
+What does not stop an apply is listed too, to be looked at: accounts with no email (left as they are), documents whose id is not a standard UUID (below), countries with no ISO code (no Tenant is made for them), and Officials or Operators that name an account that is not there (no grant is made).
 
 ### The cutover
 
@@ -241,8 +238,7 @@ The order of the migrations and the steps of the cutover are owned by the runboo
 2. **Stop the legacy hosts and the Api.** The command reads before it writes, so a write by another process in between would be overwritten.
 3. **Run the dry run, read it, then apply** with `--environment Production` (or `Staging` on the staging database). Read the lists of accounts and of Events with care: they are the places the data has a mistake the command will not guess about.
 4. **Seed the Tenant Root**: `seed-tenant-root --tenant country-bg --email <exact email> --apply` for the person who runs the federation. The account exists after step 3, so there is nothing to register first.
-5. **Run `migrate-tenants --apply --environment <the same>` again.** It gives the Events that waited their Main Operator, the Tenant Root, and writes nothing else. Naming the account with `--main-operator` in step 3 does it in one run, but for every Event that has none, in place of the Tenant Root of its Tenant, so use it only when the Events are all one federation's.
-6. **Run it once more after the ids are converted** (`migrate-identities`, #637): the documents the command counts as having another id (accounts, Events and their Setups that are not UUIDs yet) are left as they are until then, and the report says how many wait.
+5. **Run it once more after the ids are converted** (`migrate-identities`, #637): the documents the command counts as having another id (accounts, Events and their Setups that are not UUIDs yet) are left as they are until then, and the report says how many wait.
 
 The Api and the Ui are deployed together afterwards, as the runbook of #648 has it. There is no dual-read and no lazy upgrade: the code that is deployed reads only the new shape.
 
@@ -308,10 +304,10 @@ The order of the migrations and the steps of the cutover are owned by the runboo
 ## seed-staging
 
 ```powershell
-dotnet run --project tools/NTS.Tools -- seed-staging --connection-string <mongo> --tenant-root <email> --main-operator <email> [--official <email>:<Role>]... [--operator <email>]... [--environment Staging] [--event-name <name>] [--days 7] [--start 00:00] [--database nts] [--apply]
+dotnet run --project tools/NTS.Tools -- seed-staging --connection-string <mongo> --tenant-root <email> --console-operator <email> [--official <email>:<Role>]... [--operator <email>]... [--environment Staging] [--event-name <name>] [--days 7] [--start 00:00] [--database nts] [--apply]
 ```
 
-What a person who tries the platform on a staging database needs, made in the Tenant of Bulgaria: a Tenant Root (which makes the Tenant operational), a Main Operator, Officials and Operators, and a Live Event with twelve Participations that the Officials, the Operators and the Main Operator may send Snapshots to. The accounts are named by their email and made when they are not there, with the address unconfirmed (each person signs in with a code sent to it); an account that exists is left as it is, but for the Membership and the role the seed gives it. The people and the horses of the Event are invented. The Event is made the way the Api starts one (its Setup, its Core, and the Officials, Operators, Participations and Rankings it copies and makes), and every id comes from the name of the Event and of the thing, so the same name is the same Event on every run: a run that stopped is finished by running it again, and `--days` moves its end.
+What a person who tries the platform on a staging database needs, made in the Tenant of Bulgaria: a Tenant Root (which makes the Tenant operational), a Console Operator, Officials and Operators, and a Live Event with twelve Participations that the Officials, the Operators and the Console Operator may send Snapshots to. The accounts are named by their email and made when they are not there, with the address unconfirmed (each person signs in with a code sent to it); an account that exists is left as it is, but for the Membership and the role the seed gives it. The people and the horses of the Event are invented. The Event is made the way the Api starts one (its Setup, its Core, and the Officials, Operators, Participations and Rankings it copies and makes), and every id comes from the name of the Event and of the thing, so the same name is the same Event on every run: a run that stopped is finished by running it again, and `--days` moves its end.
 
 - `--official` is an email and a role of the Setup (`Steward`, `ChiefSteward`, `GroundJury`, `GroundJuryPresident`, and the other roles), and can be given any number of times; so can `--operator`.
 - `--environment Staging` (or `Development`) marks a database that has no marker. A database that says Production, or anything else that is not Staging or Development, is refused, and so is one that says nothing when `--environment` is not given: the seed never marks a database as Production and never writes into one.

@@ -26,8 +26,7 @@ public class ConsoleTenant : AccountAwareContext, IConsoleTenant, IScoped
 
     public string? TenantId { get; private set; }
     public string Name { get; private set; } = string.Empty;
-    public bool CanEditRules { get; private set; }
-    public bool CanEditBranding { get; private set; }
+    public bool CanEdit { get; private set; }
     public bool OnlyAverageLoopSpeed { get; private set; }
     public string? RankerCode { get; private set; }
 
@@ -62,8 +61,7 @@ public class ConsoleTenant : AccountAwareContext, IConsoleTenant, IScoped
         var may = capabilities is { IsSuccess: true, Document: { } granted }
             ? granted.GetProperty("data").GetProperty("attributes")
             : default;
-        CanEditRules = may.ValueKind == JsonValueKind.Object && Flag(may, "canEditRules");
-        CanEditBranding = may.ValueKind == JsonValueKind.Object && Flag(may, "canEditBranding");
+        CanEdit = may.ValueKind == JsonValueKind.Object && Flag(may, "canEditTenant");
         return true;
     }
 
@@ -93,8 +91,7 @@ public class ConsoleTenant : AccountAwareContext, IConsoleTenant, IScoped
     {
         TenantId = null;
         Name = string.Empty;
-        CanEditRules = false;
-        CanEditBranding = false;
+        CanEdit = false;
         OnlyAverageLoopSpeed = false;
         RankerCode = null;
     }

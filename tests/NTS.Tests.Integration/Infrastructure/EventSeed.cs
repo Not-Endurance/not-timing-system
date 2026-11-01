@@ -8,9 +8,10 @@ namespace NTS.Tests.Integration.Infrastructure;
 
 /// <summary>
 /// Events as the Api keeps them, written straight into the collections: a Setup in
-/// <c>configure_events</c> and, once an Event has started, its Core document in <c>event_informations</c> with the Tenant,
-/// the Main Operator and the end of its last day (ADR-0007, ADR-0012). A test makes an Event Live or Historic by giving it
-/// an end after or before the clock of the host.
+/// <c>configure_events</c> and, once an Event has started, its Core document in <c>event_informations</c> with the Tenant
+/// and the end of its last day (ADR-0007, ADR-0012). The Console Operators of an Event are grants, so an account that is to
+/// run an Event is given one in <c>event_grants</c> (#671). A test makes an Event Live or Historic by giving it an end after
+/// or before the clock of the host.
 /// </summary>
 internal static class EventSeed
 {
@@ -44,11 +45,11 @@ internal static class EventSeed
         return new BsonBinaryData(id, GuidRepresentation.Standard);
     }
 
-    /// <summary>An Event that has not started: its Setup only.</summary>
+    /// <summary>An Event that has not started: its Setup only, and the account named is a Console Operator of it.</summary>
     public static async Task<Guid> SetupAsync(
         string mongoConnectionString,
         string tenant,
-        Guid? mainOperator,
+        Guid? consoleOperator,
         string? name = null,
         Guid? id = null
     )
@@ -67,13 +68,46 @@ internal static class EventSeed
             { "Loops", new BsonArray() },
             { "Combinations", new BsonArray() },
         };
-        if (mainOperator != null)
+        await Setups(mongoConnectionString).InsertOneAsync(document);
+        await ConsoleOperatorAsync(mongoConnectionString, tenant, id.Value, consoleOperator);
+        return id.Value;
+    }
+
+    /// <summary>
+    /// The account is made a Console Operator of the Event, with the email it has (an account that is not there is given one of
+    /// its own), once: asking again for an account that is one already does nothing. Nobody is none.
+    /// </summary>
+    public static async Task ConsoleOperatorAsync(
+        string mongoConnectionString,
+        string tenant,
+        Guid eventId,
+        Guid? account
+    )
+    {
+        if (account == null)
         {
-            document["MainOperatorId"] = Binary(mainOperator.Value);
+            return;
         }
 
-        await Setups(mongoConnectionString).InsertOneAsync(document);
-        return id.Value;
+        var held = new BsonDocument
+        {
+            { "EventId", Binary(eventId) },
+            { "Kind", "ConsoleOperator" },
+            { "AccountId", Binary(account.Value) },
+        };
+        if (await Grants(mongoConnectionString).CountDocumentsAsync(held) > 0)
+        {
+            return;
+        }
+
+        var user = await UserSeed
+            .Users(mongoConnectionString)
+            .Find(new BsonDocument("_id", Binary(account.Value)))
+            .FirstOrDefaultAsync();
+        var email = user?.GetValue("Email", BsonNull.Value) is { IsString: true } stored
+            ? stored.AsString
+            : $"{account.Value:N}@console-operator.test";
+        await GrantAsync(mongoConnectionString, tenant, eventId, "ConsoleOperator", null, email, account);
     }
 
     /// <summary>
@@ -83,7 +117,7 @@ internal static class EventSeed
     public static async Task<Guid> FullSetupAsync(
         string mongoConnectionString,
         string tenant,
-        Guid? mainOperator,
+        Guid? consoleOperator,
         string name = "Full Setup",
         bool startNumberInTwoCompetitions = false,
         bool eachHasAnother = true
@@ -100,8 +134,8 @@ internal static class EventSeed
             )
         );
         model.TenantId = tenant;
-        model.MainOperatorId = mainOperator;
         await Setups(mongoConnectionString).InsertOneAsync(model.ToBsonDocument());
+        await ConsoleOperatorAsync(mongoConnectionString, tenant, id, consoleOperator);
         return id;
     }
 
@@ -113,7 +147,6 @@ internal static class EventSeed
         string mongoConnectionString,
         string tenant,
         Guid id,
-        Guid? mainOperator,
         string name,
         DateTimeOffset start
     )
@@ -121,7 +154,6 @@ internal static class EventSeed
         ApiMongo.Configure();
         var model = ConfigureEventModel.From(SetupFactory.Full(id, name, start));
         model.TenantId = tenant;
-        model.MainOperatorId = mainOperator;
         await Setups(mongoConnectionString)
             .ReplaceOneAsync(new BsonDocument("_id", Binary(id)), model.ToBsonDocument());
     }
@@ -156,12 +188,12 @@ internal static class EventSeed
             .InsertOneAsync(new BsonDocument { { "_id", Binary(Guid.NewGuid()) }, { "EventId", Binary(eventId) } });
     }
 
-    /// <summary>An Event that has started: the Core document of it, which ends at the instant given.</summary>
+    /// <summary>An Event that has started: the Core document of it, which ends at the instant given, and the account named is a Console Operator of it.</summary>
     public static async Task StartAsync(
         string mongoConnectionString,
         Guid id,
         string tenant,
-        Guid? mainOperator,
+        Guid? consoleOperator,
         DateTimeOffset end
     )
     {
@@ -175,24 +207,20 @@ internal static class EventSeed
             { "StartDay", new BsonDateTime(end.AddDays(-1).UtcDateTime) },
             { "EndDay", new BsonDateTime(end.UtcDateTime) },
         };
-        if (mainOperator != null)
-        {
-            document["MainOperatorId"] = Binary(mainOperator.Value);
-        }
-
         await Cores(mongoConnectionString).InsertOneAsync(document);
+        await ConsoleOperatorAsync(mongoConnectionString, tenant, id, consoleOperator);
     }
 
     /// <summary>An Event that has started and is Live for another day after the instant given as now.</summary>
     public static async Task<Guid> LiveAsync(
         string mongoConnectionString,
         string tenant,
-        Guid? mainOperator,
+        Guid? consoleOperator,
         DateTimeOffset now
     )
     {
-        var id = await SetupAsync(mongoConnectionString, tenant, mainOperator);
-        await StartAsync(mongoConnectionString, id, tenant, mainOperator, now.AddDays(1));
+        var id = await SetupAsync(mongoConnectionString, tenant, consoleOperator);
+        await StartAsync(mongoConnectionString, id, tenant, consoleOperator, now.AddDays(1));
         return id;
     }
 
@@ -200,12 +228,12 @@ internal static class EventSeed
     public static async Task<Guid> HistoricAsync(
         string mongoConnectionString,
         string tenant,
-        Guid? mainOperator,
+        Guid? consoleOperator,
         DateTimeOffset now
     )
     {
-        var id = await SetupAsync(mongoConnectionString, tenant, mainOperator);
-        await StartAsync(mongoConnectionString, id, tenant, mainOperator, now.AddDays(-1));
+        var id = await SetupAsync(mongoConnectionString, tenant, consoleOperator);
+        await StartAsync(mongoConnectionString, id, tenant, consoleOperator, now.AddDays(-1));
         return id;
     }
 

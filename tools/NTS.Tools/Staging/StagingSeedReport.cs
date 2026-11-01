@@ -14,8 +14,8 @@ public sealed class StagingSeedOptions
     /// <summary>The email of the account that is the Tenant Root of the Tenant of Bulgaria, which makes the Tenant operational.</summary>
     public string? TenantRoot { get; init; }
 
-    /// <summary>The email of the account that is the Main Operator of the Event.</summary>
-    public string? MainOperator { get; init; }
+    /// <summary>The email of the account that is a Console Operator of the Event.</summary>
+    public string? ConsoleOperator { get; init; }
 
     /// <summary>The accounts that are Officials of the Event, with their role. An Official of a role that sends Snapshots may send them.</summary>
     public IReadOnlyList<(string Email, OfficialRole Role)> Officials { get; init; } = [];

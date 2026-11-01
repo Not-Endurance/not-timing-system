@@ -119,8 +119,7 @@ public sealed class EventStartDocumentsTests
             combinations,
             Guid.NewGuid(),
             [],
-            "country-bg",
-            Guid.NewGuid()
+            "country-bg"
         );
     }
 }

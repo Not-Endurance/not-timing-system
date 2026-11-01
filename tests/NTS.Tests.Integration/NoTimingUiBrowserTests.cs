@@ -146,7 +146,7 @@ public sealed class NoTimingUiBrowserTests : IClassFixture<ApiHostFixture>, ICla
         await SignInOnTheHostPagesAsync(page, scene.Official.Email);
         await page.WaitForURLAsync(device.Url(snapshotPage), new PageWaitForURLOptions { Timeout = PATIENCE });
         await Expect(ChipOf(page, 1)).ToBeVisibleAsync(Loaded());
-        await scene.RemoveGrantAsync(scene.Official.Email); // the Main Operator takes the access away, and the page does not know
+        await scene.RemoveGrantAsync(scene.Official.Email); // the Console Operator takes the access away, and the page does not know
 
         await SendSnapshotOfAsync(page, 1); // the Api refuses it, and says why
 

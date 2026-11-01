@@ -19,18 +19,10 @@ internal static class AccountRoles
     public const string MEMBERSHIPS = "Memberships";
     public const string IS_DEVELOPER = "IsDeveloper";
 
-    /// <summary>
-    /// The account as the access policy needs to know it. The Tenants of the Events it is the Main Operator of, which only
-    /// some questions need, are read by whoever asks them and given here.
-    /// </summary>
-    public static Caller CallerOf(NIdentityUser user, IEnumerable<string>? openMainOperatorIn = null)
+    /// <summary>What the document says the account is apart from any place: the Developer, and the Tenants it is a Tenant Root of.</summary>
+    public static Roles RolesOf(NIdentityUser user)
     {
-        return Caller.Of(
-            user.Id,
-            IsDeveloper(user),
-            MembershipsOf(user).Where(x => x.IsTenantRoot).Select(x => x.TenantId),
-            openMainOperatorIn
-        );
+        return Roles.Of(IsDeveloper(user), MembershipsOf(user).Where(x => x.IsTenantRoot).Select(x => x.TenantId));
     }
 
     public static IReadOnlyList<Membership> MembershipsOf(NIdentityUser user)

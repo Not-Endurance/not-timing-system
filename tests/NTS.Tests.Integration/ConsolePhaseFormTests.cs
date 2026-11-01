@@ -27,7 +27,7 @@ namespace NTS.Tests.Integration;
 /// The Save of the Phase form of the Console (#620, ADR-0005, ADR-0013): one event of its own, a <c>PhaseUpdated</c>, that lists
 /// only the times that differ from the ones the form showed, a cleared time as an explicit empty value, written in one change
 /// against the version the Participation was read at; Start edited in place, a Save that changes nothing writes nothing, one
-/// that puts the times out of order records nothing, and the Main Operator undoes an edit by disabling its event in the
+/// that puts the times out of order records nothing, and the Console Operator undoes an edit by disabling its event in the
 /// timeline. Through the service the form uses, over the real Api in this process, with the store and the services of the Ui
 /// built as the app builds them.
 /// </summary>
@@ -50,7 +50,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
         var changes = new RecordedChanges();
         await using var api = ApiOf(changes);
         using var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var before = VersionOf(await StoredAsync(scene.ParticipationId));
         var typed = FormOf(tab);
         typed.ArriveTimeInput = "06:32:00";
@@ -66,7 +66,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
         var edit = events[2];
         Assert.Equal("Accepted", edit["Outcome"].AsString);
         Assert.Equal("Manual", edit["Method"].AsString);
-        Assert.Equal(scene.MainOperator.Id, edit["ActorId"].AsGuid);
+        Assert.Equal(scene.ConsoleOperator.Id, edit["ActorId"].AsGuid);
         Assert.Equal(BsonType.DateTime, edit["RecordedAt"].BsonType);
         Assert.False(edit.Contains("Time")); // it has no time of its own: it lists the times it changed
         Assert.All(events.Take(2), x => Assert.False(x.Contains("Changes"))); // and an event of a Snapshot lists none
@@ -84,7 +84,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
     {
         await using var api = ApiOf(new RecordedChanges());
         using var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var typed = FormOf(tab);
         typed.ArriveTimeInput = "06:32:00";
         typed.PresentTimeInput = "06:44:00";
@@ -118,7 +118,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
         var changes = new RecordedChanges();
         await using var api = ApiOf(changes);
         using var scene = await SceneAsync(api, fractionOfASecond);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var before = VersionOf(await StoredAsync(scene.ParticipationId));
         var typed = FormOf(tab); // the times as the form showed them, to the second
         tab.Requests.Asked.Clear();
@@ -138,7 +138,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
     {
         await using var api = ApiOf(new RecordedChanges());
         using var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var told = 0;
         tab.Store.ObservableEvent.Subscribe(() => told++);
 
@@ -157,7 +157,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
     {
         await using var api = ApiOf(new RecordedChanges());
         using var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var typed = FormOf(tab);
         typed.PresentTimeInput = null;
 
@@ -191,7 +191,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
         var changes = new RecordedChanges();
         await using var api = ApiOf(changes);
         using var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var before = VersionOf(await StoredAsync(scene.ParticipationId));
         var typed = FormOf(tab);
         typed.StartTimeInput = "05:45:00";
@@ -219,7 +219,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
     {
         await using var api = ApiOf(new RecordedChanges());
         using var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var before = VersionOf(await StoredAsync(scene.ParticipationId));
         var typed = FormOf(tab);
         typed.StartTimeInput = "05:50:00";
@@ -238,7 +238,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
         var changes = new RecordedChanges();
         await using var api = ApiOf(changes);
         using var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var next = tab.Dashboard.Selected!.Phases[1].StartTime!.ToDateTimeOffset();
         Assert.Equal(PRESENT.AddMinutes(40), next); // the Out time of the first Phase is where the next one starts
         var typed = FormOf(tab);
@@ -262,7 +262,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
     {
         await using var api = ApiOf(new RecordedChanges());
         using var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var typed = FormOf(tab);
         typed.PresentTimeInput = "07:20:00"; // 50 minutes after the arrival, and the limit is 40
 
@@ -285,7 +285,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
     {
         await using var api = ApiOf(new RecordedChanges());
         using var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var typed = FormOf(tab);
         typed.ArriveTimeInput = "06:32:00";
         typed.PresentTimeInput = null;
@@ -315,8 +315,8 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
     {
         await using var api = ApiOf(new RecordedChanges());
         using var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
-        await using var other = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
+        await using var other = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var typed = FormOf(tab);
         typed.ArriveTimeInput = "06:32:00";
         await other.Dashboard.Withdraw(); // the Participation moved on to the next version
@@ -340,7 +340,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
         var changes = new RecordedChanges();
         await using var api = ApiOf(changes);
         using var scene = await SceneAsync(api);
-        await using var tab = await Tab.OpenAsync(api, scene.MainOperator, scene.EventId);
+        await using var tab = await Tab.OpenAsync(api, scene.ConsoleOperator, scene.EventId);
         var typed = FormOf(tab);
         typed.ArriveTimeInput = "06:32:00";
         await tab.Form.Update(typed);
@@ -349,7 +349,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
         changes.Announced.Clear();
         var time = ARRIVE.AddMinutes(9);
 
-        var sent = await scene.MainOperator.Page.WriteAsync(
+        var sent = await scene.ConsoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/snapshots",
             "snapshots",
@@ -362,7 +362,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
             },
             id: edit.ToString()
         );
-        var corrected = await scene.MainOperator.Page.WriteAsync(
+        var corrected = await scene.ConsoleOperator.Page.WriteAsync(
             HttpMethod.Patch,
             $"/api/snapshots/{edit}",
             "snapshots",
@@ -420,12 +420,12 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
     {
         var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Marin Main");
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Marin Main");
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Olga Official");
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var recorded = new DateTimeOffset(DateTime.Today.AddHours(12));
@@ -446,7 +446,7 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
             recorded.AddMinutes(1)
         );
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
-        return new Scene(mainOperator, eventId, participation.Id, client);
+        return new Scene(consoleOperator, eventId, participation.Id, client);
     }
 
     async Task<BsonDocument> StoredAsync(Guid id)
@@ -461,15 +461,15 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
     {
         readonly HttpClient _client;
 
-        public Scene(Person mainOperator, Guid eventId, Guid participationId, HttpClient client)
+        public Scene(Person consoleOperator, Guid eventId, Guid participationId, HttpClient client)
         {
-            MainOperator = mainOperator;
+            ConsoleOperator = consoleOperator;
             EventId = eventId;
             ParticipationId = participationId;
             _client = client;
         }
 
-        public Person MainOperator { get; }
+        public Person ConsoleOperator { get; }
         public Guid EventId { get; }
         public Guid ParticipationId { get; }
 

@@ -15,7 +15,7 @@ using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// The Rankings of a Live Event as the Main Operator changes them (#646, ADR-0006): made of the Participations it chooses,
+/// The Rankings of a Live Event as the Console Operator changes them (#646, ADR-0006): made of the Participations it chooses,
 /// stored by the Api for the Event of the view, and removed. Over the real Api in this process.
 /// </summary>
 public sealed class ConsoleRankingsTests : IClassFixture<MongoFixture>
@@ -43,7 +43,7 @@ public sealed class ConsoleRankingsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_Ranking_is_removed_by_the_Main_Operator_and_the_view_reads_its_Rankings_again()
+    public async Task A_Ranking_is_removed_by_the_Console_Operator_and_the_view_reads_its_Rankings_again()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api);
@@ -61,7 +61,7 @@ public sealed class ConsoleRankingsTests : IClassFixture<MongoFixture>
     public async Task A_Ranking_that_the_Api_does_not_take_is_said_in_its_words_and_nothing_is_stored()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
-        var scene = await SceneAsync(api, mainOperator: false);
+        var scene = await SceneAsync(api, consoleOperator: false);
         var rankings = scene.Open();
 
         var refused = await Assert.ThrowsAsync<DomainException>(
@@ -93,12 +93,12 @@ public sealed class ConsoleRankingsTests : IClassFixture<MongoFixture>
         Assert.Equal(0, scene.View.Refreshes);
     }
 
-    async Task<Scene> SceneAsync(ApiFactory api, bool mainOperator = true, bool canWrite = true)
+    async Task<Scene> SceneAsync(ApiFactory api, bool consoleOperator = true, bool canWrite = true)
     {
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var boss = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var person = mainOperator ? boss : await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var person = consoleOperator ? boss : await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, boss.Id, DateTimeOffset.UtcNow);
         var participations = new List<Participation>();
         foreach (var number in new[] { 1, 2 })

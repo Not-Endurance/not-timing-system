@@ -100,12 +100,12 @@ public sealed class CountryRoutesTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
         var iso = CountrySeed.UniqueIsoCode();
         var existing = await CountrySeed.AddAsync(_mongo.ConnectionString, "Land " + iso, iso);
 
-        foreach (var person in new[] { root, mainOperator })
+        foreach (var person in new[] { root, consoleOperator })
         {
             var made = await person.Page.WriteAsync(
                 HttpMethod.Post,

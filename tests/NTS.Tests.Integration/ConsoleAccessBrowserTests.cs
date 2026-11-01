@@ -1,30 +1,24 @@
 using Microsoft.Playwright;
+using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using static NTS.Tests.Integration.Infrastructure.UiBrowser;
 
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// Who reaches the pages of the Console, in a real browser (#646, ADR-0012): the pages that run an Event are the Main Operator's,
-/// and a Tenant Root who assigned the role away, an Operator, an Official and the Developer are shown none of them, whatever the
+/// Who reaches the pages of the Console, in a real browser (#646, ADR-0012, #671): the pages that run an Event are a Console
+/// Operator's and Root's, and an Operator, an Official and an account that holds nothing are shown none of them, whatever the
 /// address they type. What a person may do is what the Api says of them, so the pages show what is theirs and nothing more.
 /// </summary>
 public sealed class ConsoleAccessBrowserTests : IClassFixture<ApiHostFixture>, IClassFixture<PasskeyBrowserFixture>
 {
-    const string REFUSAL = "Only the Main Operator of an Event opens its Setup.";
+    const string REFUSAL =
+        "Only a Console Operator of an Event, or an administrator of the federation, opens its Setup.";
 
     public static TheoryData<string> People()
     {
         var people = new TheoryData<string>();
-        foreach (
-            var who in new[]
-            {
-                "a Tenant Root that assigned the role away",
-                "an Operator",
-                "an Official",
-                "the Developer",
-            }
-        )
+        foreach (var who in new[] { "an Operator", "an Official", "an account that holds nothing" })
         {
             people.Add(who);
         }
@@ -43,7 +37,7 @@ public sealed class ConsoleAccessBrowserTests : IClassFixture<ApiHostFixture>, I
 
     [Theory]
     [MemberData(nameof(People))]
-    public async Task The_pages_that_run_a_Live_Event_are_shown_to_nobody_but_its_Main_Operator(string who)
+    public async Task The_pages_that_run_a_Live_Event_are_shown_to_nobody_but_its_Console_Operators_and_Root(string who)
     {
         var scene = await Scene.CreateAsync(_host.MongoConnectionString, who);
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
@@ -71,27 +65,6 @@ public sealed class ConsoleAccessBrowserTests : IClassFixture<ApiHostFixture>, I
         await page.EvaluateAsync("Blazor.navigateTo('/console')");
         await Expect(page.GetByTestId("console-events").Or(page.GetByTestId("console-no-events")))
             .ToBeVisibleAsync(Loaded());
-        if (who.StartsWith("a Tenant Root", StringComparison.Ordinal))
-        {
-            await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Results", Exact = true }).First)
-                .ToBeVisibleAsync(Loaded()); // the Tenant's Live Event is listed, with the Results that it may read
-        }
-
-        if (who.StartsWith("a Tenant Root", StringComparison.Ordinal))
-        {
-            // the Results of the Live Event that it does not run have the row of buttons of the Event, and say nothing of a connection to it
-            await page.EvaluateAsync($"Blazor.navigateTo('/console/events/{scene.Live}/rankings')");
-            await Expect(
-                    page.GetByTestId("console-event-navigation")
-                        .GetByRole(AriaRole.Button, new() { Name = "Ranklist", Exact = true })
-                )
-                .ToBeDisabledAsync(new() { Timeout = PATIENCE });
-            await Expect(page.GetByTestId("console-connection")).ToHaveCountAsync(0, Counted());
-            await page.EvaluateAsync("Blazor.navigateTo('/console')");
-            await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Results", Exact = true }).First)
-                .ToBeVisibleAsync(Loaded());
-        }
-
         foreach (var name in new[] { "Dashboard", "Setup", "start" })
         {
             await Expect(page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true }))
@@ -101,7 +74,9 @@ public sealed class ConsoleAccessBrowserTests : IClassFixture<ApiHostFixture>, I
 
     [Theory]
     [MemberData(nameof(People))]
-    public async Task The_Setup_of_an_Event_that_has_not_started_is_opened_by_nobody_but_its_Main_Operator(string who)
+    public async Task The_Setup_of_an_Event_that_has_not_started_is_opened_by_nobody_but_its_Console_Operators_and_Root(
+        string who
+    )
     {
         var scene = await Scene.CreateAsync(_host.MongoConnectionString, who);
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
@@ -113,17 +88,44 @@ public sealed class ConsoleAccessBrowserTests : IClassFixture<ApiHostFixture>, I
         await Expect(page.GetByLabel("Name", new() { Exact = true })).ToHaveCountAsync(0, Counted());
     }
 
+    [Theory]
+    [InlineData("a Tenant Root")]
+    [InlineData("the Developer")]
+    public async Task Root_is_shown_the_pages_that_run_an_Event_without_being_assigned_to_it(string who)
+    {
+        var scene = await Scene.CreateAsync(_host.MongoConnectionString, who);
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, scene.Person.Email, $"/console/events/{scene.Live}/dashboard");
+
+        await Expect(page.GetByTestId("console-time-panel")).ToBeVisibleAsync(Loaded());
+        await page.EvaluateAsync($"Blazor.navigateTo('/console/events/{scene.Unstarted}/setup')");
+        await Expect(page.GetByLabel("Name", new() { Exact = true })).ToBeVisibleAsync(Loaded());
+        Assert.Equal(0, await page.GetByText(REFUSAL).CountAsync());
+    }
+
     sealed class Scene
     {
         public static async Task<Scene> CreateAsync(string mongo, string who)
         {
             var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-            var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-            var live = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
-            var unstarted = await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "Not yet");
+            var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+            var live = await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
+            var unstarted = await EventSeed.SetupAsync(mongo, tenant, consoleOperator.Id, "Not yet");
+            await EventSeed.ParticipationAsync(
+                mongo,
+                tenant,
+                IntegrationPayloadFactory.ActiveParticipation(
+                    live,
+                    1,
+                    Guid.NewGuid(),
+                    startTime: new DateTimeOffset(DateTime.Today.AddHours(6))
+                )
+            );
             var person = who switch
             {
-                "a Tenant Root that assigned the role away" => await TenancySeed.AccountAsync(
+                "a Tenant Root" => await TenancySeed.AccountAsync(
                     mongo,
                     tenant,
                     TenancySeed.TenantRootOf(tenant),

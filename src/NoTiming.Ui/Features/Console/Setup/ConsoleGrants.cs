@@ -10,7 +10,7 @@ using static NoTiming.Ui.Features.Console.ApiAnswers;
 namespace NoTiming.Ui.Features.Console.Setup;
 
 /// <summary>
-/// The grants of an Event (#646, ADR-0012): the people the Main Operator linked to its Officials and Operators, by the exact
+/// The grants of an Event (#646, ADR-0012): the people the Console Operator linked to its Officials and Operators, by the exact
 /// email. The Api decides who may, and says why when it does not (an Event that has ended, an address it cannot read, the
 /// limit of grants an Event has): what it says is thrown as a domain error, so that the form that asked shows it and keeps
 /// what was typed.

@@ -58,25 +58,28 @@ internal static class ApiPipeline
                     }
                 )
         );
-        app.MapAccount();
+        // The routes that declare what they need are mapped through the group the endpoint filter is on (ADR-0012, #671).
+        var guarded = app.MapGroup(string.Empty).AddEndpointFilter<AccessFilter>();
+        guarded.MapAccount();
         app.MapLocalhost();
-        app.MapProfile();
-        app.MapTenancy();
-        app.MapBranding();
-        app.MapEvents();
-        app.MapEventResources();
+        guarded.MapProfile();
+        guarded.MapTenancy();
+        guarded.MapBranding();
+        guarded.MapEvents();
+        guarded.MapEventResources();
         app.MapHistoricEventRedirects();
-        app.MapSetups();
-        app.MapEventGrants();
-        app.MapAccountSearch();
-        app.MapRegistrySearch();
-        app.MapParticipationHistory();
-        app.MapParticipantLinks();
-        app.MapReference();
-        app.MapEventData();
-        app.MapTimeEventActors();
-        app.MapSnapshots();
-        app.MapUserSessions();
+        guarded.MapSetups();
+        guarded.MapEventGrants();
+        guarded.MapConsoleOperators();
+        guarded.MapAccountSearch();
+        guarded.MapRegistrySearch();
+        guarded.MapParticipationHistory();
+        guarded.MapParticipantLinks();
+        guarded.MapReference();
+        guarded.MapEventData();
+        guarded.MapTimeEventActors();
+        guarded.MapSnapshots();
+        guarded.MapUserSessions();
         app.MapHub<LiveHub>(ApplicationConstants.LIVE_HUB).RequireCors(ApiServices.CORS_POLICY_NAME);
 
         // An unknown API route is a 404 in the error format of the rest-api skill, never the Ui's page.
@@ -103,6 +106,17 @@ internal static class ApiPipeline
 
         // Deep links into the Ui. A path that looks like a file (it has an extension) that is missing stays a 404.
         app.MapFallbackToFile("{**path:nonfile}", "index.html");
+
+        // Fail closed: a route of the Api that is neither public nor declares what it needs does not let the host start.
+#if DEBUG
+        var hostEntries = app.Services.GetService<LocalhostPublicEndpoints>()?.Entries;
+#else
+        IEnumerable<PublicEndpoint>? hostEntries = null;
+#endif
+        EndpointGuard.ThrowWhenUnguarded(
+            ((IEndpointRouteBuilder)app).DataSources.SelectMany(x => x.Endpoints),
+            hostEntries
+        );
 
         return app;
     }

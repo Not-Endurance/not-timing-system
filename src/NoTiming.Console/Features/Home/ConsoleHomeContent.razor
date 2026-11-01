@@ -68,17 +68,12 @@
                                     <NButtonPrimary Text="@Dashboard_string" OnClick="() => OpenDashboard(context)" />
                                 }
 
-                                @if (context.CanAssignMainOperator)
+                                @if (context.CanAssignConsoleOperators)
                                 {
-                                    <NButtonSecondary Text="@Assign_main_operator_string" OnClick="() => Assign(context)" />
+                                    <NButtonSecondary Text="@Console_operators_string" OnClick="() => ChooseConsoleOperators(context)" />
                                 }
 
-                                @if (context.CanHandOver)
-                                {
-                                    <NButtonSecondary Text="@Hand_over_string" OnClick="() => HandOver(context)" />
-                                }
-
-                                @if (context.CanReset)
+                                @if (context.CanRun)
                                 {
                                     <NButtonDanger Text="@Reset_string" OnClick="() => Reset(context)" />
                                 }

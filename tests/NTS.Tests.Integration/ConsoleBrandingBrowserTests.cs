@@ -9,7 +9,7 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// The logos in the Console, in a real browser (#646, ADR-0012): a Tenant Root puts a file in the place of one of the federation's
-/// logos and takes it away, a file that no server would take is said so, a Main Operator puts its own in the place of an Event's
+/// logos and takes it away, a file that no server would take is said so, a Console Operator puts its own in the place of an Event's
 /// and has the federation's back, and what is printed has the logo at its head.
 /// </summary>
 public sealed class ConsoleBrandingBrowserTests : IClassFixture<ApiHostFixture>, IClassFixture<PasskeyBrowserFixture>
@@ -84,19 +84,19 @@ public sealed class ConsoleBrandingBrowserTests : IClassFixture<ApiHostFixture>,
     }
 
     [Fact]
-    public async Task A_Main_Operator_puts_a_logo_of_its_Event_in_place_of_the_federations_has_it_back_and_what_is_printed_has_the_logo_at_its_head()
+    public async Task A_Console_Operator_puts_a_logo_of_its_Event_in_place_of_the_federations_has_it_back_and_what_is_printed_has_the_logo_at_its_head()
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var eventId = await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
         var participation = IntegrationPayloadFactory.ActiveParticipation(eventId, 5, Guid.NewGuid());
         await EventSeed.ParticipationAsync(mongo, tenant, participation);
         await SeedTenantLogoAsync(mongo, tenant, PNG);
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator.Email, $"/console/events/{eventId}/dashboard");
+        await SignInAndOpenAsync(_host, device, consoleOperator.Email, $"/console/events/{eventId}/dashboard");
 
         // the Event is printed with the logo of the federation until it has one of its own
         await page.GetByTestId("console-event-navigation")

@@ -367,9 +367,9 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
         var byTheDeveloper = await EditRulesAsync(developer, tenant, new { onlyAverageLoopSpeed = true });
 
         Assert.Equal(HttpStatusCode.Forbidden, byAMember.StatusCode);
-        Assert.Equal("not-tenant-root", await ErrorCodeAsync(byAMember));
+        Assert.Equal("not-root", await ErrorCodeAsync(byAMember));
         Assert.Equal(HttpStatusCode.Forbidden, byARootElsewhere.StatusCode);
-        Assert.Equal("not-tenant-root", await ErrorCodeAsync(byARootElsewhere));
+        Assert.Equal("not-root", await ErrorCodeAsync(byARootElsewhere));
         Assert.Equal(HttpStatusCode.OK, byTheDeveloper.StatusCode);
     }
 
@@ -458,13 +458,13 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
         var ofRoot = await CapabilitiesOfTenantAsync(root, tenant);
         var ofDeveloper = await CapabilitiesOfTenantAsync(developer, tenant);
 
-        Assert.All(ofMember.EnumerateObject(), x => Assert.False(x.Value.GetBoolean(), x.Name));
+        Assert.Equal("account", ofMember.GetProperty("level").GetString());
+        Assert.All(MayOf(ofMember), x => Assert.False(x.Value.GetBoolean(), x.Name));
+        Assert.Equal("root", ofRoot.GetProperty("level").GetString());
         Assert.True(ofRoot.GetProperty("canCreateEvents").GetBoolean());
-        Assert.True(ofRoot.GetProperty("canEditRules").GetBoolean());
-        Assert.True(ofRoot.GetProperty("canEditBranding").GetBoolean());
+        Assert.True(ofRoot.GetProperty("canEditTenant").GetBoolean());
         Assert.True(ofRoot.GetProperty("canEditRegistry").GetBoolean());
-        Assert.True(ofRoot.GetProperty("canSearchAccounts").GetBoolean());
-        Assert.True(ofDeveloper.GetProperty("canEditRules").GetBoolean());
+        Assert.True(ofDeveloper.GetProperty("canEditTenant").GetBoolean());
         Assert.True(ofDeveloper.GetProperty("canCreateEvents").GetBoolean()); // the Tenant has a Tenant Root, so it holds Events
     }
 
@@ -485,7 +485,7 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
         var capabilities = await CapabilitiesOfTenantAsync(developer, tenant);
 
         Assert.False(capabilities.GetProperty("canCreateEvents").GetBoolean());
-        Assert.True(capabilities.GetProperty("canEditRules").GetBoolean());
+        Assert.True(capabilities.GetProperty("canEditTenant").GetBoolean());
     }
 
     [Fact]
@@ -509,25 +509,33 @@ public sealed class TenantRolesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_Main_Operator_of_an_Event_that_is_not_Historic_edits_the_registry_and_searches_the_accounts_of_the_Tenant()
+    public async Task A_Console_Operator_of_an_Event_that_is_not_Historic_edits_the_registry_and_searches_the_accounts_of_the_Tenant()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var former = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
         await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, former.Id, DateTimeOffset.UtcNow);
 
-        var ofTheMainOperator = await CapabilitiesOfTenantAsync(mainOperator, tenant);
+        var ofTheConsoleOperator = await CapabilitiesOfTenantAsync(consoleOperator, tenant);
         var ofTheFormerOne = await CapabilitiesOfTenantAsync(former, tenant);
 
-        Assert.True(ofTheMainOperator.GetProperty("canEditRegistry").GetBoolean());
-        Assert.True(ofTheMainOperator.GetProperty("canSearchAccounts").GetBoolean());
-        Assert.False(ofTheMainOperator.GetProperty("canEditRules").GetBoolean());
-        Assert.False(ofTheMainOperator.GetProperty("canEditBranding").GetBoolean());
-        Assert.False(ofTheMainOperator.GetProperty("canCreateEvents").GetBoolean());
-        Assert.All(ofTheFormerOne.EnumerateObject(), x => Assert.False(x.Value.GetBoolean(), x.Name));
+        Assert.Equal("consoleOperator", ofTheConsoleOperator.GetProperty("level").GetString());
+        Assert.True(ofTheConsoleOperator.GetProperty("canEditRegistry").GetBoolean());
+        Assert.False(ofTheConsoleOperator.GetProperty("canEditTenant").GetBoolean());
+        Assert.False(ofTheConsoleOperator.GetProperty("canCreateEvents").GetBoolean());
+        Assert.Equal("account", ofTheFormerOne.GetProperty("level").GetString()); // the Event it ran is over
+        Assert.All(MayOf(ofTheFormerOne), x => Assert.False(x.Value.GetBoolean(), x.Name));
+    }
+
+    /// <summary>What a person may do, which is every member of the capabilities that is a yes or a no.</summary>
+    static IEnumerable<JsonProperty> MayOf(JsonElement capabilities)
+    {
+        return capabilities
+            .EnumerateObject()
+            .Where(x => x.Value.ValueKind is JsonValueKind.True or JsonValueKind.False);
     }
 
     static async Task<JsonElement> MeAsync(TenancySeed.Person person)

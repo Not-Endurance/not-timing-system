@@ -20,7 +20,6 @@ public class EventInformationModel : IDocument, ISoftDeletableDocument, IKrudMod
     [BsonId]
     public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public Guid? MainOperatorId { get; set; }
     public CountryModel Country { get; set; } = default!;
     public string Name { get; set; } = default!;
     public string Location { get; set; } = default!;
@@ -35,7 +34,6 @@ public class EventInformationModel : IDocument, ISoftDeletableDocument, IKrudMod
     {
         Id = eventInformation.Id;
         TenantId = eventInformation.TenantId;
-        MainOperatorId = eventInformation.MainOperatorId;
         Country = CountryModel.From(eventInformation.Country);
         Name = eventInformation.Name;
         Location = eventInformation.Location;
@@ -57,8 +55,7 @@ public class EventInformationModel : IDocument, ISoftDeletableDocument, IKrudMod
             FeiShowId,
             Id,
             RegionalRules?.MapToEntity(),
-            TenantId,
-            MainOperatorId
+            TenantId
         );
     }
 }

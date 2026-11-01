@@ -8,7 +8,7 @@ using NTS.Domain.Aggregates;
 
 namespace NoTiming.Api.Features.Events;
 
-/// <summary>An Event with what has to be known about it to say who may do what: where it belongs, who runs it, and its stage now.</summary>
+/// <summary>An Event with what has to be known about it to say who may do what: where it belongs and its stage now.</summary>
 internal sealed class EventFacts
 {
     public EventFacts(EventRecord record, EventStage stage)
@@ -22,11 +22,8 @@ internal sealed class EventFacts
     public Guid Id => Record.Id;
     public string TenantId => Record.TenantId;
 
-    /// <summary>The place the policy is asked about the Event in: it knows what the caller has been granted on it.</summary>
-    public AccessScope ScopeFor(CallerGrants grants)
-    {
-        return AccessScope.ForEvent(Record.TenantId, Record.MainOperatorId, Stage, grants);
-    }
+    /// <summary>The state of the place the policy is asked about the Event in.</summary>
+    public PlaceState State => PlaceState.OfEvent(Stage);
 }
 
 /// <summary>The country of a Tenant is not among the countries, so there is nothing to make its Events in.</summary>
@@ -37,11 +34,11 @@ internal sealed class TenantCountryMissingException : InvalidOperationException
 }
 
 /// <summary>
-/// The authority over an Event (ADR-0012, #643): an Event is made in a Tenant by a Tenant Root, who is its Main Operator
-/// until it assigns another account while the Event has not started, and the Main Operator hands it over once it is Live.
-/// Where an Event belongs and who runs it are fields of the document of the Event: the Setup's before it starts and the
-/// Core's once it has, as a hand-over leaves it. The writes go through the Tenant's collection, so they cannot reach an
-/// Event of another Tenant; the reads of an Event by its id are the named capability of <see cref="CrossTenantReads"/>.
+/// Making an Event, and where it belongs (ADR-0012, #643): an Event is made in a Tenant by Root and has no Console Operator
+/// until Root assigns one, as a grant. Where an Event belongs is a field of its document, the Setup's before it starts and
+/// the Core's once it has, and it travels with it when it starts. The writes go through the Tenant's collection, so they
+/// cannot reach an Event of another Tenant; the reads of an Event by its id are the named capability of
+/// <see cref="CrossTenantReads"/>.
 /// </summary>
 internal sealed class EventStore
 {

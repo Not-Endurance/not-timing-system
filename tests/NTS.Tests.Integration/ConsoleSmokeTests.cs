@@ -8,9 +8,9 @@ using static NTS.Tests.Integration.Infrastructure.UiBrowser;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// The whole way, in real browsers, one for each person (#646): a Tenant Root makes an Event and assigns its Main Operator, the
-/// Main Operator starts it, an Official sends a Snapshot from the page of the Snapshots, the Console and a viewer both show it,
-/// and the Main Operator prints a Handout. What each page does is tried on its own in the tests of the pages; this one is that
+/// The whole way, in real browsers, one for each person (#646): a Tenant Root makes an Event and assigns its Console Operator, the
+/// Console Operator starts it, an Official sends a Snapshot from the page of the Snapshots, the Console and a viewer both show it,
+/// and the Console Operator prints a Handout. What each page does is tried on its own in the tests of the pages; this one is that
 /// they are the same Event, in the same app, over the Api that serves it.
 /// </summary>
 public sealed class ConsoleSmokeTests : IClassFixture<ApiHostFixture>, IClassFixture<PasskeyBrowserFixture>
@@ -28,15 +28,15 @@ public sealed class ConsoleSmokeTests : IClassFixture<ApiHostFixture>, IClassFix
     }
 
     [Fact]
-    public async Task A_Tenant_Root_makes_an_Event_the_Main_Operator_starts_it_an_Official_sends_a_Snapshot_which_the_Console_and_a_viewer_show_and_the_Main_Operator_prints_a_Handout()
+    public async Task A_Tenant_Root_makes_an_Event_the_Console_Operator_starts_it_an_Official_sends_a_Snapshot_which_the_Console_and_a_viewer_show_and_the_Console_Operator_prints_a_Handout()
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
         var root = await TenancySeed.AccountAsync(mongo, tenant, TenancySeed.TenantRootOf(tenant), name: "Rada Root");
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
         var official = await TenancySeed.AccountAsync(mongo, tenant, name: "Elena Petrova");
 
-        // a Tenant Root makes an Event, and the person it assigns it to is the one who runs it from then on
+        // a Tenant Root makes an Event, and assigns a Console Operator to it, who runs it beside Root
         await using var rootDevice = await _browsers.OpenAsync(_host.BaseAddress);
         var rootPage = rootDevice.Page;
         rootPage.SetDefaultTimeout(PATIENCE);
@@ -47,24 +47,30 @@ public sealed class ConsoleSmokeTests : IClassFixture<ApiHostFixture>, IClassFix
         await rootPage.GetByRole(AriaRole.Button, new() { Name = "Create", Exact = true }).ClickAsync();
         var made = rootPage.GetByRole(AriaRole.Row).Filter(new() { HasText = EVENT_NAME });
         await Expect(made).ToBeVisibleAsync(Loaded());
-        await made.GetByRole(AriaRole.Button, new() { Name = "Assign the Main Operator" }).ClickAsync();
-        await rootPage.GetByLabel("Find an account by name").FillAsync("Boris Iv");
-        await rootPage.GetByText("Boris Ivanov").First.ClickAsync();
-        await rootPage.GetByRole(AriaRole.Button, new() { Name = "Confirm", Exact = true }).ClickAsync();
-        await Expect(made.GetByRole(AriaRole.Button, new() { Name = "Assign the Main Operator" }))
-            .ToHaveCountAsync(0, Counted());
+        await made.GetByRole(AriaRole.Button, new() { Name = "Console Operators" }).ClickAsync();
+        var assigning = rootPage.GetByRole(AriaRole.Dialog);
+        await Expect(assigning.GetByTestId("console-operators-empty")).ToBeVisibleAsync(Loaded()); // nobody is assigned when an Event is made
+        await assigning.GetByLabel("Find an account by name").FillAsync("Boris Iv");
+        await rootPage
+            .Locator(".mud-popover-open .mud-list-item")
+            .Filter(new() { HasText = "Boris Ivanov" })
+            .First.ClickAsync();
+        await assigning.GetByRole(AriaRole.Button, new() { Name = "Assign", Exact = true }).ClickAsync();
+        await Expect(assigning.GetByTestId("console-operators-list").GetByText("Boris Ivanov"))
+            .ToBeVisibleAsync(Loaded());
+        await assigning.GetByRole(AriaRole.Button, new() { Name = "Close", Exact = true }).ClickAsync();
 
-        // the Main Operator configures it, which is tried on the pages of the Setup, and the Official is given the Event
-        await Eventually(async () => (await SetupOfAsync(mongo))?["MainOperatorId"].AsGuid == mainOperator.Id);
+        // the Console Operator configures it, which is tried on the pages of the Setup, and the Official is given the Event
         var eventId = (await SetupOfAsync(mongo))!["_id"].AsGuid;
-        await EventSeed.MakeWholeAsync(mongo, tenant, eventId, mainOperator.Id, EVENT_NAME, StartOfTheDay());
+        await Eventually(async () => await IsConsoleOperatorAsync(mongo, eventId, consoleOperator.Id));
+        await EventSeed.MakeWholeAsync(mongo, tenant, eventId, EVENT_NAME, StartOfTheDay());
         await EventSeed.GrantAsync(mongo, tenant, eventId, "Official", "Steward", official.Email, official.Id);
 
-        // the Main Operator starts it and is taken to its dashboard
+        // the Console Operator starts it and is taken to its dashboard
         await using var operatorDevice = await _browsers.OpenAsync(_host.BaseAddress);
         var operatorPage = operatorDevice.Page;
         operatorPage.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, operatorDevice, mainOperator.Email, "/console");
+        await SignInAndOpenAsync(_host, operatorDevice, consoleOperator.Email, "/console");
         var theirs = operatorPage.GetByRole(AriaRole.Row).Filter(new() { HasText = EVENT_NAME });
         await theirs.GetByRole(AriaRole.Button, new() { Name = "start", Exact = true }).ClickAsync();
         await operatorPage.WaitForURLAsync(
@@ -99,7 +105,7 @@ public sealed class ConsoleSmokeTests : IClassFixture<ApiHostFixture>, IClassFix
         await viewer.EvaluateAsync($"Blazor.navigateTo('/events/{eventId}/presentlist')");
         await Expect(viewer.GetByText("Ivan Petrov").First).ToBeVisibleAsync(Loaded());
 
-        // the Main Operator makes the Handout of the rider, prints it and says that it was printed
+        // the Console Operator makes the Handout of the rider, prints it and says that it was printed
         var pages = operatorPage.GetByTestId("console-event-navigation");
         await pages.GetByRole(AriaRole.Button, new() { Name = "Handouts", Exact = true }).ClickAsync();
         var handouts = operatorPage.GetByTestId("console-handouts-panel");
@@ -133,6 +139,20 @@ public sealed class ConsoleSmokeTests : IClassFixture<ApiHostFixture>, IClassFix
     static async Task<BsonDocument?> SetupOfAsync(string mongo)
     {
         return await EventSeed.Setups(mongo).Find(new BsonDocument("Name", EVENT_NAME)).FirstOrDefaultAsync();
+    }
+
+    static async Task<bool> IsConsoleOperatorAsync(string mongo, Guid eventId, Guid account)
+    {
+        return await EventSeed
+                .Grants(mongo)
+                .CountDocumentsAsync(
+                    new BsonDocument
+                    {
+                        { "EventId", EventSeed.Binary(eventId) },
+                        { "Kind", "ConsoleOperator" },
+                        { "AccountId", EventSeed.Binary(account) },
+                    }
+                ) == 1;
     }
 
     static async Task<bool> ArrivedAsync(string mongo, Guid eventId)

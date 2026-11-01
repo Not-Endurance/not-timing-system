@@ -46,7 +46,9 @@ public class HomeContentBehind : NStatefulComponent
             return;
         }
 
-        Navigator.NavigateTo(WitnessAccessPolicy.ResolveHomeRoute(AccessState.AccessLevel, SocketService.Event?.Id));
+        Navigator.NavigateTo(
+            WitnessAccessPolicy.ResolveHomeRoute(AccessState.CanSendSnapshots, SocketService.Event?.Id)
+        );
     }
 
     public override void Dispose()

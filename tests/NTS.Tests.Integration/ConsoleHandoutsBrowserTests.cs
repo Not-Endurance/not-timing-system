@@ -146,8 +146,8 @@ public sealed class ConsoleHandoutsBrowserTests : IClassFixture<ApiHostFixture>,
         public static async Task<Scene> CreateAsync(string mongo, bool arrived, bool handouts)
         {
             var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-            var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-            var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+            var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+            var eventId = await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
             var start = new DateTimeOffset(DateTime.Today.AddHours(6));
             var ids = new List<Guid>();
             foreach (var number in new[] { 1, 2 })
@@ -182,7 +182,7 @@ public sealed class ConsoleHandoutsBrowserTests : IClassFixture<ApiHostFixture>,
                         },
                     }
                 );
-            return new Scene(mongo, eventId, mainOperator.Email, [.. ids]);
+            return new Scene(mongo, eventId, consoleOperator.Email, [.. ids]);
         }
 
         readonly string _mongo;

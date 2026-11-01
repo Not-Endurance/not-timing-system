@@ -15,7 +15,7 @@ using SetupLoop = NTS.Domain.Setup.Aggregates.ConfigureEvents.Loop;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// The Setup of an Event as the Console edits it (#646, ADR-0012): opened by the Main Operator of the Event and by nobody
+/// The Setup of an Event as the Console edits it (#646, ADR-0012): opened by the Console Operator of the Event and by nobody
 /// else, composed of its Competitions, Phases, Loops, Combinations and Participations through the services the Krud pages
 /// use, and stored by the Api each time. Over the real Api in this process and the container the app builds.
 /// </summary>
@@ -29,17 +29,17 @@ public sealed class ConsoleSetupTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task Only_the_Main_Operator_of_an_Event_opens_its_Setup_and_not_a_Tenant_Root_who_assigned_it_away_an_Operator_an_Official_or_the_Developer()
+    public async Task A_Console_Operator_of_an_Event_and_Root_open_its_Setup_and_an_Operator_or_an_Official_does_not()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
         var operatorGrant = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Open");
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Open");
         await EventSeed.GrantAsync(
             _mongo.ConnectionString,
             tenant,
@@ -59,18 +59,21 @@ public sealed class ConsoleSetupTests : IClassFixture<MongoFixture>
             official.Id
         );
 
-        foreach (var person in new[] { root, operatorGrant, official, developer })
+        foreach (var person in new[] { operatorGrant, official })
         {
             await using var theirs = ConsoleUi.Open(api, person);
 
             Assert.Null(await theirs.Get<IConsoleSetup>().Open(id));
         }
 
-        await using var mine = ConsoleUi.Open(api, mainOperator);
-        var opened = await mine.Get<IConsoleSetup>().Open(id);
-        Assert.NotNull(opened);
-        Assert.Equal("Open", opened.Model.Name);
-        Assert.True(opened.CanEdit && opened.CanLinkAccounts);
+        foreach (var person in new[] { consoleOperator, root, developer })
+        {
+            await using var mine = ConsoleUi.Open(api, person);
+            var opened = await mine.Get<IConsoleSetup>().Open(id);
+            Assert.NotNull(opened);
+            Assert.Equal("Open", opened.Model.Name);
+            Assert.True(opened.CanEdit && opened.CanLinkAccounts);
+        }
     }
 
     [Fact]
@@ -79,9 +82,9 @@ public sealed class ConsoleSetupTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "The Cup");
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "The Cup");
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         var setup = ui.Get<IConsoleSetup>();
         var opened = await setup.Open(id);
         Assert.NotNull(opened);
@@ -162,9 +165,9 @@ public sealed class ConsoleSetupTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Before");
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Before");
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         var setup = ui.Get<IConsoleSetup>();
         var opened = (await setup.Open(id))!;
 
@@ -188,9 +191,9 @@ public sealed class ConsoleSetupTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         await ui.Get<IConsoleEvents>().Load();
         await ui.Get<IConsoleEvents>().Start(id);
 
@@ -212,9 +215,9 @@ public sealed class ConsoleSetupTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Before");
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Before");
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         var setup = ui.Get<IConsoleSetup>();
         var opened = (await setup.Open(id))!;
         var competition = opened.Model.Competitions.Single();
@@ -256,9 +259,9 @@ public sealed class ConsoleSetupTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         ui.Requests.Answer = request =>
             request.Method == HttpMethod.Get
             && request.RequestUri!.AbsolutePath.EndsWith($"/{id}", StringComparison.Ordinal)
@@ -276,9 +279,9 @@ public sealed class ConsoleSetupTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
-        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
+        await using var ui = ConsoleUi.Open(api, consoleOperator);
         var setup = ui.Get<IConsoleSetup>();
         var before = (await setup.Open(id))!.Model.Competitions.Single();
         var number = before.Participations.Single().Combination.Number;

@@ -98,7 +98,7 @@ internal sealed class ViewerDriver : IAsyncDisposable
         _fixture = fixture;
     }
 
-    public WitnessAccessLevel AccessLevel => _accessContext.AccessLevel;
+    public WitnessSays Says => WitnessSays.Of(_accessContext);
 
     public T GetRequiredService<T>()
         where T : notnull

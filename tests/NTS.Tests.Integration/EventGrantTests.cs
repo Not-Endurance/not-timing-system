@@ -10,8 +10,9 @@ using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// The Main Operator links people to the Officials and Operators of an Event by their exact email (ADR-0012, #643). An
-/// email that has an account gives that account the grant at once; one that has none is a pending invitation that
+/// A Console Operator of an Event, or Root, links people to the Officials and Operators of an Event by their exact email
+/// (ADR-0012, #643, #671). A Console Operator is a grant too, but of a resource of its own (see <c>EventAccessTests</c>), so the
+/// grants here are the Operators and the Officials. An email that has an account gives that account the grant at once; one that has none is a pending invitation that
 /// attaches to the account that registers with it, and gives nothing until then. A grant is the Event's and stays in the
 /// Event's Tenant, ends the moment it is removed, and names a person by an email that is never given back unmasked.
 /// </summary>
@@ -25,14 +26,14 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_links_an_account_to_the_Event_as_an_Operator_by_its_exact_email()
+    public async Task The_Console_Operator_links_an_account_to_the_Event_as_an_Operator_by_its_exact_email()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var setup = await SetUpAsync(api, client);
         var worker = await SignedInAsync(api, client, _mongo.ConnectionString, setup.Tenant, name: "Georgi Dimitrov");
 
-        var response = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: worker.Email);
+        var response = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: worker.Email);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var resource = (await ApiSessions.ReadJsonAsync(response)).GetProperty("data");
@@ -69,7 +70,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var setup = await SetUpAsync(api, client);
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, setup.Tenant);
 
-        var response = await LinkOfficialAsync(setup.MainOperator, setup.Live, role, email: official.Email);
+        var response = await LinkOfficialAsync(setup.ConsoleOperator, setup.Live, role, email: official.Email);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var attributes = (await ApiSessions.ReadJsonAsync(response)).GetProperty("data").GetProperty("attributes");
@@ -89,7 +90,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var setup = await SetUpAsync(api, client);
         var worker = await SignedInAsync(api, client, _mongo.ConnectionString, setup.Tenant);
 
-        var response = await LinkOperatorAsync(setup.MainOperator, setup.Live, accountId: worker.Id);
+        var response = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, accountId: worker.Id);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Equal(worker.Email, (await GrantOfAsync(await GrantIdAsync(response)))!["Email"].AsString);
@@ -105,7 +106,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var abroad = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var visitor = await SignedInAsync(api, client, _mongo.ConnectionString, abroad);
 
-        var response = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: visitor.Email);
+        var response = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: visitor.Email);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.True((await CapabilitiesAsync(visitor, setup.Live)).GetProperty("canSnapshot").GetBoolean());
@@ -120,7 +121,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var setup = await SetUpAsync(api, client);
         var email = UserSeed.NewEmail("invited");
 
-        var response = await LinkOfficialAsync(setup.MainOperator, setup.Live, "Steward", email: email);
+        var response = await LinkOfficialAsync(setup.ConsoleOperator, setup.Live, "Steward", email: email);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var attributes = (await ApiSessions.ReadJsonAsync(response)).GetProperty("data").GetProperty("attributes");
@@ -140,14 +141,14 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var setup = await SetUpAsync(api, client);
         var email = UserSeed.NewEmail("invited");
-        await LinkOfficialAsync(setup.MainOperator, setup.Live, "Steward", email: email);
+        await LinkOfficialAsync(setup.ConsoleOperator, setup.Live, "Steward", email: email);
         var otherEvent = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             setup.Tenant,
-            setup.MainOperator.Id,
+            setup.ConsoleOperator.Id,
             DateTimeOffset.UtcNow
         );
-        await LinkOperatorAsync(setup.MainOperator, otherEvent, email: email);
+        await LinkOperatorAsync(setup.ConsoleOperator, otherEvent, email: email);
 
         var registered = await RegisterAsync(api, email);
 
@@ -207,7 +208,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
             null
         );
 
-        var response = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: worker.Email);
+        var response = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: worker.Email);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(waiting, await GrantIdAsync(response));
@@ -223,8 +224,8 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var setup = await SetUpAsync(api, client);
         var registering = UserSeed.NewEmail("invited");
         var staying = UserSeed.NewEmail("invited");
-        await LinkOperatorAsync(setup.MainOperator, setup.Live, email: registering);
-        await LinkOfficialAsync(setup.MainOperator, setup.Live, "Steward", email: staying);
+        await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: registering);
+        await LinkOfficialAsync(setup.ConsoleOperator, setup.Live, "Steward", email: staying);
 
         var registered = await RegisterAsync(api, registering);
 
@@ -294,9 +295,9 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var setup = await SetUpAsync(api, client);
         var worker = await SignedInAsync(api, client, _mongo.ConnectionString, setup.Tenant);
 
-        var first = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: worker.Email);
-        var again = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: worker.Email.ToUpperInvariant());
-        var asOfficial = await LinkOfficialAsync(setup.MainOperator, setup.Live, "Steward", email: worker.Email);
+        var first = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: worker.Email);
+        var again = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: worker.Email.ToUpperInvariant());
+        var asOfficial = await LinkOfficialAsync(setup.ConsoleOperator, setup.Live, "Steward", email: worker.Email);
 
         Assert.Equal(HttpStatusCode.Created, first.StatusCode);
         Assert.Equal(HttpStatusCode.OK, again.StatusCode);
@@ -314,15 +315,15 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var first = await SignedInAsync(api, client, _mongo.ConnectionString, setup.Tenant);
         var second = await SignedInAsync(api, client, _mongo.ConnectionString, setup.Tenant);
 
-        var asSteward = await LinkOfficialAsync(setup.MainOperator, setup.Live, "Steward", email: first.Email);
+        var asSteward = await LinkOfficialAsync(setup.ConsoleOperator, setup.Live, "Steward", email: first.Email);
         var asChiefSteward = await LinkOfficialAsync(
-            setup.MainOperator,
+            setup.ConsoleOperator,
             setup.Live,
             "ChiefSteward",
             email: first.Email
         );
-        var firstAsOperator = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: first.Email);
-        var secondAsOperator = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: second.Email);
+        var firstAsOperator = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: first.Email);
+        var secondAsOperator = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: second.Email);
 
         var ids = new HashSet<Guid>();
         foreach (var response in new[] { asSteward, asChiefSteward, firstAsOperator, secondAsOperator })
@@ -344,15 +345,16 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var otherEvent = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             setup.Tenant,
-            setup.MainOperator.Id,
+            setup.ConsoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var limit = EventGrantStore.MAX_GRANTS_PER_EVENT;
+        var held = (await AllGrantsOfEventAsync(setup.Live)).Count; // the Console Operator is one of them
         await EventSeed
             .Grants(_mongo.ConnectionString)
             .InsertManyAsync(
                 Enumerable
-                    .Range(0, limit - 1)
+                    .Range(0, limit - 1 - held)
                     .Select(x => new BsonDocument
                     {
                         { "_id", EventSeed.Binary(Guid.NewGuid()) },
@@ -363,10 +365,10 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
                     })
             );
 
-        var last = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: "the-last@example.test");
-        var over = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: "one-more@example.test");
-        var again = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: "the-last@example.test");
-        var elsewhere = await LinkOperatorAsync(setup.MainOperator, otherEvent, email: "one-more@example.test");
+        var last = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: "the-last@example.test");
+        var over = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: "one-more@example.test");
+        var again = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: "the-last@example.test");
+        var elsewhere = await LinkOperatorAsync(setup.ConsoleOperator, otherEvent, email: "one-more@example.test");
 
         Assert.Equal(HttpStatusCode.Created, last.StatusCode);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, over.StatusCode);
@@ -374,7 +376,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.OK, again.StatusCode);
         Assert.Equal(await GrantIdAsync(last), await GrantIdAsync(again));
         Assert.Equal(HttpStatusCode.Created, elsewhere.StatusCode);
-        Assert.Equal(limit, (await GrantsOfEventAsync(setup.Live)).Count);
+        Assert.Equal(limit, (await AllGrantsOfEventAsync(setup.Live)).Count);
         Assert.DoesNotContain(
             await GrantsOfEventAsync(setup.Live),
             x => x["Email"].AsString == "one-more@example.test"
@@ -382,7 +384,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_grants_of_an_Event_that_has_ended_are_still_listed_to_its_Main_Operator_and_none_is_added_or_removed()
+    public async Task The_grants_of_an_Event_that_has_ended_are_still_listed_to_its_Console_Operator_and_none_is_added_or_removed()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
@@ -391,7 +393,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var historic = await EventSeed.HistoricAsync(
             _mongo.ConnectionString,
             setup.Tenant,
-            setup.MainOperator.Id,
+            setup.ConsoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var grant = await EventSeed.GrantAsync(
@@ -404,8 +406,8 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
             worker.Id
         );
 
-        var listed = await setup.MainOperator.Page.GetAsync($"/api/event-grants?filter=eventId eq {historic}");
-        var removed = await setup.MainOperator.Page.DeleteAsync($"/api/event-grants/{grant}");
+        var listed = await setup.ConsoleOperator.Page.GetAsync($"/api/event-grants?filter=eventId eq {historic}");
+        var removed = await setup.ConsoleOperator.Page.DeleteAsync($"/api/event-grants/{grant}");
         var strangers = await setup.Member.Page.GetAsync($"/api/event-grants?filter=eventId eq {historic}");
 
         Assert.Equal(HttpStatusCode.OK, listed.StatusCode);
@@ -417,28 +419,59 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task Only_the_Main_Operator_of_the_Event_links_and_the_Developer_only_before_it_starts()
+    public async Task Only_a_Console_Operator_of_the_Event_and_Root_link_and_nobody_who_holds_less_does()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var setup = await SetUpAsync(api, client);
         var worker = await SignedInAsync(api, client, _mongo.ConnectionString, setup.Tenant);
         var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperatorElsewhere = await SignedInAsync(api, client, _mongo.ConnectionString, other);
-        await EventSeed.LiveAsync(_mongo.ConnectionString, other, mainOperatorElsewhere.Id, DateTimeOffset.UtcNow);
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, setup.Tenant, setup.MainOperator.Id);
+        var consoleOperatorElsewhere = await SignedInAsync(api, client, _mongo.ConnectionString, other);
+        await EventSeed.LiveAsync(_mongo.ConnectionString, other, consoleOperatorElsewhere.Id, DateTimeOffset.UtcNow);
+        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, setup.Tenant, setup.ConsoleOperator.Id);
 
-        foreach (var caller in new[] { setup.Root, setup.Member, setup.Developer, mainOperatorElsewhere })
+        foreach (var caller in new[] { setup.Member, consoleOperatorElsewhere })
         {
             var response = await LinkOperatorAsync(caller, setup.Live, accountId: worker.Id);
 
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-            Assert.Equal("not-main-operator", await ErrorCodeAsync(response));
+            Assert.Equal("not-console-operator", await ErrorCodeAsync(response));
         }
 
-        var developerBefore = await LinkOperatorAsync(setup.Developer, unstarted, accountId: worker.Id);
-        Assert.Equal(HttpStatusCode.Created, developerBefore.StatusCode);
         Assert.Empty(await GrantsOfEventAsync(setup.Live));
+        var byRootWhileLive = await LinkOperatorAsync(setup.Root, setup.Live, accountId: worker.Id);
+        var byTheDeveloperBefore = await LinkOperatorAsync(setup.Developer, unstarted, accountId: worker.Id);
+        Assert.Equal(HttpStatusCode.Created, byRootWhileLive.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, byTheDeveloperBefore.StatusCode);
+    }
+
+    [Fact]
+    public async Task Registering_with_the_email_of_a_Console_Operator_invitation_attaches_it_and_the_person_then_runs_the_Event()
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var setup = await SetUpAsync(api, client);
+        var email = UserSeed.NewEmail("invited");
+        await EventSeed.GrantAsync(
+            _mongo.ConnectionString,
+            setup.Tenant,
+            setup.Live,
+            "ConsoleOperator",
+            null,
+            email,
+            null
+        );
+
+        var registered = await RegisterAsync(api, email);
+
+        Assert.Equal(
+            "consoleOperator",
+            (await CapabilitiesAsync(registered, setup.Live)).GetProperty("level").GetString()
+        );
+        Assert.All(
+            (await AllGrantsOfEventAsync(setup.Live)).Where(x => x["Email"].AsString == email),
+            x => Assert.Equal(registered.Id, x["AccountId"].AsGuid)
+        );
     }
 
     [Fact]
@@ -451,12 +484,12 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var historic = await EventSeed.HistoricAsync(
             _mongo.ConnectionString,
             setup.Tenant,
-            setup.MainOperator.Id,
+            setup.ConsoleOperator.Id,
             DateTimeOffset.UtcNow
         );
 
-        var ended = await LinkOperatorAsync(setup.MainOperator, historic, accountId: worker.Id);
-        var missing = await LinkOperatorAsync(setup.MainOperator, Guid.NewGuid(), accountId: worker.Id);
+        var ended = await LinkOperatorAsync(setup.ConsoleOperator, historic, accountId: worker.Id);
+        var missing = await LinkOperatorAsync(setup.ConsoleOperator, Guid.NewGuid(), accountId: worker.Id);
 
         Assert.Equal(HttpStatusCode.Conflict, ended.StatusCode);
         Assert.Equal("event-ended", await ErrorCodeAsync(ended));
@@ -467,6 +500,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
     [InlineData("tenant-root")]
     [InlineData("developer")]
     [InlineData("main-operator")]
+    [InlineData("console-operator")] // a Console Operator is assigned by the console-operators resource
     [InlineData("")]
     public async Task A_grant_is_of_a_kind_the_Event_has_and_never_a_role_of_the_Tenant_or_the_platform(string kind)
     {
@@ -479,7 +513,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
             .Find(new BsonDocument("Email", worker.Email))
             .FirstAsync();
 
-        var response = await setup.MainOperator.Page.WriteAsync(
+        var response = await setup.ConsoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/event-grants",
             "event-grants",
@@ -515,7 +549,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var setup = await SetUpAsync(api, client);
         var worker = await SignedInAsync(api, client, _mongo.ConnectionString, setup.Tenant);
 
-        var response = await setup.MainOperator.Page.WriteAsync(
+        var response = await setup.ConsoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/event-grants",
             "event-grants",
@@ -540,10 +574,15 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var setup = await SetUpAsync(api, client);
         var worker = await SignedInAsync(api, client, _mongo.ConnectionString, setup.Tenant);
 
-        var both = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: worker.Email, accountId: worker.Id);
-        var neither = await LinkOperatorAsync(setup.MainOperator, setup.Live);
-        var notAnEmail = await LinkOperatorAsync(setup.MainOperator, setup.Live, email: "not an email");
-        var noAccount = await LinkOperatorAsync(setup.MainOperator, setup.Live, accountId: Guid.NewGuid());
+        var both = await LinkOperatorAsync(
+            setup.ConsoleOperator,
+            setup.Live,
+            email: worker.Email,
+            accountId: worker.Id
+        );
+        var neither = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live);
+        var notAnEmail = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: "not an email");
+        var noAccount = await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, accountId: Guid.NewGuid());
 
         Assert.Equal("malformed-request", await ErrorCodeAsync(both));
         Assert.Equal("malformed-request", await ErrorCodeAsync(neither));
@@ -555,7 +594,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_lists_the_grants_of_its_Event_and_none_of_another_with_the_emails_masked()
+    public async Task The_Console_Operator_lists_the_grants_of_its_Event_and_none_of_another_with_the_emails_masked()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
@@ -565,14 +604,14 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var otherEvent = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             setup.Tenant,
-            setup.MainOperator.Id,
+            setup.ConsoleOperator.Id,
             DateTimeOffset.UtcNow
         );
-        await LinkOperatorAsync(setup.MainOperator, setup.Live, email: worker.Email);
-        await LinkOfficialAsync(setup.MainOperator, setup.Live, "Steward", email: invited);
-        await LinkOperatorAsync(setup.MainOperator, otherEvent, email: worker.Email);
+        await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: worker.Email);
+        await LinkOfficialAsync(setup.ConsoleOperator, setup.Live, "Steward", email: invited);
+        await LinkOperatorAsync(setup.ConsoleOperator, otherEvent, email: worker.Email);
 
-        var response = await setup.MainOperator.Page.GetAsync($"/api/event-grants?filter=eventId eq {setup.Live}");
+        var response = await setup.ConsoleOperator.Page.GetAsync($"/api/event-grants?filter=eventId eq {setup.Live}");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var body = await ApiSessions.ReadJsonAsync(response);
@@ -601,17 +640,17 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         foreach (var name in new[] { "ccc", "aaa", "bbb" }) // linked out of the order of their emails
         {
             ids[name] = await GrantIdAsync(
-                await LinkOperatorAsync(setup.MainOperator, setup.Live, email: $"{name}.{marker}@sign-in.test")
+                await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: $"{name}.{marker}@sign-in.test")
             );
         }
 
         var path = $"/api/event-grants?filter=eventId eq {setup.Live}";
-        var first = await GrantPageAsync(setup.MainOperator, path + "&page[size]=2");
-        var last = await GrantPageAsync(setup.MainOperator, path + "&page[size]=2&page[number]=2");
-        var followed = await GrantPageAsync(setup.MainOperator, first.Next!);
-        var backwards = await GrantPageAsync(setup.MainOperator, path + "&sort=-email&page[size]=2");
-        var full = await GrantPageAsync(setup.MainOperator, path + "&page[size]=3");
-        var unnamed = await GrantPageAsync(setup.MainOperator, path);
+        var first = await GrantPageAsync(setup.ConsoleOperator, path + "&page[size]=2");
+        var last = await GrantPageAsync(setup.ConsoleOperator, path + "&page[size]=2&page[number]=2");
+        var followed = await GrantPageAsync(setup.ConsoleOperator, first.Next!);
+        var backwards = await GrantPageAsync(setup.ConsoleOperator, path + "&sort=-email&page[size]=2");
+        var full = await GrantPageAsync(setup.ConsoleOperator, path + "&page[size]=3");
+        var unnamed = await GrantPageAsync(setup.ConsoleOperator, path);
 
         Assert.Equal([ids["aaa"], ids["bbb"]], first.Ids);
         Assert.Equal((2, 1), (first.Size, first.Number));
@@ -643,9 +682,9 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         await EventSeed.GrantAsync(mongo, tenant, setup.Live, "Official", "Steward", email, null, low);
 
         var path = $"/api/event-grants?filter=eventId eq {setup.Live}&page[size]=1";
-        var first = await GrantPageAsync(setup.MainOperator, path);
-        var second = await GrantPageAsync(setup.MainOperator, path + "&page[number]=2");
-        var backwards = await GrantPageAsync(setup.MainOperator, path + "&sort=-email");
+        var first = await GrantPageAsync(setup.ConsoleOperator, path);
+        var second = await GrantPageAsync(setup.ConsoleOperator, path + "&page[number]=2");
+        var backwards = await GrantPageAsync(setup.ConsoleOperator, path + "&sort=-email");
 
         Assert.Equal([low], first.Ids);
         Assert.Equal([high], second.Ids);
@@ -666,7 +705,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var setup = await SetUpAsync(api, client);
 
-        var refused = await setup.MainOperator.Page.GetAsync(
+        var refused = await setup.ConsoleOperator.Page.GetAsync(
             $"/api/event-grants?filter=eventId eq {setup.Live}{query}"
         );
 
@@ -681,20 +720,21 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var setup = await SetUpAsync(api, client);
 
-        var noFilter = await setup.MainOperator.Page.GetAsync("/api/event-grants");
-        var otherParameter = await setup.MainOperator.Page.GetAsync(
+        var noFilter = await setup.ConsoleOperator.Page.GetAsync("/api/event-grants");
+        var otherParameter = await setup.ConsoleOperator.Page.GetAsync(
             $"/api/event-grants?filter=eventId eq {setup.Live}&tenantId=x"
         );
-        var byTenant = await setup.MainOperator.Page.GetAsync("/api/event-grants?filter=tenantId eq country-bg");
+        var byTenant = await setup.ConsoleOperator.Page.GetAsync("/api/event-grants?filter=tenantId eq country-bg");
         var byAMember = await setup.Member.Page.GetAsync($"/api/event-grants?filter=eventId eq {setup.Live}");
-        var byTheRoot = await setup.Root.Page.GetAsync($"/api/event-grants?filter=eventId eq {setup.Live}");
+        var byRoot = await setup.Root.Page.GetAsync($"/api/event-grants?filter=eventId eq {setup.Live}");
 
         Assert.Equal(HttpStatusCode.BadRequest, noFilter.StatusCode);
         Assert.Equal("invalid-filter", await ErrorCodeAsync(noFilter));
         Assert.Equal("unsupported-parameter", await ErrorCodeAsync(otherParameter));
         Assert.Equal("invalid-filter", await ErrorCodeAsync(byTenant));
         Assert.Equal(HttpStatusCode.Forbidden, byAMember.StatusCode);
-        Assert.Equal(HttpStatusCode.Forbidden, byTheRoot.StatusCode);
+        Assert.Equal("not-console-operator", await ErrorCodeAsync(byAMember));
+        Assert.Equal(HttpStatusCode.OK, byRoot.StatusCode); // Root sees what a Console Operator of the Event sees
     }
 
     [Fact]
@@ -705,11 +745,11 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var setup = await SetUpAsync(api, client);
         var worker = await SignedInAsync(api, client, _mongo.ConnectionString, setup.Tenant);
         var grant = await GrantIdAsync(
-            await LinkOfficialAsync(setup.MainOperator, setup.Live, "Steward", email: worker.Email)
+            await LinkOfficialAsync(setup.ConsoleOperator, setup.Live, "Steward", email: worker.Email)
         );
         Assert.True((await CapabilitiesAsync(worker, setup.Live)).GetProperty("canSnapshot").GetBoolean());
 
-        var removed = await setup.MainOperator.Page.DeleteAsync($"/api/event-grants/{grant}");
+        var removed = await setup.ConsoleOperator.Page.DeleteAsync($"/api/event-grants/{grant}");
 
         Assert.Equal(HttpStatusCode.NoContent, removed.StatusCode);
         Assert.False((await CapabilitiesAsync(worker, setup.Live)).GetProperty("canSnapshot").GetBoolean());
@@ -717,24 +757,27 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_grant_is_removed_by_the_Main_Operator_of_its_Event_and_to_everybody_else_it_is_not_there()
+    public async Task A_grant_is_removed_by_a_Console_Operator_of_its_Event_or_Root_and_to_everybody_else_it_is_not_there()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
         var setup = await SetUpAsync(api, client);
         var worker = await SignedInAsync(api, client, _mongo.ConnectionString, setup.Tenant);
-        var grant = await GrantIdAsync(await LinkOperatorAsync(setup.MainOperator, setup.Live, email: worker.Email));
+        var grant = await GrantIdAsync(await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: worker.Email));
 
-        foreach (var caller in new[] { setup.Root, setup.Member, worker })
+        foreach (var caller in new[] { setup.Member, worker })
         {
             var response = await caller.Page.DeleteAsync($"/api/event-grants/{grant}");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        var missing = await setup.MainOperator.Page.DeleteAsync($"/api/event-grants/{Guid.NewGuid()}");
+        var missing = await setup.ConsoleOperator.Page.DeleteAsync($"/api/event-grants/{Guid.NewGuid()}");
         Assert.Equal(HttpStatusCode.NotFound, missing.StatusCode);
         Assert.NotNull(await GrantOfAsync(grant));
+        var byRoot = await setup.Root.Page.DeleteAsync($"/api/event-grants/{grant}");
+        Assert.Equal(HttpStatusCode.NoContent, byRoot.StatusCode);
+        Assert.Null(await GrantOfAsync(grant));
     }
 
     [Fact]
@@ -747,10 +790,10 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         var otherEvent = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             setup.Tenant,
-            setup.MainOperator.Id,
+            setup.ConsoleOperator.Id,
             DateTimeOffset.UtcNow
         );
-        await LinkOperatorAsync(setup.MainOperator, setup.Live, email: worker.Email);
+        await LinkOperatorAsync(setup.ConsoleOperator, setup.Live, email: worker.Email);
 
         Assert.True((await CapabilitiesAsync(worker, setup.Live)).GetProperty("canSnapshot").GetBoolean());
         Assert.False((await CapabilitiesAsync(worker, otherEvent)).GetProperty("canSnapshot").GetBoolean());
@@ -769,16 +812,21 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
         return new ApiFactory(_mongo.ConnectionString, time: time);
     }
 
-    /// <summary>A Tenant that has a Tenant Root, a Live Event run by a Main Operator, and the people around it.</summary>
+    /// <summary>A Tenant that has a Tenant Root, a Live Event run by a Console Operator, and the people around it.</summary>
     async Task<Scene> SetUpAsync(ApiFactory api, HttpClient client)
     {
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
-        return new Scene(tenant, root, mainOperator, member, developer, live);
+        var live = await EventSeed.LiveAsync(
+            _mongo.ConnectionString,
+            tenant,
+            consoleOperator.Id,
+            DateTimeOffset.UtcNow
+        );
+        return new Scene(tenant, root, consoleOperator, member, developer, live);
     }
 
     /// <summary>A person registers with the address, as a visitor does: the details, then the code that was mailed.</summary>
@@ -884,7 +932,14 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
             .FirstOrDefaultAsync();
     }
 
+    /// <summary>The Operators and the Officials of the Event: the grants of the resource under test, and not the Console Operators.</summary>
     async Task<List<BsonDocument>> GrantsOfEventAsync(Guid eventId)
+    {
+        return [.. (await AllGrantsOfEventAsync(eventId)).Where(x => x["Kind"].AsString != "ConsoleOperator")];
+    }
+
+    /// <summary>Every grant the Event has, whatever its kind.</summary>
+    async Task<List<BsonDocument>> AllGrantsOfEventAsync(Guid eventId)
     {
         return await EventSeed
             .Grants(_mongo.ConnectionString)
@@ -907,11 +962,11 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
 
     sealed class Scene
     {
-        public Scene(string tenant, Person root, Person mainOperator, Person member, Person developer, Guid live)
+        public Scene(string tenant, Person root, Person consoleOperator, Person member, Person developer, Guid live)
         {
             Tenant = tenant;
             Root = root;
-            MainOperator = mainOperator;
+            ConsoleOperator = consoleOperator;
             Member = member;
             Developer = developer;
             Live = live;
@@ -919,7 +974,7 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
 
         public string Tenant { get; }
         public Person Root { get; }
-        public Person MainOperator { get; }
+        public Person ConsoleOperator { get; }
         public Person Member { get; }
         public Person Developer { get; }
         public Guid Live { get; }

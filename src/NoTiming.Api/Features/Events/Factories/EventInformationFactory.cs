@@ -8,7 +8,7 @@ namespace NoTiming.Api.Features.Events.Factories;
 public static class EventInformationFactory
 {
     /// <summary>
-    /// The Event as it starts from its Setup. It keeps the Tenant and the Main Operator of the Setup, and the rules of
+    /// The Event as it starts from its Setup. It keeps the Tenant of the Setup, and the rules of
     /// the Regional competitions are those of its Tenant at this moment, copied: the Event keeps them whatever the Tenant
     /// edits later (ADR-0012). An Event started without any has none.
     /// </summary>
@@ -33,8 +33,7 @@ public static class EventInformationFactory
             setupEvent.FeiShowId,
             setupEvent.Id,
             regionalRules: regionalRules,
-            tenantId: setupEvent.TenantId,
-            mainOperatorId: setupEvent.MainOperatorId
+            tenantId: setupEvent.TenantId
         );
         return eventInformation;
     }

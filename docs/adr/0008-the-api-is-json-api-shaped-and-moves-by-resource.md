@@ -14,6 +14,10 @@ Every route of the Functions API returns a `Result<T>` envelope, turns a domain 
 
 **Domain errors become statuses.** A rule violation is 422, a conflict with the current state (`event-ended`) is 409, a malformed request or filter is 400, a missing item is 404, each with an error `code`.
 
+**A request is validated in layers, and the endpoint does none of it (ADR-0012).** The transport is checked first, by the binding of the JSON:API document: the media type, the size, well-formed JSON and one resource of the expected type (415, 413, 400 `malformed-request`). The shape of the attributes comes next, after the caller's Level has been checked, so that a person who may not never learns what is wrong with the content: the request type of the endpoint validates itself (required members, allowed values, members the endpoint does not take: 400). The rules of the domain come last: a violation the domain throws, and a refusal that only the work can know (an account that is not there, a limit that is reached), are typed exceptions with a code, and one place of the pipeline turns them into 422, or 409 for a conflict with the current state. The handler holds none of it.
+
+**The stable codes are named once.** The codes the pipeline itself answers (access, transport, shape) are constants in one catalogue, and the codes of a feature are constants beside the feature. Tests and clients name them, and a handler holds no code string.
+
 ## Considered options
 
 **Port the routes and payloads as they are.** Easier to cut over, but it carries HTTP 200 for errors and the absence of error codes into the new host and pins them with parity tests.

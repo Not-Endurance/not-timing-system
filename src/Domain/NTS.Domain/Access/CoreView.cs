@@ -24,6 +24,6 @@ public enum CoreView
     /// <summary>The live view of how a Participation is doing, which follows the running Event.</summary>
     Performance = 9,
 
-    /// <summary>The dashboard of the Console, on which the Main Operator runs the Event and changes what it keeps by hand (#631).</summary>
+    /// <summary>The dashboard of the Console, on which the Console Operator runs the Event and changes what it keeps by hand (#631).</summary>
     Dashboard = 10,
 }

@@ -2,8 +2,9 @@ using System.Buffers.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Identity;
-using Not.Identity;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.JsonApi;
+using NTS.Domain.Access;
 
 namespace NoTiming.Api.Features.Account;
 
@@ -22,11 +23,11 @@ internal static class PasskeyEndpoints
         // Signing in with a passkey is a session created with a credential: see AccountEndpoints.
         app.MapPost("/api/passkeys/actions/request-options", RequestOptions);
 
-        app.MapPost("/api/passkeys/actions/creation-options", CreationOptions).RequireAuthorization();
-        app.MapGet("/api/passkeys", List).RequireAuthorization();
-        app.MapPost("/api/passkeys", Create).RequireAuthorization();
-        app.MapPatch("/api/passkeys/{id}", Rename).RequireAuthorization();
-        app.MapDelete("/api/passkeys/{id}", Remove).RequireAuthorization();
+        app.MapPost("/api/passkeys/actions/creation-options", CreationOptions);
+        app.MapGet("/api/passkeys", List);
+        app.MapPost("/api/passkeys", Create);
+        app.MapPatch("/api/passkeys/{id}", Rename);
+        app.MapDelete("/api/passkeys/{id}", Remove);
         return app;
     }
 
@@ -95,11 +96,13 @@ internal static class PasskeyEndpoints
         );
     }
 
+    // The ceremony has an order of its own: the host supports passkeys, the token is good, and only then the document.
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
     static async Task<IResult> CreationOptions(
         HttpContext context,
         IAntiforgery antiforgery,
         PasskeyService passkeys,
-        UserManager<NIdentityUser> users
+        AccessContext access
     )
     {
         if (!passkeys.Availability.Enabled)
@@ -112,13 +115,7 @@ internal static class PasskeyEndpoints
             return forged;
         }
 
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var options = await passkeys.CreationOptionsAsync(user);
+        var options = await passkeys.CreationOptionsAsync(access.User);
         return JsonApiResults.Resource(
             StatusCodes.Status200OK,
             "passkey-creation-options",
@@ -127,15 +124,10 @@ internal static class PasskeyEndpoints
         );
     }
 
-    static async Task<IResult> List(HttpContext context, PasskeyService passkeys, UserManager<NIdentityUser> users)
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    static async Task<IResult> List(PasskeyService passkeys, AccessContext access)
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var list = await passkeys.ListAsync(user);
+        var list = await passkeys.ListAsync(access.User);
         return Results.Json(
             new
             {
@@ -151,11 +143,12 @@ internal static class PasskeyEndpoints
         );
     }
 
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
     static async Task<IResult> Create(
         HttpContext context,
         IAntiforgery antiforgery,
         PasskeyService passkeys,
-        UserManager<NIdentityUser> users,
+        AccessContext access,
         AccountText text
     )
     {
@@ -190,14 +183,8 @@ internal static class PasskeyEndpoints
             return invalidName;
         }
 
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
         var passkey = await passkeys.EnrolAsync(
-            user,
+            access.User,
             credential.GetRawText(),
             read.Attributes.Name,
             text.Resolve(context.Request)
@@ -221,12 +208,8 @@ internal static class PasskeyEndpoints
         );
     }
 
-    static async Task<IResult> Rename(
-        HttpContext context,
-        string id,
-        PasskeyService passkeys,
-        UserManager<NIdentityUser> users
-    )
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    static async Task<IResult> Rename(HttpContext context, string id, PasskeyService passkeys, AccessContext access)
     {
         var read = await JsonApiRequests.ReadAsync<PasskeyAttributes>(context.Request, PASSKEYS);
         if (read.Error != null)
@@ -244,13 +227,7 @@ internal static class PasskeyEndpoints
             return JsonApiResults.NotFound();
         }
 
-        var userId = users.GetUserId(context.User);
-        if (!Guid.TryParse(userId, out var user))
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var (result, renamed) = await passkeys.RenameAsync(user, credentialId, read.Attributes!.Name);
+        var (result, renamed) = await passkeys.RenameAsync(access.User.Id, credentialId, read.Attributes!.Name);
         if (renamed is null)
         {
             return result.Errors.Any(x => x.Code == PasskeyService.NO_SUCH_PASSKEY)
@@ -261,24 +238,15 @@ internal static class PasskeyEndpoints
         return JsonApiResults.Resource(StatusCodes.Status200OK, PASSKEYS, id, Describe(renamed));
     }
 
-    static async Task<IResult> Remove(
-        HttpContext context,
-        string id,
-        PasskeyService passkeys,
-        UserManager<NIdentityUser> users
-    )
+    [Requires(Capability.SignedIn, PlaceIn.Platform)]
+    static async Task<IResult> Remove(string id, PasskeyService passkeys, AccessContext access)
     {
         if (!TryDecode(id, out var credentialId))
         {
             return JsonApiResults.NotFound();
         }
 
-        if (!Guid.TryParse(users.GetUserId(context.User), out var user))
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var result = await passkeys.RemoveAsync(user, credentialId);
+        var result = await passkeys.RemoveAsync(access.User.Id, credentialId);
         if (result.Succeeded)
         {
             return Results.NoContent();

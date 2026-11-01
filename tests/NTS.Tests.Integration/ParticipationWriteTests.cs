@@ -11,7 +11,7 @@ using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// Writing the Participations of an Event (#604, ADR-0012, ADR-0013): the Main Operator's, while the Event is Live. A change
+/// Writing the Participations of an Event (#604, ADR-0012, ADR-0013): the Console Operator's, while the Event is Live. A change
 /// is made against the version the row was read at, which it increments: a change without one is refused, and a stale one
 /// is 409 <c>participation-changed</c> and changes nothing. Every write that was stored is announced once to the viewers of
 /// the Event, and one that was not is not. The documents are seeded straight into MongoDB and read back from it.
@@ -28,22 +28,22 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_of_a_Live_Event_makes_a_Participation_and_the_viewers_are_told()
+    public async Task The_Console_Operator_of_a_Live_Event_makes_a_Participation_and_the_viewers_are_told()
     {
         var changes = new RecordedChanges();
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var made = Ridden(eventId, 1);
 
-        var response = await mainOperator.Page.WriteAsync(
+        var response = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/participations",
             "participations",
@@ -71,25 +71,25 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var otherEvent = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var made = Ridden(eventId, 1);
-        await Make(mainOperator, made);
+        await Make(consoleOperator, made);
         changes.Announced.Clear();
 
-        var again = await Make(mainOperator, made);
-        var elsewhere = await mainOperator.Page.WriteAsync(
+        var again = await Make(consoleOperator, made);
+        var elsewhere = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/participations",
             "participations",
@@ -108,17 +108,17 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task Only_the_Main_Operator_writes_a_row_of_a_Live_Event_and_nobody_else_not_even_the_Developer()
+    public async Task Only_a_Console_Operator_of_the_Event_and_Root_write_a_row_of_a_Live_Event_and_an_account_that_holds_nothing_does_not()
     {
         var changes = new RecordedChanges();
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var existing = Ridden(eventId, 1);
@@ -129,22 +129,19 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         using var anonymous = ApiClients.Of(api);
         var attempt = Ridden(eventId, 2);
 
-        foreach (var person in new[] { root, member, developer })
-        {
-            var made = await person.Page.WriteAsync(
-                HttpMethod.Post,
-                "/api/participations",
-                "participations",
-                AttributesOf(attempt)
-            );
-            var changed = await Change(person, existing.Id, new { }, version: 0);
-            var removed = await person.Page.DeleteAsync($"/api/participations/{existing.Id}");
+        var made = await member.Page.WriteAsync(
+            HttpMethod.Post,
+            "/api/participations",
+            "participations",
+            AttributesOf(attempt)
+        );
+        var changed = await Change(member, existing.Id, new { }, version: 0);
+        var removed = await member.Page.DeleteAsync($"/api/participations/{existing.Id}");
 
-            foreach (var refused in new[] { made, changed, removed })
-            {
-                Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
-                Assert.Equal("not-main-operator", await ErrorCodeAsync(refused));
-            }
+        foreach (var refused in new[] { made, changed, removed })
+        {
+            Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
+            Assert.Equal("not-console-operator", await ErrorCodeAsync(refused));
         }
 
         var anonymousWrite = await new PageClient(anonymous).WriteAsync(
@@ -160,37 +157,66 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task Root_writes_a_row_of_a_Live_Event_it_is_not_assigned_to_as_a_Console_Operator_does()
+    {
+        await using var api = NewApi(new RecordedChanges());
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
+
+        foreach (var (person, number) in new[] { (root, 1), (developer, 2) })
+        {
+            var row = Ridden(eventId, number);
+            var made = await person.Page.WriteAsync(
+                HttpMethod.Post,
+                "/api/participations",
+                "participations",
+                AttributesOf(row),
+                id: row.Id.ToString()
+            );
+            var changed = await Change(person, row.Id, new { }, version: 0);
+            var removed = await person.Page.DeleteAsync($"/api/participations/{row.Id}");
+
+            Assert.Equal(HttpStatusCode.Created, made.StatusCode);
+            Assert.True(changed.StatusCode is HttpStatusCode.OK, $"{number}: {changed.StatusCode}");
+            Assert.Equal(HttpStatusCode.NoContent, removed.StatusCode);
+        }
+    }
+
+    [Fact]
     public async Task An_Event_that_has_not_started_takes_no_rows_and_one_that_has_ended_takes_no_more()
     {
         var changes = new RecordedChanges();
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
         var historic = await EventSeed.HistoricAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var kept = Ridden(historic, 1);
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, kept);
 
-        var early = await mainOperator.Page.WriteAsync(
+        var early = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/participations",
             "participations",
             AttributesOf(Ridden(unstarted, 2))
         );
-        var late = await mainOperator.Page.WriteAsync(
+        var late = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/participations",
             "participations",
             AttributesOf(Ridden(historic, 3))
         );
-        var changed = await Change(mainOperator, kept.Id, new { }, version: 0);
-        var removed = await mainOperator.Page.DeleteAsync($"/api/participations/{kept.Id}");
+        var changed = await Change(consoleOperator, kept.Id, new { }, version: 0);
+        var removed = await consoleOperator.Page.DeleteAsync($"/api/participations/{kept.Id}");
 
         Assert.Equal(HttpStatusCode.Conflict, early.StatusCode);
         Assert.Equal("event-not-started", await ErrorCodeAsync(early));
@@ -211,11 +237,11 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var attributes = AttributesOf(Ridden(eventId, 1));
@@ -223,19 +249,19 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         var elsewhere = AttributesOf(Ridden(Guid.NewGuid(), 2));
         var broken = JsonApiAttributes.Without(attributes, "combination");
 
-        var unnamed = await mainOperator.Page.WriteAsync(
+        var unnamed = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/participations",
             "participations",
             without
         );
-        var unknown = await mainOperator.Page.WriteAsync(
+        var unknown = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/participations",
             "participations",
             elsewhere
         );
-        var invalid = await mainOperator.Page.WriteAsync(
+        var invalid = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/participations",
             "participations",
@@ -257,18 +283,18 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var participation = Ridden(eventId, 1);
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation, version: 4);
 
         var response = await Change(
-            mainOperator,
+            consoleOperator,
             participation.Id,
             new { eliminated = new { code = "WD" } },
             version: 4
@@ -295,18 +321,18 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var participation = Ridden(eventId, 1);
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
 
         var response = await Change(
-            mainOperator,
+            consoleOperator,
             participation.Id,
             new { eliminated = new { code = "RET" } },
             version: 0
@@ -336,11 +362,11 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var participation = Ridden(eventId, 1);
@@ -349,19 +375,29 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
             await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_participations", participation.Id)
         )!;
 
-        var without = await mainOperator.Page.WriteAsync(
+        var without = await consoleOperator.Page.WriteAsync(
             HttpMethod.Patch,
             $"/api/participations/{participation.Id}",
             "participations",
             new { eliminated = new { code = "WD" } }
         );
-        var older = await Change(mainOperator, participation.Id, new { eliminated = new { code = "WD" } }, version: 3);
-        var newer = await Change(mainOperator, participation.Id, new { eliminated = new { code = "WD" } }, version: 5);
+        var older = await Change(
+            consoleOperator,
+            participation.Id,
+            new { eliminated = new { code = "WD" } },
+            version: 3
+        );
+        var newer = await Change(
+            consoleOperator,
+            participation.Id,
+            new { eliminated = new { code = "WD" } },
+            version: 5
+        );
         var notNumbers = new List<HttpResponseMessage>();
         foreach (var version in new object[] { "four", -1, 1.5, true, new { } })
         {
             notNumbers.Add(
-                await mainOperator.Page.WriteAsync(
+                await consoleOperator.Page.WriteAsync(
                     HttpMethod.Patch,
                     $"/api/participations/{participation.Id}",
                     "participations",
@@ -399,11 +435,11 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var participation = Ridden(eventId, 1);
@@ -413,7 +449,7 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
             Enumerable
                 .Range(0, 6)
                 .Select(_ =>
-                    Change(mainOperator, participation.Id, new { eliminated = new { code = "RET" } }, version: 1)
+                    Change(consoleOperator, participation.Id, new { eliminated = new { code = "RET" } }, version: 1)
                 )
         );
 
@@ -435,18 +471,18 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var participation = Ridden(eventId, 1);
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation, version: 2);
 
-        var nothing = await Change(mainOperator, participation.Id, new { }, version: 2);
-        var staleNothing = await Change(mainOperator, participation.Id, new { }, version: 1);
+        var nothing = await Change(consoleOperator, participation.Id, new { }, version: 2);
+        var staleNothing = await Change(consoleOperator, participation.Id, new { }, version: 1);
         var refused = new List<HttpResponseMessage>();
         foreach (
             var attributes in new object[]
@@ -458,7 +494,7 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
             }
         )
         {
-            refused.Add(await Change(mainOperator, participation.Id, attributes, version: 2));
+            refused.Add(await Change(consoleOperator, participation.Id, attributes, version: 2));
         }
 
         Assert.Equal(HttpStatusCode.Conflict, staleNothing.StatusCode); // a change that names nothing is made on a version too
@@ -495,24 +531,24 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var participation = Ridden(eventId, 1);
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation, version: 2);
 
         var invalid = await Change(
-            mainOperator,
+            consoleOperator,
             participation.Id,
             new { eliminated = new { code = "DQ" } },
             version: 2
         );
-        var missing = await Change(mainOperator, Guid.NewGuid(), new { }, version: 0);
-        var removedMissing = await mainOperator.Page.DeleteAsync($"/api/participations/{Guid.NewGuid()}");
+        var missing = await Change(consoleOperator, Guid.NewGuid(), new { }, version: 0);
+        var removedMissing = await consoleOperator.Page.DeleteAsync($"/api/participations/{Guid.NewGuid()}");
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, invalid.StatusCode);
         Assert.Equal("invalid-attribute", await ErrorCodeAsync(invalid));
@@ -528,17 +564,17 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_removes_a_Participation_and_the_viewers_are_told()
+    public async Task The_Console_Operator_removes_a_Participation_and_the_viewers_are_told()
     {
         var changes = new RecordedChanges();
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var participation = Ridden(eventId, 1);
@@ -546,7 +582,7 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, kept);
 
-        var response = await mainOperator.Page.DeleteAsync($"/api/participations/{participation.Id}");
+        var response = await consoleOperator.Page.DeleteAsync($"/api/participations/{participation.Id}");
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Null(await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_participations", participation.Id));
@@ -561,11 +597,11 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var counted = Ridden(eventId, 1);
@@ -581,16 +617,16 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await EventSeed.RankingAsync(_mongo.ConnectionString, tenant, ranking);
         await EventSeed.HandoutAsync(_mongo.ConnectionString, tenant, handout);
 
-        var ofARanking = await mainOperator.Page.DeleteAsync($"/api/participations/{counted.Id}");
-        var ofAHandout = await mainOperator.Page.DeleteAsync($"/api/participations/{handedOut.Id}");
-        var unnamed = await mainOperator.Page.DeleteAsync($"/api/participations/{free.Id}");
+        var ofARanking = await consoleOperator.Page.DeleteAsync($"/api/participations/{counted.Id}");
+        var ofAHandout = await consoleOperator.Page.DeleteAsync($"/api/participations/{handedOut.Id}");
+        var unnamed = await consoleOperator.Page.DeleteAsync($"/api/participations/{free.Id}");
         var announcedWhileReferenced = changes.Announced.ToList();
-        await mainOperator.Page.DeleteAsync($"/api/rankings/{ranking.Id}");
-        await mainOperator.Page.DeleteAsync($"/api/handouts/{handout.Id}");
+        await consoleOperator.Page.DeleteAsync($"/api/rankings/{ranking.Id}");
+        await consoleOperator.Page.DeleteAsync($"/api/handouts/{handout.Id}");
         var afterwards = new[]
         {
-            await mainOperator.Page.DeleteAsync($"/api/participations/{counted.Id}"),
-            await mainOperator.Page.DeleteAsync($"/api/participations/{handedOut.Id}"),
+            await consoleOperator.Page.DeleteAsync($"/api/participations/{counted.Id}"),
+            await consoleOperator.Page.DeleteAsync($"/api/participations/{handedOut.Id}"),
         };
 
         foreach (var refused in new[] { ofARanking, ofAHandout })
@@ -616,11 +652,11 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var first = Ridden(eventId, 1);
@@ -634,7 +670,7 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         await EventSeed.RankingAsync(_mongo.ConnectionString, tenant, ranking);
         var before = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_rankings", ranking.Id))!;
 
-        var response = await Change(mainOperator, first.Id, new { eliminated = new { code = "WD" } }, version: 0);
+        var response = await Change(consoleOperator, first.Id, new { eliminated = new { code = "WD" } }, version: 0);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode); // the change was written
         Assert.Equal(before, await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_rankings", ranking.Id)); // and the Ranking was not
@@ -648,19 +684,19 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
         var otherTenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var strayed = Ridden(eventId, 1);
         await EventSeed.ParticipationAsync(_mongo.ConnectionString, otherTenant, strayed, version: 1);
         var before = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_participations", strayed.Id))!;
 
-        var changed = await Change(mainOperator, strayed.Id, new { eliminated = new { code = "WD" } }, version: 1);
-        var removed = await mainOperator.Page.DeleteAsync($"/api/participations/{strayed.Id}");
+        var changed = await Change(consoleOperator, strayed.Id, new { eliminated = new { code = "WD" } }, version: 1);
+        var removed = await consoleOperator.Page.DeleteAsync($"/api/participations/{strayed.Id}");
 
         Assert.Equal(HttpStatusCode.Conflict, changed.StatusCode); // what the Tenant of the Event holds is not that row
         Assert.Equal("participation-changed", await ErrorCodeAsync(changed));

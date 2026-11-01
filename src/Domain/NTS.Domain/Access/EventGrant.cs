@@ -2,21 +2,33 @@ using NTS.Domain.Enums;
 
 namespace NTS.Domain.Access;
 
-/// <summary>What a grant is for: Snapshot access as an Operator, or a link to an Official of the Event (ADR-0012).</summary>
+/// <summary>What a grant is for: the Console of the Event as a Console Operator, Snapshot access as an Operator, or a link to an Official of the Event (ADR-0012).</summary>
 public enum GrantKind
 {
     Operator = 1,
     Official = 2,
+    ConsoleOperator = 3,
 }
 
 /// <summary>
-/// The access the Main Operator gives to a person for one Event: as an Operator (never named in documents) or as an
+/// The access given to a person for one Event: as a Console Operator, as an Operator (never named in documents) or as an
 /// Official of a role (named in documents). A grant names the person by their exact email. When the email has an account
 /// the grant is theirs at once; when it has none it is a pending invitation that attaches to the account that
 /// registers with that email, and gives nothing until then. A grant never moves from one account to another.
 /// </summary>
 public sealed record EventGrant
 {
+    public static EventGrant ForConsoleOperator(
+        Guid id,
+        Guid eventId,
+        string tenantId,
+        string email,
+        Guid? accountId = null
+    )
+    {
+        return new EventGrant(id, eventId, tenantId, GrantKind.ConsoleOperator, null, NormalizeEmail(email), accountId);
+    }
+
     public static EventGrant ForOperator(Guid id, Guid eventId, string tenantId, string email, Guid? accountId = null)
     {
         return new EventGrant(id, eventId, tenantId, GrantKind.Operator, null, NormalizeEmail(email), accountId);

@@ -29,13 +29,18 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
     }
 
     [Fact]
-    public async Task The_Main_Operator_opens_the_timeline_and_sees_every_time_event_with_who_recorded_it_and_what_became_of_it()
+    public async Task The_Console_Operator_opens_the_timeline_and_sees_every_time_event_with_who_recorded_it_and_what_became_of_it()
     {
         var scene = await TimelineScene.CreateAsync(_host.MongoConnectionString);
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(
+            _host,
+            device,
+            scene.ConsoleOperator.Email,
+            $"/console/events/{scene.EventId}/dashboard"
+        );
 
         var dialog = await OpenTimelineAsync(page);
 
@@ -64,7 +69,12 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(
+            _host,
+            device,
+            scene.ConsoleOperator.Email,
+            $"/console/events/{scene.EventId}/dashboard"
+        );
         var dialog = await OpenTimelineAsync(page);
         var entries = dialog.GetByTestId("timeline-entry");
         await Expect(entries).ToHaveCountAsync(4, Counted());
@@ -95,7 +105,12 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(
+            _host,
+            device,
+            scene.ConsoleOperator.Email,
+            $"/console/events/{scene.EventId}/dashboard"
+        );
         var dialog = await OpenTimelineAsync(page);
         var entries = dialog.GetByTestId("timeline-entry");
         var save = dialog.GetByRole(AriaRole.Button, new() { Name = "Save", Exact = true });
@@ -142,7 +157,12 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(
+            _host,
+            device,
+            scene.ConsoleOperator.Email,
+            $"/console/events/{scene.EventId}/dashboard"
+        );
         var dialog = await OpenTimelineAsync(page);
         var entries = dialog.GetByTestId("timeline-entry");
         await Expect(entries).ToHaveCountAsync(5, Counted());
@@ -166,7 +186,12 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(
+            _host,
+            device,
+            scene.ConsoleOperator.Email,
+            $"/console/events/{scene.EventId}/dashboard"
+        );
         var dialog = await OpenTimelineAsync(page);
         var entries = dialog.GetByTestId("timeline-entry");
         await Expect(entries).ToHaveCountAsync(4, Counted());
@@ -192,7 +217,12 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(
+            _host,
+            device,
+            scene.ConsoleOperator.Email,
+            $"/console/events/{scene.EventId}/dashboard"
+        );
         var dialog = await OpenTimelineAsync(page);
         var entries = dialog.GetByTestId("timeline-entry");
         await Expect(entries).ToHaveCountAsync(4, Counted());
@@ -212,8 +242,8 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var eventId = await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
         await EventSeed.ParticipationAsync(
             mongo,
             tenant,
@@ -227,7 +257,7 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator.Email, $"/console/events/{eventId}/dashboard");
+        await SignInAndOpenAsync(_host, device, consoleOperator.Email, $"/console/events/{eventId}/dashboard");
 
         var dialog = await OpenTimelineAsync(page);
 
@@ -247,7 +277,7 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
 
     /// <summary>
     /// A Live Event with one Participation whose first Phase has an arrival that an Official recorded, a second arrival that was
-    /// refused, an update of the first, and a presentation that the Main Operator recorded; and, when asked for, an arrival in the
+    /// refused, an update of the first, and a presentation that the Console Operator recorded; and, when asked for, an arrival in the
     /// second Phase.
     /// </summary>
     sealed class TimelineScene
@@ -258,9 +288,9 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
         public static async Task<TimelineScene> CreateAsync(string mongo, bool laterPhaseHasATime = false)
         {
             var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-            var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+            var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
             var official = await TenancySeed.AccountAsync(mongo, tenant, name: "Olga Official");
-            var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+            var eventId = await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
             var recorded = new DateTimeOffset(DateTime.Today.AddHours(12));
             var participation = IntegrationPayloadFactory.TwoPhaseParticipation(
                 eventId,
@@ -286,7 +316,7 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
             );
             participation.Process(
                 IntegrationPayloadFactory.PresentSnapshot(1, START.AddMinutes(40)),
-                mainOperator.Id,
+                consoleOperator.Id,
                 recorded.AddMinutes(3)
             );
             if (laterPhaseHasATime)
@@ -300,7 +330,7 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
             }
 
             await EventSeed.ParticipationAsync(mongo, tenant, participation);
-            return new TimelineScene(mongo, mainOperator, eventId, participation.Id, recorded);
+            return new TimelineScene(mongo, consoleOperator, eventId, participation.Id, recorded);
         }
 
         readonly string _mongo;
@@ -308,7 +338,7 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
 
         TimelineScene(
             string mongo,
-            TenancySeed.Seeded mainOperator,
+            TenancySeed.Seeded consoleOperator,
             Guid eventId,
             Guid participation,
             DateTimeOffset recordedAt
@@ -316,12 +346,12 @@ public sealed class ConsoleTimelineBrowserTests : IClassFixture<ApiHostFixture>,
         {
             _mongo = mongo;
             _participation = participation;
-            MainOperator = mainOperator;
+            ConsoleOperator = consoleOperator;
             EventId = eventId;
             RecordedAt = recordedAt;
         }
 
-        public TenancySeed.Seeded MainOperator { get; }
+        public TenancySeed.Seeded ConsoleOperator { get; }
         public Guid EventId { get; }
         public DateTimeOffset RecordedAt { get; }
         public string ArriveBeforeUpdate => ARRIVE.ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);

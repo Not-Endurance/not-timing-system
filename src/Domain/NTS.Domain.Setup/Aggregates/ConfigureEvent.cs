@@ -31,8 +31,7 @@ public class ConfigureEvent
         IEnumerable<Combination> combinations,
         Guid? id = null,
         IEnumerable<Operator>? operators = null,
-        string? tenantId = null,
-        Guid? mainOperatorId = null
+        string? tenantId = null
     )
         : base(id)
     {
@@ -41,7 +40,6 @@ public class ConfigureEvent
         Country = Required(nameof(Country), country);
         FeiShowId = feiShowId;
         TenantId = string.IsNullOrWhiteSpace(tenantId) ? Tenant.LEGACY_ID : tenantId;
-        MainOperatorId = mainOperatorId;
         _competitions = competitions.ToList();
         _officials = officials.ToList();
         _operators = operators?.ToList() ?? [];
@@ -63,9 +61,6 @@ public class ConfigureEvent
 
     /// <summary>The Tenant the Event belongs to (ADR-0012). An Event from before Tenants has the constant one.</summary>
     public string TenantId { get; }
-
-    /// <summary>The one account that configures and runs the Event; none for an Event from before Tenants.</summary>
-    public Guid? MainOperatorId { get; }
 
     public IReadOnlyList<Competition> Competitions => _competitions.AsReadOnly();
     public IReadOnlyList<Official> Officials => _officials.AsReadOnly();

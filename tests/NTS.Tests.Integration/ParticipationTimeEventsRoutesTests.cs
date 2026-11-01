@@ -14,7 +14,7 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// Who may read how the times of a Participation were recorded (#619, ADR-0005, ADR-0012): anybody reads the times each Phase
-/// shows, and only Staff, which is every Official, every Operator and the Main Operator of the Event (and the Developer), read
+/// shows, and only Staff, which is every Official, every Operator and the Console Operator of the Event (and the Developer), read
 /// its time events, with who recorded each and when. The Participation is the same resource for all of them and is read by
 /// the caller. The people who recorded times are named to Staff only, and only the ones who recorded a time of the Event. The
 /// documents are seeded straight into MongoDB.
@@ -92,11 +92,11 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
     }
 
     [Fact]
-    public async Task An_Official_an_Operator_the_Main_Operator_and_the_Developer_read_the_time_events_with_who_recorded_each_and_when()
+    public async Task An_Official_an_Operator_the_Console_Operator_and_the_Developer_read_the_time_events_with_who_recorded_each_and_when()
     {
         await using var scene = await SceneAsync();
 
-        foreach (var person in new[] { scene.Official, scene.Operator, scene.MainOperator, scene.Developer })
+        foreach (var person in new[] { scene.Official, scene.Operator, scene.ConsoleOperator, scene.Developer })
         {
             var list = await person.Page.GetAsync($"/api/participations?filter=eventId eq {scene.EventId}");
             var one = await person.Page.GetAsync($"/api/participations/{scene.Participation.Id}");
@@ -130,10 +130,10 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
     }
 
     [Fact]
-    public async Task What_a_Main_Operator_writes_is_answered_with_the_Participation_as_Staff_read_it()
+    public async Task What_a_Console_Operator_writes_is_answered_with_the_Participation_as_Staff_read_it()
     {
         await using var scene = await SceneAsync();
-        var response = await scene.MainOperator.Page.WriteAsync(
+        var response = await scene.ConsoleOperator.Page.WriteAsync(
             HttpMethod.Patch,
             $"/api/participations/{scene.Participation.Id}",
             "participations",
@@ -156,7 +156,7 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
         await using var scene = await SceneAsync();
         var path = $"/api/time-event-actors?filter=eventId eq {scene.EventId}";
 
-        foreach (var person in new[] { scene.Official, scene.Operator, scene.MainOperator, scene.Developer })
+        foreach (var person in new[] { scene.Official, scene.Operator, scene.ConsoleOperator, scene.Developer })
         {
             var response = await person.Page.GetAsync(path);
 
@@ -209,12 +209,12 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
         }
 
         var path = $"/api/time-event-actors?filter=eventId eq {scene.EventId}";
-        var first = await ActorPageAsync(scene.MainOperator, path + "&page[size]=3");
-        var last = await ActorPageAsync(scene.MainOperator, path + "&page[size]=3&page[number]=2");
-        var followed = await ActorPageAsync(scene.MainOperator, first.Next!);
-        var backwards = await ActorPageAsync(scene.MainOperator, path + "&sort=-displayName&page[size]=3");
-        var full = await ActorPageAsync(scene.MainOperator, path + "&page[size]=4");
-        var unnamed = await ActorPageAsync(scene.MainOperator, path);
+        var first = await ActorPageAsync(scene.ConsoleOperator, path + "&page[size]=3");
+        var last = await ActorPageAsync(scene.ConsoleOperator, path + "&page[size]=3&page[number]=2");
+        var followed = await ActorPageAsync(scene.ConsoleOperator, first.Next!);
+        var backwards = await ActorPageAsync(scene.ConsoleOperator, path + "&sort=-displayName&page[size]=3");
+        var full = await ActorPageAsync(scene.ConsoleOperator, path + "&page[size]=4");
+        var unnamed = await ActorPageAsync(scene.ConsoleOperator, path);
 
         Assert.Equal(["Anna Actor", "Boris Barn", "Cora Clerk"], first.Names);
         Assert.Equal((3, 1), (first.Size, first.Number));
@@ -255,9 +255,9 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
         }
 
         var path = $"/api/time-event-actors?filter=eventId eq {scene.EventId}&page[size]=1";
-        var first = await ActorPageAsync(scene.MainOperator, path);
-        var second = await ActorPageAsync(scene.MainOperator, path + "&page[number]=2");
-        var third = await ActorPageAsync(scene.MainOperator, path + "&page[number]=3");
+        var first = await ActorPageAsync(scene.ConsoleOperator, path);
+        var second = await ActorPageAsync(scene.ConsoleOperator, path + "&page[number]=2");
+        var third = await ActorPageAsync(scene.ConsoleOperator, path + "&page[number]=3");
 
         Assert.Equal([low], first.Ids);
         Assert.Equal([high], second.Ids);
@@ -283,7 +283,7 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
             );
 
         var page = await ActorPageAsync(
-            scene.MainOperator,
+            scene.ConsoleOperator,
             $"/api/time-event-actors?filter=eventId eq {scene.EventId}&page[size]=1"
         );
 
@@ -302,7 +302,7 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
     {
         await using var scene = await SceneAsync();
 
-        var response = await scene.MainOperator.Page.GetAsync(
+        var response = await scene.ConsoleOperator.Page.GetAsync(
             $"/api/time-event-actors?filter=eventId eq {scene.EventId}{query}"
         );
 
@@ -319,7 +319,7 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
     {
         await using var scene = await SceneAsync();
 
-        var response = await scene.MainOperator.Page.GetAsync(path);
+        var response = await scene.ConsoleOperator.Page.GetAsync(path);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -329,7 +329,7 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
     {
         await using var scene = await SceneAsync();
 
-        var response = await scene.MainOperator.Page.GetAsync(
+        var response = await scene.ConsoleOperator.Page.GetAsync(
             "/api/time-event-actors?filter=eventId eq 3f2504e0-4f89-41d3-9a0c-0305e82c3301"
         );
 
@@ -343,11 +343,11 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
         var quiet = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             scene.Tenant,
-            scene.MainOperator.Id,
+            scene.ConsoleOperator.Id,
             DateTimeOffset.UtcNow
         );
 
-        var response = await scene.MainOperator.Page.GetAsync($"/api/time-event-actors?filter=eventId eq {quiet}");
+        var response = await scene.ConsoleOperator.Page.GetAsync($"/api/time-event-actors?filter=eventId eq {quiet}");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Empty((await ApiSessions.ReadJsonAsync(response)).GetProperty("data").EnumerateArray());
@@ -358,14 +358,19 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
         var api = new ApiFactory(_mongo.ConnectionString);
         var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
-        var other = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var other = await EventSeed.LiveAsync(
+            _mongo.ConnectionString,
+            tenant,
+            consoleOperator.Id,
+            DateTimeOffset.UtcNow
+        );
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Olga Official");
         await EventSeed.GrantAsync(
             _mongo.ConnectionString,
@@ -416,7 +421,7 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
             client,
             tenant,
             eventId,
-            mainOperator,
+            consoleOperator,
             official,
             operatorOf,
             developer,
@@ -496,7 +501,7 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
             HttpClient anonymous,
             string tenant,
             Guid eventId,
-            Person mainOperator,
+            Person consoleOperator,
             Person official,
             Person operatorOf,
             Person developer,
@@ -510,7 +515,7 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
             Anonymous = anonymous;
             Tenant = tenant;
             EventId = eventId;
-            MainOperator = mainOperator;
+            ConsoleOperator = consoleOperator;
             Official = official;
             Operator = operatorOf;
             Developer = developer;
@@ -524,7 +529,7 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
         public HttpClient Anonymous { get; }
         public string Tenant { get; }
         public Guid EventId { get; }
-        public Person MainOperator { get; }
+        public Person ConsoleOperator { get; }
         public Person Official { get; }
         public Person Operator { get; }
         public Person Developer { get; }

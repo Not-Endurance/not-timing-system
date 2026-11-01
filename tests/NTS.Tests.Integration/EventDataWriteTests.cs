@@ -11,7 +11,7 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// Writing the rest of what an Event keeps (#604, ADR-0012, ADR-0013): the Rankings, Officials and Handouts it made when it
-/// started, which the Main Operator of a Live Event makes, changes and removes as it does the Participations (see
+/// started, which the Console Operator of a Live Event makes, changes and removes as it does the Participations (see
 /// <c>ParticipationWriteTests</c>), but which count no writes and are not announced: a change of them is the last one made,
 /// and what the viewers follow is the Participations. The documents are seeded straight into MongoDB and read back from it.
 /// </summary>
@@ -25,38 +25,38 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_makes_changes_and_removes_a_Ranking_that_nobody_is_told_of_and_that_counts_no_version()
+    public async Task The_Console_Operator_makes_changes_and_removes_a_Ranking_that_nobody_is_told_of_and_that_counts_no_version()
     {
         var changes = new RecordedChanges();
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var first = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 1, Guid.NewGuid());
         var second = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 2, Guid.NewGuid());
         var ranking = IntegrationPayloadFactory.Ranking(eventId, [first, second], Guid.NewGuid(), "CEI 1*");
 
-        var made = await mainOperator.Page.WriteAsync(
+        var made = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/rankings",
             "rankings",
             JsonApiAttributes.Of(RankingModel.From(ranking)),
             id: ranking.Id.ToString()
         );
-        var changed = await mainOperator.Page.WriteAsync(
+        var changed = await consoleOperator.Page.WriteAsync(
             HttpMethod.Patch,
             $"/api/rankings/{ranking.Id}",
             "rankings",
             new { name = "CEI 2*" }
         );
         var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_rankings", ranking.Id))!;
-        var removed = await mainOperator.Page.DeleteAsync($"/api/rankings/{ranking.Id}");
+        var removed = await consoleOperator.Page.DeleteAsync($"/api/rankings/{ranking.Id}");
 
         Assert.Equal(HttpStatusCode.Created, made.StatusCode);
         Assert.Equal($"/api/rankings/{ranking.Id}", made.Headers.Location?.OriginalString);
@@ -88,31 +88,31 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var participation = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 1, Guid.NewGuid());
         var handout = IntegrationPayloadFactory.Handout(participation, Guid.NewGuid());
         await EventSeed.HandoutAsync(_mongo.ConnectionString, tenant, handout);
 
-        var elsewhere = await mainOperator.Page.WriteAsync(
+        var elsewhere = await consoleOperator.Page.WriteAsync(
             HttpMethod.Patch,
             $"/api/handouts/{handout.Id}",
             "handouts",
             new { eventId = Guid.NewGuid() }
         );
-        var theirs = await mainOperator.Page.WriteAsync(
+        var theirs = await consoleOperator.Page.WriteAsync(
             HttpMethod.Patch,
             $"/api/handouts/{handout.Id}",
             "handouts",
             new { tenantId = "country-xx" }
         );
         var another = Guid.NewGuid();
-        var moved = await mainOperator.Page.WriteAsync(
+        var moved = await consoleOperator.Page.WriteAsync(
             HttpMethod.Patch,
             $"/api/handouts/{handout.Id}",
             "handouts",
@@ -137,11 +137,11 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var linked = IntegrationPayloadFactory.Official(eventId, TestId.Of(77), Guid.NewGuid());
@@ -150,15 +150,15 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
 
         var naming = JsonApiAttributes.Of(OfficialModel.MapFrom(made), "userId");
         naming["userId"] = JsonSerializer.SerializeToElement(TestId.Of(78));
-        var refused = await mainOperator.Page.WriteAsync(HttpMethod.Post, "/api/officials", "officials", naming);
-        var created = await mainOperator.Page.WriteAsync(
+        var refused = await consoleOperator.Page.WriteAsync(HttpMethod.Post, "/api/officials", "officials", naming);
+        var created = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/officials",
             "officials",
             JsonApiAttributes.Of(OfficialModel.MapFrom(made), "userId"),
             id: made.Id.ToString()
         );
-        var changed = await mainOperator.Page.WriteAsync(
+        var changed = await consoleOperator.Page.WriteAsync(
             HttpMethod.Patch,
             $"/api/officials/{linked.Id}",
             "officials",
@@ -185,22 +185,28 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
     [InlineData("rankings")]
     [InlineData("officials")]
     [InlineData("handouts")]
-    public async Task Every_family_is_written_by_the_Main_Operator_of_a_Live_Event_and_by_nobody_else(string route)
+    public async Task Every_family_is_written_by_a_Console_Operator_of_a_Live_Event_and_by_Root_and_by_nobody_else(
+        string route
+    )
     {
         var changes = new RecordedChanges();
         await using var api = NewApi(changes);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
         using var anonymous = ApiClients.Of(api);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        var live = await EventSeed.LiveAsync(
+            _mongo.ConnectionString,
+            tenant,
+            consoleOperator.Id,
+            DateTimeOffset.UtcNow
+        );
+        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id);
         var historic = await EventSeed.HistoricAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var existing = EventDataRow.Of(route, live);
@@ -208,22 +214,19 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
         await existing.SeedAsync(_mongo.ConnectionString, tenant);
         await ended.SeedAsync(_mongo.ConnectionString, tenant);
 
-        foreach (var person in new[] { member, developer })
-        {
-            var made = await person.Page.WriteAsync(
-                HttpMethod.Post,
-                $"/api/{route}",
-                route,
-                EventDataRow.Of(route, live).Attributes
-            );
-            var changed = await person.Page.WriteAsync(HttpMethod.Patch, $"/api/{route}/{existing.Id}", route, new { });
-            var removed = await person.Page.DeleteAsync($"/api/{route}/{existing.Id}");
+        var made = await member.Page.WriteAsync(
+            HttpMethod.Post,
+            $"/api/{route}",
+            route,
+            EventDataRow.Of(route, live).Attributes
+        );
+        var changed = await member.Page.WriteAsync(HttpMethod.Patch, $"/api/{route}/{existing.Id}", route, new { });
+        var removed = await member.Page.DeleteAsync($"/api/{route}/{existing.Id}");
 
-            foreach (var refused in new[] { made, changed, removed })
-            {
-                Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
-                Assert.Equal("not-main-operator", await ErrorCodeAsync(refused));
-            }
+        foreach (var refused in new[] { made, changed, removed })
+        {
+            Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
+            Assert.Equal("not-console-operator", await ErrorCodeAsync(refused));
         }
 
         var page = new PageClient(anonymous);
@@ -233,7 +236,7 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
             await page.WriteAsync(HttpMethod.Patch, $"/api/{route}/{existing.Id}", route, new { }),
             await page.DeleteAsync($"/api/{route}/{existing.Id}"),
         };
-        var early = await mainOperator.Page.WriteAsync(
+        var early = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             $"/api/{route}",
             route,
@@ -241,14 +244,14 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
         );
         var late = new[]
         {
-            await mainOperator.Page.WriteAsync(
+            await consoleOperator.Page.WriteAsync(
                 HttpMethod.Post,
                 $"/api/{route}",
                 route,
                 EventDataRow.Of(route, historic).Attributes
             ),
-            await mainOperator.Page.WriteAsync(HttpMethod.Patch, $"/api/{route}/{ended.Id}", route, new { }),
-            await mainOperator.Page.DeleteAsync($"/api/{route}/{ended.Id}"),
+            await consoleOperator.Page.WriteAsync(HttpMethod.Patch, $"/api/{route}/{ended.Id}", route, new { }),
+            await consoleOperator.Page.DeleteAsync($"/api/{route}/{ended.Id}"),
         };
 
         Assert.All(signedOut, x => Assert.Equal(HttpStatusCode.Unauthorized, x.StatusCode));
@@ -270,6 +273,37 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
     [InlineData("rankings")]
     [InlineData("officials")]
     [InlineData("handouts")]
+    public async Task Root_writes_every_family_of_a_Live_Event_it_is_not_assigned_to(string route)
+    {
+        var changes = new RecordedChanges();
+        await using var api = NewApi(changes);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
+        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+
+        foreach (var person in new[] { root, developer })
+        {
+            var row = EventDataRow.Of(route, live);
+            var made = await person.Page.WriteAsync(
+                HttpMethod.Post,
+                $"/api/{route}",
+                route,
+                row.Attributes,
+                id: row.Id.ToString()
+            );
+            var removed = await person.Page.DeleteAsync($"/api/{route}/{row.Id}");
+
+            Assert.Equal(HttpStatusCode.Created, made.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, removed.StatusCode);
+        }
+    }
+
+    [Theory]
+    [InlineData("rankings")]
+    [InlineData("officials")]
+    [InlineData("handouts")]
     public async Task A_row_is_not_changed_removed_or_made_through_the_Tenant_of_another_Event(string route)
     {
         var changes = new RecordedChanges();
@@ -277,8 +311,13 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
         var otherTenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var live = await EventSeed.LiveAsync(
+            _mongo.ConnectionString,
+            tenant,
+            consoleOperator.Id,
+            DateTimeOffset.UtcNow
+        );
         var foreign = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             otherTenant,
@@ -288,10 +327,15 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
         var theirs = EventDataRow.Of(route, foreign);
         await theirs.SeedAsync(_mongo.ConnectionString, otherTenant);
 
-        var made = await mainOperator.Page.WriteAsync(HttpMethod.Post, $"/api/{route}", route, theirs.Attributes);
-        var changed = await mainOperator.Page.WriteAsync(HttpMethod.Patch, $"/api/{route}/{theirs.Id}", route, new { });
-        var removed = await mainOperator.Page.DeleteAsync($"/api/{route}/{theirs.Id}");
-        var taken = await mainOperator.Page.WriteAsync(
+        var made = await consoleOperator.Page.WriteAsync(HttpMethod.Post, $"/api/{route}", route, theirs.Attributes);
+        var changed = await consoleOperator.Page.WriteAsync(
+            HttpMethod.Patch,
+            $"/api/{route}/{theirs.Id}",
+            route,
+            new { }
+        );
+        var removed = await consoleOperator.Page.DeleteAsync($"/api/{route}/{theirs.Id}");
+        var taken = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             $"/api/{route}",
             route,
@@ -301,8 +345,8 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
 
         foreach (var refused in new[] { made, changed, removed })
         {
-            Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode); // the Main Operator of one Event is nobody to another
-            Assert.Equal("not-main-operator", await ErrorCodeAsync(refused));
+            Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode); // the Console Operator of one Event is nobody to another
+            Assert.Equal("not-console-operator", await ErrorCodeAsync(refused));
         }
 
         Assert.Equal(HttpStatusCode.Conflict, taken.StatusCode);

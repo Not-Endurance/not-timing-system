@@ -25,7 +25,7 @@ public class WitnessAccessContext
 {
     readonly INtsSocketContext _socketContext;
     readonly JsonApiClient _api;
-    (Guid Person, Guid? Event, WitnessAccessLevel Level)? _said;
+    (Guid Person, Guid? Event, bool CanSend)? _said;
 
     public WitnessAccessContext(INtsSocketContext socketContext, IAccountSession account, JsonApiClient api)
         : base(account)
@@ -34,7 +34,11 @@ public class WitnessAccessContext
         _api = api;
     }
 
-    public WitnessAccessLevel AccessLevel { get; private set; }
+    public bool IsKnown { get; private set; }
+
+    public bool IsSignedIn { get; private set; }
+
+    public bool CanSendSnapshots { get; private set; }
 
     protected override async Task<bool> InitializeState()
     {
@@ -46,32 +50,33 @@ public class WitnessAccessContext
 
         if (Account.Current is not { } person)
         {
-            AccessLevel = WitnessAccessLevel.Anonymous;
+            IsKnown = true;
+            IsSignedIn = false;
+            CanSendSnapshots = false;
             return true;
         }
 
-        // The level is said once, when the Api has answered: a person who may send Snapshots is not shown as one who may not
-        // for the time it takes to ask again, which a page that decides by the level (the Snapshot page) would act on. An Api
-        // that cannot answer leaves what it last said of this person and Event, so that a phone that lost its connection for a
-        // moment does not take the page and the sending from an Official (the Api refuses what they may no longer do when it
-        // is sent), and the person registered when it has said nothing; and the state is loaded again.
+        // What may be done is said once, when the Api has answered: a person who may send Snapshots is not shown as one who may
+        // not for the time it takes to ask again, which a page that decides by it (the Snapshot page) would act on. An Api that
+        // cannot answer leaves what it last said of this person and Event, so that a phone that lost its connection for a moment
+        // does not take the page and the sending from an Official (the Api refuses what they may no longer do when it is sent),
+        // and the person may not when it has said nothing; and the state is loaded again.
         var eventId = _socketContext.Event?.Id;
-        var level =
-            _said is { } said && said.Person == person.Id && said.Event == eventId
-                ? said.Level
-                : WitnessAccessLevel.Registered;
+        var canSend = _said is { } said && said.Person == person.Id && said.Event == eventId && said.CanSend;
         try
         {
             if (eventId is { } id)
             {
-                level = await CanSendSnapshots(id) ? WitnessAccessLevel.Official : WitnessAccessLevel.Registered;
+                canSend = await MaySendTo(id);
             }
 
-            _said = (person.Id, eventId, level);
+            _said = (person.Id, eventId, canSend);
         }
         finally
         {
-            AccessLevel = level;
+            IsKnown = true;
+            IsSignedIn = true;
+            CanSendSnapshots = canSend;
         }
 
         // With no Event followed there is nothing to ask the Api, and what is said then is not what the Event will say. The state
@@ -96,7 +101,7 @@ public class WitnessAccessContext
     /// in to it, is a no: the Snapshot is refused by the Api again when it is sent. An Api that cannot be reached, or that
     /// fails (5xx), has not answered: the state is loaded again, as it is for every stateful service.
     /// </summary>
-    async Task<bool> CanSendSnapshots(Guid eventId)
+    async Task<bool> MaySendTo(Guid eventId)
     {
         var response = await _api.Send(HttpMethod.Get, $"events/{eventId}/capabilities");
         if ((int)response.Status >= 500)

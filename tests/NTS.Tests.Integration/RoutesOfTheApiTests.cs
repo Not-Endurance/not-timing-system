@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using NoTiming.Api.Features.Access;
 using NTS.Tests.Integration.Infrastructure;
 using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 
@@ -39,6 +40,16 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             route =>
                 Assert.DoesNotContain(NeverInARoute(), word => route.Contains(word, StringComparison.OrdinalIgnoreCase))
         );
+    }
+
+    [Fact]
+    public async Task Every_route_of_the_Api_is_public_or_declares_what_it_needs()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+
+        var endpoints = api.Services.GetServices<EndpointDataSource>().SelectMany(x => x.Endpoints);
+
+        Assert.Empty(EndpointGuard.Mistakes(endpoints));
     }
 
     [Fact]
@@ -156,6 +167,7 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             "DELETE api/athletes/{id}/link",
             "DELETE api/clubs/{id}",
             "DELETE api/configure-events/{id}",
+            "DELETE api/console-operators/{id}",
             "DELETE api/event-grants/{id}",
             "DELETE api/events/{id}",
             "DELETE api/handouts/{id}",
@@ -190,11 +202,10 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             "POST api/clubs",
             "POST api/code-challenges",
             "POST api/configure-events",
+            "POST api/console-operators",
             "POST api/countries",
             "POST api/event-grants",
             "POST api/events",
-            "POST api/events/{id}/actions/assign-main-operator",
-            "POST api/events/{id}/actions/hand-over",
             "POST api/handouts",
             "POST api/horses",
             "POST api/horses/{id}/link",
@@ -228,6 +239,7 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             "GET api/clubs/{id}",
             "GET api/configure-events",
             "GET api/configure-events/{id}",
+            "GET api/console-operators",
             "GET api/countries",
             "GET api/countries/{id}",
             "GET api/event-grants",

@@ -25,7 +25,7 @@ using Competition = NTS.Domain.Core.Aggregates.Participations.Objects.Competitio
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// The dashboard of a Live Event in the Console (#646, ADR-0013): what the Main Operator does to the Participation it works on,
+/// The dashboard of a Live Event in the Console (#646, ADR-0013): what the Console Operator does to the Participation it works on,
 /// each change written to the Api against the version it saw, and what happens when another tab has changed it meanwhile.
 /// Over the real Api in this process, with the store and the services of the Ui built as the app builds them; the hub is left
 /// to the tests of the hub, so a tab reads a Participation again only when it asks to.
@@ -43,7 +43,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_withdraws_a_Participation_and_restores_it_and_the_Api_stores_each_change()
+    public async Task The_Console_Operator_withdraws_a_Participation_and_restores_it_and_the_Api_stores_each_change()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var (person, eventId, ids) = await SceneAsync(api);
@@ -98,7 +98,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_time_the_Main_Operator_names_is_recorded_by_the_server_as_an_Arrival_of_the_Participation()
+    public async Task A_time_the_Console_Operator_names_is_recorded_by_the_server_as_an_Arrival_of_the_Participation()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var (person, eventId, _) = await SceneAsync(api);
@@ -206,7 +206,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var (_, eventId, ids) = await SceneAsync(api);
-        var plain = await SomebodyElseAsync(api); // not the Main Operator of the Event, nor an Official of it
+        var plain = await SomebodyElseAsync(api); // not the Console Operator of the Event, nor an Official of it
         await using var tab = await Tab.OpenAsync(api, plain, eventId);
         tab.Dashboard.Selected = tab.Dashboard.Participations.First();
 
@@ -314,7 +314,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var (_, eventId, ids) = await SceneAsync(api);
-        var plain = await SomebodyElseAsync(api); // not the Main Operator of the Event
+        var plain = await SomebodyElseAsync(api); // not the Console Operator of the Event
         await using var tab = await Tab.OpenAsync(api, plain, eventId);
         tab.Dashboard.Selected = tab.Dashboard.Participations.First();
 
@@ -502,7 +502,7 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
         }
     }
 
-    /// <summary>One tab of the Main Operator: its own store of the Participations and its own dashboard, over the Api.</summary>
+    /// <summary>One tab of the Console Operator: its own store of the Participations and its own dashboard, over the Api.</summary>
     sealed class Tab : IAsyncDisposable
     {
         public static async Task<Tab> OpenAsync(

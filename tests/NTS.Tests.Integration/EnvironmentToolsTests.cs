@@ -136,7 +136,7 @@ public sealed class EnvironmentToolsTests : IClassFixture<MongoFixture>
             var option in new[]
             {
                 "--tenant-root",
-                "--main-operator",
+                "--console-operator",
                 "--official",
                 "--operator",
                 "--environment",
@@ -245,8 +245,8 @@ public sealed class EnvironmentToolsTests : IClassFixture<MongoFixture>
             data.Database.DatabaseNamespace.DatabaseName,
             "--tenant-root",
             "root@example.test",
-            "--main-operator",
-            "main@example.test",
+            "--console-operator",
+            "console@example.test",
         };
         args.AddRange(more);
         var code = await StagingSeedTool.Run([.. args], output, error, NOW);

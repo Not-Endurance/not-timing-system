@@ -7,7 +7,7 @@ using NTS.Domain.Enums;
 namespace NTS.Contracts.Features.Console;
 
 /// <summary>
-/// The dashboard of a Live Event in the Console (#646): the Participations of the Event, the one the Main Operator has selected,
+/// The dashboard of a Live Event in the Console (#646): the Participations of the Event, the one the Console Operator has selected,
 /// and what is done to it: its times are edited, a time is recorded for it, a Representation or an Inspection is requested
 /// for it, it is eliminated and restored. Every change is written to the Api against the version of the Participation that
 /// the person saw (ADR-0013): when the Participation has changed since, the Api refuses it (409 <c>participation-changed</c>),
@@ -36,7 +36,7 @@ public interface IConsoleDashboard : IStatefulService
     /// <summary>Opens the dashboard for the Event the view shows: it is refused as a write is when the view cannot write.</summary>
     Task Show(IViewedEvent view);
 
-    /// <summary>Records a time of the day that the Main Operator names as an Arrival or a Presentation of the selected Participation.</summary>
+    /// <summary>Records a time of the day that the Console Operator names as an Arrival or a Presentation of the selected Participation.</summary>
     Task RecordTime(SnapshotType type, TimeSpan timeOfDay);
 
     Task RequestRepresentation(bool isRequested);

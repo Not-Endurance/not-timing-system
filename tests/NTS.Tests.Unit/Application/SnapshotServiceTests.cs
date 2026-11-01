@@ -95,7 +95,7 @@ public sealed class SnapshotServiceTests
         service.SelectForSnapshot(service.Participations[0]);
         service.SelectForSnapshot(service.Participations[0]);
         service.Capture(service.Snapshots[0]);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
 
         var published = await service.Publish(view, SnapshotType.Arrive);
 
@@ -124,7 +124,7 @@ public sealed class SnapshotServiceTests
             service.Capture(snapshot);
         }
 
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
 
         var published = await service.Publish(view, SnapshotType.Arrive);
 
@@ -161,7 +161,7 @@ public sealed class SnapshotServiceTests
             service.Capture(snapshot);
         }
 
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
 
         var refused = await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
 
@@ -179,7 +179,7 @@ public sealed class SnapshotServiceTests
             SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.RejectedDuplicateArrive));
         service.SelectForSnapshot(service.Participations[0]);
         service.Capture(service.Snapshots[0]);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
 
         var published = await service.Publish(view, SnapshotType.Arrive);
 
@@ -195,7 +195,7 @@ public sealed class SnapshotServiceTests
         publisher.Answer = (_, id) => SnapshotReceipt.Failed(id, 403, "not-allowed", "You may not do this.");
         service.SelectForSnapshot(service.Participations[0]);
         service.Capture(service.Snapshots[0]);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
 
         await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
 
@@ -211,7 +211,7 @@ public sealed class SnapshotServiceTests
             ParticipationFixtures.Active(2)
         );
         SelectAndCapture(service);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         publisher.Fail = new HttpRequestException("The answer was lost.");
         await Assert.ThrowsAsync<HttpRequestException>(() => service.Publish(view, SnapshotType.Arrive));
         Assert.Equal([1, 2], service.Snapshots.Select(x => x.Number)); // nothing was taken off the page
@@ -232,7 +232,7 @@ public sealed class SnapshotServiceTests
     {
         var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
         SelectAndCapture(service);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         publisher.Answer = (_, id) => SnapshotReceipt.Failed(id, 503, null, "The server could not answer.");
         await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
         publisher.Answer = (_, id) => SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.Accepted));
@@ -247,7 +247,7 @@ public sealed class SnapshotServiceTests
     {
         var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
         SelectAndCapture(service);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         publisher.Fail = new HttpRequestException("The answer was lost.");
         await Assert.ThrowsAsync<HttpRequestException>(() => service.Publish(view, SnapshotType.Arrive));
         publisher.Fail = null;
@@ -264,7 +264,7 @@ public sealed class SnapshotServiceTests
     {
         var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
         SelectAndCapture(service);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         publisher.Fail = new HttpRequestException("The answer was lost.");
         await Assert.ThrowsAsync<HttpRequestException>(() => service.Publish(view, SnapshotType.Arrive));
         publisher.Fail = null;
@@ -284,7 +284,7 @@ public sealed class SnapshotServiceTests
         );
         service.SelectForSnapshot(service.Participations[0]);
         service.Capture(service.Snapshots[0]);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         publisher.Fail = new HttpRequestException("The answer was lost.");
         await Assert.ThrowsAsync<HttpRequestException>(() => service.Publish(view, SnapshotType.Arrive));
         publisher.Fail = null;
@@ -307,7 +307,7 @@ public sealed class SnapshotServiceTests
         var captured = new Timestamp(DateTimeOffset.Now);
         service.SelectForSnapshot(service.Participations[0]);
         service.UpdateTimestamp(service.Snapshots[0], captured);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         publisher.Fail = new HttpRequestException("The answer was lost.");
         await Assert.ThrowsAsync<HttpRequestException>(() => service.Publish(view, SnapshotType.Arrive));
         publisher.Fail = null;
@@ -326,7 +326,7 @@ public sealed class SnapshotServiceTests
     {
         var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
         SelectAndCapture(service);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         await service.Publish(view, SnapshotType.Arrive);
         var sent = Assert.Single(service.History);
 
@@ -345,7 +345,7 @@ public sealed class SnapshotServiceTests
             [new Snapshot(1, "Athlete 1", null, new Timestamp(DateTimeOffset.Now))],
             SnapshotType.Arrive
         );
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         publisher.Fail = new HttpRequestException("The answer was lost.");
         await Assert.ThrowsAsync<HttpRequestException>(() => service.RePublish(view, group, SnapshotType.Present));
         publisher.Fail = null;
@@ -364,7 +364,7 @@ public sealed class SnapshotServiceTests
             ParticipationFixtures.Active(2)
         );
         SelectAndCapture(service);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         publisher.Answer = (number, id) =>
             number == 2
                 ? SnapshotReceipt.Failed(id, 409, "participation-busy", "Too many at once.")
@@ -388,7 +388,7 @@ public sealed class SnapshotServiceTests
             [new Snapshot(1, "Athlete 1", null, new Timestamp(DateTimeOffset.Now))],
             SnapshotType.Arrive
         );
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         publisher.Fail = new HttpRequestException("The answer was lost.");
         await Assert.ThrowsAsync<HttpRequestException>(() => service.RePublish(view, group, SnapshotType.Present));
         publisher.Fail = null;
@@ -408,7 +408,7 @@ public sealed class SnapshotServiceTests
             [new Snapshot(1, "Athlete 1", null, new Timestamp(DateTimeOffset.Now))],
             SnapshotType.Arrive
         );
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
 
         await service.RePublish(view, group, SnapshotType.Present);
 
@@ -443,7 +443,7 @@ public sealed class SnapshotServiceTests
         var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
         service.SelectForSnapshot(service.Participations[0]);
         service.Capture(service.Snapshots[0]);
-        using var view = await LiveView(store, WitnessAccessLevel.Registered);
+        using var view = await LiveView(store, canSendSnapshots: false);
 
         await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
 
@@ -515,7 +515,7 @@ public sealed class SnapshotServiceTests
             ParticipationFixtures.Active(2)
         );
         SelectAndCapture(service);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         await service.Publish(view, SnapshotType.Arrive);
         var group = Assert.Single(service.History);
         var entry = group.Entries.Single(x => x.Number == 1);
@@ -539,7 +539,7 @@ public sealed class SnapshotServiceTests
             ParticipationFixtures.Active(1),
             ParticipationFixtures.Active(2)
         );
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         service.SelectForSnapshot(service.Participations[0]);
         service.SelectForSnapshot(service.Participations[0]);
         foreach (var snapshot in service.Snapshots.ToArray())
@@ -595,7 +595,7 @@ public sealed class SnapshotServiceTests
             ParticipationFixtures.Active(1),
             ParticipationFixtures.Active(2)
         );
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         var (keptGroup, legacyGroup) = (service.History[0], service.History[1]);
 
         Assert.True(service.CanUpdate(keptGroup, keptGroup.Entries.Single()));
@@ -630,7 +630,7 @@ public sealed class SnapshotServiceTests
         var session = new SessionOf(null);
         var (service, store, _, publisher) = await ConnectedTo(session, ParticipationFixtures.Active(1));
         SelectAndCapture(service);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         await service.Publish(view, SnapshotType.Arrive);
         var group = Assert.Single(service.History);
         var entry = group.Entries.Single();
@@ -654,7 +654,7 @@ public sealed class SnapshotServiceTests
         var session = new SessionOf(null);
         var (service, store, _, publisher) = await ConnectedTo(session, account, ParticipationFixtures.Active(1));
         SelectAndCapture(service);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         await service.Publish(view, SnapshotType.Arrive);
         var group = Assert.Single(service.History);
         var entry = group.Entries.Single();
@@ -681,10 +681,10 @@ public sealed class SnapshotServiceTests
     {
         var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
         SelectAndCapture(service);
-        using var writer = await LiveView(store, WitnessAccessLevel.Official);
+        using var writer = await LiveView(store, canSendSnapshots: true);
         await service.Publish(writer, SnapshotType.Arrive);
         var group = Assert.Single(service.History);
-        using var reader = await LiveView(store, WitnessAccessLevel.Registered);
+        using var reader = await LiveView(store, canSendSnapshots: false);
 
         await Assert.ThrowsAsync<DomainException>(
             () => service.UpdateTime(reader, group, group.Entries.Single(), new Timestamp(DateTimeOffset.Now))
@@ -699,7 +699,7 @@ public sealed class SnapshotServiceTests
         var session = new SessionOf(null);
         var (service, store, _, publisher) = await ConnectedTo(session, ParticipationFixtures.Active(1));
         SelectAndCapture(service);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         await service.Publish(view, SnapshotType.Arrive);
         var group = Assert.Single(service.History);
         var entry = group.Entries.Single();
@@ -723,7 +723,7 @@ public sealed class SnapshotServiceTests
         var session = new SessionOf(null) { UpdateFails = new InvalidOperationException("The host failed (500)") };
         var (service, store, _, _) = await ConnectedTo(session, ParticipationFixtures.Active(1));
         SelectAndCapture(service);
-        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        using var view = await LiveView(store, canSendSnapshots: true);
         await service.Publish(view, SnapshotType.Arrive);
         var group = Assert.Single(service.History);
         var entry = group.Entries.Single();

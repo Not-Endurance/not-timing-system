@@ -36,13 +36,13 @@ internal static class ViewedEventFixtures
         );
     }
 
-    /// <summary>The Live Event the app follows, opened, as a person of that access level sees it.</summary>
-    public static async Task<IViewedEvent> LiveView(IParticipationStore store, WitnessAccessLevel level)
+    /// <summary>The Live Event the app follows, opened, as a person who may, or may not, send Snapshots to it sees it.</summary>
+    public static async Task<IViewedEvent> LiveView(IParticipationStore store, bool canSendSnapshots)
     {
         var view = new LiveEventView(
             EventOf(LIVE_EVENT_ID),
             store,
-            new AccessOf(level),
+            new AccessOf(canSendSnapshots),
             new ReadOnlyRepository<Ranking>([]),
             new ReadOnlyRepository<Official>([])
         );
@@ -235,32 +235,41 @@ internal sealed class RecordingSocketService : INtsSocketService
 }
 
 /// <summary>
-/// What the Api said the person may do about the Event they follow. As the real context does, it knows nothing until it is
-/// loaded: the level is the Api's answer, which a service asks for when it loads.
+/// What the Api said the person, who is signed in, may do about the Event they follow. As the real context does, it knows
+/// nothing until it is loaded: whether they may send a Snapshot is the Api's answer, which a service asks for when it loads.
 /// </summary>
 internal sealed class AccessOf : IWitnessAccessContext
 {
     readonly Event _changed = new();
-    WitnessAccessLevel _answer;
+    bool _answer;
 
-    public AccessOf(WitnessAccessLevel level)
+    public AccessOf(bool canSendSnapshots)
     {
-        _answer = level;
+        _answer = canSendSnapshots;
     }
 
-    public WitnessAccessLevel AccessLevel { get; private set; } = WitnessAccessLevel.Unknown;
+    public bool IsKnown { get; private set; }
+    public bool IsSignedIn { get; private set; }
+    public bool CanSendSnapshots { get; private set; }
     public IEventSubscriber ObservableEvent => _changed;
 
     public Task Load()
     {
-        AccessLevel = _answer;
+        Say(_answer);
         return Task.CompletedTask;
     }
 
-    public void Become(WitnessAccessLevel level)
+    public void Become(bool canSendSnapshots)
     {
-        _answer = level;
-        AccessLevel = level;
+        _answer = canSendSnapshots;
+        Say(canSendSnapshots);
         _changed.Emit();
+    }
+
+    void Say(bool canSendSnapshots)
+    {
+        IsKnown = true;
+        IsSignedIn = true;
+        CanSendSnapshots = canSendSnapshots;
     }
 }

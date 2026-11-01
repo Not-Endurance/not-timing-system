@@ -1,0 +1,52 @@
+@using Not.Blazor.Components.Input
+@using NTS.Contracts.Features.Console
+
+@inherits ConsoleOperatorsDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2" data-testid="console-operators">
+            <MudText Typo="Typo.body2">@Console_operators_description_string</MudText>
+
+            @if (IsLoaded && Rows.Count == 0)
+            {
+                <MudText Typo="Typo.body1" data-testid="console-operators-empty">@Console_operators_empty_string</MudText>
+            }
+            else if (Rows.Count > 0)
+            {
+                <MudTable Items="@Rows" Dense Hover Breakpoint="Breakpoint.Sm" data-testid="console-operators-list">
+                    <HeaderContent>
+                        <MudTh>@Person_string</MudTh>
+                        <MudTh></MudTh>
+                        <MudTh></MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate>
+                        <MudTd DataLabel="@Person_string">@PersonText(context)</MudTd>
+                        <MudTd>
+                            @if (context.IsPending)
+                            {
+                                <MudChip T="string" Size="Size.Small" Color="Color.Warning">@Pending_invitation_string</MudChip>
+                            }
+                            else
+                            {
+                                <MudChip T="string" Size="Size.Small" Color="Color.Success">@Linked_string</MudChip>
+                            }
+                        </MudTd>
+                        <MudTd>
+                            <NButtonDanger Text="@Delete_string" OnClick="() => Remove(context)" />
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            }
+
+            <NAutocomplete T="AccountMatch" @bind-Value="Chosen" Label="@Find_account_string" SearchSafe="Search" MinCharacters="3" />
+        </MudStack>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonPrimary Text="@Assign_console_operator_string" Disabled="@(Chosen == null)" OnClick="Assign" />
+
+        <NButtonSecondary Text="@Close_string" OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

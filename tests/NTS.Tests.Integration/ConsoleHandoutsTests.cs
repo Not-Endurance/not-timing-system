@@ -26,7 +26,7 @@ using Competition = NTS.Domain.Core.Aggregates.Participations.Objects.Competitio
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// The Handouts of a Live Event in the Console (#646, ADR-0006): the sheet of a Participation, made by the Main Operator or by
+/// The Handouts of a Live Event in the Console (#646, ADR-0006): the sheet of a Participation, made by the Console Operator or by
 /// the Console while a page that watches is open and a Phase completes, composed from the Participation as it is, and removed
 /// once it was printed. Over the real Api in this process, with the store and the services of the Ui built as the app builds
 /// them; the hub is left to the tests of the hub, so the store reads a Participation again when a time was recorded.
@@ -177,7 +177,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     public async Task A_removal_that_the_Api_refuses_stops_at_the_first_Handout_and_says_why()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
-        var scene = await SceneAsync(api, [Plain(1), Plain(2), Plain(3)], mainOperator: false);
+        var scene = await SceneAsync(api, [Plain(1), Plain(2), Plain(3)], consoleOperator: false);
         foreach (var id in scene.Ids)
         {
             await EventSeed.HandoutAsync(_mongo.ConnectionString, scene.Tenant, new Handout(scene.EventId, id, id));
@@ -197,7 +197,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     public async Task A_Handout_that_the_Api_does_not_take_is_said_in_its_words_and_nothing_is_stored()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
-        var scene = await SceneAsync(api, [Plain(1)], mainOperator: false);
+        var scene = await SceneAsync(api, [Plain(1)], consoleOperator: false);
         await using var tab = await Tab.OpenAsync(api, scene);
 
         var refused = await Assert.ThrowsAsync<DomainException>(() => tab.Handouts.Create(1));
@@ -342,7 +342,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     public async Task A_Handout_that_the_Api_does_not_take_while_the_Event_is_watched_is_told_and_the_Event_goes_on()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
-        var scene = await SceneAsync(api, [TwoPhases(1), TwoPhases(2)], mainOperator: false);
+        var scene = await SceneAsync(api, [TwoPhases(1), TwoPhases(2)], consoleOperator: false);
         await using var tab = await Tab.OpenAsync(api, scene, scene.Person); // it may not make Handouts, and sees the Event as it is
         await using var other = await Tab.OpenAsync(api, scene, scene.Boss);
         using var watching = tab.Handouts.Watch(tab.View);
@@ -387,12 +387,16 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
         return Task.Delay(500);
     }
 
-    async Task<Scene> SceneAsync(ApiFactory api, Func<Guid, Participation>[] participations, bool mainOperator = true)
+    async Task<Scene> SceneAsync(
+        ApiFactory api,
+        Func<Guid, Participation>[] participations,
+        bool consoleOperator = true
+    )
     {
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var boss = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var person = mainOperator ? boss : await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var person = consoleOperator ? boss : await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, boss.Id, DateTimeOffset.UtcNow);
         var ids = new List<Guid>();
         foreach (var make in participations)
@@ -489,7 +493,7 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
         public Guid[] Ids { get; }
     }
 
-    /// <summary>One tab of the Main Operator: its own store of the Participations, its dashboard and its Handouts, over the Api.</summary>
+    /// <summary>One tab of the Console Operator: its own store of the Participations, its dashboard and its Handouts, over the Api.</summary>
     sealed class Tab : IAsyncDisposable
     {
         public static async Task<Tab> OpenAsync(

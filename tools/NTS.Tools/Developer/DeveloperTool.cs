@@ -155,8 +155,8 @@ public static class DeveloperTool
             Usage:
               dotnet run --project tools/NTS.Tools -- grant-developer --connection-string <mongo> --email <email> [--database nts] [--apply]
 
-            Makes the account with that exact email the Developer, the platform owner who holds every right across Tenants
-            except acting as the Main Operator of a Live Event. The account has to exist already. Running it again changes
+            Makes the account with that exact email the Developer, the platform owner who holds every right across Tenants.
+            The account has to exist already. Running it again changes
             nothing. A dry run says what it would do.
 
             Options:

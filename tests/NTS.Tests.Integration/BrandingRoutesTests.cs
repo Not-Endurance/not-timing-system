@@ -9,7 +9,7 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// The logos that go at the head of what an Event prints (#646, ADR-0012): <c>/api/tenants/{id}/branding</c> and
-/// <c>/api/events/{id}/branding</c>. A Tenant Root edits the Tenant's, the Main Operator an Event's in place of them while the Event
+/// <c>/api/events/{id}/branding</c>. A Tenant Root edits the Tenant's, the Console Operator an Event's in place of them while the Event
 /// has not ended, and what an Event is printed with is its own logo for a position and the Tenant's where it has none. A logo is an
 /// image of a kind a browser prints, of at most 512 KiB, sent as base64 and checked by what it starts with.
 /// </summary>
@@ -81,7 +81,7 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
             var read = await person.Page.GetAsync($"/api/tenants/{tenant}/branding");
 
             Assert.Equal(HttpStatusCode.Forbidden, write.StatusCode);
-            Assert.Equal("not-tenant-root", await Code(write));
+            Assert.Equal("not-root", await Code(write));
             Assert.Equal(HttpStatusCode.Forbidden, read.StatusCode);
         }
 
@@ -378,15 +378,15 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_puts_a_logo_of_its_Event_in_place_of_the_Tenants_and_an_Event_is_printed_with_the_logo_it_has_or_the_Tenants()
+    public async Task The_Console_Operator_puts_a_logo_of_its_Event_in_place_of_the_Tenants_and_an_Event_is_printed_with_the_logo_it_has_or_the_Tenants()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
         await EventSeed.GrantAsync(
             _mongo.ConnectionString,
             tenant,
@@ -407,11 +407,11 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
 
         var before = await official.Page.GetAsync($"/api/events/{eventId}/branding"); // any signed-in person reads what an Event is printed with
         var set = await Edit(
-            mainOperator,
+            consoleOperator,
             $"/api/events/{eventId}/branding",
             new { left = Document("image/png", eventsLeft) }
         );
-        var cleared = await Edit(mainOperator, $"/api/events/{eventId}/branding", new { left = (object?)null });
+        var cleared = await Edit(consoleOperator, $"/api/events/{eventId}/branding", new { left = (object?)null });
 
         var beforeBody = await Body(before);
         var setBody = await Body(set);
@@ -430,17 +430,17 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task Nobody_but_the_Main_Operator_edits_the_logos_of_an_Event_and_not_once_it_has_ended()
+    public async Task Nobody_but_Root_and_a_Console_Operator_edits_the_logos_of_an_Event_and_not_once_it_has_ended()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var operatorGrant = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
-        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
-        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Not yet");
+        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var historic = await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, NOW);
+        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, consoleOperator.Id, "Not yet");
         await EventSeed.GrantAsync(
             _mongo.ConnectionString,
             tenant,
@@ -452,16 +452,12 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
         );
         var logo = new { left = Document("image/png", Png(10, 1)) };
 
-        foreach (var person in new[] { root, operatorGrant })
-        {
-            var refused = await Edit(person, $"/api/events/{live}/branding", logo);
+        var refused = await Edit(operatorGrant, $"/api/events/{live}/branding", logo);
+        Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
+        Assert.Equal("not-console-operator", await Code(refused));
 
-            Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
-            Assert.Equal("not-main-operator", await Code(refused));
-        }
-
-        var beforeItStarted = await Edit(mainOperator, $"/api/events/{unstarted}/branding", logo); // an Event is branded as it is made ready
-        var ended = await Edit(mainOperator, $"/api/events/{historic}/branding", logo);
+        var beforeItStarted = await Edit(consoleOperator, $"/api/events/{unstarted}/branding", logo); // an Event is branded as it is made ready
+        var ended = await Edit(consoleOperator, $"/api/events/{historic}/branding", logo);
         var read = await operatorGrant.Page.GetAsync($"/api/events/{historic}/branding"); // what it was printed with is still read
 
         Assert.Equal(HttpStatusCode.OK, beforeItStarted.StatusCode);
@@ -470,13 +466,15 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.OK, read.StatusCode);
         Assert.Null(await FindAsync($"event:{live}"));
         Assert.Null(await FindAsync($"event:{historic}"));
+        var byRoot = await Edit(root, $"/api/events/{live}/branding", logo); // Root runs every Event of its Tenant
+        Assert.Equal(HttpStatusCode.OK, byRoot.StatusCode);
         Assert.Equal(
             HttpStatusCode.NotFound,
-            (await mainOperator.Page.GetAsync($"/api/events/{Guid.NewGuid()}/branding")).StatusCode
+            (await consoleOperator.Page.GetAsync($"/api/events/{Guid.NewGuid()}/branding")).StatusCode
         );
         Assert.Equal(
             HttpStatusCode.NotFound,
-            (await mainOperator.Page.GetAsync("/api/events/not-an-id/branding")).StatusCode
+            (await consoleOperator.Page.GetAsync("/api/events/not-an-id/branding")).StatusCode
         );
     }
 

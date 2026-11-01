@@ -16,7 +16,7 @@ using SetupUser = NTS.Domain.Setup.Aggregates.User;
 namespace NTS.Tests.Integration.Infrastructure;
 
 /// <summary>
-/// A Setup with everything in it, as a Main Operator would have configured it: a competition of three phases over two
+/// A Setup with everything in it, as a Console Operator would have configured it: a competition of three phases over two
 /// loops, a combination that rides in it, an Official and an Operator who are named by an email. It is what a change of a
 /// Setup is shown to carry whole, so every kind of member the Setup has is in it once.
 /// </summary>

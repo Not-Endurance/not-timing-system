@@ -18,8 +18,8 @@ internal sealed class UiScene
         var mongo = host.MongoConnectionString;
         ApiMongo.Configure();
         var tenant = await TenancySeed.TenantAsync(mongo);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant);
-        var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant);
+        var eventId = await EventSeed.LiveAsync(mongo, tenant, consoleOperator.Id, DateTimeOffset.UtcNow);
         var started = DateTimeOffset.Now.AddHours(-1);
         var ids = new List<Guid>();
         for (var number = 1; number <= 3; number++)
@@ -77,7 +77,7 @@ internal sealed class UiScene
         );
     }
 
-    /// <summary>The Main Operator takes the grant of the person on the Event away.</summary>
+    /// <summary>The Console Operator takes the grant of the person on the Event away.</summary>
     public async Task RemoveGrantAsync(string email)
     {
         await EventSeed.Grants(_host.MongoConnectionString).DeleteManyAsync(new BsonDocument("Email", email));

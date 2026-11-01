@@ -48,14 +48,14 @@ static int ShowHelp()
                                Remove the IsActive flag from every Event, after listing the Events that were inactive and
                                whose last day is still ahead, which are Live again (a dry run unless --apply)
           migrate-tenants      Turn the data of before Tenants into the data of Tenants: the accounts, the Tenants, the Tenant
-                               of every document, the Main Operators, the grants and the environment marker
+                               of every document, the grants and the environment marker
                                (a dry run unless --apply)
           migrate-identities   Group the copies of every Athlete and Horse into the identities they are, and write a report and a
                                file of decisions for the owner; with --apply convert every id to a Guid, merge the identities,
                                finalise the Rankings of the Events that have ended and verify (a dry run unless --apply)
           mark-environment     Mark a database as Production, Staging or Development, which the commands that must not touch
                                a production database look at (a dry run unless --apply)
-          seed-staging         Make a Tenant Root, a Main Operator, Officials, Operators and a Live Event with Participations
+          seed-staging         Make a Tenant Root, a Console Operator, Officials, Operators and a Live Event with Participations
                                in the Tenant of Bulgaria, on a database that is not production (a dry run unless --apply)
           seed-tenant-root     Make an account a Tenant Root of a Tenant, which makes the Tenant operational
                                (a dry run unless --apply)

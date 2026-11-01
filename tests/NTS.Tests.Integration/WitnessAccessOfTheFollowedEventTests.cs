@@ -39,13 +39,13 @@ public sealed class WitnessAccessOfTheFollowedEventTests : IClassFixture<MongoFi
 
         await access.Load(); // the page is loaded and no Event is followed
 
-        Assert.Equal(WitnessAccessLevel.Registered, access.AccessLevel);
+        Assert.Equal(WitnessSays.Registered, WitnessSays.Of(access));
         Assert.Equal(0, CapabilityRequests(asked)); // there is no Event to ask about
 
         followed.Follow(eventId); // the connection names the Event, and the services that follow it have not been told yet
         await access.Load(); // the viewed Event loads what it wraps
 
-        Assert.Equal(WitnessAccessLevel.Official, access.AccessLevel);
+        Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
         Assert.Equal(1, CapabilityRequests(asked));
 
         await access.Load();
@@ -69,7 +69,7 @@ public sealed class WitnessAccessOfTheFollowedEventTests : IClassFixture<MongoFi
         await access.Load();
         await access.Load();
 
-        Assert.Equal(WitnessAccessLevel.Official, access.AccessLevel);
+        Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
         Assert.Equal(1, CapabilityRequests(asked));
     }
 
@@ -84,11 +84,11 @@ public sealed class WitnessAccessOfTheFollowedEventTests : IClassFixture<MongoFi
     async Task<(Guid EventId, TenancySeed.Person Official)> SceneAsync(ApiFactory api, HttpClient client)
     {
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var eventId = await EventSeed.LiveAsync(
             _mongo.ConnectionString,
             tenant,
-            mainOperator.Id,
+            consoleOperator.Id,
             DateTimeOffset.UtcNow
         );
         var official = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);

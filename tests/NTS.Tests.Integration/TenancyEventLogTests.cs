@@ -10,8 +10,8 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// What changes who may do what is logged (#643, ADR-0012), and so are the Events that start and reset (#628): an Event
-/// made, deleted, started or reset, its Main Operator assigned or handed over, a grant made or removed, the invitations that attached to an account, the rules of a Tenant edited. Each is an event with an id and
-/// a name that stay as they are, carries the user who did it and the ids of what it was done to, and carries no email, no
+/// made, deleted, started or reset, a grant made or removed (a Console Operator assigned is one, #671), the invitations that
+/// attached to an account, the rules of a Tenant edited. Each is an event with an id and a name that stay as they are, carries the user who did it and the ids of what it was done to, and carries no email, no
 /// name and nothing an account keeps: the log is the one place that is read by people who are not meant to read those.
 /// </summary>
 public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
@@ -56,9 +56,9 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
         );
         await root.Page.WriteAsync(
             HttpMethod.Post,
-            $"/api/events/{eventId}/actions/assign-main-operator",
-            "main-operators",
-            new { accountId = colleague.Id }
+            "/api/console-operators",
+            "console-operators",
+            new { eventId, accountId = colleague.Id }
         );
         var linked = await colleague.Page.WriteAsync(
             HttpMethod.Post,
@@ -91,13 +91,6 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
             "tenants",
             new { regionalRules = new { onlyAverageLoopSpeed = true } }
         );
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, colleague.Id, DateTimeOffset.UtcNow);
-        await colleague.Page.WriteAsync(
-            HttpMethod.Post,
-            $"/api/events/{live}/actions/hand-over",
-            "main-operators",
-            new { accountId = worker.Id }
-        );
         var doomed = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, colleague.Id, "Doomed Ride");
         await root.Page.DeleteAsync($"/api/configure-events/{doomed}");
         var fullSetup = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, colleague.Id);
@@ -110,29 +103,31 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
         Assert.Contains(eventId.ToString(), made.Message);
         Assert.Contains(tenant, made.Message);
         Assert.Contains(root.Id.ToString(), made.Message);
-        var assigned = Assert.Single(capture.Of("MainOperatorAssigned"));
-        Assert.Contains(eventId.ToString(), assigned.Message);
-        Assert.Contains(colleague.Id.ToString(), assigned.Message);
-        Assert.Contains(root.Id.ToString(), assigned.Message);
-        var handedOver = Assert.Single(capture.Of("EventHandedOver"));
-        Assert.Contains(live.ToString(), handedOver.Message);
-        Assert.Contains(worker.Id.ToString(), handedOver.Message);
-        Assert.Contains(colleague.Id.ToString(), handedOver.Message);
         var grants = capture.Of("GrantLinked");
-        Assert.Equal(2, grants.Count);
+        Assert.Equal(3, grants.Count);
+        var assigned = Assert.Single(
+            grants,
+            x => x.Message.Contains(": ConsoleOperator, role none", StringComparison.Ordinal)
+        );
+        Assert.EndsWith("pending: False.", assigned.Message);
+        Assert.Contains(eventId.ToString(), assigned.Message);
+        Assert.Contains(root.Id.ToString(), assigned.Message); // Root assigned it, and it is told no more of the person
         Assert.Contains(
             grants,
             x =>
-                x.Message.Contains("Operator, role none")
+                x.Message.Contains(": Operator, role none", StringComparison.Ordinal)
                 && x.Message.EndsWith("pending: False.", StringComparison.Ordinal)
         );
         Assert.Contains(
             grants,
             x =>
-                x.Message.Contains("Official, role Steward")
+                x.Message.Contains(": Official, role Steward", StringComparison.Ordinal)
                 && x.Message.EndsWith("pending: True.", StringComparison.Ordinal)
         );
-        Assert.All(grants, x => Assert.Contains(colleague.Id.ToString(), x.Message));
+        Assert.All(
+            grants.Where(x => !x.Message.Contains("ConsoleOperator", StringComparison.Ordinal)),
+            x => Assert.Contains(colleague.Id.ToString(), x.Message)
+        );
         var removed = Assert.Single(capture.Of("GrantRemoved"));
         Assert.Contains(grantId, removed.Message);
         Assert.Contains(colleague.Id.ToString(), removed.Message);
@@ -156,7 +151,7 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
             .Entries.Where(x => x.EventId.Id is >= FIRST_TENANCY_EVENT and <= LAST_TENANCY_EVENT)
             .Select(x => x.Message)
             .ToList();
-        Assert.Equal(11, ofTenancy.Count);
+        Assert.Equal(10, ofTenancy.Count);
         foreach (
             var personal in new[] { worker.Email, invited, root.Email, colleague.Email, "Rositsa", "Kolyo", "Vasil" }
         )
@@ -192,9 +187,9 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
 
         var refused = await member.Page.WriteAsync(
             HttpMethod.Post,
-            $"/api/events/{live}/actions/hand-over",
-            "main-operators",
-            new { accountId = member.Id }
+            "/api/console-operators",
+            "console-operators",
+            new { eventId = live, accountId = member.Id }
         );
         var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, root.Id);
         var refusedDelete = await member.Page.DeleteAsync($"/api/configure-events/{unstarted}");
@@ -226,7 +221,6 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.Created, first.StatusCode);
         Assert.Equal(HttpStatusCode.OK, again.StatusCode);
         Assert.Equal(HttpStatusCode.OK, sameRules.StatusCode);
-        Assert.Empty(capture.Of("EventHandedOver"));
         Assert.Empty(capture.Of("EventDeleted"));
         Assert.Empty(capture.Of("EventStarted"));
         Assert.Empty(capture.Of("EventReset"));
@@ -241,12 +235,17 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
         await using var api = NewApi(capture);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var consoleOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var live = await EventSeed.LiveAsync(
+            _mongo.ConnectionString,
+            tenant,
+            consoleOperator.Id,
+            DateTimeOffset.UtcNow
+        );
         var worker = await AccountAsync(_mongo.ConnectionString, tenant);
         await EventSeed.GrantAsync(_mongo.ConnectionString, tenant, live, "Operator", null, worker.Email, null);
 
-        var response = await mainOperator.Page.WriteAsync(
+        var response = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/event-grants",
             "event-grants",

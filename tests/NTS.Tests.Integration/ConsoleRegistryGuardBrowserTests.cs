@@ -30,14 +30,14 @@ public sealed class ConsoleRegistryGuardBrowserTests
     {
         var mongo = _host.MongoConnectionString;
         var token = Guid.NewGuid().ToString("N")[..8];
-        var (tenant, mainOperator) = await MainOperatorAsync();
+        var (tenant, consoleOperator) = await ConsoleOperatorAsync();
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
         await RegistrySeed.AthleteAsync(mongo, tenant, $"Юлия Тестова {token}", bulgaria, null, "10012345");
         await RegistrySeed.HorseAsync(mongo, tenant, $"Тест Огън {token}", null, "103BK17");
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator, "/console/registry/athletes-horses");
+        await SignInAndOpenAsync(_host, device, consoleOperator, "/console/registry/athletes-horses");
 
         await AddToListAsync(page, "Athletes");
         var dialog = page.GetByRole(AriaRole.Dialog);
@@ -67,12 +67,12 @@ public sealed class ConsoleRegistryGuardBrowserTests
     {
         var mongo = _host.MongoConnectionString;
         var token = Guid.NewGuid().ToString("N")[..8];
-        var (tenant, mainOperator) = await MainOperatorAsync();
+        var (tenant, consoleOperator) = await ConsoleOperatorAsync();
         await RegistrySeed.HorseAsync(mongo, tenant, $"Тест Огън {token}", null, "103BK17");
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator, "/console/registry/athletes-horses");
+        await SignInAndOpenAsync(_host, device, consoleOperator, "/console/registry/athletes-horses");
 
         await AddToListAsync(page, "Horses");
         var dialog = page.GetByRole(AriaRole.Dialog);
@@ -88,7 +88,7 @@ public sealed class ConsoleRegistryGuardBrowserTests
     {
         var mongo = _host.MongoConnectionString;
         var token = Guid.NewGuid().ToString("N")[..8];
-        var (tenant, mainOperator) = await MainOperatorAsync();
+        var (tenant, consoleOperator) = await ConsoleOperatorAsync();
         var eventId = await EventSeed.LiveAsync(mongo, tenant, null, DateTimeOffset.UtcNow);
         var participation = IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid());
         await EventSeed.ParticipationAsync(mongo, tenant, participation);
@@ -110,7 +110,7 @@ public sealed class ConsoleRegistryGuardBrowserTests
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(_host, device, mainOperator, "/console/registry/athletes-horses");
+        await SignInAndOpenAsync(_host, device, consoleOperator, "/console/registry/athletes-horses");
         await Expect(RowOf(page, $"Named Rider {token}")).ToBeVisibleAsync(Loaded());
 
         await DeleteAsync(page, $"Named Rider {token}");
@@ -127,13 +127,13 @@ public sealed class ConsoleRegistryGuardBrowserTests
         await Expect(RowOf(page, $"Named Horse {token}")).ToHaveCountAsync(1, Counted());
     }
 
-    async Task<(string Tenant, string Email)> MainOperatorAsync()
+    async Task<(string Tenant, string Email)> ConsoleOperatorAsync()
     {
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
-        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "The Cup");
-        return (tenant, mainOperator.Email);
+        var consoleOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        await EventSeed.SetupAsync(mongo, tenant, consoleOperator.Id, "The Cup");
+        return (tenant, consoleOperator.Email);
     }
 
     static async Task DeleteAsync(IPage page, string name)

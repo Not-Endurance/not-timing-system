@@ -253,6 +253,44 @@ public sealed class ArchitectureRulesTests
         Assert.Empty(ArchitectureRules.OnlyTestsTakePlaywright(graph));
     }
 
+    [Fact]
+    public void A_handler_that_asks_the_policy_or_reads_the_session_is_found_and_the_filter_and_the_places_that_tell_are_not()
+    {
+        var sources = new List<(string Path, string Text)>
+        {
+            (
+                "src/NoTiming.Api/Features/Access/AccessFilter.cs",
+                "AccessPolicy.Decide(capability, standing, state); users.GetUserAsync(user);"
+            ),
+            (
+                "src/NoTiming.Api/Features/Events/EventEndpoints.cs",
+                "canRun = AccessPolicy.Decide(Capability.RunEvent, standing, state)"
+            ),
+            (
+                "src/NoTiming.Api/Features/Events/Elsewhere.cs",
+                "await standing.DecideAtEventAsync(Capability.RunEvent, user, facts, token);"
+            ),
+            ("src/NoTiming.Api/Features/Profile/Another.cs", "var user = await users.GetUserAsync(context.User);"),
+            ("src/NoTiming.Api/Features/Profile/Fine.cs", "var user = access.User;"),
+        };
+
+        var violations = ArchitectureRules.OnlyTheFilterAndThePlacesThatTellAskThePolicy(sources);
+
+        Assert.Equal(2, violations.Count);
+        Assert.Contains("src/NoTiming.Api/Features/Events/Elsewhere.cs asks the policy", violations[0]);
+        Assert.Contains("src/NoTiming.Api/Features/Profile/Another.cs asks the policy", violations[1]);
+    }
+
+    [Fact]
+    public void A_rule_about_the_endpoint_filter_cannot_pass_in_a_repository_that_has_none()
+    {
+        var sources = new List<(string Path, string Text)> { ("src/NoTiming.Api/Features/Events/Fine.cs", "") };
+
+        Assert.Throws<InvalidOperationException>(
+            () => ArchitectureRules.OnlyTheFilterAndThePlacesThatTellAskThePolicy(sources)
+        );
+    }
+
     /// <summary>A project file with what the rules read from it and nothing else.</summary>
     static (string Path, string Xml) Project(
         string name,

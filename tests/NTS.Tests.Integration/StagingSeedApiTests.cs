@@ -47,14 +47,14 @@ public sealed class StagingSeedApiTests : IClassFixture<MongoFixture>
         var arrive = Today.AddHours(8);
         var steward = await PageOfAsync(api, client, "official.one@example.test");
         var operatorPage = await PageOfAsync(api, client, "operator@example.test");
-        var main = await PageOfAsync(api, client, "main@example.test");
+        var consoleOperator = await PageOfAsync(api, client, "console@example.test");
         var root = await PageOfAsync(api, client, "root@example.test");
 
         Assert.Equal(HttpStatusCode.Created, (await SendAsync(steward, eventId, 1, arrive)).StatusCode);
         Assert.Equal(HttpStatusCode.Created, (await SendAsync(operatorPage, eventId, 2, arrive)).StatusCode);
-        Assert.Equal(HttpStatusCode.Created, (await SendAsync(main, eventId, 3, arrive)).StatusCode);
-        var refused = await SendAsync(root, eventId, 4, arrive);
-        Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode); // a Tenant Root is not linked to the Event it made no grant for
+        Assert.Equal(HttpStatusCode.Created, (await SendAsync(consoleOperator, eventId, 3, arrive)).StatusCode);
+        var byRoot = await SendAsync(root, eventId, 4, arrive);
+        Assert.Equal(HttpStatusCode.Created, byRoot.StatusCode); // Root holds every Event of its Tenant without a grant (#671)
     }
 
     [Fact]
@@ -93,14 +93,16 @@ public sealed class StagingSeedApiTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Main_Operator_of_the_seeded_Event_may_reset_it()
+    public async Task The_Console_Operator_of_the_seeded_Event_may_reset_it()
     {
         var (eventId, api, client) = await SeededApiAsync();
         await using var _ = api;
         using var __ = client;
-        var main = await PageOfAsync(api, client, "main@example.test");
+        var consoleOperator = await PageOfAsync(api, client, "console@example.test");
 
-        var reset = await main.SendAsync(new HttpRequestMessage(HttpMethod.Delete, $"/api/events/{eventId}"));
+        var reset = await consoleOperator.SendAsync(
+            new HttpRequestMessage(HttpMethod.Delete, $"/api/events/{eventId}")
+        );
 
         Assert.Equal(HttpStatusCode.NoContent, reset.StatusCode);
         var database = new MongoClient(_mongo.ConnectionString).GetDatabase(UserSeed.DATABASE);
@@ -152,7 +154,7 @@ public sealed class StagingSeedApiTests : IClassFixture<MongoFixture>
                 Apply = true,
                 Environment = "Staging",
                 TenantRoot = "root@example.test",
-                MainOperator = "main@example.test",
+                ConsoleOperator = "console@example.test",
                 Officials =
                 [
                     ("official.one@example.test", OfficialRole.Steward),

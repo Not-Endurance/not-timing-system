@@ -91,7 +91,7 @@ public sealed class EventLinksTests
         Assert.Equal([false, true], links.Select(x => x.IsCurrent));
     }
 
-    static ConsoleEvent Row(EventStage stage, bool isMainOperator)
+    static ConsoleEvent Row(EventStage stage, bool runsTheConsole)
     {
         return new ConsoleEvent
         {
@@ -99,7 +99,7 @@ public sealed class EventLinksTests
             Name = "Event",
             Location = "Location",
             Stage = stage,
-            IsMainOperator = isMainOperator,
+            Level = runsTheConsole ? AccessLevel.ConsoleOperator : AccessLevel.Staff,
         };
     }
 }

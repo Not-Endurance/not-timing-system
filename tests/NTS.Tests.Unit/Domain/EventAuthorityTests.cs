@@ -13,9 +13,10 @@ using SetupPhase = NTS.Domain.Setup.Aggregates.ConfigureEvents.Phase;
 namespace NTS.Tests.Unit.Domain;
 
 /// <summary>
-/// An Event belongs to one Tenant and has one Main Operator (ADR-0012). Both are fixed when the Event is created and
-/// travel with it when it starts, so the Event that is Live is the one its Tenant Root created, in the hands of the
-/// person the Tenant Root named. An Event from before Tenants has the constant Tenant of those days and nobody to run it.
+/// An Event belongs to one Tenant (ADR-0012). The Tenant is fixed when the Event is created and travels with it when it
+/// starts, so the Event that is Live is the one Root created, in the Tenant it was created in. Who runs it is not part of
+/// the Event: Root runs every Event of the Tenant, and the Console Operators are grants (#671). An Event from before
+/// Tenants has the constant Tenant of those days.
 /// </summary>
 public sealed class EventAuthorityTests
 {
@@ -23,63 +24,56 @@ public sealed class EventAuthorityTests
     static readonly Country BULGARIA = new(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
 
     [Fact]
-    public void An_Event_that_starts_keeps_the_Tenant_and_the_Main_Operator_of_its_Setup()
+    public void An_Event_that_starts_keeps_the_Tenant_of_its_Setup()
     {
-        var setup = CreateSetupEvent("country-bg", TestId.Of(77));
+        var setup = CreateSetupEvent("country-bg");
 
         var started = EventInformationFactory.Create(setup, RegionalRules.None);
 
         Assert.Equal("country-bg", started.TenantId);
-        Assert.Equal(TestId.Of(77), started.MainOperatorId);
     }
 
     [Fact]
-    public void A_Setup_from_before_Tenants_has_the_constant_Tenant_and_no_Main_Operator_and_starts_as_such()
+    public void A_Setup_from_before_Tenants_has_the_constant_Tenant_and_starts_as_such()
     {
-        var setup = CreateSetupEvent(null, null);
+        var setup = CreateSetupEvent(null);
 
         var started = EventInformationFactory.Create(setup);
 
         Assert.Equal(Tenant.LEGACY_ID, setup.TenantId);
-        Assert.Null(setup.MainOperatorId);
         Assert.Equal(Tenant.LEGACY_ID, started.TenantId);
-        Assert.Null(started.MainOperatorId);
     }
 
     [Fact]
-    public void The_Tenant_and_the_Main_Operator_of_a_Setup_are_kept_by_the_model_it_is_stored_as()
+    public void The_Tenant_of_a_Setup_is_kept_by_the_model_it_is_stored_as()
     {
-        var setup = CreateSetupEvent("country-bg", TestId.Of(77));
+        var setup = CreateSetupEvent("country-bg");
 
         var loaded = ConfigureEventModel.From(setup).MapToEntity();
 
         Assert.Equal("country-bg", loaded.TenantId);
-        Assert.Equal(TestId.Of(77), loaded.MainOperatorId);
     }
 
     [Fact]
-    public void The_Tenant_and_the_Main_Operator_of_a_started_Event_are_kept_by_the_model_it_is_stored_as()
+    public void The_Tenant_of_a_started_Event_is_kept_by_the_model_it_is_stored_as()
     {
-        var started = EventInformationFactory.Create(CreateSetupEvent("country-bg", TestId.Of(77)));
+        var started = EventInformationFactory.Create(CreateSetupEvent("country-bg"));
 
         var loaded = EventInformationModel.From(started).MapToEntity();
 
         Assert.Equal("country-bg", loaded.TenantId);
-        Assert.Equal(TestId.Of(77), loaded.MainOperatorId);
     }
 
     [Fact]
-    public void A_stored_Event_that_has_no_Tenant_or_Main_Operator_loads_with_the_constant_Tenant_and_none()
+    public void A_stored_Event_that_has_no_Tenant_loads_with_the_constant_Tenant()
     {
-        var started = EventInformationFactory.Create(CreateSetupEvent("country-bg", TestId.Of(77)));
+        var started = EventInformationFactory.Create(CreateSetupEvent("country-bg"));
         var stored = EventInformationModel.From(started);
         stored.TenantId = Tenant.LEGACY_ID;
-        stored.MainOperatorId = null;
 
         var loaded = stored.MapToEntity();
 
         Assert.Equal(Tenant.LEGACY_ID, loaded.TenantId);
-        Assert.Null(loaded.MainOperatorId);
     }
 
     [Fact]
@@ -109,9 +103,15 @@ public sealed class EventAuthorityTests
     }
 
     [Fact]
-    public void A_grant_for_an_Operator_has_no_role_and_one_for_an_Official_has_the_role_of_the_Official()
+    public void A_grant_for_an_Operator_or_a_Console_Operator_has_no_role_and_one_for_an_Official_has_the_role_of_the_Official()
     {
         var operatorGrant = EventGrant.ForOperator(TestId.Of(1), TestId.Of(300), "country-bg", " Ana@Example.test ");
+        var consoleOperatorGrant = EventGrant.ForConsoleOperator(
+            TestId.Of(3),
+            TestId.Of(300),
+            "country-bg",
+            " Vera@Example.test "
+        );
         var officialGrant = EventGrant.ForOfficial(
             TestId.Of(2),
             TestId.Of(300),
@@ -123,6 +123,9 @@ public sealed class EventAuthorityTests
         Assert.Equal(GrantKind.Operator, operatorGrant.Kind);
         Assert.Null(operatorGrant.OfficialRole);
         Assert.Equal("ana@example.test", operatorGrant.Email);
+        Assert.Equal(GrantKind.ConsoleOperator, consoleOperatorGrant.Kind);
+        Assert.Null(consoleOperatorGrant.OfficialRole);
+        Assert.Equal("vera@example.test", consoleOperatorGrant.Email);
         Assert.Equal(GrantKind.Official, officialGrant.Kind);
         Assert.Equal(OfficialRole.Steward, officialGrant.OfficialRole);
     }
@@ -167,47 +170,7 @@ public sealed class EventAuthorityTests
         );
     }
 
-    [Fact]
-    public void What_an_account_has_been_granted_on_an_Event_is_every_Operator_grant_and_the_role_of_every_Official_one()
-    {
-        var grants = new[]
-        {
-            EventGrant.ForOfficial(
-                TestId.Of(1),
-                TestId.Of(300),
-                "country-bg",
-                OfficialRole.Steward,
-                "a@x.test",
-                TestId.Of(9)
-            ),
-            EventGrant.ForOfficial(
-                TestId.Of(2),
-                TestId.Of(300),
-                "country-bg",
-                OfficialRole.GroundJury,
-                "a@x.test",
-                TestId.Of(9)
-            ),
-            EventGrant.ForOperator(TestId.Of(3), TestId.Of(300), "country-bg", "a@x.test", TestId.Of(9)),
-        };
-
-        var held = CallerGrants.Of(grants);
-
-        Assert.True(held.IsOperator);
-        Assert.Equal([OfficialRole.Steward, OfficialRole.GroundJury], held.OfficialRoles.Order());
-        Assert.True(held.MaySendSnapshot);
-        Assert.False(CallerGrants.Of([]).IsStaff);
-    }
-
-    [Fact]
-    public void A_pending_grant_gives_nothing_until_it_has_an_account()
-    {
-        var pending = EventGrant.ForOperator(TestId.Of(3), TestId.Of(300), "country-bg", "a@x.test");
-
-        Assert.False(CallerGrants.Of([pending]).IsStaff);
-    }
-
-    static ConfigureEvent CreateSetupEvent(string? tenantId, Guid? mainOperatorId)
+    static ConfigureEvent CreateSetupEvent(string? tenantId)
     {
         var loop = new SetupLoop(40, id: TestId.Of(4));
         var competition = new SetupCompetition(
@@ -237,8 +200,7 @@ public sealed class EventAuthorityTests
             [loop],
             [],
             id: TestId.Of(300),
-            tenantId: tenantId,
-            mainOperatorId: mainOperatorId
+            tenantId: tenantId
         );
     }
 }

@@ -1,29 +1,63 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.JsonApi;
 using NTS.Domain.Enums;
 
 namespace NoTiming.Api.Features.Snapshots;
 
 /// <summary>What a device says about a Snapshot it sends: where it was captured and when. A member that is not one of these is kept, to be refused.</summary>
-internal sealed class SnapshotAttributes
+internal sealed class SnapshotAttributes : IResourceAttributes, INamesEvent
 {
-    public Guid? EventId { get; set; }
+    public static string? ResourceType => SnapshotEndpoints.TYPE;
+
+    public static DocumentIds Ids => DocumentIds.RequiredGuid;
+
+    public static JsonApiFailure IdRequired { get; } =
+        new(
+            StatusCodes.Status400BadRequest,
+            "id-required",
+            "A Snapshot has the id its device made for it.",
+            "Send a Guid as the id of the resource: it is how a Snapshot sent again is told from a new one."
+        );
+
+    public string? EventId { get; set; }
     public int? Number { get; set; }
     public string? Kind { get; set; }
     public DateTimeOffset? Time { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Others { get; set; }
+
+    public JsonApiFailure? Invalid()
+    {
+        return SnapshotRequest.Problem(this);
+    }
 }
 
 /// <summary>What an Official says in an Update of a Snapshot they sent: the time it should have had. A member that is not that is kept, to be refused.</summary>
-internal sealed class SnapshotUpdateAttributes
+internal sealed class SnapshotUpdateAttributes : IResourceAttributes
 {
+    public static string? ResourceType => SnapshotEndpoints.TYPE;
+
+    public static DocumentIds Ids => DocumentIds.MatchesRoute;
+
     public DateTimeOffset? Time { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Others { get; set; }
+
+    public JsonApiFailure? Invalid()
+    {
+        if (SnapshotRequest.Unsupported(Others) is { } unsupported)
+        {
+            return unsupported;
+        }
+
+        return Time is null
+            ? SnapshotRequest.Invalid("Say the time the Snapshot should have had: an instant with its offset.")
+            : null;
+    }
 }
 
 /// <summary>
@@ -36,58 +70,64 @@ internal sealed class SnapshotRequest
     /// <summary>The Snapshot a document describes, or what is wrong with it: nothing it names is ignored without saying so.</summary>
     public static (SnapshotRequest? Request, JsonApiFailure? Failure) From(string? id, SnapshotAttributes attributes)
     {
-        if (Unsupported(attributes.Others) is { } unsupported)
+        if (Problem(attributes) is { } problem)
         {
-            return (null, unsupported);
+            return (null, problem);
         }
 
         if (id is null)
         {
-            return (
-                null,
-                new JsonApiFailure(
-                    StatusCodes.Status400BadRequest,
-                    "id-required",
-                    "A Snapshot has the id its device made for it.",
-                    "Send a Guid as the id of the resource: it is how a Snapshot sent again is told from a new one."
-                )
-            );
+            return (null, SnapshotAttributes.IdRequired);
         }
 
-        if (!Guid.TryParse(id, out var snapshotId) || snapshotId == Guid.Empty)
+        return !Guid.TryParse(id, out var snapshotId) || snapshotId == Guid.Empty
+            ? (null, JsonApiFailures.InvalidId)
+            : (Of(snapshotId, attributes), null);
+    }
+
+    /// <summary>The Snapshot of attributes that are valid, with the id its device made for it.</summary>
+    public static SnapshotRequest Of(Guid id, SnapshotAttributes attributes)
+    {
+        return new SnapshotRequest(
+            id,
+            Guid.Parse(attributes.EventId!),
+            attributes.Number!.Value,
+            KindNamed(attributes.Kind)!.Value,
+            attributes.Time!.Value
+        );
+    }
+
+    /// <summary>What is wrong with the members of a Snapshot, none when they are valid.</summary>
+    public static JsonApiFailure? Problem(SnapshotAttributes attributes)
+    {
+        if (Unsupported(attributes.Others) is { } unsupported)
         {
-            return (null, InvalidId());
+            return unsupported;
         }
 
-        if (attributes.EventId is not { } eventId || eventId == Guid.Empty)
+        if (!Guid.TryParse(attributes.EventId, out var eventId) || eventId == Guid.Empty)
         {
-            return (
-                null,
-                new JsonApiFailure(
-                    StatusCodes.Status400BadRequest,
-                    "event-required",
-                    "Name the Event the Snapshot is of.",
-                    "The Event is the eventId attribute of the document."
-                )
+            return new JsonApiFailure(
+                StatusCodes.Status400BadRequest,
+                "event-required",
+                "Name the Event the Snapshot is of.",
+                "The Event is the eventId attribute of the document."
             );
         }
 
         if (attributes.Number is not { } number || number < 1)
         {
-            return (null, Invalid("The start number is a whole number from 1."));
+            return Invalid("The start number is a whole number from 1.");
         }
 
-        if (KindNamed(attributes.Kind) is not { } kind)
+        if (KindNamed(attributes.Kind) is null)
         {
-            return (null, Invalid("The kind is Arrive, Present or Final."));
+            return Invalid("The kind is Arrive, Present or Final.");
         }
 
-        if (attributes.Time is not { } time)
-        {
-            return (null, Invalid("Say the time the Snapshot was captured: an instant with its offset."));
-        }
-
-        return (new SnapshotRequest(snapshotId, eventId, number, kind, time), null);
+        return attributes.Time is null
+            ? Invalid("Say the time the Snapshot was captured: an instant with its offset.")
+            : null;
     }
 
     /// <summary>The refusal of a member that is not one of the resource's, none when there is none.</summary>
@@ -111,11 +151,6 @@ internal sealed class SnapshotRequest
             "The document is not a Snapshot.",
             detail
         );
-    }
-
-    public static JsonApiFailure InvalidId()
-    {
-        return new JsonApiFailure(StatusCodes.Status400BadRequest, "invalid-id", "The id of a resource is a Guid.");
     }
 
     SnapshotRequest(Guid id, Guid eventId, int number, SnapshotType kind, DateTimeOffset time)

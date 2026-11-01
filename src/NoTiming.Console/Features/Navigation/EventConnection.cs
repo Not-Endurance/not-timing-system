@@ -5,7 +5,7 @@ using NTS.Contracts.Socket;
 namespace NoTiming.Console.Features.Navigation;
 
 /// <summary>
-/// Whether the page is in touch with the Event it runs (#646): Judge said so beside its menu, and a Main Operator who is not told
+/// Whether the page is in touch with the Event it runs (#646): Judge said so beside its menu, and a Console Operator who is not told
 /// that the connection is down works on what the Event was a moment ago. It is connected when the app follows this Event and the
 /// connection is up, not when it follows another, and it is disconnected when it follows this one and the connection is down.
 /// </summary>

@@ -36,8 +36,8 @@ public sealed class ToolsProcessTests : IClassFixture<MongoFixture>
             "Staging",
             "--tenant-root",
             "root@example.test",
-            "--main-operator",
-            "main@example.test",
+            "--console-operator",
+            "console@example.test",
             "--official",
             "steward@example.test:Steward",
             "--apply"
