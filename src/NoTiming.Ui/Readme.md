@@ -37,7 +37,7 @@ address overrides it locally.
 
 A visitor downloads the app to read a startlist, so its size is measured on what is delivered: `UiFirstLoadBudgetTests`
 publishes the Ui for Release and sums the Brotli files that the Api serves (a debug build is several times larger and says
-nothing about it). When it was written down the app was **8.29 MB over 180 files** (6.8 MB of assemblies, 0.9 MB of runtime,
+nothing about it). It is a manual check, left out of the verification runs: see the integration README for the command. When it was written down the app was **8.29 MB over 180 files** (6.8 MB of assemblies, 0.9 MB of runtime,
 0.3 MB of globalization data, 0.2 MB of scripts and styles), and with the Console's services and its text in three languages
 (#646) it was **8.37 MB over 183 files**, and with the libraries on .NET 10 and the application layer a folder of the app (#647)
 it is **8.26 MB over 180 files**; the budget is a **ceiling of 9 MB**. A change that raises

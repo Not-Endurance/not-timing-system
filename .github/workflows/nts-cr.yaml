@@ -5,6 +5,11 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
 
+# One CR run per pull request: a new push cancels the run still going for the commit it replaces.
+concurrency:
+  group: cr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 env:
   # Every project is .NET 10 and builds with the .NET 10 SDK. Csharpier 0.30.6 runs on .NET 8, so that job installs it.
   DOTNET_CORE_VERSION: 8.0.x
@@ -78,6 +83,34 @@ jobs:
     - name: Build
       run: dotnet build ${{ env.SOURCE_DIR }}/${{ env.SOLUTION_FILE }} -c ${{ env.CONFIGURATION }} --no-restore
 
-    # The layering of ADR-0011, read from the project files: no Docker and no browser, a few seconds on the build above.
-    - name: Architecture tests
-      run: dotnet test tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -c ${{ env.CONFIGURATION }} --no-build --filter "FullyQualifiedName~NTS.Tests.Integration.Architecture"
+    # The unit tests, which include the architecture of ADR-0011 read from the project files: no Docker and no browser, a few seconds on the build above.
+    - name: Unit tests
+      run: dotnet test tests/NTS.Tests.Unit/NTS.Tests.Unit.csproj -c ${{ env.CONFIGURATION }} --no-build
+
+    # The shared library of the tests (ADR-0016): generic, no Docker and no browser.
+    - name: Shared test library tests
+      run: dotnet test nugets/Not.Test.Tests/Not.Test.Tests.csproj -c ${{ env.CONFIGURATION }} --no-build
+
+    # The integration tests (ADR-0016) need Docker and a browser, both on the runner. They run only for pull requests into master.
+    # Docker Hub rate-limits anonymous pulls, so the MongoDB image is pulled first, with retries.
+    - name: Pull the MongoDB image
+      if: github.base_ref == 'master'
+      run: |
+        for attempt in 1 2 3; do
+          if docker pull mongo:6.0; then exit 0; fi
+          sleep 30
+        done
+        exit 1
+
+    - name: Install Chromium for Playwright
+      if: github.base_ref == 'master'
+      shell: pwsh
+      run: ./tests/NTS.Tests.Integration/bin/${{ env.CONFIGURATION }}/net10.0/playwright.ps1 install --with-deps chromium
+
+    # Ryuk, the Testcontainers reaper, is off: the runner is discarded after the job, and its image comes from Docker Hub.
+    - name: Integration tests
+      if: github.base_ref == 'master'
+      timeout-minutes: 60
+      env:
+        TESTCONTAINERS_RYUK_DISABLED: "true"
+      run: dotnet test tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -c ${{ env.CONFIGURATION }} --no-build
