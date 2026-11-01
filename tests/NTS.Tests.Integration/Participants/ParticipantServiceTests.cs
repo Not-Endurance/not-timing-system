@@ -181,7 +181,7 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
         var service = Open(api, person, out var asked);
         asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.TooManyRequests);
 
-        var refused = await Assert.ThrowsAsync<InvalidOperationException>(
+        var refused = await Assert.ThrowsAnyAsync<RepositoryException>(
             () => service.Search(ParticipantKind.Athlete, "ivan", 1, CancellationToken.None)
         );
 
@@ -348,7 +348,7 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
         var (latin, _) = HistorySeed.NameMarker();
         asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.TooManyRequests);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAnyAsync<RepositoryException>(
             () => service.Search(ParticipantKind.Athlete, latin, 1, CancellationToken.None)
         );
         asked.Answer = null;

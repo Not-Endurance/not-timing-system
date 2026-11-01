@@ -6,6 +6,7 @@ using NoTiming.Ui.Features.Profile;
 using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Profile;
 using NTS.Tests.Integration.Harness;
+using Not.Application.CRUD.Ports;
 
 namespace NTS.Tests.Integration;
 
@@ -145,9 +146,9 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
         model.Country = (await ui.Profile.SearchCountries(iso, CancellationToken.None)).Single();
         model.GivenName = new string('x', 101);
 
-        var refused = await Assert.ThrowsAsync<InvalidOperationException>(() => ui.Profile.Save(model));
+        var refused = await Assert.ThrowsAnyAsync<RepositoryException>(() => ui.Profile.Save(model));
 
-        Assert.Contains("invalid-name", refused.Message);
+        Assert.Equal("invalid-name", refused.Code);
         Assert.Equal("Ana", ui.Profile.Profile!.GivenName);
     }
 

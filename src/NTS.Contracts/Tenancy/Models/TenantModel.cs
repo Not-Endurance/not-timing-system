@@ -14,7 +14,7 @@ public class TenantModel
     {
         return new TenantModel
         {
-            Id = tenant.Id,
+            Key = tenant.Id,
             Name = tenant.Name,
             Kind = tenant.Kind,
             RegionalRules = new RegionalRulesModel
@@ -25,7 +25,7 @@ public class TenantModel
         };
     }
 
-    public string Id { get; set; } = string.Empty;
+    public string Key { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Kind { get; set; } = string.Empty;
     public RegionalRulesModel RegionalRules { get; set; } = new();
@@ -33,7 +33,7 @@ public class TenantModel
     public Tenant MapToEntity()
     {
         return new Tenant(
-            Id,
+            Key,
             Name,
             Kind,
             new RegionalRules(RegionalRules.OnlyAverageLoopSpeed, RegionalRules.RankerCode)

@@ -8,6 +8,7 @@ using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Tests.Integration.Harness;
 using NoTiming.Ui.Storage.REST;
+using Not.Application.CRUD.Ports;
 
 namespace NTS.Tests.Integration;
 
@@ -282,8 +283,8 @@ public sealed class UserSessionStateTests : IClassFixture<SharedApiFixture>
                 ? new HttpResponseMessage(HttpStatusCode.InternalServerError)
                 : null;
 
-        var read = await Assert.ThrowsAsync<InvalidOperationException>(() => tab.Sessions.GetCurrent());
-        var written = await Assert.ThrowsAsync<InvalidOperationException>(
+        var read = await Assert.ThrowsAnyAsync<RepositoryException>(() => tab.Sessions.GetCurrent());
+        var written = await Assert.ThrowsAnyAsync<RepositoryException>(
             () => tab.Sessions.ReplaceSnapshotSelections([Selected(12)])
         );
 

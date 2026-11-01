@@ -37,7 +37,7 @@ public class TenantApiRepository
             resource.GetProperty("attributes").GetRawText(),
             _client.Json
         )!;
-        model.Id = resource.GetProperty("id").GetString() ?? tenantId;
+        model.Key = resource.GetProperty("id").GetString() ?? tenantId;
         return model;
     }
 

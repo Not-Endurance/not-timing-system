@@ -6,6 +6,7 @@ using NoTiming.Ui.Features.Profile;
 using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Participants;
 using NTS.Tests.Integration.Harness;
+using Not.Application.CRUD.Ports;
 
 namespace NTS.Tests.Integration;
 
@@ -143,9 +144,9 @@ public sealed class ProfileLinksTests : IClassFixture<SharedApiFixture>
         await ui.Profile.Load();
         var before = ui.Profile.Profile;
 
-        var refused = await Assert.ThrowsAsync<InvalidOperationException>(() => ui.Profile.AddHorse(Guid.NewGuid()));
+        var refused = await Assert.ThrowsAnyAsync<RepositoryException>(() => ui.Profile.AddHorse(Guid.NewGuid()));
 
-        Assert.Contains("not-found", refused.Message);
+        Assert.Equal("not-found", refused.Code);
         Assert.Same(before, ui.Profile.Profile);
     }
 
@@ -169,10 +170,10 @@ public sealed class ProfileLinksTests : IClassFixture<SharedApiFixture>
                 }
                 : null;
 
-        var refused = await Assert.ThrowsAsync<InvalidOperationException>(() => ui.Profile.AddHorse(Guid.NewGuid()));
+        var refused = await Assert.ThrowsAnyAsync<RepositoryException>(() => ui.Profile.AddHorse(Guid.NewGuid()));
 
         Assert.Contains("A person links at most 100 Horses.", refused.Message);
-        Assert.Contains("horse-limit-reached", refused.Message);
+        Assert.Equal("horse-limit-reached", refused.Code);
     }
 
     [Fact]
@@ -266,7 +267,7 @@ public sealed class ProfileLinksTests : IClassFixture<SharedApiFixture>
                 }
                 : null;
 
-        var refused = await Assert.ThrowsAsync<InvalidOperationException>(() => ui.Profile.AddHorse(fire));
+        var refused = await Assert.ThrowsAnyAsync<RepositoryException>(() => ui.Profile.AddHorse(fire));
 
         Assert.Contains("The profile could not be read.", refused.Message);
         Assert.Same(before, ui.Profile.Profile);

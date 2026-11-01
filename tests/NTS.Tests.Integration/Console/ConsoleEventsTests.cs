@@ -176,10 +176,9 @@ public sealed class ConsoleEventsTests : IClassFixture<SharedApiFixture>
         var assigned = Assert.Single(await console.Events.ConsoleOperators(live));
 
         await console.Events.RemoveConsoleOperator(assigned.Id);
-        var gone = await Assert.ThrowsAsync<DomainException>(() => console.Events.RemoveConsoleOperator(assigned.Id));
+        await console.Events.RemoveConsoleOperator(assigned.Id); // a row that is gone is removed all the same (ADR-0017)
 
         Assert.Empty(await console.Events.ConsoleOperators(live));
-        Assert.NotEmpty(gone.Message);
         using var theirs = Open(api, consoleOperator);
         await theirs.Events.Load();
         Assert.Empty(theirs.Events.Events);

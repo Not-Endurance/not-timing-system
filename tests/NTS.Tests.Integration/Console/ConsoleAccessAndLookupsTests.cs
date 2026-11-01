@@ -145,11 +145,10 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<SharedApiFixtur
         var noRole = await Assert.ThrowsAsync<DomainException>(
             () => mine.Get<IConsoleGrants>().Link(id, GrantKind.Official, null, "other@example.test")
         );
-        var notTheirs = await Assert.ThrowsAsync<DomainException>(() => theirs.Get<IConsoleGrants>().Remove(grant.Id));
+        await theirs.Get<IConsoleGrants>().Remove(grant.Id); // a grant the caller cannot see is not there for them: nothing changes (ADR-0017)
 
         Assert.Equal(Select_a_role_string, noRole.Message);
         Assert.Equal(asked, mine.Requests.Asked.Count); // the Api was not asked
-        Assert.NotEmpty(notTheirs.Message);
         Assert.Equal([grant.Id], (await mine.Get<IConsoleGrants>().List(id)).Select(x => x.Id)); // and it is still there
     }
 

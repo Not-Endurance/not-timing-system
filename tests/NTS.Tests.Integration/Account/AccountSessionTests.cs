@@ -5,6 +5,7 @@ using NTS.Contracts;
 using NTS.Contracts.Features.Account;
 using NTS.Tests.Integration.Harness;
 using NoTiming.Ui.Storage.REST;
+using Not.Application.CRUD.Ports;
 
 namespace NTS.Tests.Integration;
 
@@ -147,13 +148,13 @@ public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
         await session.SelectTenant(other);
         var selected = session.Current!;
         var toldOfTheSelection = told;
-        var refused = await Assert.ThrowsAsync<InvalidOperationException>(() => session.SelectTenant(stranger));
+        var refused = await Assert.ThrowsAnyAsync<RepositoryException>(() => session.SelectTenant(stranger));
         await session.SelectTenant(null);
 
         Assert.True(toldOfTheSelection > 0); // who watches is told, as the Tenant is where they read and write
         Assert.Equal(other, selected.SelectedTenantId);
         Assert.Equal(other, selected.CurrentTenantId);
-        Assert.Contains("not-a-member", refused.Message);
+        Assert.Equal("not-a-member", refused.Code);
         Assert.Null(session.Current!.SelectedTenantId);
         Assert.Equal(home, session.Current.CurrentTenantId);
     }
