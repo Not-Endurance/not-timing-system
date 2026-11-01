@@ -4,7 +4,7 @@ namespace NTS.Domain.Access;
 /// What the Core views show of an Event and whether they may change it, by the stage the Event is in (#630, ADR-0007).
 /// A Live Event shows every Core view. A Historic Event is a record: it shows its Rankings and Results and the
 /// Participation detail with the times that were recorded, and hides the views that are about the running Event (the
-/// Startlist, Handouts, the Arrivelist and Presentlist, Snapshot capture and Performance). Whether a view may write is
+/// Startlist, Handouts, the Arrivelist and Presentlist, Snapshot capture, Performance and the dashboard). Whether a view may write is
 /// the stage and the permission together: the Api decides the permission (<see cref="AccessPolicy"/>), and a Historic
 /// Event takes no write from a view whoever looks at it.
 /// </summary>
@@ -20,7 +20,8 @@ public static class EventViewPolicy
             or CoreView.Arrivelist
             or CoreView.Presentlist
             or CoreView.SnapshotCapture
-            or CoreView.Performance => stage == EventStage.Live,
+            or CoreView.Performance
+            or CoreView.Dashboard => stage == EventStage.Live,
             _ => throw new ArgumentOutOfRangeException(nameof(view), view, "A Core view the policy has no row for."),
         };
     }

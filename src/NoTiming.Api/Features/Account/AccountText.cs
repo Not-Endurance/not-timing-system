@@ -45,7 +45,7 @@ public sealed class AccountText
         _text = text;
     }
 
-    public static IReadOnlyList<string> Languages { get; } = ["en", "bg", "tr"];
+    public static IReadOnlyList<string> Languages { get; } = ["en", "bg"];
 
     public IReadOnlyCollection<string> Keys(string language)
     {

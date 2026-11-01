@@ -1,6 +1,7 @@
 using NTS.Tools.Developer;
 using NTS.Tools.EnvironmentMarking;
 using NTS.Tools.EventLiveness;
+using NTS.Tools.IdentityMigration;
 using NTS.Tools.NameMigration;
 using NTS.Tools.ParticipationCopies;
 using NTS.Tools.PhaseTimes;
@@ -16,6 +17,7 @@ return args.FirstOrDefault() switch
     "migrate-phase-times" => await RunPhaseTimesMigration(args.Skip(1).ToArray()),
     "migrate-event-liveness" => await RunEventLivenessMigration(args.Skip(1).ToArray()),
     "migrate-tenants" => await TenantsMigrationTool.Run(args.Skip(1).ToArray()),
+    "migrate-identities" => await IdentitiesMigrationTool.Run(args.Skip(1).ToArray()),
     "mark-environment" => await MarkEnvironmentTool.Run(args.Skip(1).ToArray()),
     "seed-staging" => await StagingSeedTool.Run(args.Skip(1).ToArray()),
     "seed-tenant-root" => await DeveloperTool.SeedTenantRoot(args.Skip(1).ToArray()),
@@ -48,6 +50,9 @@ static int ShowHelp()
           migrate-tenants      Turn the data of before Tenants into the data of Tenants: the accounts, the Tenants, the Tenant
                                of every document, the Main Operators, the grants and the environment marker
                                (a dry run unless --apply)
+          migrate-identities   Group the copies of every Athlete and Horse into the identities they are, and write a report and a
+                               file of decisions for the owner; with --apply convert every id to a Guid, merge the identities,
+                               finalise the Rankings of the Events that have ended and verify (a dry run unless --apply)
           mark-environment     Mark a database as Production, Staging or Development, which the commands that must not touch
                                a production database look at (a dry run unless --apply)
           seed-staging         Make a Tenant Root, a Main Operator, Officials, Operators and a Live Event with Participations

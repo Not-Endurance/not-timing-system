@@ -9,8 +9,12 @@ the browser sends to the page's own origin and the app cannot read. The app asks
   were on (only a path of this site is passed on). Signing out is `DELETE /api/sessions/current`, followed by loading
   the app again as a visitor.
 - What a page asks of a person is decided in one place (`WitnessRoutePolicy`, applied by `AccountRouteGate`): everything
-  that only shows is public, sending Snapshots and the profile need a person who is signed in, and sending Snapshots also
-  waits for a complete profile. The Api decides what is allowed whatever a page shows (ADR-0012).
+  that only shows is public, sending Snapshots, the profile and the search for the Participations of an Athlete or a Horse
+  (#639, ADR-0010) need a person who is signed in, and sending Snapshots also waits for a complete profile. The Api
+  decides what is allowed whatever a page shows (ADR-0012), and the drawer offers those pages to a person who is signed in
+  alone.
+- The Api tells names and words in the language of the request, so every request carries the language the app is in
+  (`Accept-Language`, from the culture the person chose), which is not always the language of the browser.
 - What depends on who is signed in (`AccountAwareContext`: the profile, the access level) loads again when the account
   changes. What a person keeps per Event (the selected and the sent Snapshots) is kept by the Api under their account
   (`/api/user-sessions`), not in the browser.
@@ -38,7 +42,7 @@ nothing about it). When it was written down the app was **8.29 MB over 180 files
 (#646) it is **8.37 MB over 183 files**; the budget is a **ceiling of 9 MB**. A change that raises
 the size past it raises it on purpose, and raises the ceiling in the test, here and in the ticket.
 
-- `BlazorWebAssemblyLoadAllGlobalizationData` is on. A person who chooses Bulgarian or Turkish changes the culture of the app
+- `BlazorWebAssemblyLoadAllGlobalizationData` is on. A person who chooses Bulgarian changes the culture of the app
   when it starts, which Blazor refuses with the globalization data that comes with the runtime (it has English and a few
   other languages); the full data costs about 0.2 MB more than that.
 - What the app carries that a viewer does not need, and the first things to take out: the MongoDB driver (0.8 MB), OData (1.1

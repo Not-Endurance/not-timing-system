@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Xml.Linq;
 using Not.Domain.Exceptions;
 using NoTiming.Console.Features.Rankings.Fei;
+using NTS.Contracts.Core.Models;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
@@ -466,6 +467,45 @@ public sealed class FeiExportTests
             false,
             false
         );
+    }
+
+    [Theory]
+    [InlineData(3)] // Sofia
+    [InlineData(-5)] // a place behind UTC, whose last second is the next day in UTC
+    public void The_days_of_the_Show_are_the_days_at_its_place_for_an_Event_that_was_stored_in_UTC_and_read_back(
+        int hoursFromUtc
+    )
+    {
+        // 1 to 2 May at the place; the database holds the instants in UTC, and a read makes the Event from them.
+        var sofia = TimeSpan.FromHours(hoursFromUtc);
+        var made = new EventInformation(
+            new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG"),
+            "Integration FEI Show",
+            "Sofia",
+            new EventSpan(
+                new DateTimeOffset(2026, 5, 1, 9, 0, 0, sofia),
+                new DateTimeOffset(2026, 5, 2, 9, 0, 0, sofia)
+            ),
+            "FEI-SHOW-1",
+            id: EVENT
+        );
+        var model = EventInformationModel.From(made);
+        model.StartDay = model.StartDay.ToUniversalTime();
+        model.EndDay = model.EndDay.ToUniversalTime();
+        var first = RankingOf(1, "CEI 1*", "FEI-EVENT-1", "CEI1", "FEI-COMP-1", "01");
+
+        var document = new FeiExport().Create(model.MapToEntity(), [first.Result], [first.Ranking]);
+
+        var xml = XDocument.Parse(document.Content);
+        var ns = xml.Root!.Name.Namespace;
+        var show = xml.Root.Element(ns + "EventResult")!.Element(ns + "Show")!;
+        Assert.Equal("2026-05-01", show.Attribute("StartDate")!.Value);
+        Assert.Equal("2026-05-02", show.Attribute("EndDate")!.Value);
+        var one = show.Element(ns + "EnduranceEvent")!;
+        Assert.Equal("2026-05-01", one.Attribute("StartDate")!.Value);
+        Assert.Equal("2026-05-02", one.Attribute("EndDate")!.Value);
+        var competition = Assert.Single(one.Element(ns + "Competitions")!.Elements(ns + "Competition"));
+        Assert.Equal("2026-05-01", competition.Attribute("StartDate")!.Value);
     }
 
     static EventInformation EventOf(string? feiShowId = "FEI-SHOW-1", string name = "Integration FEI Show")

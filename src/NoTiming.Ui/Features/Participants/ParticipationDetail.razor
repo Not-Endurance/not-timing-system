@@ -1,0 +1,31 @@
+@using NoTiming.Ui.Components.ParticipationTable
+@using NoTiming.Ui.Components.Results
+
+@inherits ParticipationDetailBehind
+
+<MudStack Spacing="1" Class="pa-2">
+    <MudText Typo="Typo.caption">
+        <MudLink Href="@EventAddress" data-testid="participation-event">@Row.EventName</MudLink>
+    </MudText>
+
+    @if (UseInlineLayout)
+    {
+        <MudStack Row Justify="Justify.FlexEnd">
+            <ParticipationSummaryComponent Participation="Participation" />
+        </MudStack>
+    }
+
+    <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+        <ParticipationTable Phases="Participation.Phases" Number="Participation.Combination.Number" />
+
+        @if (!UseInlineLayout)
+        {
+            <ParticipationSummaryComponent Participation="Participation" />
+        }
+    </MudStack>
+
+    @foreach (var counted in Row.AlsoCountedIn)
+    {
+        <MudText Typo="Typo.caption" data-testid="participation-also">@AlsoText(counted)</MudText>
+    }
+</MudStack>

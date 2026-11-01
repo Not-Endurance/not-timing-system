@@ -134,7 +134,7 @@ public static class AccessPolicy
         return capability switch
         {
             Capability.ReadRegistryAcrossTenants => Verdict.Allowed,
-            Capability.SearchAccountsAcrossTenants => Role(
+            Capability.SearchAccountsAcrossTenants or Capability.ReadRegistryDetailsAcrossTenants => Role(
                 caller.TenantRootIn.Count > 0 || caller.OpenMainOperatorIn.Count > 0 || caller.IsDeveloper,
                 Refusal.NotAllowed
             ),

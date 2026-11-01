@@ -79,6 +79,16 @@
 
     @if (ShowProfileHeader)
     {
+        <MudNavGroup Title="@Participations_string" Expanded="true">
+            <NNavLink Endpoint="@PROFILE_PAGE">
+                <strong>@My_participations_string</strong>
+            </NNavLink>
+
+            <NNavLink Endpoint="@PARTICIPATIONS_PAGE">
+                <strong>@Not.Localization.NStrings.Search_string</strong>
+            </NNavLink>
+        </MudNavGroup>
+
         <MudNavGroup Title="@Console_string" Expanded="true">
             <NNavLink Endpoint="@CONSOLE_PAGE">
                 <strong>@Console_string</strong>

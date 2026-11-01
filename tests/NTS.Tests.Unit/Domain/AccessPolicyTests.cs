@@ -287,6 +287,8 @@ public sealed class AccessPolicyTests
     [InlineData(Who.TenantRoot, Capability.GrantDeveloper, Refusal.NotDeveloper)]
     [InlineData(Who.Anonymous, Capability.ReadRegistryAcrossTenants, Refusal.NotSignedIn)]
     [InlineData(Who.SomeAccount, Capability.SearchAccountsAcrossTenants, Refusal.NotAllowed)]
+    [InlineData(Who.SomeAccount, Capability.ReadRegistryDetailsAcrossTenants, Refusal.NotAllowed)]
+    [InlineData(Who.Anonymous, Capability.ReadRegistryDetailsAcrossTenants, Refusal.NotSignedIn)]
     [InlineData(Who.TenantRoot, Capability.EditCountries, Refusal.NotDeveloper)]
     [InlineData(Who.Anonymous, Capability.EditCountries, Refusal.NotSignedIn)]
     public void A_refusal_of_an_action_of_the_platform_says_what_is_missing(
@@ -510,6 +512,15 @@ public sealed class AccessPolicyTests
     /// <summary>The actions that belong to no Tenant and no Event.</summary>
     static Dictionary<Capability, Who[]> PlatformRows()
     {
+        Who[] whoSetsAnEventUp =
+        [
+            Who.TenantRoot,
+            Who.TenantRootOfAnotherTenant,
+            Who.MainOperator,
+            Who.MainOperatorOfAnotherEventOfTheTenant,
+            Who.MainOperatorOfAnotherTenantsEvent,
+            Who.Developer,
+        ];
         return new()
         {
             // "Read public Event views: Anyone, signed in or not".
@@ -518,15 +529,10 @@ public sealed class AccessPolicyTests
             [Capability.ReadRegistryAcrossTenants] = SignedIn(),
             // The account search "reaches across Tenants only when the caller asks for it explicitly": for the people who may
             // search at all, in any Tenant.
-            [Capability.SearchAccountsAcrossTenants] =
-            [
-                Who.TenantRoot,
-                Who.TenantRootOfAnotherTenant,
-                Who.MainOperator,
-                Who.MainOperatorOfAnotherEventOfTheTenant,
-                Who.MainOperatorOfAnotherTenantsEvent,
-                Who.Developer,
-            ],
+            [Capability.SearchAccountsAcrossTenants] = whoSetsAnEventUp,
+            // The whole row of an Athlete or a Horse of another Tenant (its FEI ID, its club, its country), and a search that matches the FEI ID:
+            // the people who set an Event up, which the Setup needs. Any other signed-in account reads the name and the name in English.
+            [Capability.ReadRegistryDetailsAcrossTenants] = whoSetsAnEventUp,
             // "Seed a Tenant Root, grant Developer: The Developer, by command".
             [Capability.SeedTenantRoot] = [Who.Developer],
             [Capability.GrantDeveloper] = [Who.Developer],

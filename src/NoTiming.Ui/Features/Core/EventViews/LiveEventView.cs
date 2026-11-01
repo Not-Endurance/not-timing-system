@@ -15,18 +15,23 @@ public sealed class LiveEventView : EventView
 {
     readonly IParticipationStore _store;
     readonly IWitnessAccessContext _access;
+    readonly Action<Guid>? _ended;
+    bool _hasEnded;
 
+    /// <param name="ended">What is done, once, when a refused write says that the Event has ended.</param>
     public LiveEventView(
         EventInformation eventInformation,
         IParticipationStore store,
         IWitnessAccessContext access,
         IRepository<Ranking> rankings,
-        IRepository<Official> officials
+        IRepository<Official> officials,
+        Action<Guid>? ended = null
     )
         : base(eventInformation, EventStage.Live, rankings, officials)
     {
         _store = store;
         _access = access;
+        _ended = ended;
         Observe(store, EmitChanged);
         Observe(access, EmitChanged);
     }
@@ -40,5 +45,16 @@ public sealed class LiveEventView : EventView
         await _store.Load();
         await _access.Load();
         return await base.InitializeState();
+    }
+
+    public override void Refused(string? code)
+    {
+        if (code != EventRefusals.ENDED || _hasEnded)
+        {
+            return;
+        }
+
+        _hasEnded = true;
+        _ended?.Invoke(Event.Id);
     }
 }

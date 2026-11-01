@@ -38,10 +38,12 @@ public class SnapshotService
     readonly INotifier _notifier;
     readonly INtsSocketContext _socketContext;
     readonly IParticipationStore _store;
+    readonly ISnapshotPublisher _snapshotPublisher;
     readonly List<Snapshot> _snapshots = [];
     readonly WaitingGroups _waiting;
     readonly SelectionSaver _selections;
     readonly Gate _sending = new();
+    readonly HashSet<SnapshotGroup> _withoutId = [];
     readonly CancellationTokenSource _stopped = new();
     readonly IWitnessUserSession _userSessionService;
     IReadOnlyList<Participation> _participations = [];
@@ -64,6 +66,7 @@ public class SnapshotService
         _account = account;
         _groups = groups;
         _notifier = notifier;
+        _snapshotPublisher = snapshotPublisher;
         _waiting = new WaitingGroups(account, groups, snapshotPublisher);
         _selections = new SelectionSaver(userSessionService);
         Observe(store, Rebuild);
@@ -95,7 +98,17 @@ public class SnapshotService
 
         _snapshots.Clear();
         _history.Clear();
-        _history.AddRange(session?.GetSnapshotHistory() ?? []);
+        _withoutId.Clear();
+        foreach (var stored in session?.SnapshotHistory ?? [])
+        {
+            var group = stored.MapToDomain();
+            _history.Add(group);
+            if (stored.GroupId == null)
+            {
+                _withoutId.Add(group); // kept before the ids were: the server cannot be asked of its Snapshots
+            }
+        }
+
         RestoreSnapshotSelections(session?.GetSnapshotSelections() ?? []);
         await RestoreUnanswered();
         BuildViews();
@@ -167,7 +180,7 @@ public class SnapshotService
                     _waiting.RepeatOf(view.Event.Id, readySnapshots, snapshotType)
                     ?? new SnapshotGroup(readySnapshots, snapshotType);
                 var receipts = await _waiting.Send(view.Event.Id, group);
-                return await Settle(view.Event.Id, group, receipts, snapshotType);
+                return await Settle(view, group, receipts, snapshotType);
             }
         );
     }
@@ -192,7 +205,7 @@ public class SnapshotService
                 var receipts = await _waiting.Send(view.Event.Id, group);
                 await _waiting.Release(view.Event.Id, group, receipts);
                 await AskAgainWhenRefused(receipts);
-                SnapshotReceipts.RefuseWhenNotRecorded(receipts);
+                SnapshotReceipts.RefuseWhenNotRecorded(view, receipts);
                 return true;
             }
         );
@@ -227,10 +240,56 @@ public class SnapshotService
         await ReloadState();
     }
 
+    public bool CanUpdate(SnapshotGroup group, Snapshot entry)
+    {
+        return entry.Timestamp != null
+            && group.Type is SnapshotType.Arrive or SnapshotType.Present // the kinds that an Update names
+            && !_withoutId.Contains(group)
+            && ReferenceEquals(LatestOf(entry.Number, group.Type), group);
+    }
+
+    public async Task UpdateTime(IViewedEvent view, SnapshotGroup group, Snapshot entry, Timestamp time)
+    {
+        view.EnsureCanWrite();
+        GuardHelper.ThrowIfDefault(group);
+        GuardHelper.ThrowIfDefault(entry);
+        GuardHelper.ThrowIfDefault(time);
+        await Sending(
+            view,
+            async () =>
+            {
+                if (!CanUpdate(group, entry))
+                {
+                    throw new DomainException(Snapshot_not_the_latest_string);
+                }
+
+                var receipt = await _snapshotPublisher.UpdateSnapshotAsync(
+                    group.IdOf(entry),
+                    time.ToDateTimeOffset(),
+                    _stopped.Token
+                );
+                await AskAgainWhenRefused([receipt]);
+                SnapshotReceipts.RefuseWhenNotRecorded(view, [receipt]);
+                if (!receipt.IsAccepted)
+                {
+                    throw new DomainException(
+                        string.Format(Time_not_taken_string, OutcomeWords.Of(receipt.Snapshot!.Outcome.ToString()))
+                    );
+                }
+
+                entry.Timestamp = time;
+                await KeepTimeInHistory(group, entry);
+                EmitChanged();
+                return true;
+            }
+        );
+    }
+
     public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
     {
         _waiting.Clear();
         _history.Clear();
+        _withoutId.Clear();
         _snapshots.Clear();
         _participations = [];
         _participationsToSnapshot = [];
@@ -257,7 +316,7 @@ public class SnapshotService
                     break;
                 }
 
-                await ResendOne(id, cancellationToken);
+                await ResendOne(view, id, cancellationToken);
             }
         }
         finally
@@ -272,7 +331,7 @@ public class SnapshotService
     /// Sends one waiting group again. A failure that is not the server's answer, such as a request that timed out, leaves the group
     /// waiting for the next round.
     /// </summary>
-    async Task ResendOne(Guid id, CancellationToken cancellationToken)
+    async Task ResendOne(IViewedEvent view, Guid id, CancellationToken cancellationToken)
     {
         if (_waiting.Find(id) is not { } waiting)
         {
@@ -282,7 +341,7 @@ public class SnapshotService
         try
         {
             var receipts = await _waiting.Send(waiting.EventId, waiting.Group);
-            await Settle(waiting.EventId, waiting.Group, receipts, waiting.Group.Type);
+            await Settle(view, waiting.Group, receipts, waiting.Group.Type);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -325,7 +384,7 @@ public class SnapshotService
     /// its own. What it did not record stays selected, to be sent again, and the person is told why.
     /// </summary>
     async Task<bool> Settle(
-        Guid eventId,
+        IViewedEvent view,
         SnapshotGroup snapshotGroup,
         IReadOnlyList<SnapshotReceipt> receipts,
         SnapshotType snapshotType
@@ -342,13 +401,32 @@ public class SnapshotService
 
             _history.Add(sent);
             FlushSnapshots(recorded.Select(x => x.Number).ToHashSet());
-            await _waiting.Release(eventId, snapshotGroup, receipts);
+            await _waiting.Release(view.Event.Id, snapshotGroup, receipts);
             Rebuild();
         }
 
         await AskAgainWhenRefused(receipts);
-        SnapshotReceipts.RefuseWhenNotRecorded(receipts);
+        SnapshotReceipts.RefuseWhenNotRecorded(view, receipts);
         return recorded.Count > 0;
+    }
+
+    /// <summary>The group of the history that was sent last as that kind of time for the start number: the one whose entry can be corrected.</summary>
+    SnapshotGroup? LatestOf(int number, SnapshotType type)
+    {
+        return _history.LastOrDefault(x => x.Type == type && x.Entries.Any(y => y.Number == number));
+    }
+
+    /// <summary>The time the server took is what the history that is kept shows too; one that cannot be kept is shown by this page still.</summary>
+    async Task KeepTimeInHistory(SnapshotGroup group, Snapshot entry)
+    {
+        try
+        {
+            await _userSessionService.UpdateSnapshotInHistory(group.Id, entry.Number, entry.Timestamp!);
+        }
+        catch
+        {
+            // The server has the time, which is what matters; the history of this page shows it as it is held in memory.
+        }
     }
 
     /// <summary>

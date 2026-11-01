@@ -1,9 +1,12 @@
 using MongoDB.Bson;
+using Not.Application.HTTP;
 using Not.Domain.Exceptions;
+using NoTiming.Ui.Features.Console;
 using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain.Access;
 using NTS.Domain.Enums;
 using NTS.Tests.Integration.Infrastructure;
+using static NoTiming.Ui.Features.Console.ApiAnswers;
 using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 
@@ -61,6 +64,44 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task A_list_that_the_Api_cuts_into_pages_is_read_page_after_page_to_its_end_and_the_grants_ask_for_the_biggest_page()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Open");
+        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var grants = ui.Get<IConsoleGrants>();
+        var marker = Guid.NewGuid().ToString("N");
+        var linked = new List<Guid>();
+        foreach (var name in new[] { "aaa", "bbb", "ccc" })
+        {
+            linked.Add((await grants.Link(id, GrantKind.Operator, null, $"{name}.{marker}@example.test")).Id);
+        }
+
+        ui.Requests.Asked.Clear();
+        var pages = await AcceptedPages(
+            ui.Get<JsonApiClient>(),
+            $"event-grants?filter={Uri.EscapeDataString($"eventId eq {id}")}",
+            x => Guid.Parse(x.GetProperty("id").GetString()!),
+            pageSize: 2
+        );
+        var asked = ui.Requests.Asked.Select(Unescaped).ToList();
+        ui.Requests.Asked.Clear();
+        var listed = await grants.List(id);
+
+        Assert.Equal(linked, pages); // the three, in the order of their emails, from two pages
+        Assert.Equal(2, asked.Count);
+        Assert.Contains("page[number]=1", asked[0]);
+        Assert.Contains("page[number]=2", asked[1]);
+        Assert.All(asked, x => Assert.Contains("page[size]=2", x));
+        Assert.Equal(linked, listed.Select(x => x.Id));
+        var listing = Assert.Single(ui.Requests.Asked); // and the page the grants ask for holds them all
+        Assert.Contains("page[size]=500", Unescaped(listing));
+    }
+
+    [Fact]
     public async Task The_Api_says_why_it_will_not_link_a_person_and_what_it_says_is_what_the_form_shows()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
@@ -114,7 +155,7 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_other_Tenants_are_asked_for_three_characters_a_quote_is_part_of_the_name_and_the_Tenants_own_rows_are_all_there_is_when_the_others_cannot_say()
+    public async Task The_other_Tenants_are_asked_for_two_characters_a_quote_is_part_of_the_name_and_the_Tenants_own_rows_are_all_there_is_when_the_others_cannot_say()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
@@ -140,10 +181,10 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         var lookups = ui.Get<IConsoleLookups>();
         int Searches() => ui.Requests.Asked.Count(x => x.Contains("/all-tenants", StringComparison.Ordinal));
 
+        await lookups.SearchAthletes("C");
+        var oneCharacter = Searches();
         await lookups.SearchAthletes("Co");
         var twoCharacters = Searches();
-        await lookups.SearchAthletes("Con");
-        var threeCharacters = Searches();
         var quoted = await lookups.SearchAthletes("O'Bri");
         ui.Requests.Answer = request =>
             request.RequestUri!.AbsolutePath.EndsWith("/all-tenants", StringComparison.Ordinal)
@@ -151,8 +192,8 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
                 : null;
         var refused = await lookups.SearchAthletes("Maria");
 
-        Assert.Equal(0, twoCharacters);
-        Assert.Equal(1, threeCharacters);
+        Assert.Equal(0, oneCharacter);
+        Assert.Equal(1, twoCharacters);
         var found = Assert.Single(quoted);
         Assert.Equal(theirs, found.Id);
         Assert.Null(found.Club); // a row of another Tenant that has no Club has none
@@ -160,7 +201,64 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_Tenants_own_rows_are_found_by_name_and_another_Tenants_rows_by_a_term_of_three_characters_or_more()
+    public async Task The_FEI_ID_of_a_row_of_another_Tenant_reaches_the_Setup_of_a_Tenant_Root_and_no_other_account()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, cyrillic) = HistorySeed.NameMarker(); // the registries are shared by the tests of this class: the name is this test's own
+        var theirs = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            other,
+            $"Мария Друга {cyrillic}",
+            RegistrySeed.CountryOf("Bulgaria", "BG"),
+            $"Maria Other {latin}",
+            feiId: "10009999"
+        );
+        await using var rootUi = ConsoleUi.Open(api, root);
+        await using var memberUi = ConsoleUi.Open(api, member);
+
+        var forTheRoot = await rootUi.Get<IConsoleLookups>().SearchAthletes(latin);
+        var forTheMember = await memberUi.Get<IConsoleLookups>().SearchAthletes(latin);
+
+        Assert.Equal(("10009999", theirs), (Assert.Single(forTheRoot).FeiId, forTheRoot[0].Id)); // what a Combination and the FEI export need
+        Assert.Equal(theirs, Assert.Single(forTheMember).Id);
+        Assert.Null(forTheMember[0].FeiId); // an account that sets nothing up reads the name of a rider, and not the FEI ID
+    }
+
+    [Fact]
+    public async Task Other_Tenants_are_asked_for_a_term_with_a_word_of_two_characters_and_for_the_first_six_words_of_it()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, cyrillic) = HistorySeed.NameMarker(); // the registries are shared by the tests of this class: the name is this test's own
+        var theirs = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            other,
+            $"Конан {cyrillic}",
+            RegistrySeed.CountryOf("Bulgaria", "BG"),
+            $"Conan {latin}"
+        );
+        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var lookups = ui.Get<IConsoleLookups>();
+        int Searches() => ui.Requests.Asked.Count(x => x.Contains("/all-tenants", StringComparison.Ordinal));
+
+        await lookups.SearchAthletes("C B"); // three characters, but no word of two: the Api would refuse it
+        var shortWords = Searches();
+        var sevenWords = await lookups.SearchAthletes($"Conan {latin} c o n a r"); // the Api takes six words and the seventh is left out
+
+        Assert.Equal(0, shortWords);
+        Assert.Equal(theirs, Assert.Single(sevenWords).Id);
+    }
+
+    [Fact]
+    public async Task The_Tenants_own_rows_are_found_by_name_and_another_Tenants_rows_by_a_term_with_a_word_of_two_characters_or_more()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
@@ -168,30 +266,31 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
         var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
+        var (latin, cyrillic) = HistorySeed.NameMarker(); // the registries are shared by the tests of this class: the names are this test's own
         var own = await RegistrySeed.AthleteAsync(
             _mongo.ConnectionString,
             tenant,
-            "Мария Тенант",
+            $"Мария Тенант {cyrillic}",
             bulgaria,
-            "Maria Tenant"
+            $"Maria Tenant {latin}"
         );
         var theirs = await RegistrySeed.AthleteAsync(
             _mongo.ConnectionString,
             other,
-            "Мария Друга",
+            $"Мария Друга {cyrillic}",
             bulgaria,
-            "Maria Other"
+            $"Maria Other {latin}"
         );
-        await RegistrySeed.HorseAsync(_mongo.ConnectionString, other, "Далечен", "Faraway");
-        await RegistrySeed.ClubAsync(_mongo.ConnectionString, other, "Далечен клуб");
+        await RegistrySeed.HorseAsync(_mongo.ConnectionString, other, $"Далечен {cyrillic}", $"Faraway {latin}");
+        await RegistrySeed.ClubAsync(_mongo.ConnectionString, other, $"Далечен клуб {cyrillic}");
         await using var ui = ConsoleUi.Open(api, mainOperator);
         var lookups = ui.Get<IConsoleLookups>();
 
-        var byName = await lookups.SearchAthletes("Maria");
-        var short1 = await lookups.SearchAthletes("Ma"); // too short to ask the other Tenants
-        var englishName = await lookups.SearchAthletes("maria tenant");
-        var horses = await lookups.SearchHorses("Farawa");
-        var clubs = await lookups.SearchClubs("Далечен");
+        var byName = await lookups.SearchAthletes(latin);
+        var short1 = await lookups.SearchAthletes("M"); // too short to ask the other Tenants
+        var englishName = await lookups.SearchAthletes($"maria tenant {latin}");
+        var horses = await lookups.SearchHorses($"Farawa {latin}");
+        var clubs = await lookups.SearchClubs($"Далечен {cyrillic}");
 
         Assert.Equal([own, theirs], byName.Select(x => x.Id)); // the Tenant's own first, then the others'
         Assert.Equal([own], short1.Select(x => x.Id));
@@ -240,5 +339,10 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         Assert.Equal("Land of Test", country.Name);
         Assert.Contains(country.Id, (await lookups.SearchCountries("land of")).Select(x => x.Id));
         Assert.Empty(await lookups.SearchCountries("no such country anywhere"));
+    }
+
+    static string Unescaped(string request)
+    {
+        return request.Replace("%5B", "[").Replace("%5D", "]");
     }
 }

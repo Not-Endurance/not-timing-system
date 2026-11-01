@@ -6,7 +6,7 @@ namespace NTS.Tests.Unit.Domain;
 /// What the Core views show of an Event and whether they may change it, by the stage the Event is in (#630, ADR-0007).
 /// A Live Event shows every Core view and can be written to by whoever the Api lets write; a Historic Event is a record:
 /// it shows its Rankings and Results and the Participation detail, hides the views that are about the running Event (the
-/// Startlist among them), and takes no write from a view whoever looks at it.
+/// Startlist and the dashboard of the Main Operator among them), and takes no write from a view whoever looks at it.
 /// </summary>
 public sealed class EventViewPolicyTests
 {
@@ -20,6 +20,7 @@ public sealed class EventViewPolicyTests
     [InlineData(CoreView.Presentlist)]
     [InlineData(CoreView.SnapshotCapture)]
     [InlineData(CoreView.Performance)]
+    [InlineData(CoreView.Dashboard)]
     public void A_Live_Event_shows_every_Core_view(CoreView view)
     {
         Assert.True(EventViewPolicy.Shows(view, EventStage.Live));
@@ -35,6 +36,7 @@ public sealed class EventViewPolicyTests
     [InlineData(CoreView.Presentlist, false)]
     [InlineData(CoreView.SnapshotCapture, false)]
     [InlineData(CoreView.Performance, false)]
+    [InlineData(CoreView.Dashboard, false)]
     public void A_Historic_Event_shows_its_record_and_hides_what_is_about_the_running_Event(CoreView view, bool shown)
     {
         Assert.Equal(shown, EventViewPolicy.Shows(view, EventStage.Historic));

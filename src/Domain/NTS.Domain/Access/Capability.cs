@@ -10,7 +10,10 @@ public enum Capability
     /// <summary>Read the public views of an Event: anyone, signed in or not.</summary>
     ReadPublicViews = 1,
 
-    /// <summary>Read an Athlete's or a Horse's history and search the registries of every Tenant: any signed-in account.</summary>
+    /// <summary>
+    /// Read an Athlete's or a Horse's history and search the registries of every Tenant by name: any signed-in account. What it
+    /// reads of an Athlete or a Horse is its name and its name in English (<see cref="ReadRegistryDetailsAcrossTenants"/> is the rest).
+    /// </summary>
     ReadRegistryAcrossTenants = 2,
 
     /// <summary>See how times were recorded: Staff, which is every Official, every Operator and the Main Operator.</summary>
@@ -85,4 +88,12 @@ public enum Capability
     /// before the start and nothing once the Event has ended.
     /// </summary>
     EditEventData = 23,
+
+    /// <summary>
+    /// Read the whole row of an Athlete or a Horse of another Tenant in the search across Tenants (its FEI ID, its club, its country
+    /// and the Tenant that registered it) and match the words of a search against its FEI ID: the people who set an Event up, which
+    /// the Setup needs, a Tenant Root, the Main Operator of an Event that is not yet Historic and the Developer. Any other
+    /// signed-in account reads the name and the name in English and nothing else of a person.
+    /// </summary>
+    ReadRegistryDetailsAcrossTenants = 24,
 }

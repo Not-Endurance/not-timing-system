@@ -6,7 +6,7 @@ namespace NTS.Domain.Core.Aggregates.Participations.Events;
 /// An Official corrected the Arrive time of a Snapshot they sent (ADR-0005). It is an event of its own and not another
 /// <see cref="Arrived"/>, because it records a different intent, and it feeds the Arrive time like it.
 /// </summary>
-public sealed class ArriveUpdated : ParticipationEventBase
+public sealed class ArriveUpdated : SnapshotTimeEvent
 {
     public ArriveUpdated(
         Timestamp time,
@@ -14,9 +14,10 @@ public sealed class ArriveUpdated : ParticipationEventBase
         SnapshotMethod method,
         DateTimeOffset? recordedAt,
         Guid? actorId,
-        Guid? id = null
+        Guid? id = null,
+        DateTimeOffset? disabledAt = null
     )
-        : base(time, outcome, method, recordedAt, actorId, id) { }
+        : base(time, outcome, method, recordedAt, actorId, id, disabledAt) { }
 
     public override TimeSlot Slot => TimeSlot.Arrive;
 

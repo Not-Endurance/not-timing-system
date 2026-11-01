@@ -202,9 +202,93 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
         }
     }
 
+    [Fact]
+    public async Task The_list_is_cut_into_pages_in_the_order_of_the_Events_and_a_page_says_where_the_next_one_is()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var ana = await SignedInAsync(api, client);
+        var first = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        var second = Guid.Parse("00000000-0000-0000-0000-000000000002");
+        var third = Guid.Parse("00000000-0000-0000-0000-000000000003");
+        foreach (var eventId in new[] { third, first, second })
+        {
+            await MakeAsync(ana, eventId, null);
+        }
+
+        var firstPage = await PageAsync(ana, "/api/user-sessions?page[size]=2");
+        var lastPage = await PageAsync(ana, "/api/user-sessions?page[size]=2&page[number]=2");
+        var backwards = await PageAsync(ana, "/api/user-sessions?sort=-eventId&page[size]=2");
+        var full = await PageAsync(ana, "/api/user-sessions?page[size]=3");
+        var unnamed = await PageAsync(ana, "/api/user-sessions");
+        var biggest = await PageAsync(ana, "/api/user-sessions?page[size]=500");
+        var beyond = await PageAsync(ana, "/api/user-sessions?page[size]=2&page[number]=9");
+
+        Assert.Equal([first, second], firstPage.EventIds);
+        Assert.Equal((2, 1), (firstPage.Size, firstPage.Number));
+        Assert.Equal("/api/user-sessions?page%5Bsize%5D=2&page%5Bnumber%5D=2", firstPage.Next);
+        Assert.Equal([third], lastPage.EventIds);
+        Assert.Equal((2, 2), (lastPage.Size, lastPage.Number));
+        Assert.Null(lastPage.Next);
+        Assert.Equal([third, second], backwards.EventIds);
+        Assert.Equal("/api/user-sessions?sort=-eventId&page%5Bsize%5D=2&page%5Bnumber%5D=2", backwards.Next);
+        Assert.Equal([first, second, third], full.EventIds); // a page that is exactly full is the last
+        Assert.Null(full.Next);
+        Assert.Equal([first, second, third], unnamed.EventIds);
+        Assert.Equal((100, 1), (unnamed.Size, unnamed.Number));
+        Assert.Equal(500, biggest.Size);
+        Assert.Empty(beyond.EventIds);
+        Assert.Null(beyond.Next);
+    }
+
+    [Fact]
+    public async Task A_page_of_records_with_the_same_Event_follows_the_order_of_their_ids_so_that_none_is_twice_or_missing()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var ana = await SignedInAsync(api, client);
+        var eventId = Guid.NewGuid();
+        var ids = Enumerable.Range(1, 3).Select(x => Guid.Parse($"00000000-0000-0000-0000-00000000000{x}")).ToList();
+        foreach (var id in ids.AsEnumerable().Reverse())
+        {
+            await SeedAsync(ana.Id.ToString(), eventId, id);
+        }
+
+        var seen = new List<Guid>();
+        for (var number = 1; number <= 3; number++)
+        {
+            var response = await ana.Page.GetAsync($"/api/user-sessions?page[size]=1&page[number]={number}");
+            var data = (await ApiSessions.ReadJsonAsync(response)).GetProperty("data").EnumerateArray();
+            seen.AddRange(data.Select(x => Guid.Parse(x.GetProperty("id").GetString()!)));
+        }
+
+        Assert.Equal(ids, seen);
+    }
+
     [Theory]
-    [InlineData("?sort=eventId")]
-    [InlineData("?page[size]=10")]
+    [InlineData("?page[size]=0", "invalid-page")]
+    [InlineData("?page[size]=501", "invalid-page")]
+    [InlineData("?page[size]=ten", "invalid-page")]
+    [InlineData("?page[number]=0", "invalid-page")]
+    [InlineData("?page[number]=first", "invalid-page")]
+    [InlineData("?page[number]=999999999", "invalid-page")] // the rows to skip would not fit in a whole number
+    [InlineData("?sort=state", "invalid-sort")]
+    [InlineData("?sort=userIdentifier", "invalid-sort")]
+    [InlineData("?sort=-id", "invalid-sort")]
+    [InlineData("?sort=eventId,id", "invalid-sort")]
+    public async Task A_page_or_a_sort_that_the_list_does_not_have_is_refused(string query, string code)
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var ana = await SignedInAsync(api, client);
+
+        var refused = await ana.Page.GetAsync("/api/user-sessions" + query);
+
+        Assert.Equal(HttpStatusCode.BadRequest, refused.StatusCode);
+        Assert.Equal(code, await ErrorCodeAsync(refused));
+    }
+
+    [Theory]
     [InlineData("?include=owner")]
     [InlineData("?fields[user-sessions]=eventId")]
     [InlineData("?something=1")]
@@ -534,6 +618,28 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
             Content = new StringContent(json, Encoding.UTF8, ApiSessions.MEDIA_TYPE),
         };
         return person.Page.SendAsync(request);
+    }
+
+    /// <summary>A page of the list: the Events of its records, the page it says it is and where it says the next one is.</summary>
+    static async Task<(List<Guid> EventIds, int Size, int Number, string? Next)> PageAsync(Person person, string path)
+    {
+        var response = await person.Page.GetAsync(path);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await ApiSessions.ReadJsonAsync(response);
+        var page = body.GetProperty("meta").GetProperty("page");
+        var links = body.GetProperty("links");
+        return (
+            [
+                .. body.GetProperty("data")
+                    .EnumerateArray()
+                    .Select(x => Guid.Parse(x.GetProperty("attributes").GetProperty("eventId").GetString()!)),
+            ],
+            page.GetProperty("size").GetInt32(),
+            page.GetProperty("number").GetInt32(),
+            links.TryGetProperty("next", out var next) && next.ValueKind == JsonValueKind.String
+                ? next.GetString()
+                : null
+        );
     }
 
     static async Task<List<Guid>> ListAsync(Person person, string path)

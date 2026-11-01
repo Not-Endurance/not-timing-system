@@ -14,7 +14,12 @@ public class SameRowsAlertBehind : NComponent
     protected static string TextOf(SameRow row)
     {
         var name = string.IsNullOrWhiteSpace(row.NameEnglish) ? row.Name : $"{row.Name} ({row.NameEnglish})";
-        var because = row.Reason == SameRowReason.FeiId ? Same_FEI_ID_string : Same_name_string;
+        var because = row.Reason switch
+        {
+            SameRowReason.FeiId => Same_FEI_ID_string,
+            SameRowReason.SimilarName => Similar_name_string,
+            _ => Same_name_string,
+        };
         var feiId = string.IsNullOrWhiteSpace(row.FeiId) ? string.Empty : $", {FEI_ID_string} {row.FeiId}";
         var whose = row.IsOwn ? string.Empty : $", {Of_another_federation_string}";
         return $"{name}: {because}{feiId}{whose}";

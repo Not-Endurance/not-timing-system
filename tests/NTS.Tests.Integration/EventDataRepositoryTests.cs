@@ -57,7 +57,7 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
         Assert.Equal(0, all.Single(x => x.Id == second.Id).Version);
         Assert.Equal([second.Id], narrowed.Select(x => x.Id));
         Assert.Equal(3, one!.Version);
-        Assert.Equal(START.AddHours(1), one.Phases[0].Events.Single().Time);
+        Assert.Equal(START.AddHours(1), one.Phases[0].Events.Single().Times.Single().Time);
         var lists = requests
             .Asked.Select(Uri.UnescapeDataString)
             .Where(x => x.StartsWith("GET /api/participations?", StringComparison.Ordinal));

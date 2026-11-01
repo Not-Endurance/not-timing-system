@@ -210,7 +210,7 @@ public sealed class RegistrationTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_registration_page_lists_the_countries_gives_a_one_line_privacy_notice_and_hides_a_trap_for_bots()
+    public async Task The_registration_page_lists_the_countries_links_the_privacy_notice_and_hides_a_trap_for_bots()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
@@ -223,7 +223,39 @@ public sealed class RegistrationTests : IClassFixture<MongoFixture>
         Assert.Contains("href=\"/privacy\"", page);
         Assert.Matches(@"<input[^>]*name=""website""[^>]*tabindex=""-1""", page);
         Assert.Contains("id=\"register-form\"", page);
-        Assert.Contains("placeholder", privacy, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Draft.", privacy);
+    }
+
+    [Theory]
+    [InlineData(
+        "en",
+        "Draft.",
+        "What we keep about your account",
+        "the name and the name in English of an Athlete or a Horse and nothing else"
+    )]
+    [InlineData(
+        "bg",
+        "Чернова.",
+        "Какво пазим за профила ви",
+        "името и името на английски на Атлет или Кон и нищо друго"
+    )]
+    public async Task The_privacy_notice_is_a_draft_that_says_what_is_kept_and_what_a_signed_in_account_sees_of_a_rider(
+        string language,
+        string draft,
+        string heading,
+        string whatIsSeen
+    )
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+
+        var page = await ApiClients.PageAsync(client, "/privacy", language);
+
+        Assert.Contains(draft, page);
+        Assert.Contains(heading, page);
+        Assert.Contains(whatIsSeen, page);
+        Assert.Contains("[", page); // what the organisation has still to fill in is marked
+        Assert.DoesNotContain("{{", page); // and every text of the page has been told
     }
 
     [Fact]
@@ -248,7 +280,7 @@ public sealed class RegistrationTests : IClassFixture<MongoFixture>
 
     [Theory]
     [InlineData("bg", "Регистрация")]
-    [InlineData("tr", "Kayıt")]
+    [InlineData("tr", "Create an account")]
     [InlineData("de", "Create an account")]
     public async Task The_registration_page_speaks_the_language_of_the_visitor_and_falls_back_to_English(
         string language,

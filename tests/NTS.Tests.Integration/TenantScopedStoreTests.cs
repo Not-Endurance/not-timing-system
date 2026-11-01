@@ -85,6 +85,29 @@ public sealed class TenantScopedStoreTests : IClassFixture<MongoFixture>
 
     [Theory]
     [MemberData(nameof(OwnedCollections))]
+    public async Task A_page_of_a_Tenants_documents_is_cut_by_the_sort_the_skip_and_the_limit_and_holds_none_of_another(
+        string collection
+    )
+    {
+        var (a, _) = await SeedTwoTenantsAsync(collection);
+        var asA = Store().Of(collection, a.Tenant);
+        var latestFirst = new BsonDocument("Marker", -1); // the second document of the Tenant before the first
+
+        var all = await asA.FindPageAsync(null, latestFirst, 0, 10, default);
+        var first = await asA.FindPageAsync(null, latestFirst, 0, 1, default);
+        var second = await asA.FindPageAsync(null, latestFirst, 1, 1, default);
+        var beyond = await asA.FindPageAsync(null, latestFirst, 2, 1, default);
+        var noTenant = await Store().Of(collection, null).FindPageAsync(null, latestFirst, 0, 10, default);
+
+        Assert.Equal([a.Ids[1], a.Ids[0]], all.Select(IdOf));
+        Assert.Equal([a.Ids[1]], first.Select(IdOf));
+        Assert.Equal([a.Ids[0]], second.Select(IdOf));
+        Assert.Empty(beyond);
+        Assert.Empty(noTenant);
+    }
+
+    [Theory]
+    [MemberData(nameof(OwnedCollections))]
     public async Task A_query_with_no_current_Tenant_returns_nothing_from_a_collection_that_holds_documents(
         string collection
     )

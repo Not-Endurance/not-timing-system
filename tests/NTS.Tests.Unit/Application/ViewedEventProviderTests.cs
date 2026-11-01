@@ -239,6 +239,86 @@ public sealed class ViewedEventProviderTests
     }
 
     [Fact]
+    public async Task A_refusal_that_says_the_Event_has_ended_is_told_by_the_provider_once_and_the_view_is_left_for_the_page_to_replace()
+    {
+        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: WitnessAccessLevel.Official);
+        var view = await fixture.Provider.Open(LIVE_EVENT_ID);
+        var ended = new List<Guid>();
+        fixture.Provider.EventEnded.Subscribe(ended.Add);
+
+        view!.Refused("event-ended");
+        view.Refused("event-ended"); // the next refused write of the same view says nothing more
+
+        Assert.Equal([LIVE_EVENT_ID], ended);
+        Assert.True(view.IsLive); // it is the page that opens the Event again, as a Historic one, and the view goes on until then
+        Assert.True(view.CanWrite);
+    }
+
+    [Fact]
+    public async Task Each_view_of_an_Event_tells_that_it_has_ended_once_and_the_Event_opened_again_is_Historic()
+    {
+        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: WitnessAccessLevel.Official);
+        var first = await fixture.Provider.Open(LIVE_EVENT_ID);
+        var second = await fixture.Provider.Open(LIVE_EVENT_ID);
+        var ended = new List<Guid>();
+        fixture.Provider.EventEnded.Subscribe(ended.Add);
+
+        first!.Refused("event-ended");
+        second!.Refused("event-ended");
+
+        Assert.Equal([LIVE_EVENT_ID, LIVE_EVENT_ID], ended); // the pages that show each of them are told
+    }
+
+    [Theory]
+    [InlineData("participation-changed")]
+    [InlineData("not-main-operator")]
+    [InlineData("not-allowed")]
+    [InlineData("event-not-started")]
+    [InlineData("participation-busy")]
+    [InlineData("")]
+    [InlineData(null)]
+    public async Task A_refusal_for_any_other_reason_tells_nothing_and_the_view_may_still_write(string? code)
+    {
+        var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], access: WitnessAccessLevel.Official);
+        var view = await fixture.Provider.Open(LIVE_EVENT_ID);
+        var ended = new List<Guid>();
+        fixture.Provider.EventEnded.Subscribe(ended.Add);
+
+        view!.Refused(code);
+
+        Assert.Empty(ended);
+        Assert.True(view.CanWrite);
+        view.EnsureCanWrite();
+    }
+
+    [Fact]
+    public async Task A_view_of_an_Event_that_has_ended_already_has_nothing_to_tell()
+    {
+        var fixture = Open(historic: [EventOf(HISTORIC_EVENT_ID)]);
+        var view = await fixture.Provider.Open(HISTORIC_EVENT_ID);
+        var ended = new List<Guid>();
+        fixture.Provider.EventEnded.Subscribe(ended.Add);
+
+        view!.Refused("event-ended");
+
+        Assert.Empty(ended);
+        Assert.False(view.CanWrite);
+    }
+
+    [Fact]
+    public async Task A_Historic_Event_that_the_app_follows_is_opened_with_the_connection_as_it_was_because_only_a_refused_write_closes_it()
+    {
+        var fixture = Open(historic: [EventOf(LIVE_EVENT_ID)]); // the Event the app follows, which the Api does not list as Live
+
+        var view = await fixture.Provider.Open(LIVE_EVENT_ID);
+
+        Assert.Equal(EventStage.Historic, view!.Stage);
+        Assert.Equal(0, fixture.Socket.Disconnects); // a list that could not be read says the same as a list without the Event
+        Assert.Equal(LIVE_EVENT_ID, fixture.Socket.Event?.Id);
+        Assert.Empty(fixture.Socket.Connects);
+    }
+
+    [Fact]
     public async Task A_view_shows_the_Core_views_its_stage_allows()
     {
         var fixture = Open(live: [EventOf(LIVE_EVENT_ID)], historic: [EventOf(HISTORIC_EVENT_ID)]);

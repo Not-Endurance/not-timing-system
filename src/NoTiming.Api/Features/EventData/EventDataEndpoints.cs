@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Net.Http.Headers;
 using Not.Domain.Abstractions;
 using Not.Identity;
 using Not.Krud.Abstractions;
@@ -31,12 +32,24 @@ internal static class EventDataEndpoints
         var path = $"/api/{family.Route}";
         app.MapGet(
             path,
-            (HttpContext context, EventStore events, TenantCollections tenants) =>
-                ListAsync(family, context, events, tenants)
+            (
+                HttpContext context,
+                EventStore events,
+                TenantCollections tenants,
+                TimeEventViewers viewers,
+                UserManager<NIdentityUser> users
+            ) => ListAsync(family, context, events, tenants, viewers, users)
         );
         app.MapGet(
             path + "/{id}",
-            (string id, HttpContext context, CrossTenantReads reads) => ReadAsync(family, id, context, reads)
+            (
+                string id,
+                HttpContext context,
+                CrossTenantReads reads,
+                EventStore events,
+                TimeEventViewers viewers,
+                UserManager<NIdentityUser> users
+            ) => ReadAsync(family, id, context, reads, events, viewers, users)
         );
         app.MapPost(
                 path,
@@ -62,12 +75,22 @@ internal static class EventDataEndpoints
         EventDataFamily<TModel, TEntity> family,
         HttpContext context,
         EventStore events,
-        TenantCollections tenants
+        TenantCollections tenants,
+        TimeEventViewers viewers,
+        UserManager<NIdentityUser> users
     )
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var eventId = EventFilter.EventOf(context.Request.Query["filter"].ToString());
+        var filter = context.Request.Query["filter"].ToString();
+
+        // A visitor reads what an Event keeps, but does not look a person up in it (ADR-0010).
+        if (context.User.Identity?.IsAuthenticated != true && EventFilter.Names(filter, family.PersonMembers))
+        {
+            return JsonApiResults.NotSignedIn();
+        }
+
+        var eventId = EventFilter.EventOf(filter);
         if (eventId is not { } id)
         {
             return JsonApiResults.Error(
@@ -108,9 +131,14 @@ internal static class EventDataEndpoints
 
         var page = rows!.Take(query.Size).ToList();
         var byId = page.ToDictionary(x => x.Id.ToString());
+        var sees =
+            facts != null
+            && family.ShownTo != null
+            && await viewers.MaySeeAsync(context, users, facts, context.RequestAborted);
+        VaryByCaller(family, context);
         return JsonApiResults.Collection(
             family.Route,
-            page.Select(x => (x.Id.ToString(), (object)family.Made.AttributesOf(x))),
+            page.Select(x => (x.Id.ToString(), (object)family.Made.AttributesOf(Shown(family, x, sees)))),
             links: ReferenceEndpoints.Links(context.Request, query, rows!.Count > query.Size),
             meta: new { page = new { size = query.Size, number = query.Number } },
             itemMeta: key => EventDataFamily<TModel, TEntity>.MetaOf(byId[key])
@@ -121,7 +149,10 @@ internal static class EventDataEndpoints
         EventDataFamily<TModel, TEntity> family,
         string id,
         HttpContext context,
-        CrossTenantReads reads
+        CrossTenantReads reads,
+        EventStore events,
+        TimeEventViewers viewers,
+        UserManager<NIdentityUser> users
     )
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
@@ -129,7 +160,22 @@ internal static class EventDataEndpoints
         var row = Guid.TryParse(id, out var rowId)
             ? await reads.FindEventRowAsync<TModel>(family.Collection, rowId, context.RequestAborted)
             : null;
-        return row is null ? JsonApiResults.NotFound() : Resource(family, row, StatusCodes.Status200OK);
+        if (row is null)
+        {
+            return JsonApiResults.NotFound();
+        }
+
+        // Whether the caller is Staff of the Event is looked into only for a caller who is signed in, and only where there is
+        // something to hide: a visitor, and a row that hides nothing, cost no more than they did.
+        VaryByCaller(family, context);
+        var sees = false;
+        if (family.ShownTo != null && context.User.Identity?.IsAuthenticated == true)
+        {
+            var facts = await events.FindAsync(row.EventId, context.RequestAborted);
+            sees = facts != null && await viewers.MaySeeAsync(context, users, facts, context.RequestAborted);
+        }
+
+        return Resource(family, row, StatusCodes.Status200OK, sees);
     }
 
     static async Task<IResult> CreateAsync<TModel, TEntity>(
@@ -192,14 +238,14 @@ internal static class EventDataEndpoints
         if (await collection.InsertAsync(row, context.RequestAborted))
         {
             await access.AnnounceAsync(family, row);
-            return Resource(family, row, StatusCodes.Status201Created, $"/api/{family.Route}/{id}");
+            return Resource(family, row, StatusCodes.Status201Created, true, $"/api/{family.Route}/{id}");
         }
 
         // The same id again is the row that was made, as it is for anything a client makes the id of; the id of a row of
         // another Event, or of another Tenant, is not that, and is not told about.
         var existing = await collection.FindAsync(id, context.RequestAborted);
         return existing is not null && existing.EventId == row.EventId
-            ? Resource(family, existing, StatusCodes.Status200OK)
+            ? Resource(family, existing, StatusCodes.Status200OK, true)
             : JsonApiResults.IdTaken();
     }
 
@@ -281,7 +327,7 @@ internal static class EventDataEndpoints
         var update = family.Changed.UpdateOf(row, named);
         if (update.ElementCount == 0)
         {
-            return Resource(family, row, StatusCodes.Status200OK);
+            return Resource(family, row, StatusCodes.Status200OK, true);
         }
 
         var collection = access.Collection(family, facts!);
@@ -300,7 +346,7 @@ internal static class EventDataEndpoints
         }
 
         await access.AnnounceAsync(family, row);
-        return Resource(family, row, StatusCodes.Status200OK);
+        return Resource(family, row, StatusCodes.Status200OK, true);
     }
 
     static async Task<IResult> RemoveAsync<TModel, TEntity>(
@@ -404,10 +450,30 @@ internal static class EventDataEndpoints
         );
     }
 
+    /// <summary>A read that answers by the caller says so, so that nothing between the Api and the person keeps one caller's answer for another.</summary>
+    static void VaryByCaller<TModel, TEntity>(EventDataFamily<TModel, TEntity> family, HttpContext context)
+        where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
+        where TEntity : class, IEntity
+    {
+        if (family.ShownTo != null)
+        {
+            context.Response.Headers.Append(HeaderNames.Vary, HeaderNames.Cookie);
+        }
+    }
+
+    /// <summary>The row as the caller reads it. A write is answered with the row as Staff read it, because it is the Main Operator that writes.</summary>
+    static TModel Shown<TModel, TEntity>(EventDataFamily<TModel, TEntity> family, TModel row, bool seesTimeEvents)
+        where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
+        where TEntity : class, IEntity
+    {
+        return family.ShownTo is { } shown ? shown(row, seesTimeEvents) : row;
+    }
+
     static IResult Resource<TModel, TEntity>(
         EventDataFamily<TModel, TEntity> family,
         TModel row,
         int status,
+        bool seesTimeEvents,
         string? location = null
     )
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
@@ -417,7 +483,7 @@ internal static class EventDataEndpoints
             status,
             family.Route,
             row.Id.ToString(),
-            family.Made.AttributesOf(row),
+            family.Made.AttributesOf(Shown(family, row, seesTimeEvents)),
             location,
             EventDataFamily<TModel, TEntity>.MetaOf(row)
         );

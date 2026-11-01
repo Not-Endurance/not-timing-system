@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using NoTiming.Api.JsonApi;
 
 namespace NoTiming.Api.Features.EventData;
 
@@ -13,12 +14,19 @@ internal static partial class EventFilter
     /// <summary>The Event the filter starts with, or none when it does not start with one.</summary>
     public static Guid? EventOf(string? filter)
     {
-        var match = filter == null ? Match.Empty : Leading().Match(filter.Trim());
-        return match.Success && Guid.TryParse(match.Groups["id"].Value, out var id) ? id : null;
+        return LeadingFilter.Of(filter, "eventId")?.Id;
     }
 
-    [GeneratedRegex(
-        @"^\(?eventId eq (?<id>[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})\)?(?: and |$)"
-    )]
-    private static partial Regex Leading();
+    /// <summary>
+    /// Whether the filter names one of the members, as a comparison does: a member that is only a word of a text it compares with
+    /// is not named.
+    /// </summary>
+    public static bool Names(string? filter, IEnumerable<string> members)
+    {
+        var outsideTexts = filter == null ? string.Empty : Texts().Replace(filter, "''");
+        return members.Any(x => outsideTexts.Contains(x, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [GeneratedRegex("'(?:[^']|'')*'")]
+    private static partial Regex Texts();
 }

@@ -1,0 +1,14 @@
+.participation-competition {
+    display: block;
+    width: 11rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* a row is a card on a narrow screen, where the values are at the right of their labels */
+@media (max-width: 599.98px) {
+    .participation-competition {
+        margin-left: auto;
+    }
+}

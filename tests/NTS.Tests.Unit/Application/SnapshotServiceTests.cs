@@ -12,6 +12,7 @@ using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
+using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Unit.Application.ViewedEventFixtures;
 
 namespace NTS.Tests.Unit.Application;
@@ -504,6 +505,235 @@ public sealed class SnapshotServiceTests
         Assert.Empty(service.Participations);
     }
 
+    [Fact]
+    public async Task The_time_of_the_latest_entry_of_a_start_number_is_corrected_at_the_server_and_the_entry_and_the_kept_history_show_it()
+    {
+        var session = new SessionOf(null);
+        var (service, store, _, publisher) = await ConnectedTo(
+            session,
+            ParticipationFixtures.Active(1),
+            ParticipationFixtures.Active(2)
+        );
+        SelectAndCapture(service);
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        await service.Publish(view, SnapshotType.Arrive);
+        var group = Assert.Single(service.History);
+        var entry = group.Entries.Single(x => x.Number == 1);
+        var other = group.Entries.Single(x => x.Number == 2);
+        var before = other.Timestamp;
+        var corrected = new Timestamp(entry.Timestamp!.ToDateTimeOffset().AddMinutes(-3));
+
+        Assert.True(service.CanUpdate(group, entry));
+        await service.UpdateTime(view, group, entry, corrected);
+
+        Assert.Equal([(group.IdOf(entry), corrected.ToDateTimeOffset())], publisher.Updates); // the server names the Snapshot by the id it was sent under
+        Assert.Equal(corrected, entry.Timestamp);
+        Assert.Equal(before, other.Timestamp); // and no other entry changed
+        Assert.Equal([(group.Id, 1, corrected)], session.Updated); // and the history that is kept says so
+    }
+
+    [Fact]
+    public async Task Only_the_latest_entry_of_a_start_number_and_kind_can_be_corrected_and_an_older_one_is_refused_before_the_server_is_asked()
+    {
+        var (service, store, _, publisher) = await Connected(
+            ParticipationFixtures.Active(1),
+            ParticipationFixtures.Active(2)
+        );
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        service.SelectForSnapshot(service.Participations[0]);
+        service.SelectForSnapshot(service.Participations[0]);
+        foreach (var snapshot in service.Snapshots.ToArray())
+        {
+            service.Capture(snapshot);
+        }
+
+        await service.Publish(view, SnapshotType.Arrive); // 1 and 2 as arrivals
+        service.SelectForSnapshot(service.Participations.Single(x => x.Combination.Number == 1));
+        service.Capture(service.Snapshots.Single());
+        await service.Publish(view, SnapshotType.Arrive); // 1 again, as an arrival
+        service.SelectForSnapshot(service.Participations.Single(x => x.Combination.Number == 1));
+        service.Capture(service.Snapshots.Single());
+        await service.Publish(view, SnapshotType.Present); // and 1 as a presentation
+
+        var (first, second, third) = (service.History[0], service.History[1], service.History[2]);
+        Assert.False(service.CanUpdate(first, first.Entries.Single(x => x.Number == 1))); // there is a later arrival of 1
+        Assert.True(service.CanUpdate(first, first.Entries.Single(x => x.Number == 2))); // none of 2
+        Assert.True(service.CanUpdate(second, second.Entries.Single()));
+        Assert.True(service.CanUpdate(third, third.Entries.Single())); // another kind of time is another entry
+
+        var refused = await Assert.ThrowsAsync<DomainException>(
+            () =>
+                service.UpdateTime(
+                    view,
+                    first,
+                    first.Entries.Single(x => x.Number == 1),
+                    new Timestamp(DateTimeOffset.Now)
+                )
+        );
+
+        Assert.Equal(Snapshot_not_the_latest_string, refused.Message);
+        Assert.Empty(publisher.Updates);
+    }
+
+    [Fact]
+    public async Task A_group_that_the_history_kept_with_its_id_is_corrected_by_it_and_one_kept_before_the_ids_were_is_not_corrected_at_all()
+    {
+        var kept = new SnapshotGroup(
+            [new Snapshot(1, "Athlete 1", null, new Timestamp(DateTimeOffset.Now.AddMinutes(-20)))],
+            SnapshotType.Arrive
+        );
+        var legacy = SnapshotGroupModel.MapFrom(
+            new SnapshotGroup(
+                [new Snapshot(2, "Athlete 2", null, new Timestamp(DateTimeOffset.Now.AddMinutes(-10)))],
+                SnapshotType.Arrive
+            )
+        );
+        legacy.GroupId = null;
+        var state = new NtsUserSessionStateModel { SnapshotHistory = [SnapshotGroupModel.MapFrom(kept), legacy] };
+        var (service, store, _, publisher) = await Connected(
+            state,
+            ParticipationFixtures.Active(1),
+            ParticipationFixtures.Active(2)
+        );
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        var (keptGroup, legacyGroup) = (service.History[0], service.History[1]);
+
+        Assert.True(service.CanUpdate(keptGroup, keptGroup.Entries.Single()));
+        Assert.False(service.CanUpdate(legacyGroup, legacyGroup.Entries.Single()));
+        await service.UpdateTime(view, keptGroup, keptGroup.Entries.Single(), new Timestamp(DateTimeOffset.Now));
+        var refused = await Assert.ThrowsAsync<DomainException>(
+            () => service.UpdateTime(view, legacyGroup, legacyGroup.Entries.Single(), new Timestamp(DateTimeOffset.Now))
+        );
+
+        Assert.Equal(kept.Id, keptGroup.Id);
+        Assert.Equal([kept.IdOf(kept.Entries.Single())], publisher.Updates.Select(x => x.Id));
+        Assert.Equal(Snapshot_not_the_latest_string, refused.Message);
+    }
+
+    [Fact]
+    public async Task A_group_of_a_kind_that_an_Update_does_not_name_is_not_corrected_though_it_has_an_id()
+    {
+        var final = new SnapshotGroup(
+            [new Snapshot(1, "Athlete 1", null, new Timestamp(DateTimeOffset.Now.AddMinutes(-5)))],
+            SnapshotType.Final
+        );
+        var state = new NtsUserSessionStateModel { SnapshotHistory = [SnapshotGroupModel.MapFrom(final)] };
+        var (service, _, _, _) = await Connected(state, ParticipationFixtures.Active(1));
+        var group = Assert.Single(service.History);
+
+        Assert.False(service.CanUpdate(group, group.Entries.Single()));
+    }
+
+    [Fact]
+    public async Task A_correction_the_server_recorded_and_did_not_take_says_so_and_leaves_the_entry_and_the_kept_history_as_they_were()
+    {
+        var session = new SessionOf(null);
+        var (service, store, _, publisher) = await ConnectedTo(session, ParticipationFixtures.Active(1));
+        SelectAndCapture(service);
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        await service.Publish(view, SnapshotType.Arrive);
+        var group = Assert.Single(service.History);
+        var entry = group.Entries.Single();
+        var before = entry.Timestamp;
+        publisher.UpdateAnswer = id =>
+            SnapshotReceipt.Recorded(id, 200, Recorded(TimeEventOutcome.RejectedInvalidTime));
+
+        await Assert.ThrowsAsync<DomainException>(
+            () => service.UpdateTime(view, group, entry, new Timestamp(DateTimeOffset.Now.AddHours(-5)))
+        );
+
+        Assert.Equal(before, entry.Timestamp);
+        Assert.Empty(session.Updated);
+        Assert.True(service.CanUpdate(group, entry)); // the person may try another time
+    }
+
+    [Fact]
+    public async Task A_correction_the_server_refused_is_said_in_its_words_and_a_refusal_of_access_makes_the_app_ask_the_account_again()
+    {
+        var account = new FakeAccount(TestId.Of(1));
+        var session = new SessionOf(null);
+        var (service, store, _, publisher) = await ConnectedTo(session, account, ParticipationFixtures.Active(1));
+        SelectAndCapture(service);
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        await service.Publish(view, SnapshotType.Arrive);
+        var group = Assert.Single(service.History);
+        var entry = group.Entries.Single();
+        publisher.UpdateAnswer = id => SnapshotReceipt.Failed(id, 409, "event-ended", "The Event has ended.");
+
+        var ended = await Assert.ThrowsAsync<DomainException>(
+            () => service.UpdateTime(view, group, entry, new Timestamp(DateTimeOffset.Now))
+        );
+        var refreshesBefore = account.Refreshes;
+        publisher.UpdateAnswer = id => SnapshotReceipt.Failed(id, 403, "not-allowed", "You may not send.");
+        var forbidden = await Assert.ThrowsAsync<DomainException>(
+            () => service.UpdateTime(view, group, entry, new Timestamp(DateTimeOffset.Now))
+        );
+
+        Assert.Equal("The Event has ended.", ended.Message);
+        Assert.Equal("You may not send.", forbidden.Message);
+        Assert.Equal(0, refreshesBefore);
+        Assert.Equal(1, account.Refreshes);
+        Assert.Empty(session.Updated);
+    }
+
+    [Fact]
+    public async Task A_correction_is_refused_before_the_server_is_asked_when_the_viewer_may_not_write()
+    {
+        var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
+        SelectAndCapture(service);
+        using var writer = await LiveView(store, WitnessAccessLevel.Official);
+        await service.Publish(writer, SnapshotType.Arrive);
+        var group = Assert.Single(service.History);
+        using var reader = await LiveView(store, WitnessAccessLevel.Registered);
+
+        await Assert.ThrowsAsync<DomainException>(
+            () => service.UpdateTime(reader, group, group.Entries.Single(), new Timestamp(DateTimeOffset.Now))
+        );
+
+        Assert.Empty(publisher.Updates);
+    }
+
+    [Fact]
+    public async Task A_correction_that_no_answer_came_to_leaves_the_entry_and_is_sent_again_by_the_person()
+    {
+        var session = new SessionOf(null);
+        var (service, store, _, publisher) = await ConnectedTo(session, ParticipationFixtures.Active(1));
+        SelectAndCapture(service);
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        await service.Publish(view, SnapshotType.Arrive);
+        var group = Assert.Single(service.History);
+        var entry = group.Entries.Single();
+        var before = entry.Timestamp;
+        var corrected = new Timestamp(DateTimeOffset.Now.AddMinutes(-2));
+        publisher.UpdateFails = new HttpRequestException("The answer was lost.");
+
+        await Assert.ThrowsAsync<HttpRequestException>(() => service.UpdateTime(view, group, entry, corrected));
+        Assert.Equal(before, entry.Timestamp);
+        publisher.UpdateFails = null;
+        await service.UpdateTime(view, group, entry, corrected);
+
+        Assert.Equal(corrected, entry.Timestamp);
+        Assert.Equal(2, publisher.Updates.Count);
+        Assert.Equal(publisher.Updates[0], publisher.Updates[1]); // the same request, which is absolute
+    }
+
+    [Fact]
+    public async Task A_history_that_cannot_be_kept_does_not_undo_a_correction_the_server_took()
+    {
+        var session = new SessionOf(null) { UpdateFails = new InvalidOperationException("The host failed (500)") };
+        var (service, store, _, _) = await ConnectedTo(session, ParticipationFixtures.Active(1));
+        SelectAndCapture(service);
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        await service.Publish(view, SnapshotType.Arrive);
+        var group = Assert.Single(service.History);
+        var entry = group.Entries.Single();
+        var corrected = new Timestamp(DateTimeOffset.Now.AddMinutes(-2));
+
+        await service.UpdateTime(view, group, entry, corrected);
+
+        Assert.Equal(corrected, entry.Timestamp); // the page shows what the server took
+    }
+
     static void SelectAndCapture(SnapshotService service)
     {
         foreach (var participation in service.Participations.ToArray())
@@ -541,6 +771,16 @@ public sealed class SnapshotServiceTests
         RecordingPublisher Publisher
     )> ConnectedTo(SessionOf session, params Participation[] participations)
     {
+        return await ConnectedTo(session, new FakeAccount(TestId.Of(1)), participations);
+    }
+
+    static async Task<(
+        SnapshotService Service,
+        ParticipationStore Store,
+        ControlledParticipationRepository Repository,
+        RecordingPublisher Publisher
+    )> ConnectedTo(SessionOf session, FakeAccount account, params Participation[] participations)
+    {
         var repository = new ControlledParticipationRepository(participations);
         var socket = new FakeSocketContext();
         var store = new ParticipationStore(repository, socket);
@@ -550,7 +790,7 @@ public sealed class SnapshotServiceTests
             store,
             session,
             publisher,
-            new FakeAccount(TestId.Of(1)),
+            account,
             new DurableStore(new StepTimer()).Repository,
             new RecordingNotifier()
         );
@@ -583,6 +823,12 @@ public sealed class SnapshotServiceTests
         /// <summary>What keeping a sent group fails with when a test says so: the host failed or the session ended.</summary>
         public Exception? AppendFails { get; set; }
 
+        /// <summary>What correcting a kept entry fails with when a test says so.</summary>
+        public Exception? UpdateFails { get; set; }
+
+        /// <summary>The corrections the service asked to be kept: the id of the group, the start number and the time.</summary>
+        public List<(Guid GroupId, int Number, Timestamp Time)> Updated { get; } = [];
+
         public Task<NtsUserSessionStateModel?> GetCurrent()
         {
             return Task.FromResult(_session);
@@ -596,6 +842,12 @@ public sealed class SnapshotServiceTests
         public Task AppendSnapshot(SnapshotGroup snapshot)
         {
             return AppendFails == null ? Task.CompletedTask : Task.FromException(AppendFails);
+        }
+
+        public Task UpdateSnapshotInHistory(Guid groupId, int number, Timestamp time)
+        {
+            Updated.Add((groupId, number, time));
+            return UpdateFails == null ? Task.CompletedTask : Task.FromException(UpdateFails);
         }
 
         public Task ReplaceSnapshotSelections(IReadOnlyCollection<Snapshot> snapshots)
@@ -620,6 +872,15 @@ public sealed class SnapshotServiceTests
         /// <summary>What the server says of the Snapshot of a start number with the id it was sent under: recorded and accepted, unless a test says otherwise.</summary>
         public Func<int, Guid, SnapshotReceipt> Answer { get; set; } =
             (_, id) => SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.Accepted));
+
+        /// <summary>The Updates the server was asked for: the id of the Snapshot and the instant it was to have.</summary>
+        public List<(Guid Id, DateTimeOffset Time)> Updates { get; } = [];
+
+        /// <summary>What the Update fails with when a test says so: the answer is lost.</summary>
+        public Exception? UpdateFails { get; set; }
+
+        /// <summary>What the server says of an Update, when a test says something other than what it says of a Snapshot.</summary>
+        public Func<Guid, SnapshotReceipt>? UpdateAnswer { get; set; }
 
         public Task<IReadOnlyList<SnapshotReceipt>> PublishSnapshotsAsync(
             Guid eventId,
@@ -647,7 +908,13 @@ public sealed class SnapshotServiceTests
             CancellationToken cancellationToken = default
         )
         {
-            return Task.FromResult(Answer(0, snapshotId));
+            Updates.Add((snapshotId, time));
+            if (UpdateFails != null)
+            {
+                throw UpdateFails;
+            }
+
+            return Task.FromResult(UpdateAnswer?.Invoke(snapshotId) ?? Answer(0, snapshotId));
         }
     }
 }

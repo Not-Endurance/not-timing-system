@@ -1,4 +1,5 @@
 using Not.Domain.Exceptions;
+using NTS.Contracts.Core;
 using NTS.Contracts.Features.Snapshots;
 using NTS.Domain.Core.Objects.Snapshots;
 
@@ -17,11 +18,15 @@ internal static class SnapshotReceipts
         return new SnapshotAnswer(receipt.IsRecorded, receipt.Status, receipt.ErrorCode);
     }
 
-    /// <summary>The person is told why the first Snapshot that was not recorded was not: the Api's own words.</summary>
-    public static void RefuseWhenNotRecorded(IReadOnlyList<SnapshotReceipt> receipts)
+    /// <summary>
+    /// The person is told why the first Snapshot that was not recorded was not: the Api's own words. The view is told the code,
+    /// which says to a view of a Live Event that the Event has ended when it has (#631).
+    /// </summary>
+    public static void RefuseWhenNotRecorded(IViewedEvent view, IReadOnlyList<SnapshotReceipt> receipts)
     {
         if (receipts.FirstOrDefault(x => !x.IsRecorded) is { } failed)
         {
+            view.Refused(failed.ErrorCode);
             throw new DomainException(failed.ErrorMessage ?? failed.ErrorCode ?? "The Snapshot was not recorded.");
         }
     }

@@ -1,4 +1,4 @@
-using NoTiming.Ui.Features.Console;
+using NoTiming.Ui.Features.Core;
 
 namespace NTS.Tests.Unit.Application;
 

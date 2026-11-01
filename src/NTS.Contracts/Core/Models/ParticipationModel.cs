@@ -41,6 +41,17 @@ public class ParticipationModel
     public bool IsDeleted { get; set; }
     public int? DeletedVersion { get; set; }
 
+    /// <summary>
+    /// The Participation as it is read (ADR-0005, ADR-0012): each Phase tells the times it shows, which anybody may read, and
+    /// how they were recorded, its events with who recorded them and when, only to someone who may see that, which is Staff.
+    /// </summary>
+    public ParticipationModel ShownTo(bool seesTimeEvents)
+    {
+        var copy = (ParticipationModel)MemberwiseClone();
+        copy.Phases = [.. Phases.Select(x => x.ShownTo(seesTimeEvents))];
+        return copy;
+    }
+
     public Participation MapToEntity()
     {
         var competition = Competition.MapToEntity();

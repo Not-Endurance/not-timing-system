@@ -2,12 +2,14 @@ using Not.Application.Behinds.Adapters;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Krud.Abstractions;
+using NoTiming.Ui.Features.Core;
 using NoTiming.Ui.Features.Core.Dashboard;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Console;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
@@ -113,6 +115,7 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
         var receipts = await _publisher.PublishSnapshotsAsync(view.Event.Id, new SnapshotGroup([snapshot], type));
         if (receipts.FirstOrDefault() is not { IsRecorded: true } recorded)
         {
+            view.Refused(receipts.FirstOrDefault()?.ErrorCode);
             throw new DomainException(
                 receipts.FirstOrDefault()?.ErrorMessage
                     ?? receipts.FirstOrDefault()?.ErrorCode
@@ -171,12 +174,30 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
         return Change((participation, _) => participation.Restore());
     }
 
+    public async Task ChangeTimeEvents(IReadOnlyCollection<Guid> disable, IReadOnlyCollection<Guid> enable)
+    {
+        Shown().EnsureCanWrite();
+        try
+        {
+            await Write(Chosen(), (participation, now) => participation.ChangeTimeEvents(disable, enable, now));
+        }
+        catch (TimelineBlockedException blocked)
+        {
+            throw new DomainException(
+                string.Format(Time_events_blocked_string, TimelineWords.Describe(Chosen(), blocked.Blocking))
+            );
+        }
+    }
+
     public Task Create(PhaseUpdateModel item)
     {
         throw new NotSupportedException("A Phase is made by the Setup and never by the dashboard.");
     }
 
-    /// <summary>The times of a Phase as the person typed them: each that differs from the one shown is an accepted time of its own.</summary>
+    /// <summary>
+    /// The times of a Phase as the person typed them: the ones that differ from the ones shown are one edit of the Phase, and a
+    /// Save that changes nothing writes nothing.
+    /// </summary>
     public async Task Update(PhaseUpdateModel model)
     {
         Shown().EnsureCanWrite();
@@ -185,7 +206,15 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
             ?? throw new DomainException(Participation_not_found_string);
         await _account.Load();
         var actor = _account.Current?.Id ?? throw new DomainException(Not_signed_in_string);
-        await Write(participation, (changed, now) => changed.Update(model, actor, now));
+        try
+        {
+            await Write(participation, (changed, now) => changed.Update(model, actor, now));
+        }
+        catch (DomainPropertyException invalid) when (invalid.Property != null)
+        {
+            // what is said of a time is shown at the input that holds it, where the person who corrects it clears it
+            throw new DomainPropertyException(PhaseUpdateModel.InputOf(invalid.Property), invalid.Message);
+        }
     }
 
     /// <summary>What the store holds changed: the list is rebuilt, and a selection that is gone is let go.</summary>
@@ -212,12 +241,28 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
         return Write(Chosen(), change);
     }
 
-    async Task Write(Participation participation, Action<Participation, DateTimeOffset> change)
+    Task Write(Participation participation, Action<Participation, DateTimeOffset> change)
+    {
+        return Write(
+            participation,
+            (changed, now) =>
+            {
+                change(changed, now);
+                return true;
+            }
+        );
+    }
+
+    /// <summary>Applies the change to the Participation of the store and writes it, unless the change says it changed nothing.</summary>
+    async Task Write(Participation participation, Func<Participation, DateTimeOffset, bool> change)
     {
         var id = participation.Id;
         try
         {
-            change(participation, _clock.Now);
+            if (!change(participation, _clock.Now))
+            {
+                return;
+            }
         }
         catch
         {
@@ -231,6 +276,7 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
         EmitChanged();
         if (refused != null)
         {
+            Shown().Refused(refused.Code);
             throw new DomainException(
                 refused.Code == PARTICIPATION_CHANGED ? Participation_changed_string : refused.Message
             );

@@ -10,8 +10,8 @@ namespace NoTiming.Api.Features.Tenancy;
 /// The collections whose documents belong to a Tenant (ADR-0012, #643): every document carries the id of its Tenant in
 /// <c>TenantId</c>, and every one of these collections is read and written through <see cref="TenantCollection"/> and
 /// never directly. A collection that no Tenant owns is not in the list and cannot be opened that way: accounts, the
-/// countries and the Tenants are global, the state a person keeps per Event is the person's own, and the pending
-/// Snapshots go with the Functions API.
+/// countries and the Tenants are global, the state a person keeps per Event and the links they make to the registries
+/// (#638) are the person's own, and the pending Snapshots go with the Functions API.
 /// </summary>
 internal static class TenantOwned
 {
@@ -131,6 +131,23 @@ internal sealed class TenantCollection
         return TenantId == null ? [] : await _documents.Find(Scoped(filter)).ToListAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// A page of the Tenant's documents the filter finds, in the order of the sort: the first <paramref name="skip"/> are left
+    /// out and no more than <paramref name="limit"/> are read.
+    /// </summary>
+    public async Task<IReadOnlyList<BsonDocument>> FindPageAsync(
+        FilterDefinition<BsonDocument>? filter,
+        BsonDocument sort,
+        int skip,
+        int limit,
+        CancellationToken cancellationToken
+    )
+    {
+        return TenantId == null
+            ? []
+            : await _documents.Find(Scoped(filter)).Sort(sort).Skip(skip).Limit(limit).ToListAsync(cancellationToken);
+    }
+
     /// <summary>The ids of the Tenant's documents the filter finds, which is all that is read of them.</summary>
     public async Task<IReadOnlyList<Guid>> FindIdsAsync(
         FilterDefinition<BsonDocument>? filter,
@@ -147,6 +164,26 @@ internal sealed class TenantCollection
             .Project(new BsonDocument("_id", 1))
             .ToListAsync(cancellationToken);
         return [.. found.Select(x => BsonGuids.Of(x, "_id")).OfType<Guid>()];
+    }
+
+    /// <summary>The distinct values that the Tenant's documents the filter finds have at the path, which is all that is read of them.</summary>
+    public async Task<IReadOnlyList<BsonValue>> DistinctAsync(
+        string field,
+        FilterDefinition<BsonDocument>? filter,
+        CancellationToken cancellationToken
+    )
+    {
+        if (TenantId == null)
+        {
+            return [];
+        }
+
+        using var cursor = await _documents.DistinctAsync<BsonValue>(
+            field,
+            Scoped(filter),
+            cancellationToken: cancellationToken
+        );
+        return await cursor.ToListAsync(cancellationToken);
     }
 
     public async Task<BsonDocument?> FindOneAsync(

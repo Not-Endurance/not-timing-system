@@ -105,9 +105,9 @@ public class Phase : Entity
     /// Records the Snapshot as a time event with the outcome that applies, whether it sets a time or not, and returns it. A
     /// time that cannot be set is rejected, and nothing is thrown for it.
     /// </summary>
-    internal ParticipationEventBase Process(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
+    internal SnapshotTimeEvent Process(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
     {
-        ParticipationEventBase recorded = snapshot.Type switch
+        SnapshotTimeEvent recorded = snapshot.Type switch
         {
             SnapshotType.Present => Present(snapshot, actorId, recordedAt),
             SnapshotType.Arrive or SnapshotType.Final => Arrive(snapshot, actorId, recordedAt),
@@ -119,7 +119,7 @@ public class Phase : Entity
             CheckCompulsoryThreshold();
         }
         return recorded;
-        static ParticipationEventBase GuardUnknownSnapshot(Snapshot snapshot)
+        static SnapshotTimeEvent GuardUnknownSnapshot(Snapshot snapshot)
         {
             var message = $"Invalid snapshot '{snapshot.GetType()}'";
             throw GuardHelper.Exception(message);
@@ -129,17 +129,17 @@ public class Phase : Entity
     /// <summary>
     /// Records an Official's Update of a Snapshot they sent (ADR-0005, ADR-0013): the new time replaces the latest accepted
     /// time of the kind, whatever the Snapshot did, and the Update is an event of its own, accepted or not. An Arrive Update
-    /// feeds the Arrive time. A Present Update changes the latest presentation the Phase accepted, so it feeds the Represent
-    /// time when that was a representation and the Present time otherwise, and when there is none it is a presentation:
-    /// it never makes a representation. A time that breaks the order is rejected as invalid, and the times stay. A time that
-    /// is there may be corrected whether or not the Participation is complete.
+    /// feeds the Arrive time. A Present Update changes the latest presentation the Phase shows, so it feeds the Represent
+    /// time when the Phase shows one and the Present time otherwise: it never makes a representation. A time that breaks the
+    /// order is rejected as invalid, and the times stay. A time that is there may be corrected whether or not the
+    /// Participation is complete.
     /// </summary>
     internal SnapshotUpdate UpdateTime(SnapshotType kind, Timestamp time, Guid actorId, DateTimeOffset recordedAt)
     {
         var slot = kind == SnapshotType.Present ? PresentationSlot() : TimeSlot.Arrive;
         var previous = Shown(slot);
         var outcome = IsInOrder(slot, time) ? Accepted : RejectedInvalidTime;
-        ParticipationEventBase recorded =
+        SnapshotTimeEvent recorded =
             slot == TimeSlot.Arrive
                 ? new ArriveUpdated(time, outcome, SnapshotMethod.Manual, recordedAt, actorId)
                 : new PresentUpdated(
@@ -159,53 +159,52 @@ public class Phase : Entity
         return new SnapshotUpdate(this, recorded, slot, previous, Shown(slot));
     }
 
-    /// <summary>The state of the Phase form: each time that differs from the one the Phase shows becomes an accepted event.</summary>
-    internal void Update(IPhaseState state, Guid actorId, DateTimeOffset recordedAt)
+    /// <summary>
+    /// The state of the Phase form (ADR-0005, #620): the times that differ from the ones the Phase shows are listed in one event
+    /// of the form, a time that is cleared as a listed time with none, and nothing is recorded when none differs. A time differs
+    /// when it is another time of the day to the second, which is what the form shows, so a time that the form gives back as it
+    /// showed it is not changed, though the time it shows has a fraction of a second. Start is edited in place and records no
+    /// event. The order of the times the form leaves is asked before anything is changed, and one that is out of order refuses
+    /// the whole Save. It tells whether the Save changed anything.
+    /// </summary>
+    internal bool Update(IPhaseState state, Guid actorId, DateTimeOffset recordedAt)
     {
-        if (state.StartTime != null)
+        var given = Timestamp.Create(state.StartTime);
+        var isStartChanged = !IsSame(given, StartTime);
+        var start = isStartChanged ? given : StartTime;
+        var changes = new List<SlotTime>();
+        ListIfChanged(TimeSlot.Arrive, state.ArriveTime);
+        ListIfChanged(TimeSlot.Present, state.PresentTime);
+        ListIfChanged(TimeSlot.Represent, state.RepresentTime);
+        if (!isStartChanged && changes.Count == 0)
         {
-            if (state.ArriveTime < state.StartTime)
+            return false;
+        }
+
+        RequireInOrder(start, After(TimeSlot.Arrive), After(TimeSlot.Present), After(TimeSlot.Represent));
+
+        StartTime = start;
+        if (changes.Count > 0)
+        {
+            _events.Add(new PhaseUpdated(changes, Accepted, SnapshotMethod.Manual, recordedAt, actorId));
+        }
+
+        CheckCompulsoryThreshold();
+        return true;
+
+        void ListIfChanged(TimeSlot slot, DateTimeOffset? asked)
+        {
+            var time = Timestamp.Create(asked);
+            if (!IsSame(time, Shown(slot)))
             {
-                throw new DomainPropertyException(
-                    nameof(ArriveTime),
-                    __cannot_be_sooner_than__string,
-                    Arrival_string,
-                    StartTime
-                );
-            }
-            if (state.PresentTime < state.StartTime)
-            {
-                throw new DomainPropertyException(
-                    nameof(PresentTime),
-                    __cannot_be_sooner_than__string,
-                    Presentation_string,
-                    StartTime
-                );
-            }
-            if (state.RepresentTime < state.ArriveTime)
-            {
-                throw new DomainPropertyException(
-                    nameof(RepresentTime),
-                    __cannot_be_sooner_than__string,
-                    Presentation_string,
-                    RepresentTime
-                );
-            }
-            if (state.RepresentTime < state.PresentTime)
-            {
-                throw new DomainPropertyException(
-                    nameof(RepresentTime),
-                    __cannot_be_sooner_than__string,
-                    Representation_string,
-                    PresentTime
-                );
+                changes.Add(new SlotTime(slot, time));
             }
         }
-        StartTime = Timestamp.Create(state.StartTime);
-        Change(TimeSlot.Arrive, state.ArriveTime, actorId, recordedAt);
-        Change(TimeSlot.Present, state.PresentTime, actorId, recordedAt);
-        Change(TimeSlot.Represent, state.RepresentTime, actorId, recordedAt);
-        CheckCompulsoryThreshold();
+
+        Timestamp? After(TimeSlot slot)
+        {
+            return changes.FirstOrDefault(x => x.Slot == slot) is { } listed ? listed.Time : Shown(slot);
+        }
     }
 
     internal bool ViolatesRecoveryTime()
@@ -257,6 +256,16 @@ public class Phase : Entity
     internal void SetGate(int number, double totalDistanceSoFar)
     {
         Gate = $"GATE{number}/{totalDistanceSoFar:0.##}";
+    }
+
+    /// <summary>Whether the recovery of the Phase makes its Inspection compulsory, which follows from its times and so is decided again whenever they change.</summary>
+    internal void CheckCompulsoryThreshold()
+    {
+        if (CompulsoryThresholdSpan == null || IsFinal)
+        {
+            return;
+        }
+        IsRequiredInspectionCompulsory = GetRecoveryInterval() >= CompulsoryThresholdSpan;
     }
 
     public override string ToString()
@@ -323,6 +332,20 @@ public class Phase : Entity
             return GetAverageLoopSpeed();
         }
         return IsFinal ? GetAverageLoopSpeed() : GetAveragePhaseSpeed();
+    }
+
+    /// <summary>Whether the Phase shows any of its times: a Phase that has none has not been ridden yet.</summary>
+    public bool HasTimes()
+    {
+        return ArriveTime != null || PresentTime != null || RepresentTime != null;
+    }
+
+    /// <summary>Whether the Phase shows a time that this event gives: it is the latest accepted event that lists that time (ADR-0005).</summary>
+    public bool Shows(ParticipationEventBase timeEvent)
+    {
+        return timeEvent.Times.Any(x =>
+            ReferenceEquals(_events.LastOrDefault(y => y.IsAccepted && y.Feeds(x.Slot)), timeEvent)
+        );
     }
 
     public bool IsComplete()
@@ -440,41 +463,74 @@ public class Phase : Entity
         };
     }
 
-    /// <summary>The time a Present Update changes: the Represent time when the latest presentation accepted was a representation.</summary>
+    /// <summary>
+    /// The time a Present Update changes: the Represent time when the Phase shows one, which is then the latest presentation,
+    /// and the Present time otherwise. What the Main Operator edits in the Phase form does not change which it is, and a
+    /// Represent time that was cleared is not made again by an Update.
+    /// </summary>
     TimeSlot PresentationSlot()
     {
-        var latest = _events.LastOrDefault(x => x.IsAccepted && x.Slot != TimeSlot.Arrive);
-        return latest?.Slot == TimeSlot.Represent ? TimeSlot.Represent : TimeSlot.Present;
+        return Shown(TimeSlot.Represent) != null ? TimeSlot.Represent : TimeSlot.Present;
     }
 
+    /// <summary>The time the Phase shows: what the latest accepted event that lists it gives, which is none when that event clears it.</summary>
     Timestamp? Shown(TimeSlot slot)
     {
-        return _events.LastOrDefault(x => x.IsAccepted && x.Slot == slot)?.Time;
+        return _events.LastOrDefault(x => x.IsAccepted && x.Feeds(slot))?.TimeOf(slot);
     }
 
-    /// <summary>A time that differs from the one shown is an accepted event; one that is cleared rejects the events that feed it.</summary>
-    void Change(TimeSlot slot, DateTimeOffset? changed, Guid actorId, DateTimeOffset recordedAt)
+    /// <summary>Whether two times are the same time of the day to the second, which is how far the form shows a time, or are both none.</summary>
+    static bool IsSame(Timestamp? left, Timestamp? right)
     {
-        var time = Timestamp.Create(changed);
-        if (time == Shown(slot))
+        if (left == null || right == null)
         {
-            return;
+            return left == null && right == null;
         }
-        if (time == null)
+
+        return Seconds(left) == Seconds(right);
+        static long Seconds(Timestamp time)
         {
-            _events.Where(x => x.IsAccepted && x.Slot == slot).ToList().ForEach(x => x.RejectManually());
-            return;
+            return time.ToTimeSpan().Ticks / TimeSpan.TicksPerSecond;
         }
-        _events.Add(Manual(slot, time, recordedAt, actorId));
     }
 
-    void CheckCompulsoryThreshold()
+    /// <summary>
+    /// Start ≤ Arrive &lt; Presentation &lt; Representation among the times the form leaves, as the order of a Snapshot is asked
+    /// (see <see cref="IsInOrder"/>): each time has to come after the nearest one before it. It names the time that does not.
+    /// </summary>
+    static void RequireInOrder(Timestamp? start, Timestamp? arrive, Timestamp? present, Timestamp? represent)
     {
-        if (CompulsoryThresholdSpan == null || IsFinal)
+        if (arrive < start)
         {
-            return;
+            throw new DomainPropertyException(
+                nameof(IPhaseState.ArriveTime),
+                __cannot_be_sooner_than__string,
+                Arrival_string,
+                start
+            );
         }
-        IsRequiredInspectionCompulsory = GetRecoveryInterval() >= CompulsoryThresholdSpan;
+
+        var beforePresent = arrive ?? start;
+        if (present <= beforePresent)
+        {
+            throw new DomainPropertyException(
+                nameof(IPhaseState.PresentTime),
+                __cannot_be_sooner_than__string,
+                Presentation_string,
+                beforePresent
+            );
+        }
+
+        var beforeRepresent = present ?? arrive ?? start;
+        if (represent <= beforeRepresent)
+        {
+            throw new DomainPropertyException(
+                nameof(IPhaseState.RepresentTime),
+                __cannot_be_sooner_than__string,
+                Representation_string,
+                beforeRepresent
+            );
+        }
     }
 }
 

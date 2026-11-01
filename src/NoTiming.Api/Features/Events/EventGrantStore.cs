@@ -105,12 +105,28 @@ internal sealed class EventGrantStore
         );
     }
 
-    public async Task<IReadOnlyList<EventGrant>> ListAsync(EventRecord record, CancellationToken cancellationToken)
+    /// <summary>
+    /// A page of the grants of the Event, in the order of their emails (the other way round when it is asked) and then of their
+    /// ids, so that none is twice or missing between two pages; and whether another page follows.
+    /// </summary>
+    public async Task<(IReadOnlyList<EventGrant> Grants, bool HasMore)> ListAsync(
+        EventRecord record,
+        bool descending,
+        int skip,
+        int size,
+        CancellationToken cancellationToken
+    )
     {
         var documents = await _tenants
             .Of(TenantOwned.EVENT_GRANTS, record.TenantId)
-            .FindAsync(new BsonDocument(GrantDocuments.EVENT_ID, BsonGuids.Binary(record.Id)), cancellationToken);
-        return [.. documents.Select(GrantDocuments.ToGrant).OfType<EventGrant>().OrderBy(x => x.Email)];
+            .FindPageAsync(
+                new BsonDocument(GrantDocuments.EVENT_ID, BsonGuids.Binary(record.Id)),
+                new BsonDocument { { GrantDocuments.EMAIL, descending ? -1 : 1 }, { "_id", 1 } },
+                skip,
+                size + 1,
+                cancellationToken
+            );
+        return ([.. documents.Take(size).Select(GrantDocuments.ToGrant).OfType<EventGrant>()], documents.Count > size);
     }
 
     /// <summary>What the account has been granted on the Event: the grants that are its own, and nothing from a pending one.</summary>

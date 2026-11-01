@@ -304,6 +304,47 @@ public sealed class UnansweredSnapshotsTests
     }
 
     [Fact]
+    public async Task A_group_that_is_refused_because_the_Event_has_ended_when_it_is_sent_again_is_told_to_the_view_once()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        var ended = new List<Guid>();
+        using var view = await rig.ViewThatTellsAsync(ended);
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+        rig.Publisher.Fail = null;
+        rig.Publisher.Answer = (_, id) => SnapshotReceipt.Failed(id, 409, "event-ended", "The Event has ended.");
+
+        rig.Timer.Elapse();
+        await rig.Resent(rig.Service);
+
+        Assert.Equal([LIVE_EVENT_ID], ended);
+    }
+
+    [Theory]
+    [InlineData(409, "event-ended", true)]
+    [InlineData(403, "not-allowed", false)]
+    [InlineData(409, "participation-busy", false)]
+    [InlineData(400, "invalid-snapshot", false)]
+    [InlineData(500, null, false)]
+    public async Task A_Snapshot_that_the_server_refuses_tells_the_view_the_code_and_only_the_end_of_the_Event_is_told_on(
+        int status,
+        string? code,
+        bool isTold
+    )
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Capture(1);
+        rig.Publisher.Answer = (_, id) => SnapshotReceipt.Failed(id, status, code, "The server said so.");
+        var ended = new List<Guid>();
+        using var view = await rig.ViewThatTellsAsync(ended);
+
+        await Assert.ThrowsAsync<DomainException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+
+        Assert.Equal(isTold ? new[] { LIVE_EVENT_ID } : Array.Empty<Guid>(), ended);
+    }
+
+    [Fact]
     public async Task A_group_is_the_persons_and_nobody_else_who_uses_the_device_sends_it()
     {
         var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
@@ -630,14 +671,21 @@ public sealed class UnansweredSnapshotsTests
             await service.Resending.WaitAsync(TimeSpan.FromSeconds(10));
         }
 
-        async Task<IViewedEvent> OpenAsync(Guid eventId, AccessOf access)
+        /// <summary>The Event the app follows, opened, with what is told of the end of the Event kept for the test.</summary>
+        public Task<IViewedEvent> ViewThatTellsAsync(List<Guid> ended)
+        {
+            return OpenAsync(LIVE_EVENT_ID, new AccessOf(WitnessAccessLevel.Official), ended.Add);
+        }
+
+        async Task<IViewedEvent> OpenAsync(Guid eventId, AccessOf access, Action<Guid>? ended = null)
         {
             var view = new LiveEventView(
                 EventOf(eventId),
                 _store,
                 access,
                 new ReadOnlyRepository<Ranking>([]),
-                new ReadOnlyRepository<Official>([])
+                new ReadOnlyRepository<Official>([]),
+                ended
             );
             await view.Load();
             return view;
@@ -667,6 +715,11 @@ public sealed class UnansweredSnapshotsTests
         }
 
         public Task AppendSnapshot(SnapshotGroup snapshot)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateSnapshotInHistory(Guid groupId, int number, Timestamp time)
         {
             return Task.CompletedTask;
         }

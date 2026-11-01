@@ -29,8 +29,7 @@ public class ConsoleGrants : IConsoleGrants, ITransient
     public async Task<IReadOnlyList<GrantRow>> List(Guid eventId)
     {
         var filter = Uri.EscapeDataString($"eventId eq {eventId}");
-        var response = Accepted(await _api.Send(HttpMethod.Get, $"{GRANTS}?filter={filter}"));
-        return [.. response.Document!.Value.GetProperty("data").EnumerateArray().Select(RowOf)];
+        return await AcceptedPages(_api, $"{GRANTS}?filter={filter}", RowOf);
     }
 
     public async Task<GrantRow> Link(Guid eventId, GrantKind kind, OfficialRole? role, string email)

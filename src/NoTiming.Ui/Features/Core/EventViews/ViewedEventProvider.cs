@@ -1,4 +1,5 @@
 using Not.Application.CRUD.Ports;
+using Not.Events;
 using Not.Injection;
 using NTS.Application.Core;
 using NTS.Contracts.Core;
@@ -16,6 +17,7 @@ namespace NoTiming.Ui.Features.Core.EventViews;
 /// </summary>
 public sealed class ViewedEventProvider : IViewedEventProvider, IScoped
 {
+    readonly Event<Guid> _ended = new();
     readonly IEventInformationRepository _events;
     readonly IRepository<Participation> _participations;
     readonly IRepository<Ranking> _rankings;
@@ -43,6 +45,8 @@ public sealed class ViewedEventProvider : IViewedEventProvider, IScoped
         _access = access;
     }
 
+    public IEventSubscriber<Guid> EventEnded => _ended;
+
     public async Task<IViewedEvent?> Open(Guid eventId)
     {
         var view = await OpenLive(eventId) ?? await OpenHistoric(eventId);
@@ -67,7 +71,7 @@ public sealed class ViewedEventProvider : IViewedEventProvider, IScoped
             await _socket.Connect(live);
         }
 
-        return new LiveEventView(live, _store, _access, _rankings, _officials);
+        return new LiveEventView(live, _store, _access, _rankings, _officials, _ended.Emit);
     }
 
     async Task<EventView?> OpenHistoric(Guid eventId)

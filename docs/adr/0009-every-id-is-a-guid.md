@@ -32,4 +32,6 @@ ADR-0002's "keyed by their int id" and the `rest-api` skill's "an integer in the
 
 ## Amendments
 
+The data migration is `migrate-identities --apply` (#637). The Guid of an id is a version 5 UUID of its space, its scope and the integer, the table of spaces and scopes is `IdPaths`, and the readings that the building of it made (what an Event, a Setup, a Participation and a Phase are scoped to, what stops the run) are in ADR-0010.
+
 ADR-0011 moves the shared libraries to .NET 10 once the Functions API retires, so `Guid.CreateVersion7` becomes available to them then; the choice of random Guids stands until index locality matters. Judge, Witness, the API and Warp no longer ship separately: the Api and the Ui do (ADR-0011).

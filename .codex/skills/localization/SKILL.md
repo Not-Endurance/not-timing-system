@@ -33,7 +33,7 @@ public static string Cannot_delete___because_it_is_used_string =>
 ## Resources
 
 - Add every new key to `src/NTS/Localization/Resources/LocalizedStrings.resx` with the English value as the default.
-- Add translations for the same key to the other supported resource files, currently `LocalizedStrings.bg.resx` and `LocalizedStrings.tr.resx`.
+- Add translations for the same key to the other supported resource files, currently `LocalizedStrings.bg.resx`.
 - When only part of a value is dynamic, use a placeholder in the resource value and surround it with single quotes, for example `Cannot delete '{0}' because it is used`.
 
 ## Blazor Usage

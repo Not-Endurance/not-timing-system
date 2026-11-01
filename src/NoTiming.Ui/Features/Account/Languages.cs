@@ -18,7 +18,7 @@ public sealed class Language
 }
 
 /// <summary>
-/// The languages the app is written in (#645): English, which every text falls back to, Bulgarian and Turkish. The choice of
+/// The languages the app is written in (#645): English, which every text falls back to, and Bulgarian. The choice of
 /// one is a preference of the browser, kept there and applied when the app starts; it is not the account's.
 /// </summary>
 public static class Languages
@@ -36,6 +36,5 @@ public static class Languages
         return Chosen(culture.TwoLetterISOLanguageName) ?? "en";
     }
 
-    public static IReadOnlyList<Language> Supported { get; } =
-        [new("en", "English"), new("bg", "Български"), new("tr", "Türkçe")];
+    public static IReadOnlyList<Language> Supported { get; } = [new("en", "English"), new("bg", "Български")];
 }

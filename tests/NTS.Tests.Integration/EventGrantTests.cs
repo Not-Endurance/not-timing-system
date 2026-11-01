@@ -591,6 +591,90 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task The_grants_of_an_Event_are_cut_into_pages_in_the_order_of_their_emails_and_a_page_says_where_the_next_one_is()
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var setup = await SetUpAsync(api, client);
+        var marker = Guid.NewGuid().ToString("N");
+        var ids = new Dictionary<string, Guid>();
+        foreach (var name in new[] { "ccc", "aaa", "bbb" }) // linked out of the order of their emails
+        {
+            ids[name] = await GrantIdAsync(
+                await LinkOperatorAsync(setup.MainOperator, setup.Live, email: $"{name}.{marker}@sign-in.test")
+            );
+        }
+
+        var path = $"/api/event-grants?filter=eventId eq {setup.Live}";
+        var first = await GrantPageAsync(setup.MainOperator, path + "&page[size]=2");
+        var last = await GrantPageAsync(setup.MainOperator, path + "&page[size]=2&page[number]=2");
+        var followed = await GrantPageAsync(setup.MainOperator, first.Next!);
+        var backwards = await GrantPageAsync(setup.MainOperator, path + "&sort=-email&page[size]=2");
+        var full = await GrantPageAsync(setup.MainOperator, path + "&page[size]=3");
+        var unnamed = await GrantPageAsync(setup.MainOperator, path);
+
+        Assert.Equal([ids["aaa"], ids["bbb"]], first.Ids);
+        Assert.Equal((2, 1), (first.Size, first.Number));
+        Assert.Equal([ids["ccc"]], last.Ids);
+        Assert.Equal((2, 2), (last.Size, last.Number));
+        Assert.Null(last.Next);
+        Assert.Equal(last.Ids, followed.Ids); // the link is a way to the next page, whole
+        Assert.Equal((last.Size, last.Number, last.Next), (followed.Size, followed.Number, followed.Next));
+        Assert.Equal([ids["ccc"], ids["bbb"]], backwards.Ids);
+        Assert.Contains("sort=-email", backwards.Next);
+        Assert.Equal([ids["aaa"], ids["bbb"], ids["ccc"]], full.Ids); // a page that is exactly full is the last
+        Assert.Null(full.Next);
+        Assert.Equal(full.Ids, unnamed.Ids);
+        Assert.Equal((100, 1), (unnamed.Size, unnamed.Number));
+    }
+
+    [Fact]
+    public async Task Grants_of_the_same_email_follow_in_the_order_of_their_ids_so_that_none_is_twice_or_missing_between_pages()
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var setup = await SetUpAsync(api, client);
+        var email = $"same.{Guid.NewGuid():N}@sign-in.test";
+        var low = Guid.Parse("00000000-0000-0000-0000-0000000000a1");
+        var high = Guid.Parse("00000000-0000-0000-0000-0000000000b2");
+        var tenant = setup.Tenant;
+        var mongo = _mongo.ConnectionString;
+        await EventSeed.GrantAsync(mongo, tenant, setup.Live, "Operator", null, email, null, high); // written first: the order of writing is not the order of the ids
+        await EventSeed.GrantAsync(mongo, tenant, setup.Live, "Official", "Steward", email, null, low);
+
+        var path = $"/api/event-grants?filter=eventId eq {setup.Live}&page[size]=1";
+        var first = await GrantPageAsync(setup.MainOperator, path);
+        var second = await GrantPageAsync(setup.MainOperator, path + "&page[number]=2");
+        var backwards = await GrantPageAsync(setup.MainOperator, path + "&sort=-email");
+
+        Assert.Equal([low], first.Ids);
+        Assert.Equal([high], second.Ids);
+        Assert.Null(second.Next);
+        Assert.Equal([low], backwards.Ids); // the ids follow the same way whichever way the emails go
+    }
+
+    [Theory]
+    [InlineData("&page[size]=0", "invalid-page")]
+    [InlineData("&page[size]=501", "invalid-page")]
+    [InlineData("&page[number]=0", "invalid-page")]
+    [InlineData("&page[number]=999999999", "invalid-page")]
+    [InlineData("&sort=kind", "invalid-sort")]
+    [InlineData("&sort=-accountId", "invalid-sort")]
+    public async Task A_page_or_a_sort_that_the_grants_do_not_have_is_refused(string query, string code)
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var setup = await SetUpAsync(api, client);
+
+        var refused = await setup.MainOperator.Page.GetAsync(
+            $"/api/event-grants?filter=eventId eq {setup.Live}{query}"
+        );
+
+        Assert.Equal(HttpStatusCode.BadRequest, refused.StatusCode);
+        Assert.Equal(code, await ErrorCodeAsync(refused));
+    }
+
+    [Fact]
     public async Task Grants_are_listed_for_one_Event_asked_for_by_its_id_and_to_nobody_else()
     {
         await using var api = NewApi();
@@ -764,6 +848,24 @@ public sealed class EventGrantTests : IClassFixture<MongoFixture>
                 email,
                 accountId,
             }
+        );
+    }
+
+    /// <summary>A page of the grants: their ids, the page it says it is and where it says the next one is.</summary>
+    static async Task<(List<Guid> Ids, int Size, int Number, string? Next)> GrantPageAsync(Person caller, string path)
+    {
+        var response = await caller.Page.GetAsync(path);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await ApiSessions.ReadJsonAsync(response);
+        var page = body.GetProperty("meta").GetProperty("page");
+        var links = body.GetProperty("links");
+        return (
+            [.. body.GetProperty("data").EnumerateArray().Select(x => Guid.Parse(x.GetProperty("id").GetString()!))],
+            page.GetProperty("size").GetInt32(),
+            page.GetProperty("number").GetInt32(),
+            links.TryGetProperty("next", out var next) && next.ValueKind == JsonValueKind.String
+                ? next.GetString()
+                : null
         );
     }
 

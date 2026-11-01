@@ -3,7 +3,7 @@ using NTS.Domain.Core.Aggregates.Participations.Entities;
 namespace NTS.Domain.Core.Aggregates.Participations.Events;
 
 /// <summary>A Combination arrived at the end of a Phase's loop. It feeds the Arrive time.</summary>
-public sealed class Arrived : ParticipationEventBase
+public sealed class Arrived : SnapshotTimeEvent
 {
     public Arrived(
         Timestamp time,
@@ -11,9 +11,10 @@ public sealed class Arrived : ParticipationEventBase
         SnapshotMethod method,
         DateTimeOffset? recordedAt,
         Guid? actorId,
-        Guid? id = null
+        Guid? id = null,
+        DateTimeOffset? disabledAt = null
     )
-        : base(time, outcome, method, recordedAt, actorId, id) { }
+        : base(time, outcome, method, recordedAt, actorId, id, disabledAt) { }
 
     public override TimeSlot Slot => TimeSlot.Arrive;
 

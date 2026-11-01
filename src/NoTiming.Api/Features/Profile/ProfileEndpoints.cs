@@ -1,8 +1,11 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Net.Http.Headers;
 using Not.Identity;
 using NoTiming.Api.Features.Account;
+using NoTiming.Api.Features.Participants;
 using NoTiming.Api.JsonApi;
 using NTS.Contracts.API;
 using NTS.Domain.Aggregates;
@@ -13,7 +16,9 @@ namespace NoTiming.Api.Features.Profile;
 /// A signed-in person reads and edits their own profile (#602, ADR-0002, ADR-0012): country, names, club and FEI ID. The
 /// routes have no id: they act on the caller and on nobody else, and a body that names another account is refused. A
 /// profile needs a country, a first name and a surname. Editing it never moves the home Tenant; a person who has none
-/// yet is placed when they first pick a country, which is the only thing a profile can do to it.
+/// yet is placed when they first pick a country, which is the only thing a profile can do to it. It also tells, read only,
+/// the Athlete the person is linked as and the Horses they added (#638, ADR-0010), which are made and taken away by the links
+/// of the Athlete and the Horse.
 /// </summary>
 internal static class ProfileEndpoints
 {
@@ -29,7 +34,12 @@ internal static class ProfileEndpoints
     }
 
     /// <summary>The profile as a resource: the account's id is its id, and what is not set is not there.</summary>
-    public static IResult ResourceOf(NIdentityUser user, IReadOnlyList<Country> countries, int status)
+    public static IResult ResourceOf(
+        NIdentityUser user,
+        IReadOnlyList<Country> countries,
+        LinkedNames linked,
+        int status
+    )
     {
         var region = user.TextOf("CountryRegion");
         var country = region == null ? null : countries.FirstOrDefault(x => x.Matches(region));
@@ -47,6 +57,8 @@ internal static class ProfileEndpoints
                 club = user.TextOf("Club"),
                 feiId = user.TextOf("FeiId"),
                 complete = IsComplete(user),
+                athlete = linked.Athlete,
+                horses = linked.Horses,
             }
         );
     }
@@ -62,13 +74,15 @@ internal static class ProfileEndpoints
     static async Task<IResult> Read(
         HttpContext context,
         UserManager<NIdentityUser> users,
-        SelectableCountries countries
+        SelectableCountries countries,
+        LinkedParticipants linked,
+        AccountText text
     )
     {
         var user = await users.GetUserAsync(context.User);
         return user is null
             ? JsonApiResults.NotSignedIn()
-            : ResourceOf(user, await countries.AllAsync(context.RequestAborted), StatusCodes.Status200OK);
+            : await ResourceAsync(context, user, countries, linked, text);
     }
 
     static async Task<IResult> Edit(
@@ -76,7 +90,9 @@ internal static class ProfileEndpoints
         UserManager<NIdentityUser> users,
         SelectableCountries countries,
         ProfileStore store,
-        TenantPlacement tenants
+        TenantPlacement tenants,
+        LinkedParticipants linked,
+        AccountText text
     )
     {
         var read = await JsonApiRequests.ReadAsync<ProfileAttributes>(context.Request, PROFILES);
@@ -131,7 +147,26 @@ internal static class ProfileEndpoints
         var saved = (await users.FindByIdAsync(user.Id.ToString()))!;
         await tenants.EnsureHomeTenantAsync(saved, context.RequestAborted);
         var after = (await users.FindByIdAsync(user.Id.ToString()))!;
-        return ResourceOf(after, await countries.AllAsync(context.RequestAborted), StatusCodes.Status200OK);
+        return await ResourceAsync(context, after, countries, linked, text);
+    }
+
+    /// <summary>The profile as the person reads it: the names of what they are linked to are told in the language of the request.</summary>
+    static async Task<IResult> ResourceAsync(
+        HttpContext context,
+        NIdentityUser user,
+        SelectableCountries countries,
+        LinkedParticipants linked,
+        AccountText text
+    )
+    {
+        var culture = CultureInfo.GetCultureInfo(text.Resolve(context.Request));
+        context.Response.Headers.Append(HeaderNames.Vary, HeaderNames.AcceptLanguage);
+        return ResourceOf(
+            user,
+            await countries.AllAsync(context.RequestAborted),
+            await linked.ReadAsync(user, culture, context.RequestAborted),
+            StatusCodes.Status200OK
+        );
     }
 
     /// <summary>

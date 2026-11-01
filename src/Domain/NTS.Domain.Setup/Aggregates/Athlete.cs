@@ -8,15 +8,7 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class Athlete : Aggregate, IKurdMirror<Club>, INamed, INtsDisplayable
 {
-    public Athlete(
-        string? name,
-        string? nameEnglish,
-        string? feiId,
-        Country? country,
-        Club? club,
-        Guid? id = null,
-        User? user = null
-    )
+    public Athlete(string? name, string? nameEnglish, string? feiId, Country? country, Club? club, Guid? id = null)
         : base(id)
     {
         FeiId = ValidateFeiId(feiId);
@@ -24,7 +16,6 @@ public class Athlete : Aggregate, IKurdMirror<Club>, INamed, INtsDisplayable
         NameEnglish = string.IsNullOrWhiteSpace(nameEnglish) ? null : nameEnglish;
         Country = Required(nameof(Country), country);
         Club = club;
-        User = user;
     }
 
     public string? FeiId { get; }
@@ -32,7 +23,6 @@ public class Athlete : Aggregate, IKurdMirror<Club>, INamed, INtsDisplayable
     public string? NameEnglish { get; }
     public Country Country { get; }
     public Club? Club { get; private set; }
-    public User? User { get; }
 
     public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
     {

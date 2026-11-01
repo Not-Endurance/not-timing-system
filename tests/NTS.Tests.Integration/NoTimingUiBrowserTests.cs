@@ -77,6 +77,7 @@ public sealed class NoTimingUiBrowserTests : IClassFixture<ApiHostFixture>, ICla
         await SignInOnTheHostPagesAsync(page, scene.Official.Email);
         await page.WaitForURLAsync(device.Url(snapshotPage), new PageWaitForURLOptions { Timeout = PATIENCE });
         await Expect(ChipOf(page, 1)).ToBeVisibleAsync(Loaded());
+        await Expect(page.GetByText("Select participations to capture time snapshots")).ToBeVisibleAsync(Loaded()); // nothing is selected yet
 
         await SendSnapshotOfAsync(page, 1);
 

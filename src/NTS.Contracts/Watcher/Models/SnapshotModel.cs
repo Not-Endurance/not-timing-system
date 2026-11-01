@@ -15,6 +15,7 @@ public class SnapshotModel
             NameEnglish = snapshot.NameEnglish,
             Ruleset = snapshot.Ruleset,
             Timestamp = snapshot.Timestamp?.ToString(),
+            Time = snapshot.Timestamp?.ToDateTimeOffset(),
         };
     }
 
@@ -24,9 +25,18 @@ public class SnapshotModel
     public CompetitionRuleset? Ruleset { get; set; }
     public string? Timestamp { get; set; }
 
+    /// <summary>
+    /// The instant of the time, with its date, which the text of the time of the day does not say (#618): what an Update of a
+    /// Snapshot that was sent needs, as it names an instant. None in what was kept before it was kept.
+    /// </summary>
+    public DateTimeOffset? Time { get; set; }
+
     public Snapshot MapToDomain()
     {
-        var timestamp = string.IsNullOrWhiteSpace(Timestamp) ? null : new Timestamp(Timestamp);
+        var timestamp =
+            Time is { } instant ? new Timestamp(instant)
+            : string.IsNullOrWhiteSpace(Timestamp) ? null
+            : new Timestamp(Timestamp);
         return new Snapshot(Number, Name, NameEnglish, timestamp, Ruleset);
     }
 
@@ -39,6 +49,7 @@ public class SnapshotModel
             NameEnglish = NameEnglish,
             Ruleset = Ruleset,
             Timestamp = Timestamp,
+            Time = Time,
         };
     }
 }

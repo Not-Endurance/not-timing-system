@@ -6,6 +6,7 @@ using NTS.Application.UserSession;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Objects.Snapshots;
+using NTS.Domain.Objects;
 
 namespace NoTiming.Ui.Features.Sessions;
 
@@ -62,6 +63,23 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
             [
                 .. state.SnapshotSelections.Where(selection => !sentNumbers.Contains(selection.Number)),
             ];
+        });
+    }
+
+    public async Task UpdateSnapshotInHistory(Guid groupId, int number, Timestamp time)
+    {
+        ArgumentNullException.ThrowIfNull(time);
+
+        await Change(state =>
+        {
+            foreach (var entry in state.SnapshotHistory.Where(x => x.GroupId == groupId).SelectMany(x => x.Entries))
+            {
+                if (entry.Number == number)
+                {
+                    entry.Timestamp = time.ToString();
+                    entry.Time = time.ToDateTimeOffset();
+                }
+            }
         });
     }
 

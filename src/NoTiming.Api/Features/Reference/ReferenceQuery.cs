@@ -46,8 +46,8 @@ internal sealed partial class ReferenceQuery<T>
         var size = DEFAULT_PAGE_SIZE;
         var number = 1;
         if (
-            !TryPage(request, PAGE_SIZE, MAX_PAGE_SIZE, ref size)
-            || !TryPage(request, PAGE_NUMBER, int.MaxValue / MAX_PAGE_SIZE, ref number)
+            !JsonApiPaging.TryRead(request, PAGE_SIZE, MAX_PAGE_SIZE, ref size)
+            || !JsonApiPaging.TryRead(request, PAGE_NUMBER, int.MaxValue / MAX_PAGE_SIZE, ref number)
         )
         {
             return Refused(
@@ -126,22 +126,6 @@ internal sealed partial class ReferenceQuery<T>
     static ReferenceQuery<T> Refused(int status, string code, string title, string? detail = null)
     {
         return new ReferenceQuery<T>(null, DEFAULT_PAGE_SIZE, 1, JsonApiResults.Error(status, code, title, detail));
-    }
-
-    static bool TryPage(HttpRequest request, string parameter, int max, ref int value)
-    {
-        if (!request.Query.TryGetValue(parameter, out var values))
-        {
-            return true;
-        }
-
-        if (!int.TryParse(values.ToString(), out var parsed) || parsed < 1 || parsed > max)
-        {
-            return false;
-        }
-
-        value = parsed;
-        return true;
     }
 
     /// <summary>

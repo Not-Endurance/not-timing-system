@@ -44,4 +44,12 @@ public interface IViewedEvent : IStatefulService, IDisposable
     /// true.
     /// </summary>
     void EnsureCanWrite();
+
+    /// <summary>
+    /// Tells the view that the Api refused a write to its Event, with the code it gave (#631, ADR-0007). The code that says
+    /// the Event has ended (<see cref="EventRefusals.ENDED"/>) is how a view of a Live Event learns it: the view says so once,
+    /// through <see cref="IViewedEventProvider.EventEnded"/>, so that whoever shows it opens the Event again, as a Historic one,
+    /// and it is that view that takes no write. Any other refusal changes nothing, and so does one told to a view that is not told.
+    /// </summary>
+    void Refused(string? code) { }
 }

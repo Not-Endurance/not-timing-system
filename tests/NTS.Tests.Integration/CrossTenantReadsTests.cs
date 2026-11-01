@@ -20,6 +20,9 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
 {
     static readonly Caller SIGNED_IN = Caller.Of(TestId.Of(1));
 
+    /// <summary>A Tenant Root: one of the people who set an Event up, who read the whole row of an Athlete or a Horse.</summary>
+    static readonly Caller STAFF = Caller.Of(TestId.Of(2), tenantRootIn: ["country-bg"]);
+
     readonly MongoFixture _mongo;
 
     public CrossTenantReadsTests(MongoFixture mongo)
@@ -142,10 +145,10 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         );
         await AddAsync("athletes", a, $"Boris{marker} Georgiev", feiId: "10000003");
 
-        var byName = await Reads().SearchAthletesAsync(SIGNED_IN, $"ANA", default);
-        var byMarker = await Reads().SearchAthletesAsync(SIGNED_IN, $"Ana{marker}", default);
-        var byEnglishName = await Reads().SearchAthletesAsync(SIGNED_IN, $"MARIA{marker}", default);
-        var byFeiId = await Reads().SearchAthletesAsync(SIGNED_IN, "10000002", default);
+        var byName = await Reads().SearchAthletesAsync(STAFF, SearchOf($"ANA"), default);
+        var byMarker = await Reads().SearchAthletesAsync(STAFF, SearchOf($"Ana{marker}"), default);
+        var byEnglishName = await Reads().SearchAthletesAsync(STAFF, SearchOf($"MARIA{marker}"), default);
+        var byFeiId = await Reads().SearchAthletesAsync(STAFF, SearchOf("10000002"), default);
 
         Assert.Contains(ana, byName.Select(x => x.Id));
         Assert.Contains(anastasia, byName.Select(x => x.Id));
@@ -165,17 +168,17 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         var club = await AddAsync("clubs", a, "Sofia Riding Club");
         await AddAsync("event_officials", b, "Georgi Georgiev", role: "GroundJury");
 
-        var horses = await Reads().SearchHorsesAsync(SIGNED_IN, "stormy", default);
-        var clubs = await Reads().SearchClubsAsync(SIGNED_IN, "RIDING", default);
-        var officials = await Reads().SearchOfficialsAsync(SIGNED_IN, "georg", default);
+        var horses = await Reads().SearchHorsesAsync(SIGNED_IN, SearchOf("stormy"), default);
+        var clubs = await Reads().SearchClubsAsync(SIGNED_IN, SearchOf("RIDING"), default);
+        var officials = await Reads().SearchOfficialsAsync(SIGNED_IN, SearchOf("georg"), default);
 
         Assert.Equal(new[] { horse }, horses.Select(x => x.Id));
         Assert.Equal(new[] { club }, clubs.Select(x => x.Id));
         var official = Assert.Single(officials);
         Assert.Equal("GroundJury", official.Role);
         Assert.Equal(b, official.TenantId);
-        Assert.Empty(await Reads().SearchHorsesAsync(SIGNED_IN, "Sofia", default));
-        Assert.Empty(await Reads().SearchClubsAsync(SIGNED_IN, "stormy", default));
+        Assert.Empty(await Reads().SearchHorsesAsync(SIGNED_IN, SearchOf("Sofia"), default));
+        Assert.Empty(await Reads().SearchClubsAsync(SIGNED_IN, SearchOf("stormy"), default));
     }
 
     [Fact]
@@ -187,7 +190,7 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         await AddAsync("event_officials", NewTenant(), "Maria Dimitrova", role: "Steward");
         await AddAsync("event_officials", a, "Maria Dimitrova", role: "ChiefSteward");
 
-        var officials = await Reads().SearchOfficialsAsync(SIGNED_IN, "dimitrova", default);
+        var officials = await Reads().SearchOfficialsAsync(SIGNED_IN, SearchOf("dimitrova"), default);
 
         Assert.Equal(["ChiefSteward", "Steward"], officials.Select(x => x.Role!).Order());
     }
@@ -226,9 +229,12 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
             }
         );
 
-        var found = Assert.Single(await Reads().SearchAthletesAsync(SIGNED_IN, "secret rider", default));
+        var found = Assert.Single(await Reads().SearchAthletesAsync(STAFF, SearchOf("secret rider"), default));
+        var named = Assert.Single(await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("secret rider"), default));
+        var byFeiId = await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("10000009"), default);
 
         Assert.Equal(id, found.Id);
+        Assert.False(found.IsNameOnly);
         Assert.Equal("Rider Club", found.Club);
         Assert.Equal("Bulgaria", found.Country);
         Assert.Equal("10000009", found.FeiId);
@@ -236,6 +242,31 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         Assert.DoesNotContain("secret.rider@example.test", json);
         Assert.DoesNotContain("stamp", json);
         Assert.DoesNotContain("official", json);
+        Assert.Equal(id, named.Id); // an account that sets nothing up reads the name, and not what else the row holds
+        Assert.True(named.IsNameOnly);
+        Assert.Equal("Secret Rider", named.Name);
+        Assert.Null(named.NameEnglish);
+        Assert.Null(named.FeiId);
+        Assert.Null(named.Club);
+        Assert.Null(named.Country);
+        Assert.Equal(string.Empty, named.TenantId);
+        Assert.Empty(byFeiId); // and the FEI ID is not matched either
+    }
+
+    [Fact]
+    public async Task The_whole_row_of_a_Horse_is_for_the_people_who_set_an_Event_up_and_the_name_for_every_other_account()
+    {
+        var marker = Guid.NewGuid().ToString("N")[..6];
+        var id = await AddAsync("horses", NewTenant(), $"Zephyr{marker} Night", feiId: $"BUL{marker}");
+
+        var whole = Assert.Single(await Reads().SearchHorsesAsync(STAFF, SearchOf($"bul{marker}"), default));
+        var named = Assert.Single(await Reads().SearchHorsesAsync(SIGNED_IN, SearchOf($"zephyr{marker}"), default));
+        var byFeiId = await Reads().SearchHorsesAsync(SIGNED_IN, SearchOf($"bul{marker}"), default);
+
+        Assert.Equal((id, $"BUL{marker}", false), (whole.Id, whole.FeiId, whole.IsNameOnly));
+        Assert.Equal((id, true), (named.Id, named.IsNameOnly));
+        Assert.Null(named.FeiId);
+        Assert.Empty(byFeiId);
     }
 
     [Fact]
@@ -245,9 +276,9 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         await AddAsync("athletes", tenant, "Ana Petrova");
         await AddAsync("athletes", tenant, "Dot.Dot Rider");
 
-        var any = await Reads().SearchAthletesAsync(SIGNED_IN, ".*.", default);
-        var dot = await Reads().SearchAthletesAsync(SIGNED_IN, "dot.d", default);
-        var brackets = await Reads().SearchAthletesAsync(SIGNED_IN, "(((", default);
+        var any = await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf(".*."), default);
+        var dot = await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("dot.d"), default);
+        var brackets = await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("((("), default);
 
         Assert.Empty(any);
         Assert.Single(dot);
@@ -255,7 +286,7 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_search_needs_at_least_three_characters_and_returns_at_most_ten_matches()
+    public async Task A_search_needs_a_word_of_two_characters_and_reads_the_page_it_is_asked_for()
     {
         var tenant = NewTenant();
         var marker = Guid.NewGuid().ToString("N")[..8];
@@ -264,12 +295,23 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
             await AddAsync("athletes", tenant, $"{marker} Rider {i:00}");
         }
 
-        var found = await Reads().SearchAthletesAsync(SIGNED_IN, marker, default);
+        var first = await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf(marker, skip: 0, take: 10), default);
+        var second = await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf(marker, skip: 10, take: 10), default);
 
-        Assert.Equal(10, found.Count);
-        Assert.Equal(found.Select(x => x.Name).Order(StringComparer.Ordinal), found.Select(x => x.Name));
-        await Assert.ThrowsAsync<ArgumentException>(() => Reads().SearchAthletesAsync(SIGNED_IN, "ab", default));
-        await Assert.ThrowsAsync<ArgumentException>(() => Reads().SearchAthletesAsync(SIGNED_IN, "  a  ", default));
+        Assert.Equal(10, first.Count);
+        Assert.Equal(first.Select(x => x.Name).Order(StringComparer.Ordinal), first.Select(x => x.Name));
+        Assert.Equal(4, second.Count);
+        Assert.Equal(Enumerable.Range(10, 4).Select(i => $"{marker} Rider {i:00}"), second.Select(x => x.Name));
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("a"), default)
+        );
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("  a  "), default)
+        );
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("a b c"), default)
+        );
+        await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("ab"), default); // two characters are enough
     }
 
     [Fact]
@@ -278,11 +320,23 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         await AddAsync("athletes", NewTenant(), "Open Rider");
 
         await Assert.ThrowsAsync<CrossTenantRefusedException>(
-            () => Reads().SearchAthletesAsync(Caller.Anonymous, "open rider", default)
+            () => Reads().SearchAthletesAsync(Caller.Anonymous, SearchOf("open rider"), default)
         );
         await Assert.ThrowsAsync<CrossTenantRefusedException>(
-            () => Reads().SearchClubsAsync(Caller.Anonymous, "open rider", default)
+            () => Reads().SearchClubsAsync(Caller.Anonymous, SearchOf("open rider"), default)
         );
+        await Assert.ThrowsAsync<CrossTenantRefusedException>(
+            () => Reads().SearchOfficialsAsync(Caller.Anonymous, SearchOf("open rider"), default)
+        );
+    }
+
+    /// <summary>The search a route would make of a text: its words, in the order of the names, and a page of ten and one row more.</summary>
+    static NameSearch SearchOf(string text, int skip = 0, int take = 11)
+    {
+        var words = text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        return new NameSearch(words, descending: false, skip, take);
     }
 
     CrossTenantReads Reads()

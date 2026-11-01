@@ -105,8 +105,8 @@ internal sealed class SnapshotRecorder
             }
 
             var participation = model.MapToEntity();
-            var recordedBefore = participation.Phases.SelectMany(x => x.Events).FirstOrDefault(x => x.Id == request.Id);
-            if (recordedBefore != null)
+            var holding = participation.Phases.SelectMany(x => x.Events).FirstOrDefault(x => x.Id == request.Id);
+            if (holding is SnapshotTimeEvent recordedBefore)
             {
                 return SnapshotAnswer.Recorded(
                     StatusCodes.Status200OK,
@@ -114,15 +114,14 @@ internal sealed class SnapshotRecorder
                 );
             }
 
+            if (holding != null)
+            {
+                return SnapshotAnswer.Failed(IdTaken()); // an edit of the Phase form has that id: it is no Snapshot
+            }
+
             if (!checkedElsewhere && await IsHeldByAnotherAsync(request.Id, participation.Id, cancellationToken))
             {
-                return SnapshotAnswer.Failed(
-                    new JsonApiFailure(
-                        StatusCodes.Status409Conflict,
-                        "id-taken",
-                        "A Snapshot with that id was recorded for another Participation."
-                    )
-                );
+                return SnapshotAnswer.Failed(IdTaken());
             }
 
             checkedElsewhere = true;
@@ -218,7 +217,7 @@ internal sealed class SnapshotRecorder
         return new DateTimeOffset(instant.Ticks - instant.Ticks % TimeSpan.TicksPerMillisecond, instant.Offset);
     }
 
-    static SnapshotResource Describe(Participation participation, Guid id, ParticipationEventBase timeEvent)
+    static SnapshotResource Describe(Participation participation, Guid id, SnapshotTimeEvent timeEvent)
     {
         var phase = participation.Phases.First(x => x.Events.Contains(timeEvent));
         return DescribeIn(participation, id, phase, timeEvent, timeEvent.Slot);
@@ -236,7 +235,7 @@ internal sealed class SnapshotRecorder
         Participation participation,
         Guid id,
         Phase phase,
-        ParticipationEventBase timeEvent,
+        SnapshotTimeEvent timeEvent,
         TimeSlot slot
     )
     {
@@ -253,6 +252,15 @@ internal sealed class SnapshotRecorder
             Gate = phase.Gate,
             RecordedAt = timeEvent.RecordedAt,
         };
+    }
+
+    static JsonApiFailure IdTaken()
+    {
+        return new JsonApiFailure(
+            StatusCodes.Status409Conflict,
+            "id-taken",
+            "An event with that id was recorded for another Participation, or is not a Snapshot."
+        );
     }
 
     static JsonApiFailure NotFound()

@@ -5,6 +5,7 @@ using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
 using NoTiming.Api.Features.Localhost;
+using NoTiming.Api.Features.Participants;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Snapshots;
@@ -61,6 +62,7 @@ internal static class ApiServices
         services.AddSingleton<GlobalCollections>();
         services.AddSingleton<ReferenceAccess>();
         services.AddSingleton<EventDataAccess>();
+        services.AddSingleton<TimeEventViewers>();
         services.AddSingleton<SnapshotRecorder>();
         services.AddSingleton<RankingFinaliser>();
         services.AddOptions<RankingFinalisationOptions>().BindConfiguration(RankingFinalisationOptions.SECTION);
@@ -76,6 +78,9 @@ internal static class ApiServices
             .ValidateOnStart();
         services.AddSingleton<SearchRateLimiter>();
         services.AddSingleton<UserSessionStore>();
+        services.AddSingleton<ParticipationHistoryReader>();
+        services.AddSingleton<ParticipantLinkStore>();
+        services.AddSingleton<LinkedParticipants>();
 
         services.AddSignalR(options =>
         {

@@ -264,7 +264,10 @@ public sealed class TimeEventStorageTests : IClassFixture<NtsIntegrationFixture>
             var received = actual.Events[index];
             Assert.Equal(sent.GetType(), received.GetType());
             Assert.Equal(sent.Id, received.Id);
-            Assert.Equal(sent.Time.ToDateTimeOffset(), received.Time.ToDateTimeOffset());
+            Assert.Equal(
+                sent.Times.Single().Time!.ToDateTimeOffset(),
+                received.Times.Single().Time!.ToDateTimeOffset()
+            );
             Assert.Equal(sent.Outcome, received.Outcome);
             Assert.Equal(sent.Method, received.Method);
             Assert.Equal(sent.RecordedAt, received.RecordedAt);

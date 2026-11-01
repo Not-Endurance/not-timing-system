@@ -91,13 +91,120 @@ public sealed class TimeEventModelTests
             new Presented(TIME, false, TimeEventOutcome.Accepted, SnapshotMethod.Manual, RECORDED, ACTOR),
             new ArriveUpdated(TIME, TimeEventOutcome.Accepted, SnapshotMethod.Manual, RECORDED, ACTOR),
             new PresentUpdated(TIME, false, TimeEventOutcome.Accepted, SnapshotMethod.Manual, RECORDED, ACTOR),
+            new PhaseUpdated(
+                [new SlotTime(TimeSlot.Arrive, TIME)],
+                TimeEventOutcome.Accepted,
+                SnapshotMethod.Manual,
+                RECORDED,
+                ACTOR
+            ),
         ];
 
         var kinds = events.Select(x => TimeEventModel.MapFrom(x).Kind).ToArray();
 
         Assert.Equal(
-            [TimeEventKind.Arrived, TimeEventKind.Presented, TimeEventKind.ArriveUpdated, TimeEventKind.PresentUpdated],
+            [
+                TimeEventKind.Arrived,
+                TimeEventKind.Presented,
+                TimeEventKind.ArriveUpdated,
+                TimeEventKind.PresentUpdated,
+                TimeEventKind.PhaseUpdated,
+            ],
             kinds
         );
+    }
+
+    [Fact]
+    public void An_edit_of_the_Phase_form_comes_out_of_its_document_as_one_event_that_lists_the_times_it_listed()
+    {
+        var represent = new Timestamp(new DateTimeOffset(2026, 1, 1, 10, 15, 0, TimeSpan.FromHours(2)));
+        var edit = new PhaseUpdated(
+            [
+                new SlotTime(TimeSlot.Arrive, TIME),
+                new SlotTime(TimeSlot.Present, null),
+                new SlotTime(TimeSlot.Represent, represent),
+            ],
+            TimeEventOutcome.Accepted,
+            SnapshotMethod.Manual,
+            RECORDED,
+            ACTOR,
+            TestId.Of(5)
+        );
+
+        var model = TimeEventModel.MapFrom(edit);
+        var read = Assert.IsType<PhaseUpdated>(model.MapToEntity());
+
+        Assert.Null(model.Time); // it has no time of its own, whatever times it lists
+        Assert.Equal(TestId.Of(5), read.Id);
+        Assert.Equal(
+            [(TimeSlot.Arrive, TIME), (TimeSlot.Present, null), (TimeSlot.Represent, represent)],
+            read.Times.Select(x => (x.Slot, x.Time)).ToArray()
+        );
+        Assert.Equal(TimeEventOutcome.Accepted, read.Outcome);
+        Assert.Equal(SnapshotMethod.Manual, read.Method);
+        Assert.Equal(RECORDED, read.RecordedAt);
+        Assert.Equal(ACTOR, read.ActorId);
+    }
+
+    [Fact]
+    public void A_time_that_an_edit_of_the_Phase_form_cleared_stays_listed_with_none_in_its_document()
+    {
+        var edit = new PhaseUpdated(
+            [new SlotTime(TimeSlot.Present, null)],
+            TimeEventOutcome.Accepted,
+            SnapshotMethod.Manual,
+            RECORDED,
+            ACTOR
+        );
+
+        var model = TimeEventModel.MapFrom(edit);
+
+        var listed = Assert.Single(model.Changes!);
+        Assert.Equal(TimeSlot.Present, listed.Slot);
+        Assert.Null(listed.Time);
+        Assert.Null(model.Time);
+        Assert.False(model.IsRepresent);
+    }
+
+    [Fact]
+    public void An_event_of_a_Snapshot_has_its_time_and_lists_no_changes()
+    {
+        var arrived = new Arrived(TIME, TimeEventOutcome.Accepted, SnapshotMethod.Manual, RECORDED, ACTOR);
+
+        var model = TimeEventModel.MapFrom(arrived);
+
+        Assert.Null(model.Changes);
+        Assert.Equal(TIME.ToDateTimeOffset(), model.Time);
+    }
+
+    [Theory]
+    [InlineData(TimeEventKind.Arrived)]
+    [InlineData(TimeEventKind.Presented)]
+    [InlineData(TimeEventKind.ArriveUpdated)]
+    [InlineData(TimeEventKind.PresentUpdated)]
+    public void A_document_of_a_Snapshot_kind_that_has_no_time_is_refused(TimeEventKind kind)
+    {
+        var model = new TimeEventModel
+        {
+            Id = TestId.Of(6),
+            Kind = kind,
+            Outcome = TimeEventOutcome.Accepted,
+            Method = SnapshotMethod.Manual,
+        };
+
+        Assert.Throws<InvalidOperationException>(() => model.MapToEntity());
+    }
+
+    [Fact]
+    public void A_document_of_a_kind_that_is_not_known_is_refused()
+    {
+        var model = new TimeEventModel
+        {
+            Id = TestId.Of(7),
+            Kind = (TimeEventKind)99,
+            Time = TIME.ToDateTimeOffset(),
+        };
+
+        Assert.Throws<NotImplementedException>(() => model.MapToEntity());
     }
 }

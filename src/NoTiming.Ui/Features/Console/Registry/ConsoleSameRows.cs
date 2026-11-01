@@ -1,8 +1,8 @@
 using Not.Application.CRUD.Ports;
 using Not.Injection;
+using NoTiming.Ui.Features.Participants;
 using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Services.Registry;
 
 namespace NoTiming.Ui.Features.Console.Registry;
 
@@ -13,12 +13,10 @@ namespace NoTiming.Ui.Features.Console.Registry;
 /// </summary>
 public class ConsoleSameRows : IConsoleSameRows, IScoped
 {
-    const int SEARCH_MIN_CHARACTERS = 3;
-
     readonly IRepository<Athlete> _athletes;
     readonly IRepository<Horse> _horses;
     readonly IConsoleLookups _lookups;
-    readonly Dictionary<string, IReadOnlyList<RegistryRow>> _searched = [];
+    readonly Dictionary<string, IReadOnlyList<SameRow>> _searched = [];
 
     public ConsoleSameRows(IRepository<Athlete> athletes, IRepository<Horse> horses, IConsoleLookups lookups)
     {
@@ -29,86 +27,54 @@ public class ConsoleSameRows : IConsoleSameRows, IScoped
 
     public async Task<IReadOnlyList<SameRow>> OfAthlete(AthleteFormModel model)
     {
-        var own = (await _athletes.ReadMany())
-            .Select(x => new RegistryRow(x.Id, x.Name, x.NameEnglish, x.FeiId))
-            .ToList();
+        var own = (await _athletes.ReadMany()).Select(x => Row(x.Id, x.Name, x.NameEnglish, x.FeiId, isOwn: true));
         var elsewhere = await Elsewhere(
             "athletes",
             model.Name,
             model.NameEnglish,
             async term =>
-                (await _lookups.SearchAthletes(term)).Select(x => new RegistryRow(x.Id, x.Name, x.NameEnglish, x.FeiId))
+                (await _lookups.SearchAthletes(term)).Select(x => Row(x.Id, x.Name, x.NameEnglish, x.FeiId, false))
         );
-        var matches = SameRows.Among(
-            Merged(own, elsewhere),
-            model.Id,
-            model.Name,
-            model.NameEnglish,
-            model.FeiId,
-            true
-        );
-        return Shown(matches, own);
+        return SameRows.Among(Merged(own, elsewhere), model.Id, model.Name, model.NameEnglish, model.FeiId, true);
     }
 
     public async Task<IReadOnlyList<SameRow>> OfHorse(HorseFormModel model)
     {
-        var own = (await _horses.ReadMany())
-            .Select(x => new RegistryRow(x.Id, x.Name, x.NameEnglish, x.FeiId))
-            .ToList();
+        var own = (await _horses.ReadMany()).Select(x => Row(x.Id, x.Name, x.NameEnglish, x.FeiId, isOwn: true));
         var elsewhere = await Elsewhere(
             "horses",
             model.Name,
             model.NameEnglish,
             async term =>
-                (await _lookups.SearchHorses(term)).Select(x => new RegistryRow(x.Id, x.Name, x.NameEnglish, x.FeiId))
+                (await _lookups.SearchHorses(term)).Select(x => Row(x.Id, x.Name, x.NameEnglish, x.FeiId, false))
         );
-        var matches = SameRows.Among(
-            Merged(own, elsewhere),
-            model.Id,
-            model.Name,
-            model.NameEnglish,
-            model.FeiId,
-            false
-        );
-        return Shown(matches, own);
+        return SameRows.Among(Merged(own, elsewhere), model.Id, model.Name, model.NameEnglish, model.FeiId, false);
     }
 
-    /// <summary>The Tenant's own rows, and of the others' only those that are not among them. The own rows come first.</summary>
-    static IEnumerable<RegistryRow> Merged(IEnumerable<RegistryRow> own, IEnumerable<RegistryRow> elsewhere)
+    static SameRow Row(Guid id, string name, string? nameEnglish, string? feiId, bool isOwn)
+    {
+        return new SameRow(id, name, nameEnglish, feiId, isOwn, SameRowReason.Name);
+    }
+
+    /// <summary>The Tenant's own rows, and of the others' only those that are not among them.</summary>
+    static IEnumerable<SameRow> Merged(IEnumerable<SameRow> own, IEnumerable<SameRow> elsewhere)
     {
         var rows = own.ToList();
         return [.. rows, .. elsewhere.Where(x => rows.All(y => y.Id != x.Id))];
     }
 
-    /// <summary>The matches as the form shows them: whether each is one of the Tenant's own rows, and why it is the same.</summary>
-    static IReadOnlyList<SameRow> Shown(IEnumerable<SameMatch> matches, IEnumerable<RegistryRow> own)
-    {
-        var ownIds = own.Select(x => x.Id).ToHashSet();
-        return
-        [
-            .. matches.Select(x => new SameRow(
-                x.Row.Id,
-                x.Row.Name,
-                x.Row.NameEnglish,
-                x.Row.FeiId,
-                ownIds.Contains(x.Row.Id),
-                x.Reason == SameReason.FeiId ? SameRowReason.FeiId : SameRowReason.Name
-            )),
-        ];
-    }
-
     /// <summary>What the other Tenants' registries hold under the name or the name in English that was typed, a name searched once.</summary>
-    async Task<IReadOnlyList<RegistryRow>> Elsewhere(
+    async Task<IReadOnlyList<SameRow>> Elsewhere(
         string registry,
         string? name,
         string? nameEnglish,
-        Func<string, Task<IEnumerable<RegistryRow>>> search
+        Func<string, Task<IEnumerable<SameRow>>> search
     )
     {
-        var found = new List<RegistryRow>();
+        var found = new List<SameRow>();
         foreach (var term in new[] { name, nameEnglish }.Select(x => x?.Trim()).Distinct())
         {
-            if (term is not { Length: >= SEARCH_MIN_CHARACTERS })
+            if (term is null || !ParticipantService.IsSearchable(term))
             {
                 continue;
             }

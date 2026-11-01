@@ -1,3 +1,5 @@
+using NTS.Contracts.Features.Participants;
+
 namespace NTS.Contracts.Features.Profile;
 
 /// <summary>
@@ -18,4 +20,10 @@ public sealed class AccountProfile
     public string? Club { get; init; }
     public string? FeiId { get; init; }
     public bool Complete { get; init; }
+
+    /// <summary>The Athlete the person bookmarked as themselves, which is not a claim and grants nothing (#638, ADR-0010); none when they have not.</summary>
+    public ParticipantName? Athlete { get; init; }
+
+    /// <summary>The Horses the person added to their profile (#638, ADR-0010).</summary>
+    public IReadOnlyList<ParticipantName> Horses { get; init; } = [];
 }

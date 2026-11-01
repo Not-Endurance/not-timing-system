@@ -148,7 +148,7 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
             }
             await Service.Delete(entity);
         }
-        _entities.Remove(entity);
+        await ReadAgain();
     }
 
     protected bool SearchEntity(T entity, string term)
@@ -162,6 +162,17 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
         {
             context.SetParent(entity);
         }
+    }
+
+    /// <summary>
+    /// What the list shows once a delete was asked for: what the service holds now. A delete that the server refused leaves the row
+    /// where it is, and the person has been told why, so the row is not taken to be gone because it was asked to go (#635).
+    /// </summary>
+    async Task ReadAgain()
+    {
+        var there = await Service.ReadMany().ToList();
+        _entities.Clear(); // the list the page shows is this one, so it is changed and not replaced
+        _entities.AddRange(there);
     }
 
     TModel CreateModel(T entity)

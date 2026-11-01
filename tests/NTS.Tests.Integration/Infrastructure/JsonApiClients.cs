@@ -57,6 +57,9 @@ internal static class JsonApiClients
         /// <summary>What a request waits for before it goes on, so that a test can hold one back and look at what happens meanwhile.</summary>
         public Func<HttpRequestMessage, Task>? Before { get; set; }
 
+        /// <summary>What an answer waits for before it is handed on, so that a test can have it arrive after another.</summary>
+        public Func<HttpRequestMessage, Task>? After { get; set; }
+
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken
@@ -72,7 +75,13 @@ internal static class JsonApiClients
                 await Before(request);
             }
 
-            return Answer?.Invoke(request) ?? await base.SendAsync(request, cancellationToken);
+            var answer = Answer?.Invoke(request) ?? await base.SendAsync(request, cancellationToken);
+            if (After != null)
+            {
+                await After(request);
+            }
+
+            return answer;
         }
     }
 

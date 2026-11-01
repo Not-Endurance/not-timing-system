@@ -71,20 +71,19 @@ public sealed class ErrorHandlingTests
             manager.GetString(key, CultureInfo.InvariantCulture)
         );
         Assert.False(string.IsNullOrWhiteSpace(manager.GetString(key, CultureInfo.GetCultureInfo("bg"))));
-        Assert.False(string.IsNullOrWhiteSpace(manager.GetString(key, CultureInfo.GetCultureInfo("tr"))));
         Assert.False(
-            string.IsNullOrWhiteSpace(manager.GetString(nameof(NStrings.Home_string), CultureInfo.GetCultureInfo("tr")))
+            string.IsNullOrWhiteSpace(manager.GetString(nameof(NStrings.Home_string), CultureInfo.GetCultureInfo("bg")))
         );
         Assert.False(
             string.IsNullOrWhiteSpace(
-                manager.GetString(nameof(NStrings.Reload_string), CultureInfo.GetCultureInfo("tr"))
+                manager.GetString(nameof(NStrings.Reload_string), CultureInfo.GetCultureInfo("bg"))
             )
         );
         Assert.False(
             string.IsNullOrWhiteSpace(
                 manager.GetString(
                     nameof(NStrings.Try_to_Reload_in_order_to_proceed_string),
-                    CultureInfo.GetCultureInfo("tr")
+                    CultureInfo.GetCultureInfo("bg")
                 )
             )
         );

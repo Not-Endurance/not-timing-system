@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -42,10 +43,17 @@ internal sealed class UserSessionStore
         _records = client.GetDatabase(options.Value.Database).GetCollection<BsonDocument>(COLLECTION);
     }
 
-    /// <summary>The owner's records, of one Event when it is named.</summary>
-    public async Task<IReadOnlyList<UserSession>> ListAsync(
+    /// <summary>
+    /// A page of the owner's records, of one Event when it is named, in the order of the Events (the other way round when it is
+    /// asked) and then of the ids, so that none is twice or missing between two pages; and whether another page follows. A
+    /// record that cannot be addressed is left out of its page, which is then a record short.
+    /// </summary>
+    public async Task<(IReadOnlyList<UserSession> Sessions, bool HasMore)> ListAsync(
         string owner,
         Guid? eventId,
+        bool descending,
+        int skip,
+        int size,
         CancellationToken cancellationToken
     )
     {
@@ -55,8 +63,13 @@ internal sealed class UserSessionStore
             filter &= Builders<BsonDocument>.Filter.Eq("EventId", Binary(eventId.Value));
         }
 
-        var records = await _records.Find(filter).ToListAsync(cancellationToken);
-        return [.. records.Select(Read).OfType<UserSession>()];
+        var records = await _records
+            .Find(filter)
+            .Sort(new BsonDocument { { "EventId", descending ? -1 : 1 }, { "Id", 1 } })
+            .Skip(skip)
+            .Limit(size + 1)
+            .ToListAsync(cancellationToken);
+        return ([.. records.Take(size).Select(Read).OfType<UserSession>()], records.Count > size);
     }
 
     public async Task<UserSession?> FindAsync(string owner, Guid id, CancellationToken cancellationToken)
@@ -184,11 +197,17 @@ internal sealed class UserSessionStore
 
     static BsonDocument GroupToBson(SnapshotGroupModel group)
     {
-        return new BsonDocument
+        var document = new BsonDocument
         {
             ["Entries"] = new BsonArray(group.Entries.Select(SnapshotToBson)),
             ["Type"] = group.Type.ToString(),
         };
+        if (group.GroupId is { } id)
+        {
+            document["GroupId"] = Binary(id);
+        }
+
+        return document;
     }
 
     static BsonDocument SnapshotToBson(SnapshotModel snapshot)
@@ -207,6 +226,11 @@ internal sealed class UserSessionStore
         if (snapshot.Timestamp != null)
         {
             document["Timestamp"] = snapshot.Timestamp;
+        }
+
+        if (snapshot.Time is { } time)
+        {
+            document["Time"] = time.ToString("O", CultureInfo.InvariantCulture); // text: it keeps its offset, and no serializer is asked
         }
 
         return document;
@@ -230,6 +254,7 @@ internal sealed class UserSessionStore
         {
             Entries = [.. ArrayOf(group, "Entries").Select(x => SnapshotFromBson(x.AsBsonDocument))],
             Type = EnumOf<SnapshotType>(group, "Type") ?? default,
+            GroupId = TryGuid(group, "GroupId", out var id) ? id : null,
         };
     }
 
@@ -242,6 +267,7 @@ internal sealed class UserSessionStore
             NameEnglish = TextOf(snapshot, "NameEnglish"),
             Ruleset = EnumOf<CompetitionRuleset>(snapshot, "Ruleset"),
             Timestamp = TextOf(snapshot, "Timestamp"),
+            Time = InstantOf(snapshot, "Time"),
         };
     }
 
@@ -250,6 +276,19 @@ internal sealed class UserSessionStore
         return document.TryGetValue(field, out var value) && value.IsBsonArray
             ? value.AsBsonArray.Where(x => x.IsBsonDocument)
             : [];
+    }
+
+    /// <summary>An instant kept as text, none when there is no such member or it is not one.</summary>
+    static DateTimeOffset? InstantOf(BsonDocument document, string field)
+    {
+        return DateTimeOffset.TryParse(
+            TextOf(document, field),
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.RoundtripKind,
+            out var instant
+        )
+            ? instant
+            : null;
     }
 
     static string? TextOf(BsonDocument document, string field)

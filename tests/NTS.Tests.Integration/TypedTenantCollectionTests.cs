@@ -69,6 +69,28 @@ public sealed class TypedTenantCollectionTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task A_query_of_the_Api_that_the_database_cannot_run_is_its_own_failure_and_not_a_filter_to_correct()
+    {
+        var tenant = NewTenant();
+        await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Short");
+        var clubs = new MongoClient(_mongo.ConnectionString)
+            .GetDatabase(UserSeed.DATABASE)
+            .GetCollection<ClubModel>(CLUBS);
+
+        // no filter of a caller is applied, so a part of a text that starts past its end is the Api's own mistake
+        await Assert.ThrowsAsync<MongoCommandException>(
+            () =>
+                ReferencePages.ReadAsync(
+                    clubs.AsQueryable().Where(x => x.TenantId == tenant && x.Name.Substring(100) == "x"),
+                    null,
+                    0,
+                    10,
+                    default
+                )
+        );
+    }
+
+    [Fact]
     public async Task A_row_of_another_Tenant_is_not_found_changed_removed_or_made_again_by_its_id()
     {
         var (a, b) = (NewTenant(), NewTenant());
