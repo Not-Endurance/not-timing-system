@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using Not.Identity;
+using Not.Krud.Models;
 
 namespace NTS.Tests.Integration;
 
@@ -34,7 +35,7 @@ public sealed class DateTimeShapeTests
         var properties = PropertiesOf(typeof(DateTime)).ToList();
         Assert.Contains(properties, x => x.Name == "ExpiresAtUtc"); // the scan reaches the documents of Not.Identity
 
-        foreach (var property in properties)
+        foreach (var property in properties.Where(x => !IsFormModel(x.DeclaringType!)))
         {
             if (!property.Name.EndsWith("Utc", StringComparison.Ordinal))
             {
@@ -109,6 +110,23 @@ public sealed class DateTimeShapeTests
 
         Assert.Equal(instant, read.At.UtcDateTime);
         Assert.Equal(TimeSpan.Zero, read.At.Offset);
+    }
+
+    /// <summary>
+    /// What a person types into a form: its date is a calendar day that is combined with a time into the entity before anything
+    /// is stored, so the form's own properties are not times the database keeps (ADR-0014 holds the stored ones to the rule).
+    /// </summary>
+    static bool IsFormModel(Type type)
+    {
+        for (var current = type; current != null; current = current.BaseType)
+        {
+            if (current.IsGenericType && current.GetGenericTypeDefinition() == typeof(KrudFormModel<>))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     static IEnumerable<PropertyInfo> PropertiesOf(Type type)

@@ -26,13 +26,27 @@ internal static class UiBrowser
     }
 
     /// <summary>Goes to a page that asks for a person, signs in as that person on the pages of the host, and arrives at the page.</summary>
-    public static async Task SignInAndOpenAsync(ApiHostFixture host, BrowserDevice device, string email, string path)
+    public static async Task SignInAndOpenAsync(
+        ApiHostFixture host,
+        BrowserDevice device,
+        string email,
+        string path,
+        Regex? arrivesAt = null
+    )
     {
         var page = device.Page;
         await page.GotoAsync(device.Url(path));
         await page.WaitForURLAsync(new Regex(@"/sign-in\?returnUrl="), new() { Timeout = PATIENCE });
         await SignInOnTheHostPagesAsync(host, page, email);
-        await page.WaitForURLAsync(device.Url(path), new() { Timeout = PATIENCE });
+        var arrival = arrivesAt ?? new Regex(Regex.Escape(device.Url(path)) + "$");
+        try
+        {
+            await page.WaitForURLAsync(arrival, new() { Timeout = PATIENCE });
+        }
+        catch (TimeoutException)
+        {
+            throw new TimeoutException($"After signing in the page is at {page.Url}, and not at {arrival}.");
+        }
     }
 
     /// <summary>What a person does to send the Snapshot of a Participation: select it, capture its time, and send it as an Arrive.</summary>
