@@ -43,7 +43,7 @@ internal static class RegistrySearchEndpoints
     {
         app.MapGet(
             $"/api/{type}/all-tenants",
-            [Requires(Capability.SignedIn, PlaceIn.Platform)]
+            [Requires(Capability.SignedIn)]
             (
                 SearchQuery query,
                 HttpRequest request,
@@ -71,7 +71,7 @@ internal static class RegistrySearchEndpoints
         }
 
         var found = await search(access.Standing, NameSearch.Of(query), cancellationToken);
-        return JsonApiResults.Collection(
+        return JsonApiResults.Page(
             type,
             found
                 .Take(query.Size)
@@ -92,8 +92,10 @@ internal static class RegistrySearchEndpoints
                             }
                     )
                 ),
-            links: JsonApiPaging.Links(request, query.Number, found.Count > query.Size),
-            meta: JsonApiPaging.Meta(query.Size, query.Number)
+            request,
+            query.Size,
+            query.Number,
+            found.Count > query.Size
         );
     }
 }

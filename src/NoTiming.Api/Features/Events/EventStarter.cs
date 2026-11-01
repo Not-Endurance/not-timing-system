@@ -49,12 +49,9 @@ internal static class EventStartPlans
         {
             return (
                 null,
-                JsonApiResults.Error(
-                    StatusCodes.Status422UnprocessableEntity,
-                    "invalid-setup",
-                    Start_validation_invalid_setup_title_string,
-                    StartValidationDetail(issues)
-                )
+                EventsFailures
+                    .InvalidSetup(Start_validation_invalid_setup_title_string, StartValidationDetail(issues))
+                    .AsResult()
             );
         }
 
@@ -63,12 +60,11 @@ internal static class EventStartPlans
         {
             return (
                 null,
-                JsonApiResults.Error(
-                    StatusCodes.Status422UnprocessableEntity,
-                    "incomplete-fei-configuration",
-                    "The FEI export is only partly configured.",
-                    string.Format(Missing_FEI_export_configurations_colon__, Environment.NewLine + Lines(missing))
-                )
+                EventsFailures
+                    .IncompleteFeiConfiguration.With(
+                        string.Format(Missing_FEI_export_configurations_colon__, Environment.NewLine + Lines(missing))
+                    )
+                    .AsResult()
             );
         }
 

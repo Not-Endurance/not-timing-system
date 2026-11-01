@@ -55,6 +55,22 @@ internal sealed class RequiresAttribute : Attribute
         Place = place;
     }
 
+    /// <summary>
+    /// A requirement of the platform, such as being signed in: no request names the place, so there is nothing to say. A
+    /// capability of an Event or a Tenant has to say where its place is named.
+    /// </summary>
+    public RequiresAttribute(Capability capability)
+        : this(capability, PlaceIn.Platform)
+    {
+        if (AccessPolicy.RequirementOf(capability).Place != NTS.Domain.Access.Place.Platform)
+        {
+            throw new ArgumentException(
+                $"{capability} is not an action of the platform: say where the request names its place.",
+                nameof(capability)
+            );
+        }
+    }
+
     public Capability Capability { get; }
     public PlaceIn Place { get; }
 

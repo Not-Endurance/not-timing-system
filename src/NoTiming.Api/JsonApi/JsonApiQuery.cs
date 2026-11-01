@@ -69,12 +69,7 @@ internal static partial class JsonApiQuery
         if (!match.Success || match.Groups["member"].Value != member)
         {
             return JsonApiSearch.Refused(
-                JsonApiResults.Error(
-                    StatusCodes.Status400BadRequest,
-                    "invalid-filter",
-                    "The filter is not valid.",
-                    $"Use contains({member},'text')."
-                )
+                JsonApiFailures.InvalidFilter.With($"Use contains({member},'text').").AsResult()
             );
         }
 
@@ -82,12 +77,7 @@ internal static partial class JsonApiQuery
         if (text.Contains('\0'))
         {
             return JsonApiSearch.Refused(
-                JsonApiResults.Error(
-                    StatusCodes.Status400BadRequest,
-                    "invalid-filter",
-                    "The filter is not valid.",
-                    "A text has no null character."
-                )
+                JsonApiFailures.InvalidFilter.With("A text has no null character.").AsResult()
             );
         }
 
@@ -97,12 +87,7 @@ internal static partial class JsonApiQuery
         if (words.Count > JsonApiSearch.MAX_WORDS)
         {
             return JsonApiSearch.Refused(
-                JsonApiResults.Error(
-                    StatusCodes.Status400BadRequest,
-                    "invalid-filter",
-                    "The filter is not valid.",
-                    $"Use at most {JsonApiSearch.MAX_WORDS} words."
-                )
+                JsonApiFailures.InvalidFilter.With($"Use at most {JsonApiSearch.MAX_WORDS} words.").AsResult()
             );
         }
 
@@ -122,15 +107,10 @@ internal static partial class JsonApiQuery
     }
 
     /// <summary>The refusal of a request that has a parameter other than those the route takes; none when it has not.</summary>
-    static IResult? Unsupported(HttpRequest request, params string[] taken)
+    public static IResult? Unsupported(HttpRequest request, params string[] taken)
     {
         return request.Query.Keys.FirstOrDefault(x => !taken.Contains(x)) is { } parameter
-            ? JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "unsupported-parameter",
-                "The parameter is not supported.",
-                parameter
-            )
+            ? JsonApiFailures.UnsupportedParameter.With(parameter).AsResult()
             : null;
     }
 
@@ -156,26 +136,15 @@ internal static partial class JsonApiQuery
         {
             if (sort.ToString() != member && sort.ToString() != "-" + member)
             {
-                return JsonApiResults.Error(
-                    StatusCodes.Status400BadRequest,
-                    "invalid-sort",
-                    "The sort is not valid.",
-                    $"Sort by {member}, with a - for descending: sort=-{member}."
-                );
+                return JsonApiFailures
+                    .InvalidSort.With($"Sort by {member}, with a - for descending: sort=-{member}.")
+                    .AsResult();
             }
 
             descending = sort.ToString().StartsWith('-');
         }
 
-        return
-            JsonApiPaging.TryRead(request, JsonApiPaging.PAGE_SIZE, maxSize, ref size)
-            && JsonApiPaging.TryRead(request, JsonApiPaging.PAGE_NUMBER, int.MaxValue / maxSize, ref number)
-            ? null
-            : JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-page",
-                $"A page is a number of at least 1 and a size of 1 to {maxSize}."
-            );
+        return JsonApiPaging.Read(request, defaultSize, maxSize, out size, out number);
     }
 
     static JsonApiFilter ReadFilter(HttpRequest request, string[] members)
@@ -194,12 +163,9 @@ internal static partial class JsonApiQuery
             if (!match.Success || !members.Contains(match.Groups["member"].Value) || !Unique(values, match))
             {
                 return JsonApiFilter.Refused(
-                    JsonApiResults.Error(
-                        StatusCodes.Status400BadRequest,
-                        "invalid-filter",
-                        "The filter is not valid.",
-                        $"Use {string.Join(" and ", members.Select(x => $"{x} eq <value>"))}."
-                    )
+                    JsonApiFailures
+                        .InvalidFilter.With($"Use {string.Join(" and ", members.Select(x => $"{x} eq <value>"))}.")
+                        .AsResult()
                 );
             }
 

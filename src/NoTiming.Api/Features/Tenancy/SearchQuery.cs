@@ -33,12 +33,6 @@ internal sealed class SearchQuery : IJsonApiInput
 
     public JsonApiFailure? Content()
     {
-        return NameSearch.HasLongWord(Search.Words!)
-            ? null
-            : new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "search-too-short",
-                $"Search with a word of at least {NameSearch.MIN_WORD_LENGTH} characters."
-            );
+        return NameSearch.HasLongWord(Search.Words!) ? null : TenancyFailures.SearchTooShort;
     }
 }

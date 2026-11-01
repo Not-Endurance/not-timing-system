@@ -193,24 +193,3 @@ internal sealed class ListQuery : IJsonApiInput
         return null;
     }
 }
-
-/// <summary>The failures of a request that more than one resource has, said once.</summary>
-internal static class JsonApiFailures
-{
-    public static JsonApiFailure InvalidId { get; } =
-        new(StatusCodes.Status400BadRequest, "invalid-id", "The id of a resource is a Guid.");
-
-    public static JsonApiFailure IdMismatch { get; } =
-        new(StatusCodes.Status409Conflict, "id-mismatch", "The id of the resource is not the one of the route.");
-
-    public static JsonApiFailure IdForbidden { get; } =
-        new(StatusCodes.Status403Forbidden, "client-id-not-supported", "The id of a record is made by the server.");
-
-    public static JsonApiFailure IdRequired { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "id-required",
-            "The resource needs the id a client makes for it.",
-            "Send a Guid as the id of the resource."
-        );
-}

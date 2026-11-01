@@ -30,8 +30,8 @@ internal static class ProfileEndpoints
 
     public static IEndpointRouteBuilder MapProfile(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/me/profile", Read);
-        app.MapPatch("/api/me/profile", Edit);
+        app.MapGet("/api/me/profile", GetMeProfile);
+        app.MapPatch("/api/me/profile", PatchMeProfile);
         return app;
     }
 
@@ -58,23 +58,15 @@ internal static class ProfileEndpoints
                 countryRegion = region,
                 club = user.TextOf("Club"),
                 feiId = user.TextOf("FeiId"),
-                complete = IsComplete(user),
+                complete = ProfileRules.IsComplete(user),
                 athlete = linked.Athlete,
                 horses = linked.Horses,
             }
         );
     }
 
-    /// <summary>The rule of the profile screen: a first name, a surname and a country that the profile names.</summary>
-    public static bool IsComplete(NIdentityUser user)
-    {
-        return user.TextOf("GivenName") != null
-            && user.TextOf("Surname") != null
-            && user.TextOf("CountryRegion") != null;
-    }
-
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
-    static async Task<IResult> Read(
+    [Requires(Capability.SignedIn)]
+    static async Task<IResult> GetMeProfile(
         HttpContext context,
         AccessContext access,
         SelectableCountries countries,
@@ -85,8 +77,8 @@ internal static class ProfileEndpoints
         return await ResourceAsync(context, access.User, countries, linked, text);
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
-    static async Task<IResult> Edit(
+    [Requires(Capability.SignedIn)]
+    static async Task<IResult> PatchMeProfile(
         JsonApiBody<ProfileAttributes> body,
         HttpContext context,
         AccessContext access,
@@ -104,11 +96,7 @@ internal static class ProfileEndpoints
         // reach another.
         if (body.Id != null && body.Id != user.Id.ToString())
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status409Conflict,
-                "profile-id-mismatch",
-                "The profile is the caller's own: the id of the resource is not theirs."
-            );
+            return ProfileFailures.ProfileIdMismatch.AsResult();
         }
 
         // Members are found whatever their case, as those of every other document are (the Web options of the Api).
@@ -127,11 +115,7 @@ internal static class ProfileEndpoints
         var profile = merged.Profile!;
         if (!profile.HasRequiredProfile())
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status422UnprocessableEntity,
-                "profile-incomplete",
-                "A profile needs a country, a first name and a surname."
-            );
+            return ProfileFailures.ProfileIncomplete.AsResult();
         }
 
         await store.SaveAsync(user.Id, ChangesOf(user, profile), context.RequestAborted);
@@ -215,17 +199,17 @@ internal static class ProfileEndpoints
             || !Apply(members, "middleName", MAX_NAME_LENGTH, required: false, ref middleName)
         )
         {
-            return MergedProfile.Refused("invalid-name", "A name is at most 100 characters of one line.");
+            return MergedProfile.Refused(ProfileFailures.InvalidName);
         }
 
         if (!Apply(members, "club", MAX_NAME_LENGTH, required: false, ref club))
         {
-            return MergedProfile.Refused("invalid-club", "A club is at most 100 characters of one line.");
+            return MergedProfile.Refused(ProfileFailures.InvalidClub);
         }
 
         if (!Apply(members, "feiId", MAX_FEI_ID_LENGTH, required: false, ref feiId))
         {
-            return MergedProfile.Refused("invalid-fei-id", "An FEI ID is at most 20 characters of one line.");
+            return MergedProfile.Refused(ProfileFailures.InvalidFeiId);
         }
 
         if (members.TryGetValue("countryId", out var member))
@@ -236,7 +220,7 @@ internal static class ProfileEndpoints
                     : null;
             if (country is null)
             {
-                return MergedProfile.Refused("invalid-country", "Choose a country from the list.");
+                return MergedProfile.Refused(ProfileFailures.InvalidCountry);
             }
 
             region = country.Name;
@@ -290,9 +274,9 @@ internal static class ProfileEndpoints
             return new MergedProfile(profile, null);
         }
 
-        public static MergedProfile Refused(string code, string title)
+        public static MergedProfile Refused(JsonApiFailure failure)
         {
-            return new MergedProfile(null, JsonApiResults.Error(StatusCodes.Status400BadRequest, code, title));
+            return new MergedProfile(null, failure.AsResult());
         }
 
         MergedProfile(UpdateUserProfilePayload? profile, IResult? refusal)
@@ -303,23 +287,5 @@ internal static class ProfileEndpoints
 
         public UpdateUserProfilePayload? Profile { get; }
         public IResult? Refusal { get; }
-    }
-}
-
-/// <summary>
-/// The members of a profile that a PATCH names. They are kept as they were sent, because "not named" and "null" mean
-/// different things: the first leaves a member alone and the second clears it.
-/// </summary>
-internal sealed class ProfileAttributes : IResourceAttributes
-{
-    public static string? ResourceType => "profiles";
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Members { get; set; }
-
-    /// <summary>The members are checked against the account they are merged into, which only the handler has.</summary>
-    public JsonApiFailure? Invalid()
-    {
-        return null;
     }
 }

@@ -85,11 +85,7 @@ internal static class JsonApiRequests
     {
         if (!request.HasJsonApiContentType())
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status415UnsupportedMediaType,
-                "unsupported-media-type",
-                $"Send {JsonApiResults.MEDIA_TYPE}."
-            );
+            return JsonApiFailures.UnsupportedMediaType.AsResult();
         }
 
         if (request.ContentLength > MAX_BODY_BYTES)
@@ -109,22 +105,12 @@ internal static class JsonApiRequests
 
     static IResult TooLarge()
     {
-        return JsonApiResults.Error(
-            StatusCodes.Status413PayloadTooLarge,
-            "payload-too-large",
-            "The body is too large.",
-            $"Send at most {MAX_BODY_BYTES} bytes."
-        );
+        return JsonApiFailures.PayloadTooLarge.AsResult();
     }
 
     static IResult Malformed(string detail)
     {
-        return JsonApiResults.Error(
-            StatusCodes.Status400BadRequest,
-            "malformed-request",
-            "The request is malformed.",
-            detail
-        );
+        return JsonApiFailures.MalformedRequest.With(detail).AsResult();
     }
 
     static bool HasJsonApiContentType(this HttpRequest request)

@@ -5,6 +5,7 @@ using Not.Application.Environments;
 using Not.Identity;
 using Not.Identity.Email;
 using Not.Storage.Mongo;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.JsonApi;
 
 namespace NoTiming.Api.Features.Account;
@@ -63,12 +64,7 @@ internal static class AccountServices
                 cookie.Events.OnRedirectToLogin = context =>
                     JsonApiResults.NotSignedIn().ExecuteAsync(context.HttpContext);
                 cookie.Events.OnRedirectToAccessDenied = context =>
-                    JsonApiResults.WriteErrorAsync(
-                        context.HttpContext,
-                        StatusCodes.Status403Forbidden,
-                        "not-allowed",
-                        "You may not do this."
-                    );
+                    AccessFailures.NotAllowed.AsResult().ExecuteAsync(context.HttpContext);
             }
         );
         services.AddAuthorization();

@@ -20,16 +20,16 @@ internal static class UserSessionEndpoints
 
     public static IEndpointRouteBuilder MapUserSessions(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/user-sessions", List);
-        app.MapGet("/api/user-sessions/{id}", Read);
-        app.MapPost("/api/user-sessions", Make);
-        app.MapPatch("/api/user-sessions/{id}", Change);
-        app.MapDelete("/api/user-sessions/{id}", Remove);
+        app.MapGet("/api/user-sessions", GetUserSessions);
+        app.MapGet("/api/user-sessions/{id}", GetUserSessionsById);
+        app.MapPost("/api/user-sessions", PostUserSessions);
+        app.MapPatch("/api/user-sessions/{id}", PatchUserSessionsById);
+        app.MapDelete("/api/user-sessions/{id}", DeleteUserSessionsById);
         return app;
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
-    static async Task<IResult> List(
+    [Requires(Capability.SignedIn)]
+    static async Task<IResult> GetUserSessions(
         [ListOf(EVENT_ID, EVENT_ID)] ListQuery list,
         HttpRequest request,
         AccessContext access,
@@ -56,16 +56,18 @@ internal static class UserSessionEndpoints
             list.Size,
             cancellationToken
         );
-        return JsonApiResults.Collection(
+        return JsonApiResults.Page(
             USER_SESSIONS,
             sessions.Select(x => (x.Id.ToString(), AttributesOf(x))),
-            links: JsonApiPaging.Links(request, list.Number, hasMore),
-            meta: JsonApiPaging.Meta(list.Size, list.Number)
+            request,
+            list.Size,
+            list.Number,
+            hasMore
         );
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
-    static async Task<IResult> Read(
+    [Requires(Capability.SignedIn)]
+    static async Task<IResult> GetUserSessionsById(
         string id,
         AccessContext access,
         UserSessionStore store,
@@ -78,8 +80,8 @@ internal static class UserSessionEndpoints
         return session is null ? JsonApiResults.NotFound() : ResourceOf(StatusCodes.Status200OK, session);
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
-    static async Task<IResult> Make(
+    [Requires(Capability.SignedIn)]
+    static async Task<IResult> PostUserSessions(
         JsonApiBody<NewUserSession> body,
         AccessContext access,
         UserSessionStore store,
@@ -98,8 +100,8 @@ internal static class UserSessionEndpoints
             : ResourceOf(StatusCodes.Status200OK, session);
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
-    static async Task<IResult> Change(
+    [Requires(Capability.SignedIn)]
+    static async Task<IResult> PatchUserSessionsById(
         string id,
         JsonApiBody<UserSessionChange> body,
         AccessContext access,
@@ -122,11 +124,7 @@ internal static class UserSessionEndpoints
             && !(Guid.TryParse(attributes.EventId, out var named) && named == session.EventId)
         )
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status409Conflict,
-                "event-immutable",
-                "The Event of a record does not change: make a record for the other Event."
-            );
+            return UserSessionFailures.EventImmutable.AsResult();
         }
 
         if (attributes.State != null)
@@ -141,8 +139,8 @@ internal static class UserSessionEndpoints
         return ResourceOf(StatusCodes.Status200OK, session);
     }
 
-    [Requires(Capability.SignedIn, PlaceIn.Platform)]
-    static async Task<IResult> Remove(
+    [Requires(Capability.SignedIn)]
+    static async Task<IResult> DeleteUserSessionsById(
         string id,
         AccessContext access,
         UserSessionStore store,
@@ -167,63 +165,6 @@ internal static class UserSessionEndpoints
 
     static IResult InvalidFilter()
     {
-        return JsonApiResults.Error(
-            StatusCodes.Status400BadRequest,
-            "invalid-filter",
-            "The filter is not valid.",
-            "Use eventId eq <the id of an Event>."
-        );
+        return JsonApiFailures.InvalidFilter.With("Use eventId eq <the id of an Event>.").AsResult();
     }
 }
-
-/// <summary>What a document of a user session may bring: the Event it is for and its state.</summary>
-internal class UserSessionAttributes : IResourceAttributes
-{
-    public static string? ResourceType => "user-sessions";
-
-    /// <summary>A text and not a Guid, so that an id that is not one is refused with a code of its own.</summary>
-    public string? EventId { get; set; }
-
-    public NtsUserSessionStateModel? State { get; set; }
-
-    public virtual JsonApiFailure? Invalid()
-    {
-        return State != null && !IsWhole(State)
-            ? new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "invalid-state",
-                "The state is not valid.",
-                "Send both lists, and no null in them or in the entries of a group."
-            )
-            : null;
-    }
-
-    /// <summary>A state has both its lists, and no list and no entry in one is null: JSON can say that, the model cannot.</summary>
-    static bool IsWhole(NtsUserSessionStateModel state)
-    {
-        return state.SnapshotHistory != null
-            && state.SnapshotSelections != null
-            && state.SnapshotHistory.All(group => group?.Entries != null && group.Entries.All(entry => entry != null))
-            && state.SnapshotSelections.All(entry => entry != null);
-    }
-}
-
-/// <summary>A record that is made: for an Event, whose id is the server's to make.</summary>
-internal sealed class NewUserSession : UserSessionAttributes, IResourceAttributes
-{
-    public static DocumentIds Ids => DocumentIds.Forbidden;
-
-    public override JsonApiFailure? Invalid()
-    {
-        return !Guid.TryParse(EventId, out var eventId) || eventId == Guid.Empty
-            ? new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "invalid-event",
-                "Name the Event the state is for by its id."
-            )
-            : base.Invalid();
-    }
-}
-
-/// <summary>A change of a record: the state it should have, and the Event it is for when the document says so, which has to be the one it has.</summary>
-internal sealed class UserSessionChange : UserSessionAttributes { }

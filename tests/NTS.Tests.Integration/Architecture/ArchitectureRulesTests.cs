@@ -286,8 +286,8 @@ public sealed class ArchitectureRulesTests
     {
         var sources = new List<(string Path, string Text)> { ("src/NoTiming.Api/Features/Events/Fine.cs", "") };
 
-        Assert.Throws<InvalidOperationException>(
-            () => ArchitectureRules.OnlyTheFilterAndThePlacesThatTellAskThePolicy(sources)
+        Assert.Throws<InvalidOperationException>(() =>
+            ArchitectureRules.OnlyTheFilterAndThePlacesThatTellAskThePolicy(sources)
         );
     }
 

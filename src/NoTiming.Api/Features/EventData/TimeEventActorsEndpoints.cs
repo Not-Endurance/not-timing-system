@@ -25,12 +25,12 @@ internal static class TimeEventActorsEndpoints
 
     public static IEndpointRouteBuilder MapTimeEventActors(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/" + TYPE, ReadAsync);
+        app.MapGet("/api/" + TYPE, GetTimeEventActors);
         return app;
     }
 
     [Requires(Capability.SeeTimeEvents, PlaceIn.EventInFilter)]
-    static async Task<IResult> ReadAsync(
+    static async Task<IResult> GetTimeEventActors(
         [ListOf(DISPLAY_NAME, EVENT_ID)] ListQuery query,
         HttpRequest request,
         AccessContext access,
@@ -50,11 +50,13 @@ internal static class TimeEventActorsEndpoints
             query.Size,
             cancellationToken
         );
-        return JsonApiResults.Collection(
+        return JsonApiResults.Page(
             TYPE,
             actors.Select(x => (x.Id.ToString(), (object)new { displayName = x.DisplayName })),
-            links: JsonApiPaging.Links(request, query.Number, hasMore),
-            meta: JsonApiPaging.Meta(query.Size, query.Number)
+            request,
+            query.Size,
+            query.Number,
+            hasMore
         );
     }
 }

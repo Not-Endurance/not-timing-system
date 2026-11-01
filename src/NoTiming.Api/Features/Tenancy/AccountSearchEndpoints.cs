@@ -19,14 +19,14 @@ internal static class AccountSearchEndpoints
 
     public static IEndpointRouteBuilder MapAccountSearch(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/accounts", SearchInTheTenant);
-        app.MapGet("/api/accounts/all-tenants", SearchEveryTenant);
+        app.MapGet("/api/accounts", GetAccounts);
+        app.MapGet("/api/accounts/all-tenants", GetAccountsAllTenants);
         return app;
     }
 
     // With no Tenant there is nobody to find, but whether the caller may search is still told as it is anywhere.
     [Requires(Capability.EditRegistry, PlaceIn.CurrentTenant, WithoutTenant = Capability.SetUpAcrossTenants)]
-    static Task<IResult> SearchInTheTenant(
+    static Task<IResult> GetAccounts(
         SearchQuery query,
         HttpRequest request,
         AccessContext access,
@@ -47,8 +47,8 @@ internal static class AccountSearchEndpoints
         );
     }
 
-    [Requires(Capability.SetUpAcrossTenants, PlaceIn.Platform)]
-    static Task<IResult> SearchEveryTenant(
+    [Requires(Capability.SetUpAcrossTenants)]
+    static Task<IResult> GetAccountsAllTenants(
         SearchQuery query,
         HttpRequest request,
         AccessContext access,
@@ -90,13 +90,15 @@ internal static class AccountSearchEndpoints
             tenantId == null && !acrossTenants
                 ? []
                 : await search.SearchAsync(NameSearch.Of(query), tenantId, cancellationToken);
-        return JsonApiResults.Collection(
+        return JsonApiResults.Page(
             ACCOUNT_MATCHES,
             found
                 .Take(query.Size)
                 .Select(x => (x.Id.ToString(), (object)new { displayName = x.DisplayName, email = x.MaskedEmail })),
-            links: JsonApiPaging.Links(request, query.Number, found.Count > query.Size),
-            meta: JsonApiPaging.Meta(query.Size, query.Number)
+            request,
+            query.Size,
+            query.Number,
+            found.Count > query.Size
         );
     }
 }

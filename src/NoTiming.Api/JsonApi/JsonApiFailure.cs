@@ -36,4 +36,10 @@ internal sealed class JsonApiFailure
     {
         return JsonApiResults.Error(Status, Code, Title, Detail);
     }
+
+    /// <summary>The same failure with what is wrong this time.</summary>
+    public JsonApiFailure With(string? detail)
+    {
+        return new JsonApiFailure(Status, Code, Title, detail);
+    }
 }

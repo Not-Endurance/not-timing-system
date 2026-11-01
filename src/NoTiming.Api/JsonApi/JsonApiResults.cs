@@ -63,15 +63,18 @@ internal static class JsonApiResults
     }
 
     /// <summary>
-    /// The members of a collection: each is a resource of the type, 200 with an empty list when there are none. A
-    /// collection that is paged says where it is and where the next page is in its <c>links</c>, and which page it is in
-    /// its <c>meta</c>. A named collection gives each item a <c>self</c> link to where the item is canonically.
+    /// A page of a list: each item is a resource of the type, 200 with an empty list when there are none. It says where the list
+    /// is and where the next page is in its <c>links</c>, and which page it is in its <c>meta</c>, whatever the list is of. A
+    /// named collection gives each item a <c>self</c> link to where the item is canonically, and a resource may have a
+    /// <c>meta</c> of its own.
     /// </summary>
-    public static IResult Collection(
+    public static IResult Page(
         string type,
         IEnumerable<(string Id, object Attributes)> items,
-        object? links = null,
-        object? meta = null,
+        HttpRequest request,
+        int size,
+        int number,
+        bool hasNext,
         Func<string, string>? itemLink = null,
         Func<string, object?>? itemMeta = null
     )
@@ -87,8 +90,8 @@ internal static class JsonApiResults
                     links = itemLink == null ? null : new { self = itemLink(item.Id) },
                     meta = itemMeta?.Invoke(item.Id),
                 }),
-                links,
-                meta,
+                links = JsonApiPaging.Links(request, number, hasNext),
+                meta = JsonApiPaging.Meta(size, number),
             },
             Options,
             MEDIA_TYPE,
@@ -102,13 +105,13 @@ internal static class JsonApiResults
     /// </summary>
     public static IResult NotFound()
     {
-        return Error(StatusCodes.Status404NotFound, "not-found", "Not found");
+        return JsonApiFailures.NotFound.AsResult();
     }
 
     /// <summary>400 <c>invalid-id</c>: the id of a resource that a client makes is a Guid (ADR-0009).</summary>
     public static IResult InvalidId()
     {
-        return Error(StatusCodes.Status400BadRequest, "invalid-id", "The id of a resource is a Guid.");
+        return JsonApiFailures.InvalidId.AsResult();
     }
 
     /// <summary>409 <c>id-taken</c>: the id a client made is another Tenant's, which is not told about.</summary>
@@ -153,13 +156,7 @@ internal static class JsonApiResults
     /// <summary>The answer of every route that needs a caller when there is none: 401, never a redirect.</summary>
     public static IResult NotSignedIn()
     {
-        return Error(StatusCodes.Status401Unauthorized, "not-signed-in", "Sign in to do this.");
-    }
-
-    /// <summary>Writes the error without an endpoint, for the events of the authentication handlers.</summary>
-    public static async Task WriteErrorAsync(HttpContext context, int status, string code, string title)
-    {
-        await Error(status, code, title).ExecuteAsync(context);
+        return JsonApiFailures.NotSignedIn.AsResult();
     }
 
     public static JsonSerializerOptions Options { get; } = CreateOptions();

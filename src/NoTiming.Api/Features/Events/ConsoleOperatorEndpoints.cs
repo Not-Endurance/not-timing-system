@@ -26,14 +26,14 @@ internal static class ConsoleOperatorEndpoints
 
     public static IEndpointRouteBuilder MapConsoleOperators(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/console-operators", Assign);
-        app.MapGet("/api/console-operators", List);
-        app.MapDelete("/api/console-operators/{id}", Remove);
+        app.MapPost("/api/console-operators", PostConsoleOperators);
+        app.MapGet("/api/console-operators", GetConsoleOperators);
+        app.MapDelete("/api/console-operators/{id}", DeleteConsoleOperatorsById);
         return app;
     }
 
     [Requires(Capability.AssignConsoleOperators, PlaceIn.EventInBody)]
-    static async Task<IResult> Assign(
+    static async Task<IResult> PostConsoleOperators(
         JsonApiBody<ConsoleOperatorAttributes> body,
         AccessContext access,
         UserManager<NIdentityUser> users,
@@ -50,11 +50,7 @@ internal static class ConsoleOperatorEndpoints
             account = await users.FindByIdAsync(accountId.ToString());
             if (account?.Email is null)
             {
-                return JsonApiResults.Error(
-                    StatusCodes.Status422UnprocessableEntity,
-                    "account-not-found",
-                    "There is no such account."
-                );
+                return EventsFailures.AccountNotFound.AsResult();
             }
 
             email = account.Email;
@@ -87,7 +83,7 @@ internal static class ConsoleOperatorEndpoints
     }
 
     [Requires(Capability.ReadConfiguration, PlaceIn.EventInFilter)]
-    static async Task<IResult> List(
+    static async Task<IResult> GetConsoleOperators(
         [ListOf(EMAIL, EVENT_ID)] ListQuery query,
         HttpRequest request,
         AccessContext access,
@@ -111,12 +107,7 @@ internal static class ConsoleOperatorEndpoints
             items.Add((grant.Id.ToString(), AttributesOf(grant, account)));
         }
 
-        return JsonApiResults.Collection(
-            CONSOLE_OPERATORS,
-            items,
-            links: JsonApiPaging.Links(request, query.Number, hasMore),
-            meta: JsonApiPaging.Meta(query.Size, query.Number)
-        );
+        return JsonApiResults.Page(CONSOLE_OPERATORS, items, request, query.Size, query.Number, hasMore);
     }
 
     // A Console Operator is a Console Operator's and Root's to see: to anybody else it is not there, as it is not for a
@@ -126,7 +117,7 @@ internal static class ConsoleOperatorEndpoints
         PlaceIn.EventOfConsoleOperator,
         SeenWith = Capability.ReadConfiguration
     )]
-    static async Task<IResult> Remove(
+    static async Task<IResult> DeleteConsoleOperatorsById(
         AccessContext access,
         EventGrantStore grants,
         TenancyLog log,
@@ -153,44 +144,5 @@ internal static class ConsoleOperatorEndpoints
             displayName = account?.TextOf("Name"),
             email = EmailMask.Of(grant.Email),
         };
-    }
-}
-
-/// <summary>What a Console Operator is sent as: an Event, and a person by an email or an account. A member that is not one of these is kept, to be refused.</summary>
-internal sealed class ConsoleOperatorAttributes : IResourceAttributes, INamesEvent
-{
-    public static string? ResourceType => "console-operators";
-
-    public string? EventId { get; set; }
-    public string? Email { get; set; }
-    public Guid? AccountId { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Others { get; set; }
-
-    public JsonApiFailure? Invalid()
-    {
-        if (Others is { Count: > 0 })
-        {
-            return new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "unsupported-attribute",
-                "A Console Operator names an Event and a person by an email or an account.",
-                string.Join(", ", Others.Keys)
-            );
-        }
-
-        if ((Email == null) == (AccountId == null))
-        {
-            return new JsonApiFailure(
-                StatusCodes.Status400BadRequest,
-                "malformed-request",
-                "Name the person by an email or by an account, and by one of them."
-            );
-        }
-
-        return Email != null && !CodeSignIn.IsValidEmail(Email)
-            ? new JsonApiFailure(StatusCodes.Status400BadRequest, "invalid-email", "Enter a valid email address.")
-            : null;
     }
 }

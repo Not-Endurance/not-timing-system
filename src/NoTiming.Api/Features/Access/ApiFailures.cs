@@ -1,4 +1,6 @@
+using MongoDB.Driver.Linq;
 using NoTiming.Api.Features.Events;
+using NoTiming.Api.Features.Reference;
 using NoTiming.Api.JsonApi;
 
 namespace NoTiming.Api.Features.Access;
@@ -14,16 +16,12 @@ internal static class ApiFailures
     {
         return exception switch
         {
-            GrantLimitReachedException => new JsonApiFailure(
-                StatusCodes.Status422UnprocessableEntity,
-                "grant-limit-reached",
-                $"An Event has at most {EventGrantStore.MAX_GRANTS_PER_EVENT} grants: remove one that is not needed."
-            ),
-            TenantCountryMissingException => new JsonApiFailure(
-                StatusCodes.Status409Conflict,
-                "tenant-country-missing",
-                "The country of the Tenant is not among the countries, so no Event can be made in it."
-            ),
+            GrantLimitReachedException => EventsFailures.GrantLimitReached,
+            TenantCountryMissingException => EventsFailures.TenantCountryMissing,
+            // A filter that is valid in the grammar and that the data cannot run is for the caller to correct (the rest-api
+            // skill), on every list.
+            ExpressionNotSupportedException => JsonApiFailures.ExpressionNotSupported,
+            UnrunnableExpressionException => JsonApiFailures.ExpressionUnrunnable,
             _ => null,
         };
     }
