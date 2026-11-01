@@ -47,7 +47,7 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
     {
         var (api, official, eventId, ids) = await SceneAsync(1);
         await using var host = api;
-        var kept = new MemoryUnansweredSnapshots();
+        var kept = new KeptSnapshotGroups();
         await using var page = await Page.OpenAsync(api, official, eventId, kept);
         await SendAsync(page, 1, ARRIVE);
         var group = Assert.Single(page.Service.History);
@@ -80,7 +80,7 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
     {
         var (api, official, eventId, ids) = await SceneAsync(1);
         await using var host = api;
-        var kept = new MemoryUnansweredSnapshots();
+        var kept = new KeptSnapshotGroups();
         await using var page = await Page.OpenAsync(api, official, eventId, kept);
         await SendAsync(page, 1, ARRIVE);
         var group = Assert.Single(page.Service.History);
@@ -107,7 +107,7 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
     {
         var (api, official, eventId, _) = await SceneAsync(1);
         await using var host = api;
-        await using var writer = await Page.OpenAsync(api, official, eventId, new MemoryUnansweredSnapshots());
+        await using var writer = await Page.OpenAsync(api, official, eventId, new KeptSnapshotGroups());
         await SendAsync(writer, 1, ARRIVE);
         var group = Assert.Single(writer.Service.History);
         var entry = Assert.Single(group.Entries);
@@ -115,7 +115,7 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
             api,
             official,
             eventId,
-            new MemoryUnansweredSnapshots(),
+            new KeptSnapshotGroups(),
             canWrite: false
         );
 
@@ -193,7 +193,7 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
             ApiFactory api,
             Person person,
             Guid eventId,
-            MemoryUnansweredSnapshots kept,
+            KeptSnapshotGroups kept,
             bool canWrite = true
         )
         {
@@ -213,8 +213,7 @@ public sealed class SnapshotHistoryUpdateTests : IClassFixture<MongoFixture>
                 sessions,
                 new SnapshotApiPublisher(json),
                 account,
-                kept,
-                new SnapshotResendTimer(),
+                kept.Repository,
                 new Quiet()
             );
             await service.Load();
