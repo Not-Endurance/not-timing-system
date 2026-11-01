@@ -290,8 +290,7 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
                 sessions,
                 new SnapshotApiPublisher(json),
                 account,
-                new MemoryUnansweredSnapshots(),
-                new SnapshotResendTimer(),
+                new KeptSnapshotGroups().Repository,
                 new Quiet()
             );
             await service.Load();
