@@ -78,7 +78,10 @@ public sealed class EndpointGuardTests
         var hostEntries = new[] { new PublicEndpoint(EndpointAccess.SignIn, "POST", "api/dev/sessions") };
 
         Assert.Empty(EndpointGuard.Mistakes(routes, hostEntries));
-        Assert.Equal(["POST api/dev/sessions declares no requirement and is not public"], EndpointGuard.Mistakes(routes));
+        Assert.Equal(
+            ["POST api/dev/sessions declares no requirement and is not public"],
+            EndpointGuard.Mistakes(routes)
+        );
     }
 
     [Fact]

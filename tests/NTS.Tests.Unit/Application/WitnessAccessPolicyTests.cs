@@ -27,7 +27,9 @@ public sealed class WitnessAccessPolicyTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void With_no_Live_Event_there_is_no_page_of_one_and_the_person_stays_at_the_home_address(bool canSendSnapshots)
+    public void With_no_Live_Event_there_is_no_page_of_one_and_the_person_stays_at_the_home_address(
+        bool canSendSnapshots
+    )
     {
         Assert.Equal(Routes.HOME, WitnessAccessPolicy.ResolveHomeRoute(canSendSnapshots, null));
     }

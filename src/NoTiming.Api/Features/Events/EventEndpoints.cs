@@ -1,15 +1,15 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
-using NTS.Contracts.Setup.Models;
-using NTS.Domain.Access;
-using NTS.Domain.Setup.Aggregates;
+using Not.Identity;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
-using Not.Identity;
-using System.Text.Json.Serialization;
-using System.Text.Json;
+using NTS.Contracts.Setup.Models;
+using NTS.Domain.Access;
+using NTS.Domain.Setup.Aggregates;
 
 namespace NoTiming.Api.Features.Events;
 
