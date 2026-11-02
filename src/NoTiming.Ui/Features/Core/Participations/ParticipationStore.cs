@@ -1,8 +1,9 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
+using Not.Application.CRUD.Ports;
 using Not.Async;
 using Not.Injection;
-using Not.Storage.REST;
+using Not.Blazor.Client.REST;
 using NTS.Contracts.Core;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
@@ -154,22 +155,19 @@ public sealed class ParticipationStore
             connection = _connection;
         }
 
-        var read = await ReadAsync(id);
-        if (!read.Failed)
+        Participation? read;
+        try
         {
-            Apply(id, read.Row, connection);
+            read = await _participations.Read(id);
         }
-    }
+        catch (RepositoryException)
+        {
+            // A read that did not come is not a Participation that is gone: the store keeps what it has, and the next change
+            // or load tells it again.
+            return;
+        }
 
-    /// <summary>
-    /// One Participation as the Api holds it now. A read that did not come is not a Participation that is gone: when the
-    /// repository can say which it was, the store keeps what it has, as it is told again by the next change or load.
-    /// </summary>
-    async Task<RowRead<Participation>> ReadAsync(Guid id)
-    {
-        return _participations is IRowReader<Participation> reader
-            ? await reader.Find(id)
-            : new RowRead<Participation>(await _participations.Read(id), failed: false);
+        Apply(id, read, connection);
     }
 
     /// <summary>

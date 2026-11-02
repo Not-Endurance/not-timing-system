@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
 using Not.Identity;
+using Not.Identity.Email;
 
 namespace NTS.Tests.Integration.Harness;
 
@@ -168,8 +169,36 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
                 services.PostConfigure<NIdentityOptions>(options => options.Database = _database);
             }
 
+            // The factory asks for the outbox sender, which the Api does not build: the host gets the test's own, so a test
+            // reads the mail it was sent (ADR-0016).
+            // The host gets the test's outbox only when the sender is the outbox, which is the default outside Production. Any other
+            // sender, and a Production host with none, is the one the Api chooses as it chooses it in production, so the refusals
+            // and the failures of a sender are the ones a test sees (ADR-0002). A Production host that is asked for the outbox is
+            // refused, as a sender that keeps the codes it sends is.
+            if (_emailSender == "Outbox")
+            {
+                if (_environment == "Production")
+                {
+                    throw new InvalidOperationException("Production refuses the outbox: it keeps the one-time codes it sends.");
+                }
+
+                UseOutbox(services);
+            }
+
             _configureServices?.Invoke(services);
         });
+    }
+
+    /// <summary>
+    /// The outbox as the sender of the host, and the one a test reads the mail from (ADR-0016). A test of a host that is not
+    /// asked for the outbox, and that reads the codes it sends, gives it the outbox itself.
+    /// </summary>
+    public static void UseOutbox(IServiceCollection services)
+    {
+        services.RemoveAll<IEmailSender>();
+        services.AddSingleton<OutboxEmailSender>();
+        services.AddSingleton<IEmailSender>(p => p.GetRequiredService<OutboxEmailSender>());
+        services.AddSingleton<IEmailOutbox>(p => p.GetRequiredService<OutboxEmailSender>());
     }
 
     static string[] RateLimitSettings()

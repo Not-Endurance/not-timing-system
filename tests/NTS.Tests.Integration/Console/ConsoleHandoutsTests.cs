@@ -513,8 +513,8 @@ public sealed class ConsoleHandoutsTests : IClassFixture<SharedApiFixture>
             var dashboard = new ConsoleDashboard(
                 store,
                 new ConsoleParticipationWrites(json),
-                new ServerClock(json, TimeProvider.System),
-                new AccountSession(json),
+                new ServerClock(new AccountApiRepository(json), TimeProvider.System),
+                new AccountSession(new AccountApiRepository(json)),
                 new SnapshotApiPublisher(json)
             );
             if (opensDashboard)

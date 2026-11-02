@@ -119,9 +119,8 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
             new { participationId = another }
         );
 
-        Assert.Equal(HttpStatusCode.BadRequest, elsewhere.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(elsewhere));
-        Assert.Equal(HttpStatusCode.BadRequest, theirs.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, elsewhere.StatusCode); // the Event of a Handout is not the change's to name: it is ignored
+        Assert.Equal(HttpStatusCode.OK, theirs.StatusCode); // and so is the Tenant
         Assert.Equal(HttpStatusCode.OK, moved.StatusCode); // what a Handout is a Handout of is what it names
         var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_handouts", handout.Id))!;
         Assert.Equal(another, stored["ParticipationId"].AsGuid);
@@ -148,9 +147,12 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
         await EventSeed.OfficialAsync(_mongo.ConnectionString, tenant, linked);
         var made = IntegrationPayloadFactory.Official(eventId, null, Guid.NewGuid());
 
-        var naming = JsonApiAttributes.Of(OfficialModel.MapFrom(made), "userId");
-        naming["userId"] = JsonSerializer.SerializeToElement(TestId.Of(78));
-        var refused = await consoleOperator.Page.WriteAsync(HttpMethod.Post, "/api/officials", "officials", naming);
+        var naming = await consoleOperator.Page.WriteAsync(
+            HttpMethod.Patch,
+            $"/api/officials/{linked.Id}",
+            "officials",
+            new { userId = TestId.Of(78) }
+        );
         var created = await consoleOperator.Page.WriteAsync(
             HttpMethod.Post,
             "/api/officials",
@@ -165,8 +167,7 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
             new { role = "Steward" }
         );
 
-        Assert.Equal(HttpStatusCode.BadRequest, refused.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(refused));
+        Assert.Equal(HttpStatusCode.OK, naming.StatusCode); // the account the Official is linked to is not the document's to name
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
         var shown = (await ApiSessions.ReadJsonAsync(created)).GetProperty("data").GetProperty("attributes");
         Assert.Equal("Integration Official", shown.GetProperty("name").GetString());

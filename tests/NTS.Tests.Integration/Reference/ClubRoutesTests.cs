@@ -432,7 +432,7 @@ public sealed class ClubRoutesTests : IClassFixture<SharedApiFixture>
     [InlineData("tenantId")]
     [InlineData("id")]
     [InlineData("bogus")]
-    public async Task A_document_that_names_what_the_server_owns_or_what_there_is_not_is_refused_and_changes_nothing(
+    public async Task A_member_the_server_owns_or_does_not_have_is_ignored_and_the_rest_of_the_document_is_taken(
         string member
     )
     {
@@ -454,15 +454,13 @@ public sealed class ClubRoutesTests : IClassFixture<SharedApiFixture>
             new Dictionary<string, object> { ["name"] = "Made", [member] = "x" }
         );
 
-        Assert.Equal(HttpStatusCode.BadRequest, change.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(change));
-        Assert.Equal(HttpStatusCode.BadRequest, create.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(create));
+        Assert.Equal(HttpStatusCode.OK, change.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, create.StatusCode);
         Assert.Equal(
-            "Old Name",
+            "New Name",
             (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString
         );
-        Assert.Equal(1, await RegistrySeed.CountAsync(_shared.MongoConnectionString, "clubs", tenant));
+        Assert.Equal(2, await RegistrySeed.CountAsync(_shared.MongoConnectionString, "clubs", tenant));
     }
 
     [Theory]

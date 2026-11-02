@@ -16,14 +16,22 @@ public class ODataApiFilterAdapterTests
         return new()
         {
             { x => x.Number == 5, "Number eq 5" },
-            { x => x.Number != 5, "Number ne 5" },
-            { x => x.Number > 5, "Number gt 5" },
-            { x => x.Number >= 5, "Number ge 5" },
-            { x => x.Number < 5, "Number lt 5" },
-            { x => x.Number <= 5, "Number le 5" },
-            { x => 5 < x.Number, "Number gt 5" },
-            { x => 5 >= x.Number, "Number le 5" },
+            { x => 5 == x.Number, "Number eq 5" },
             { x => "A" == x.Name, "Name eq 'A'" },
+        };
+    }
+
+    public static TheoryData<Expression<Func<Sample, bool>>> NotRead()
+    {
+        return new()
+        {
+            { x => x.Number != 5 },
+            { x => x.Number > 5 },
+            { x => x.Number >= 5 },
+            { x => x.Number < 5 },
+            { x => x.Number <= 5 },
+            { x => 5 < x.Number },
+            { x => 5 >= x.Number },
         };
     }
 
@@ -77,11 +85,11 @@ public class ODataApiFilterAdapterTests
     public void A_Guid_filter_combines_with_the_other_conditions_and_the_scope()
     {
         var filters = ODataApiFilterAdapter.ParseFilters<Sample>(
-            [x => x.EventId == AN_EVENT && x.IsNotRanked == false, x => x.Number > 3]
+            [x => x.EventId == AN_EVENT && x.IsNotRanked == false, x => x.Number == 3]
         );
 
         Assert.Equal(
-            "(EventId eq 3f2504e0-4f89-41d3-9a0c-0305e82c3301 and IsNotRanked eq false) and (Number gt 3)",
+            "(EventId eq 3f2504e0-4f89-41d3-9a0c-0305e82c3301 and IsNotRanked eq false) and (Number eq 3)",
             filters["$filter"]
         );
         Assert.DoesNotContain("'", filters["$filter"]);
@@ -114,9 +122,9 @@ public class ODataApiFilterAdapterTests
         CultureInfo.CurrentCulture = new CultureInfo("bg-BG");
         try
         {
-            var filters = ODataApiFilterAdapter.ParseFilters<Sample>([x => x.Speed >= 12.5]);
+            var filters = ODataApiFilterAdapter.ParseFilters<Sample>([x => x.Speed == 12.5]);
 
-            Assert.Equal("Speed ge 12.5", filters["$filter"]);
+            Assert.Equal("Speed eq 12.5", filters["$filter"]);
         }
         finally
         {
@@ -147,6 +155,18 @@ public class ODataApiFilterAdapterTests
         var filters = ODataApiFilterAdapter.ParseFilters<Sample>([comparison]);
 
         Assert.Equal(expected, filters["$filter"]);
+    }
+
+    [Theory]
+    [MemberData(nameof(NotRead))]
+    public void A_comparison_the_Api_does_not_read_is_refused_so_that_the_repository_filters_for_itself(
+        Expression<Func<Sample, bool>> comparison
+    )
+    {
+        var parsed = ODataApiFilterAdapter.TryParseFilters<Sample>([comparison], out var query);
+
+        Assert.False(parsed);
+        Assert.Empty(query);
     }
 
     [Fact]

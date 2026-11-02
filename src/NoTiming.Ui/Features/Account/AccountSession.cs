@@ -1,8 +1,7 @@
-using System.Net;
 using System.Text.Json;
 using Not.Application.Behinds.Adapters;
-using Not.Application.HTTP;
 using Not.Injection;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Account;
 
 namespace NoTiming.Ui.Features.Account;
@@ -20,11 +19,11 @@ public class AccountSession : NStatefulService, IAccountSession, IScoped
         return isPath ? $"/sign-in?returnUrl={Uri.EscapeDataString(back!)}" : "/sign-in";
     }
 
-    readonly JsonApiClient _api;
+    readonly AccountApiRepository _accounts;
 
-    public AccountSession(JsonApiClient api)
+    public AccountSession(AccountApiRepository accounts)
     {
-        _api = api;
+        _accounts = accounts;
     }
 
     public CurrentAccount? Current { get; private set; }
@@ -35,20 +34,9 @@ public class AccountSession : NStatefulService, IAccountSession, IScoped
 
     protected override async Task<bool> InitializeState()
     {
-        var response = await _api.Send(HttpMethod.Get, "me");
-        if (response.Status == HttpStatusCode.Unauthorized)
-        {
-            Current = null;
-            IsKnown = true;
-            return true;
-        }
-
-        if (!response.IsSuccess)
-        {
-            throw response.ToException(); // not a visitor: the host could not say, so ask again
-        }
-
-        Current = AccountOf(response.Document!.Value);
+        // A visitor is none; a host that could not say is an exception, so that it is asked again.
+        var me = await _accounts.Me();
+        Current = me is { } account ? AccountOf(account) : null;
         IsKnown = true;
         return true;
     }
@@ -60,12 +48,7 @@ public class AccountSession : NStatefulService, IAccountSession, IScoped
 
     public async Task SignOut()
     {
-        var response = await _api.Send(HttpMethod.Delete, "sessions/current");
-        if (!response.IsSuccess)
-        {
-            throw response.ToException();
-        }
-
+        await _accounts.SignOut();
         Current = null;
         IsKnown = true;
         EmitChanged();
@@ -74,31 +57,12 @@ public class AccountSession : NStatefulService, IAccountSession, IScoped
     public async Task SelectTenant(string? tenantId)
     {
         var account = Current ?? throw new InvalidOperationException("Nobody is signed in.");
-        var document = JsonSerializer.SerializeToElement(
-            new
-            {
-                data = new
-                {
-                    type = "accounts",
-                    id = account.Id.ToString(),
-                    attributes = new { selectedTenantId = tenantId },
-                },
-            },
-            JsonApiClient.WriteOptions
-        );
-        var response = await _api.Send(HttpMethod.Patch, "me", document);
-        if (!response.IsSuccess)
-        {
-            throw response.ToException();
-        }
-
-        Current = AccountOf(response.Document!.Value);
+        Current = AccountOf(await _accounts.SelectTenant(account.Id, tenantId));
         EmitChanged();
     }
 
-    static CurrentAccount AccountOf(JsonElement document)
+    static CurrentAccount AccountOf(JsonElement data)
     {
-        var data = document.GetProperty("data");
         var attributes = data.GetProperty("attributes");
         return new CurrentAccount
         {

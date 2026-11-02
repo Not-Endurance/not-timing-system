@@ -14,7 +14,7 @@ internal static class JsonApiAttributes
     /// </summary>
     public static Dictionary<string, JsonElement> Of<TModel>(TModel model, params string[] keptByTheFamily)
     {
-        var element = JsonSerializer.SerializeToElement(model, JsonApiClient.WriteOptions);
+        var element = JsonSerializer.SerializeToElement(model, new JsonApiSettings().Json);
         return element
             .EnumerateObject()
             .Where(x => !SERVER_OWNED.Contains(x.Name) && !keptByTheFamily.Contains(x.Name))

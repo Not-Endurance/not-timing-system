@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Not.Application\Not.Application.csproj" />
     <ProjectReference Include="..\Not.Blazor\Not.Blazor.csproj" />
+    <ProjectReference Include="..\Not.Krud\Not.Krud.csproj" />
   </ItemGroup>
 
 </Project>

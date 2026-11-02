@@ -210,7 +210,6 @@ public sealed class BrandingRoutesTests : IClassFixture<SharedApiFixture>
                 HttpStatusCode.UnprocessableEntity,
                 "logo-too-large"
             ),
-            (new { left = good, middle = good }, HttpStatusCode.BadRequest, "unsupported-attribute"),
             (
                 new Dictionary<string, object> { ["left"] = good, ["LEFT"] = good },
                 HttpStatusCode.BadRequest,
@@ -227,6 +226,8 @@ public sealed class BrandingRoutesTests : IClassFixture<SharedApiFixture>
         }
 
         Assert.Null(await FindAsync($"tenant:{tenant}")); // the good logo of each of them was not kept
+        var ignored = await Edit(root, $"/api/tenants/{tenant}/branding", new { left = good, middle = good });
+        Assert.Equal(HttpStatusCode.OK, ignored.StatusCode); // a member that is not a position is ignored, and the logo is kept
         var atTheLimit = await Edit(
             root,
             $"/api/tenants/{tenant}/branding",

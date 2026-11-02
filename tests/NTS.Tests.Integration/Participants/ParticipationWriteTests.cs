@@ -465,7 +465,7 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_change_that_names_nothing_changes_nothing_and_a_member_the_server_owns_or_keeps_is_refused()
+    public async Task A_change_that_names_nothing_changes_nothing_and_a_member_the_server_owns_or_keeps_is_ignored()
     {
         var changes = new RecordedChanges();
         await using var api = NewApi(changes);
@@ -483,7 +483,7 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
 
         var nothing = await Change(consoleOperator, participation.Id, new { }, version: 2);
         var staleNothing = await Change(consoleOperator, participation.Id, new { }, version: 1);
-        var refused = new List<HttpResponseMessage>();
+        var ignored = new List<HttpResponseMessage>();
         foreach (
             var attributes in new object[]
             {
@@ -494,7 +494,7 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
             }
         )
         {
-            refused.Add(await Change(consoleOperator, participation.Id, attributes, version: 2));
+            ignored.Add(await Change(consoleOperator, participation.Id, attributes, version: 2));
         }
 
         Assert.Equal(HttpStatusCode.Conflict, staleNothing.StatusCode); // a change that names nothing is made on a version too
@@ -509,10 +509,10 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
                 .GetInt32()
         );
         Assert.All(
-            refused,
+            ignored,
             x =>
             {
-                Assert.Equal(HttpStatusCode.BadRequest, x.StatusCode);
+                Assert.Equal(HttpStatusCode.OK, x.StatusCode);
             }
         );
         var stored = (

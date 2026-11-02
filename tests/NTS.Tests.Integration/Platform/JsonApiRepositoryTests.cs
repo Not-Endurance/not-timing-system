@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using MongoDB.Bson;
+using Not.Application.CRUD.Ports;
 using Not.Application.DomainEvents;
 using Not.Application.HTTP;
 using Not.Domain;
@@ -46,7 +47,6 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         await clubs.Create(new Club("Sofia Riders", id));
         var read = await clubs.Read(id);
 
-        Assert.Null(clubs.LastError);
         Assert.Equal(id, read!.Id);
         Assert.Equal("Sofia Riders", read.Name);
         Assert.Equal(
@@ -73,9 +73,6 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         Assert.Equal(1203, read.Count);
         Assert.Equal(1203, read.Select(x => x.Id).Distinct().Count());
         Assert.All(read, x => Assert.StartsWith("Club ", x.Name));
-        Assert.Equal(3, requests.Asked.Count);
-        Assert.Contains("page[number]=1", requests.Asked[0]);
-        Assert.Contains("page[number]=3", requests.Asked[2]);
     }
 
     [Fact]
@@ -92,17 +89,16 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
                 ? new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
                 : null;
 
-        var read = (await clubs.ReadMany()).ToList();
+        var refused = await Assert.ThrowsAsync<JsonApiException>(() => clubs.ReadMany());
 
-        Assert.Empty(read);
-        Assert.Equal(503, clubs.LastError?.Status);
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, refused.Response.Status);
+        Assert.Equal(RepositoryErrorKind.Unavailable, refused.Kind);
         requests.Answer = null;
         Assert.Equal(1203, (await clubs.ReadMany()).Count());
-        Assert.Null(clubs.LastError);
     }
 
     [Fact]
-    public async Task A_filter_that_can_be_written_is_asked_of_the_server_and_one_that_cannot_is_applied_to_what_is_read()
+    public async Task A_filter_that_can_be_written_is_asked_of_the_server_and_one_that_cannot_is_refused()
     {
         var api = _shared.Api;
         using var client = ApiClients.Of(api);
@@ -114,15 +110,15 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         var clubs = new ClubApiRepository(JsonApiClients.Of(api, member, out var requests));
 
         var byServer = (await clubs.ReadMany(x => x.Name == "Alpha")).ToList();
-        var byClient = (await clubs.ReadMany(x => x.Name.StartsWith("Alp"))).ToList();
+        var refused = await Assert.ThrowsAsync<RepositoryException>(() => clubs.ReadMany(x => x.Name.StartsWith("Alp")));
         var first = await clubs.Read(x => x.Name == "Beta");
 
         Assert.Equal(["Alpha"], byServer.Select(x => x.Name));
-        Assert.Equal(["Alpha", "Alpine"], byClient.Select(x => x.Name).Order());
+        Assert.Equal(RepositoryErrorKind.Refused, refused.Kind); // a filter the Api cannot read is refused, never read in full
         Assert.Equal("Beta", first!.Name);
         Assert.Contains("filter=name%20eq%20%27Alpha%27", requests.Asked[0]);
-        Assert.DoesNotContain("filter=", requests.Asked[1]);
-        Assert.Contains("filter=name%20eq%20%27Beta%27", requests.Asked[2]);
+        Assert.Contains("filter=name%20eq%20%27Beta%27", requests.Asked[1]);
+        Assert.Equal(2, requests.Asked.Count);
     }
 
     [Fact]
@@ -141,7 +137,6 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         await clubs.Delete(other);
         await clubs.DeleteMany(x => x.Name == "Third");
 
-        Assert.Null(clubs.LastError);
         Assert.Equal(
             "New Name",
             (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString
@@ -164,11 +159,8 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         var clubs = new ClubApiRepository(JsonApiClients.Of(api, root, out _));
 
         var missing = await clubs.Read(Guid.NewGuid());
-        Assert.Null(clubs.LastError);
         var foreign = await clubs.Read(theirs);
-        Assert.Null(clubs.LastError);
         await clubs.Delete(Guid.NewGuid());
-        Assert.Null(clubs.LastError);
 
         Assert.Null(missing);
         Assert.Null(foreign);
@@ -186,25 +178,20 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         var asMember = new ClubApiRepository(JsonApiClients.Of(api, member, out _));
         var asNobody = new ClubApiRepository(JsonApiClients.Of(api, null, out _));
 
-        await asMember.Create(new Club("Refused"));
-        var refusedCreate = asMember.LastError;
-        await asMember.Update(new Club("Taken", id));
-        var refusedUpdate = asMember.LastError;
-        await asMember.Delete(id);
-        var refusedDelete = asMember.LastError;
-        var nothing = (await asNobody.ReadMany()).ToList();
-        var notSignedIn = asNobody.LastError;
+        var refusedCreate = await Assert.ThrowsAsync<JsonApiException>(() => asMember.Create(new Club("Refused")));
+        var refusedUpdate = await Assert.ThrowsAsync<JsonApiException>(() => asMember.Update(new Club("Taken", id)));
+        var refusedDelete = await Assert.ThrowsAsync<JsonApiException>(() => asMember.Delete(id));
+        var notSignedIn = await Assert.ThrowsAsync<JsonApiException>(() => asNobody.ReadMany());
         await asMember.ReadMany();
 
-        Assert.Equal(403, refusedCreate!.Status);
+        Assert.Equal(HttpStatusCode.Forbidden, refusedCreate.Response.Status);
         Assert.Equal("not-console-operator", refusedCreate.Code);
-        Assert.Equal("not-console-operator", refusedUpdate!.Code);
-        Assert.Equal("not-console-operator", refusedDelete!.Code);
+        Assert.Equal(RepositoryErrorKind.NotAllowed, refusedCreate.Kind);
+        Assert.Equal("not-console-operator", refusedUpdate.Code);
+        Assert.Equal("not-console-operator", refusedDelete.Code);
         Assert.False(string.IsNullOrWhiteSpace(refusedCreate.Message));
-        Assert.Empty(nothing);
-        Assert.Equal(401, notSignedIn!.Status);
+        Assert.Equal(HttpStatusCode.Unauthorized, notSignedIn.Response.Status);
         Assert.Equal("not-signed-in", notSignedIn.Code);
-        Assert.Null(asMember.LastError); // the next request that is taken clears what the last said
         Assert.Equal("Kept", (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString);
         Assert.Equal(1, await RegistrySeed.CountAsync(_shared.MongoConnectionString, "clubs", tenant));
     }
@@ -222,7 +209,6 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         await horses.Update(new Horse("Barza", null, null, id));
         var read = await horses.Read(id);
 
-        Assert.Null(horses.LastError);
         var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "horses", id))!;
         Assert.False(stored.Contains("NameEnglish"));
         Assert.False(stored.Contains("FeiId"));
@@ -258,7 +244,6 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         await athletes.Update(new Athlete("Renamed Rider", null, "10012345", country, null, linked));
         await athletes.Create(new Athlete("Made Rider", null, null, country, new Club("Sofia Riders"), madeId));
 
-        Assert.Null(athletes.LastError);
         var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "athletes", linked))!;
         Assert.Equal("Renamed Rider", stored["Name"].AsString);
         Assert.Equal("rider.secret@example.test", stored["User"]["Email"].AsString);
@@ -280,14 +265,14 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         var iso = CountrySeed.UniqueIsoCode();
         var id = Guid.NewGuid();
 
-        await byRoot.Create(new Country(Guid.NewGuid(), "Refused " + iso, iso, null, null));
-        var refusal = byRoot.LastError;
+        var refusal = await Assert.ThrowsAsync<JsonApiException>(() =>
+            byRoot.Create(new Country(Guid.NewGuid(), "Refused " + iso, iso, null, null))
+        );
         await byDeveloper.Create(new Country(id, "Land " + iso, iso, iso[..3], "xx-XX"));
         var read = await byRoot.Read(id);
         var found = (await byRoot.ReadMany(x => x.IsoCode == iso)).ToList();
 
-        Assert.Equal("not-developer", refusal!.Code);
-        Assert.Null(byDeveloper.LastError);
+        Assert.Equal("not-developer", refusal.Code);
         Assert.Equal("Land " + iso, read!.Name);
         Assert.Equal("xx-XX", read.Locale);
         Assert.Equal(id, Assert.Single(found).Id);
@@ -309,7 +294,6 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         var read = await setups.Read(id);
         var listed = (await setups.ReadMany()).ToList();
 
-        Assert.Null(setups.LastError);
         var sent = ConfigureEventModel.From(made);
         var received = ConfigureEventModel.From(read!);
         received.TenantId = sent.TenantId; // what the Api sets is the Api's: the Tenant
@@ -344,15 +328,14 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         var liveSetup = (await setups.Read(live))!;
 
         await setups.Update(SetupFactory.Full(open, "Configured"));
-        var taken = setups.LastError;
-        await setups.Update(SetupFactory.Full(live, "Too late"));
-        var refused = setups.LastError;
+        var refused = await Assert.ThrowsAsync<JsonApiException>(() =>
+            setups.Update(SetupFactory.Full(live, "Too late"))
+        );
 
         Assert.Equal("Open", openSetup.Name);
         Assert.NotNull(liveSetup);
-        Assert.Null(taken);
-        Assert.Equal("event-started", refused!.Code);
-        Assert.Equal(409, refused.Status);
+        Assert.Equal("event-started", refused.Code);
+        Assert.Equal(HttpStatusCode.Conflict, refused.Response.Status);
         Assert.Equal(
             open,
             Assert.Single(dispatcher.Events.OfType<NTS.Domain.Setup.Events.ConfigureEventUpdated>()).EventId

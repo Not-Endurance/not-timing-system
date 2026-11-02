@@ -3,8 +3,10 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
+using Not.Application.CRUD.Ports;
 
 namespace Not.Application.HTTP;
 
@@ -14,11 +16,39 @@ namespace Not.Application.HTTP;
 /// </summary>
 public class JsonApiSettings
 {
+    static readonly JsonSerializerOptions SharedDefaults = Defaults();
+
     /// <summary>The address of the resources, up to and including the prefix of the routes: <c>https://host/api</c>.</summary>
     public string? Url { get; set; }
 
     /// <summary>The headers a write carries, which the Api asks for on every write of a signed-in caller.</summary>
     public Dictionary<string, string> WriteHeaders { get; } = [];
+
+    /// <summary>
+    /// The codes of a conflict that the Api says to try again later, such as <c>participation-busy</c>. An answer with one of
+    /// them is an unavailable failure, not a refusal (ADR-0017).
+    /// </summary>
+    public HashSet<string> UnavailableCodes { get; } = [];
+
+    /// <summary>
+    /// What a document is read and written with: camelCase members, enums as their names, and a null written as null, which
+    /// on a change takes the member away (ADR-0017).
+    /// </summary>
+    public JsonSerializerOptions Json { get; set; } = SharedDefaults;
+
+    /// <summary>
+    /// camelCase members, enums as their names, and a null written as null: on a change null is a member taken away, and
+    /// leaving it out would leave it as it was (ADR-0017).
+    /// </summary>
+    static JsonSerializerOptions Defaults()
+    {
+        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+        };
+        options.Converters.Add(new JsonStringEnumConverter());
+        return options;
+    }
 }
 
 /// <summary>One of the errors of a JSON:API response: the status and the stable code a client branches on, and what a person reads.</summary>
@@ -59,7 +89,8 @@ public class JsonApiResponse
         JsonElement? document,
         string? location,
         JsonApiError? error,
-        DateTimeOffset? serverTime = null
+        DateTimeOffset? serverTime = null,
+        IReadOnlyDictionary<string, string>? headers = null
     )
     {
         Status = status;
@@ -67,6 +98,7 @@ public class JsonApiResponse
         Location = location;
         Error = error;
         ServerTime = serverTime;
+        Headers = headers ?? new Dictionary<string, string>();
     }
 
     public HttpStatusCode Status { get; }
@@ -88,6 +120,9 @@ public class JsonApiResponse
 
     /// <summary>The time the server said it was when it answered (the <c>Date</c> header, to the second), when it said.</summary>
     public DateTimeOffset? ServerTime { get; }
+
+    /// <summary>The headers of the answer, with the values of each joined by a comma: <c>Retry-After</c> says when to ask again.</summary>
+    public IReadOnlyDictionary<string, string> Headers { get; }
 
     /// <summary>The first error of a response that failed, or one made of its status when the body said none.</summary>
     public JsonApiError? Error { get; }
@@ -123,16 +158,162 @@ public class JsonApiClient
         _settings = options.Value;
     }
 
-    /// <summary>What a document is read with: camelCase members and enums as their names.</summary>
-    public static JsonSerializerOptions Options { get; } = CreateOptions(JsonIgnoreCondition.WhenWritingNull);
+    /// <summary>The options this client reads and writes documents with: those of its settings.</summary>
+    public JsonSerializerOptions Json => _settings.Json;
+
+    /// <summary>The codes of a conflict the Api says to try again later, as the settings name them.</summary>
+    public IReadOnlySet<string> UnavailableCodes => _settings.UnavailableCodes;
 
     /// <summary>
-    /// What a document is written with: the same, and a member that is null is written as null, because on a change
-    /// null is a member taken away, and leaving it out would leave it as it was.
+    /// A list of a collection, or any route that answers with one: its filter, its sort and one page of it, as the rest-api
+    /// skill names them. A route that is not a list is asked with no query.
     /// </summary>
-    public static JsonSerializerOptions WriteOptions { get; } = CreateOptions(JsonIgnoreCondition.Never);
+    public Task<JsonApiResponse> Get(string path, ListQuery? query = null, CancellationToken cancellationToken = default)
+    {
+        var parameters = new List<string>();
+        if (query?.Filter is { } filter)
+        {
+            parameters.Add($"filter={Uri.EscapeDataString(filter)}");
+        }
 
-    public async Task<JsonApiResponse> Send(
+        if (query?.Sort is { } sort)
+        {
+            parameters.Add($"sort={Uri.EscapeDataString(sort)}");
+        }
+
+        if (query?.PageSize is { } size)
+        {
+            parameters.Add($"page[size]={size}");
+        }
+
+        if (query?.PageNumber is { } number)
+        {
+            parameters.Add($"page[number]={number}");
+        }
+
+        var endpoint = parameters.Count == 0 ? path : $"{path}?{string.Join('&', parameters)}";
+        return Send(HttpMethod.Get, endpoint, null, cancellationToken);
+    }
+
+    /// <summary>
+    /// Every resource of a list, a page at a time, until the Api says there is no next page. A list that goes on beyond
+    /// <paramref name="maxPages"/> pages is not cut short: it is refused with a <see cref="RepositoryException"/>, as a list
+    /// that cannot be shown whole. A refusal of a page is thrown as a <see cref="JsonApiException"/>.
+    /// </summary>
+    public async Task<IReadOnlyList<JsonElement>> GetAll(
+        string path,
+        ListQuery query,
+        int maxPages,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var resources = new List<JsonElement>();
+        for (var number = 1; number <= maxPages; number++)
+        {
+            var response = await Get(path, query.OnPage(number), cancellationToken);
+            if (!response.IsSuccess)
+            {
+                throw new JsonApiException(response, UnavailableCodes);
+            }
+
+            resources.AddRange(response.Document!.Value.GetProperty("data").EnumerateArray());
+            if (!response.HasNextPage)
+            {
+                return resources;
+            }
+        }
+
+        throw new RepositoryException(
+            RepositoryErrorKind.Refused,
+            $"The list at {path} goes on beyond the {maxPages} pages it is read to, and is not read to its end."
+        );
+    }
+
+    /// <summary>One resource of a collection, by its id.</summary>
+    public Task<JsonApiResponse> GetOne(string collection, Guid id, CancellationToken cancellationToken = default)
+    {
+        return Send(HttpMethod.Get, ItemPath(collection, id), null, cancellationToken);
+    }
+
+    /// <summary>Makes a resource of a collection. The id the model holds is the id of the document, when it holds one.</summary>
+    public Task<JsonApiResponse> Post(string collection, object model, CancellationToken cancellationToken = default)
+    {
+        return Send(HttpMethod.Post, collection, ResourceDocument(collection, model, null, null), cancellationToken);
+    }
+
+    /// <summary>An action of a route, such as linking a row, which takes no document: it is posted to its path.</summary>
+    public Task<JsonApiResponse> Post(string path, CancellationToken cancellationToken = default)
+    {
+        return Send(HttpMethod.Post, path, null, cancellationToken);
+    }
+
+    /// <summary>
+    /// An action that takes several resources in one request, such as sending a group of Snapshots: each is a resource of its
+    /// type and its id, with the attributes its model holds, and the answer says what became of each (ADR-0008).
+    /// </summary>
+    public Task<JsonApiResponse> PostMany(
+        string path,
+        IEnumerable<(string Type, string? Id, object Model)> resources,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var data = new JsonArray(
+            resources.Select(x => (JsonNode?)ResourceData(x.Type, x.Model, x.Id, null)).ToArray()
+        );
+        var document = JsonSerializer.SerializeToElement(new JsonObject { ["data"] = data });
+        return Send(HttpMethod.Post, path, document, cancellationToken);
+    }
+
+    /// <summary>
+    /// Changes the members of a resource that the model holds. <paramref name="meta"/> carries what the change is based on,
+    /// such as the version of a resource that counts its writes.
+    /// </summary>
+    public Task<JsonApiResponse> Patch(
+        string collection,
+        Guid id,
+        object model,
+        JsonObject? meta = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return Send(
+            HttpMethod.Patch,
+            ItemPath(collection, id),
+            ResourceDocument(collection, model, id.ToString(), meta),
+            cancellationToken
+        );
+    }
+
+    /// <summary>
+    /// Changes a resource that is not addressed as <c>collection/{id}</c>: a singleton such as the profile of the caller, or a
+    /// row whose id is text. The path says where it is, and the type and the id say what the document is: a singleton has
+    /// no id, and none is written.
+    /// </summary>
+    public Task<JsonApiResponse> Patch(
+        string path,
+        string type,
+        string? id,
+        object model,
+        JsonObject? meta = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return Send(HttpMethod.Patch, path, ResourceDocument(type, model, id, meta), cancellationToken);
+    }
+
+    /// <summary>Removes a resource of a collection, by its id.</summary>
+    public Task<JsonApiResponse> Delete(string collection, Guid id, CancellationToken cancellationToken = default)
+    {
+        return Send(HttpMethod.Delete, ItemPath(collection, id), null, cancellationToken);
+    }
+
+    /// <summary>Removes what a path addresses, such as the current session, which is not a row of a collection.</summary>
+    public Task<JsonApiResponse> Delete(string path, CancellationToken cancellationToken = default)
+    {
+        return Send(HttpMethod.Delete, path, null, cancellationToken);
+    }
+
+    async Task<JsonApiResponse> Send(
         HttpMethod method,
         string endpoint,
         JsonElement? document = null,
@@ -168,8 +349,69 @@ public class JsonApiClient
             parsed,
             response.Headers.Location?.OriginalString,
             response.IsSuccessStatusCode ? null : ErrorOf(response.StatusCode, parsed),
-            response.Headers.Date
+            response.Headers.Date,
+            HeadersOf(response)
         );
+    }
+
+    static string ItemPath(string collection, Guid id)
+    {
+        return $"{collection}/{id}";
+    }
+
+    /// <summary>
+    /// The document of one resource: its type is the collection, its id is the one given or else the one the model holds,
+    /// and every other member of the model is an attribute. The id is never an attribute, and a null is written as null.
+    /// An id that is empty is not written at all.
+    /// </summary>
+    JsonElement ResourceDocument(string collection, object model, string? id, JsonObject? meta)
+    {
+        return JsonSerializer.SerializeToElement(
+            new JsonObject { ["data"] = ResourceData(collection, model, id, meta) }
+        );
+    }
+
+    /// <summary>One resource of a document, as <see cref="ResourceDocument"/> writes it, without the document around it.</summary>
+    JsonObject ResourceData(string type, object model, string? id, JsonObject? meta)
+    {
+        var attributes = new JsonObject();
+        string? modelId = null;
+        foreach (var member in JsonSerializer.SerializeToElement(model, Json).EnumerateObject())
+        {
+            if (member.Name == "id")
+            {
+                modelId = member.Value.GetString();
+            }
+            else
+            {
+                attributes[member.Name] = JsonNode.Parse(member.Value.GetRawText());
+            }
+        }
+
+        var data = new JsonObject { ["type"] = type };
+        if ((id ?? modelId) is { Length: > 0 } documentId && documentId != Guid.Empty.ToString())
+        {
+            data["id"] = documentId;
+        }
+
+        data["attributes"] = attributes;
+        if (meta != null)
+        {
+            data["meta"] = meta;
+        }
+
+        return data;
+    }
+
+    static IReadOnlyDictionary<string, string> HeadersOf(HttpResponseMessage response)
+    {
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var header in response.Headers.Concat(response.Content.Headers))
+        {
+            headers[header.Key] = string.Join(", ", header.Value);
+        }
+
+        return headers;
     }
 
     Uri BuildUrl(string endpoint)
@@ -221,16 +463,5 @@ public class JsonApiClient
         return element.TryGetProperty(member, out var value) && value.ValueKind == JsonValueKind.String
             ? value.GetString()
             : null;
-    }
-
-    /// <summary>camelCase members and enums as their names, as the Api writes and reads them.</summary>
-    static JsonSerializerOptions CreateOptions(JsonIgnoreCondition ignoreCondition)
-    {
-        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
-        {
-            DefaultIgnoreCondition = ignoreCondition,
-        };
-        options.Converters.Add(new JsonStringEnumConverter());
-        return options;
     }
 }

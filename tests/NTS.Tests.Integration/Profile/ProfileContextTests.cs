@@ -6,6 +6,7 @@ using NoTiming.Ui.Features.Profile;
 using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Profile;
 using NTS.Tests.Integration.Harness;
+using Not.Application.CRUD.Ports;
 
 namespace NTS.Tests.Integration;
 
@@ -145,9 +146,9 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
         model.Country = (await ui.Profile.SearchCountries(iso, CancellationToken.None)).Single();
         model.GivenName = new string('x', 101);
 
-        var refused = await Assert.ThrowsAsync<InvalidOperationException>(() => ui.Profile.Save(model));
+        var refused = await Assert.ThrowsAnyAsync<RepositoryException>(() => ui.Profile.Save(model));
 
-        Assert.Contains("invalid-name", refused.Message);
+        Assert.Equal("invalid-name", refused.Code);
         Assert.Equal("Ana", ui.Profile.Profile!.GivenName);
     }
 
@@ -250,8 +251,8 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
         var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, name: "Ana Petrova");
         var cookie = new JsonApiClients.Cookie(null);
         var json = JsonApiClients.WithCookie(api, cookie, out _);
-        using var account = new AccountSession(json);
-        using var profile = new WitnessProfileContext(account, new CountryApiRepository(json), json);
+        using var account = new AccountSession(new AccountApiRepository(json));
+        using var profile = new WitnessProfileContext(account, new CountryApiRepository(json), new AccountApiRepository(json));
         await profile.Load();
         Assert.Null(profile.Profile); // the app booted as a visitor
 
@@ -281,8 +282,8 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
     static UiOfAPerson Open(ApiFactory api, TenancySeed.Person? person, out JsonApiClients.Requests asked)
     {
         var json = JsonApiClients.Of(api, person, out asked);
-        var account = new AccountSession(json);
-        return new UiOfAPerson(account, new WitnessProfileContext(account, new CountryApiRepository(json), json));
+        var account = new AccountSession(new AccountApiRepository(json));
+        return new UiOfAPerson(account, new WitnessProfileContext(account, new CountryApiRepository(json), new AccountApiRepository(json)));
     }
 
     async Task AddCountryAsync(string name, string iso, string nf, string idStartsWith)

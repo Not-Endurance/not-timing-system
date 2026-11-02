@@ -6,6 +6,7 @@ using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Tests.Integration.Harness;
+using NoTiming.Ui.Storage.REST;
 
 namespace NTS.Tests.Integration;
 
@@ -140,8 +141,8 @@ public sealed class UserSessionHistoryTests : IClassFixture<SharedApiFixture>
     static Tab Open(ApiFactory api, TenancySeed.Person person)
     {
         var json = JsonApiClients.Of(api, person, out _);
-        var account = new AccountSession(json);
-        return new Tab(account, new WitnessUserSessionService(account, json));
+        var account = new AccountSession(new AccountApiRepository(json));
+        return new Tab(account, new WitnessUserSessionService(account, new UserSessionApiRepository(json)));
     }
 
     /// <summary>The first group of the history as the host stores it, the way the Functions API wrote it and the way this host does.</summary>

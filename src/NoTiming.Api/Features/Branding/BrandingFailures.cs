@@ -8,13 +8,6 @@ namespace NoTiming.Api.Features.Branding;
 /// </summary>
 internal static class BrandingFailures
 {
-    public static JsonApiFailure UnsupportedAttribute { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "unsupported-attribute",
-            "Only the left and the right logo can be changed."
-        );
-
     public static JsonApiFailure LogoNamedTwice { get; } =
         new(StatusCodes.Status400BadRequest, "malformed-request", "A logo is named once.");
 

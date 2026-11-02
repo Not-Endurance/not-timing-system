@@ -19,9 +19,9 @@ written for a NoTiming screen is generalised first: the names of NoTiming come o
 | `Not.Application` | Application patterns: CRUD and JSON:API answers, HTTP and RPC helpers, caching, configuration, environments, services. |
 | `Not.Krud` | The CRUD framework: its abstractions, models, graph, services, their registration, and its Blazor side. |
 | `Not.Identity` | Sign-in and identity plumbing: sessions, codes, email senders, the Mongo stores. |
-| `Not.Storage` | Storage adapters: Mongo and REST. |
+| `Not.Storage` | Storage adapters: Mongo. |
 | `Not.Blazor` | Blazor components, dialogs, helpers and navigation. |
-| `Not.Blazor.Client` | Browser-side helpers for the Blazor client. |
+| `Not.Blazor.Client` | Browser-side helpers for the Blazor client, and the JSON:API repositories the Ui reaches the Api through (ADR-0017). |
 | `Not.Test` | Test support any test project can use: the deadline wait, the journey runner, test ids, the repository root. |
 
 A piece of test support that only one NoTiming project needs stays in that project's `Harness` folder (AGENTS.md, rule 7).

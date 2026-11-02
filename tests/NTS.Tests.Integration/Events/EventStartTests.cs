@@ -329,7 +329,7 @@ public sealed class EventStartTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_document_names_the_Setup_it_starts_and_nothing_else_and_the_Setup_has_to_be_there()
+    public async Task The_document_names_the_Setup_it_starts_and_the_Setup_has_to_be_there_and_what_else_it_carries_is_ignored()
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
@@ -366,11 +366,10 @@ public sealed class EventStartTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.BadRequest, notAnId.StatusCode);
         Assert.Equal("invalid-id", await ErrorCodeAsync(notAnId));
         Assert.Equal(HttpStatusCode.NotFound, missing.StatusCode);
-        Assert.Equal(HttpStatusCode.BadRequest, withAttributes.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(withAttributes));
+        Assert.Equal(HttpStatusCode.Created, withAttributes.StatusCode); // a member a start does not take is ignored: the Setup starts
         Assert.Equal(HttpStatusCode.BadRequest, wrongType.StatusCode);
         Assert.Equal("malformed-request", await ErrorCodeAsync(wrongType));
-        Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
+        Assert.NotNull(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id)); // the start that carried members started it
     }
 
     [Fact]

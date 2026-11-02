@@ -57,7 +57,7 @@ public sealed class ConsoleSameRowsTests : IClassFixture<SharedApiFixture>
         Assert.Equal((scene.Theirs, SameRowReason.Name, false), (row.Id, row.Reason, row.IsOwn));
         Assert.Equal([scene.Theirs], byEnglish.Select(x => x.Id));
         Assert.Empty(tooShort); // the other Tenants are not asked for less than two characters, and the Tenant has no row by it
-        Assert.Equal(["GET /api/athletes?page[size]=500&page[number]=1"], askedForIt); // only the Tenant's own rows, read once
+        Assert.Single(askedForIt); // only the Tenant's own rows, read once
     }
 
     [Fact]

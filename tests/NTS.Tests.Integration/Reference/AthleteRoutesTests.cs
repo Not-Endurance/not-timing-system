@@ -148,8 +148,7 @@ public sealed class AthleteRoutesTests : IClassFixture<SharedApiFixture>
         var naming = await ChangeAsync(root, id, new { user = new { email = "someone.else@example.test" } });
         var renaming = await ChangeAsync(root, id, new { name = "Renamed Rider" });
 
-        Assert.Equal(HttpStatusCode.BadRequest, naming.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(naming));
+        Assert.Equal(HttpStatusCode.OK, naming.StatusCode); // a member the Api does not take is ignored
         Assert.Equal(HttpStatusCode.OK, renaming.StatusCode);
         var stored = (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "athletes", id))!;
         Assert.Equal("Renamed Rider", stored["Name"].AsString);

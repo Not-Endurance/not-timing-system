@@ -1,6 +1,6 @@
 using Not.Application.DomainEvents;
 using Not.Application.HTTP;
-using Not.Storage.REST;
+using Not.Blazor.Client.REST;
 using NTS.Contracts.Setup;
 using NTS.Contracts.Setup.Models;
 using NTS.Domain.Setup.Aggregates;
@@ -18,20 +18,22 @@ public class ConfigureEventApiRepository : JsonApiRepository<ConfigureEvent, Con
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
     public ConfigureEventApiRepository(JsonApiClient client, IDomainEventDispatcher domainEventDispatcher)
-        : base("configure-events", client, "mainOperatorId")
+        : base("configure-events", client)
     {
         _domainEventDispatcher = domainEventDispatcher;
     }
 
-    protected override async Task<bool> UpdateCore(ConfigureEvent item)
+    /// <summary>Makes a Setup with what it holds, in the Tenant the caller acts in. The Api answers with the id it made.</summary>
+    public async Task<Guid> Make(ConfigureEventDraft draft)
     {
-        var updated = await base.UpdateCore(item);
-        if (updated)
-        {
-            await DispatchUpdated(item);
-        }
+        var response = await Taken(Client.Post(Collection, draft));
+        return Guid.Parse(ResourceOf(response).GetProperty("id").GetString()!);
+    }
 
-        return updated;
+    public override async Task Update(ConfigureEvent item)
+    {
+        await base.Update(item);
+        await DispatchUpdated(item);
     }
 
     Task DispatchUpdated(ConfigureEvent item)
@@ -43,4 +45,12 @@ public class ConfigureEventApiRepository : JsonApiRepository<ConfigureEvent, Con
 
         return _domainEventDispatcher.Dispatch(new ConfigureEventUpdated(item.Id));
     }
+}
+
+/// <summary>What a Setup is made with: its name, its location and the FEI show id, when it has one. The Api makes the rest.</summary>
+public class ConfigureEventDraft
+{
+    public string Name { get; set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
+    public string? FeiShowId { get; set; }
 }

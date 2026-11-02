@@ -259,8 +259,9 @@ public sealed class EventAccessTests : IClassFixture<MongoFixture>
             attributes
         );
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(response));
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode); // a member the Api does not take is ignored
+        var id = Guid.Parse((await ApiSessions.ReadJsonAsync(response)).GetProperty("data").GetProperty("id").GetString()!);
+        Assert.Equal(tenant, (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!["TenantId"].AsString);
     }
 
     [Fact]
@@ -361,15 +362,6 @@ public sealed class EventAccessTests : IClassFixture<MongoFixture>
         var colleague = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, null);
 
-        var extra = await AssignAsync(
-            root,
-            new
-            {
-                eventId = id,
-                accountId = colleague.Id,
-                tenantId = "anything",
-            }
-        );
         var nobody = await AssignAsync(root, new { eventId = id });
         var both = await AssignAsync(
             root,
@@ -384,8 +376,6 @@ public sealed class EventAccessTests : IClassFixture<MongoFixture>
         var notAnAccount = await AssignAsync(root, new { eventId = id, accountId = "not-a-guid" });
         var noEvent = await AssignAsync(root, new { eventId = "not-a-guid", accountId = colleague.Id });
 
-        Assert.Equal(HttpStatusCode.BadRequest, extra.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(extra));
         Assert.Equal(HttpStatusCode.BadRequest, nobody.StatusCode);
         Assert.Equal("malformed-request", await ErrorCodeAsync(nobody));
         Assert.Equal(HttpStatusCode.BadRequest, both.StatusCode);
@@ -396,6 +386,10 @@ public sealed class EventAccessTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.BadRequest, noEvent.StatusCode);
         Assert.Equal("invalid-event", await ErrorCodeAsync(noEvent));
         Assert.Empty(await GrantsOfAsync(id));
+
+        var extra = await AssignAsync(root, new { eventId = id, accountId = colleague.Id, tenantId = "anything" });
+        Assert.Equal(HttpStatusCode.Created, extra.StatusCode); // a member the Api does not take is ignored: the grant is the Event's
+        Assert.Single(await GrantsOfAsync(id));
     }
 
     [Fact]

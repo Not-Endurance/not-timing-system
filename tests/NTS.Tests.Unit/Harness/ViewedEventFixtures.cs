@@ -14,6 +14,7 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using Country = NTS.Domain.Aggregates.Country;
+using NTS.Contracts.Access.Models;
 
 namespace NTS.Tests.Unit.Harness;
 
@@ -168,6 +169,16 @@ internal sealed class EventsOf : ReadOnlyRepository<EventInformation>, IEventInf
     }
 
     public Task<EventInformation> Start(Guid configureEventId)
+    {
+        throw new NotSupportedException("The views read Events only.");
+    }
+
+    public Task<EventCapabilitiesModel> CapabilitiesOf(Guid eventId)
+    {
+        return Task.FromResult(new EventCapabilitiesModel());
+    }
+
+    public Task Remove(Guid eventId)
     {
         throw new NotSupportedException("The views read Events only.");
     }

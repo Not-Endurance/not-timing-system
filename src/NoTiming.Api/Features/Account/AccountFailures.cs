@@ -42,13 +42,6 @@ internal static class AccountFailures
             "An account selects only a Tenant it is a member of."
         );
 
-    public static JsonApiFailure MeUnsupportedAttribute { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "unsupported-attribute",
-            "Only the selected Tenant of an account can be changed."
-        );
-
     public static JsonApiFailure MeMalformedRequest { get; } =
         new(
             StatusCodes.Status400BadRequest,

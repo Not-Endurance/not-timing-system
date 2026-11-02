@@ -195,7 +195,7 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
     [InlineData("isLive")]
     [InlineData("id")]
     [InlineData("nothing")]
-    public async Task What_the_server_owns_or_keeps_or_the_Event_has_not_is_not_taken_and_nothing_changes(string member)
+    public async Task What_the_server_owns_or_keeps_or_the_Event_has_not_is_ignored_and_the_rest_of_the_change_is_taken(string member)
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
@@ -210,8 +210,8 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
             new Dictionary<string, object> { [member] = "x", ["name"] = "Changed" }
         );
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(response));
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode); // a member the Api does not take is ignored; the name is taken
+        before["Name"] = "Changed";
         Assert.Equal(before, await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
     }
 

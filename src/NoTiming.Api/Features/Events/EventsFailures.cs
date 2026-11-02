@@ -54,29 +54,8 @@ internal static class EventsFailures
             "An FEI show ID is at most 20 characters of one line."
         );
 
-    public static JsonApiFailure EventStartUnsupportedAttribute { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "unsupported-attribute",
-            "An Event is started from its Setup and takes nothing else."
-        );
-
     public static JsonApiFailure AccountNotFound { get; } =
         new(StatusCodes.Status422UnprocessableEntity, "account-not-found", "There is no such account.");
-
-    public static JsonApiFailure EventGrantUnsupportedAttribute { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "unsupported-attribute",
-            "A grant names an Event, a kind, a role for an Official, and a person by an email or an account."
-        );
-
-    public static JsonApiFailure ConsoleOperatorUnsupportedAttribute { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "unsupported-attribute",
-            "A Console Operator names an Event and a person by an email or an account."
-        );
 
     public static JsonApiFailure PersonNotNamedOnce { get; } =
         new(

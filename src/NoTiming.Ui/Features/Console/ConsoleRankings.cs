@@ -1,3 +1,4 @@
+using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Krud.Abstractions;
@@ -50,8 +51,16 @@ public class ConsoleRankings : IConsoleRankings, IKrudFormService<CustomRankingM
 
     async Task Write(IViewedEvent view, Func<Task> write)
     {
-        await write();
-        var refused = _writes.LastError;
+        RepositoryException? refused = null;
+        try
+        {
+            await write();
+        }
+        catch (RepositoryException error)
+        {
+            refused = error;
+        }
+
         await view.Refresh();
         if (refused != null)
         {

@@ -5,6 +5,7 @@ using NoTiming.Ui.Features.Account;
 using NoTiming.Ui.Features.Console;
 using NTS.Tests.Integration.Harness;
 using static NTS.Tests.Integration.Harness.TenancySeed;
+using NoTiming.Ui.Storage.REST;
 
 namespace NTS.Tests.Integration;
 
@@ -105,8 +106,8 @@ public sealed class ConsoleTenantTests : IClassFixture<SharedApiFixture>
         var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
         var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var json = JsonApiClients.Of(api, root, out var requests);
-        var account = new AccountSession(json);
-        using var console = new Opened(account, new ConsoleTenant(account, json));
+        var account = new AccountSession(new AccountApiRepository(json));
+        using var console = new Opened(account, new ConsoleTenant(account, new TenantApiRepository(json)));
         await console.Tenant.Load();
         var before = (console.Tenant.TenantId, console.Tenant.CanEdit);
         requests.Answer = request =>
@@ -154,8 +155,8 @@ public sealed class ConsoleTenantTests : IClassFixture<SharedApiFixture>
     static Opened Open(ApiFactory api, Person person)
     {
         var json = JsonApiClients.Of(api, person, out _);
-        var account = new AccountSession(json);
-        return new Opened(account, new ConsoleTenant(account, json));
+        var account = new AccountSession(new AccountApiRepository(json));
+        return new Opened(account, new ConsoleTenant(account, new TenantApiRepository(json)));
     }
 
     sealed class Opened : IDisposable

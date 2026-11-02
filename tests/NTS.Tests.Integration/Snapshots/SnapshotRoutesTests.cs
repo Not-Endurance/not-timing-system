@@ -179,10 +179,10 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
             id: Guid.NewGuid().ToString()
         );
 
-        Assert.Equal(HttpStatusCode.BadRequest, stamped.StatusCode);
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(stamped));
-        Assert.Empty(EventsOf(await StoredAsync(scene.One), 0));
-        Assert.Empty(scene.Changes.Announced);
+        Assert.Equal(HttpStatusCode.Created, stamped.StatusCode); // what the client stamps is ignored: the Official records the time
+        var recorded = EventsOf(await StoredAsync(scene.One), 0).Single();
+        Assert.Equal(scene.Official.Id, recorded["ActorId"].AsGuid);
+        Assert.Single(scene.Changes.Announced);
     }
 
     [Fact]
@@ -899,7 +899,7 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task An_Update_is_refused_when_it_names_anything_but_the_time()
+    public async Task An_Update_takes_the_time_and_ignores_what_else_it_names()
     {
         await using var scene = await SceneAsync();
         var sent = Guid.NewGuid();
@@ -925,11 +925,13 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
             id: Guid.NewGuid().ToString()
         );
 
-        Assert.Equal("unsupported-attribute", await ErrorCodeAsync(named));
+        Assert.Equal(HttpStatusCode.OK, named.StatusCode); // the number is not the Update's to name: it is ignored, and the time is taken
         Assert.Equal("invalid-snapshot", await ErrorCodeAsync(without));
         Assert.Equal(HttpStatusCode.Conflict, mismatch.StatusCode);
         Assert.Equal("id-mismatch", await ErrorCodeAsync(mismatch));
-        Assert.Single(EventsOf(await StoredAsync(scene.One), 0));
+        var events = EventsOf(await StoredAsync(scene.One), 0);
+        Assert.Equal(2, events.Count); // the Arrive and the Update of it, which is a time event of its own
+        Assert.Equal("ArriveUpdated", events[1]["Kind"].AsString);
     }
 
     async Task<Scene> SceneAsync(FakeTimeProvider? time = null)

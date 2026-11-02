@@ -1,3 +1,4 @@
+using Not.Domain.Abstractions;
 using NTS.Domain.Enums;
 
 namespace NTS.Domain.Access;
@@ -16,7 +17,7 @@ public enum GrantKind
 /// the grant is theirs at once; when it has none it is a pending invitation that attaches to the account that
 /// registers with that email, and gives nothing until then. A grant never moves from one account to another.
 /// </summary>
-public sealed record EventGrant
+public sealed record EventGrant : IEntity
 {
     public static EventGrant ForConsoleOperator(
         Guid id,

@@ -6,7 +6,7 @@ using NTS.Domain.Enums;
 
 namespace NoTiming.Api.Features.Snapshots;
 
-/// <summary>What a device says about a Snapshot it sends: where it was captured and when. A member that is not one of these is kept, to be refused.</summary>
+/// <summary>What a device says about a Snapshot it sends: where it was captured and when. A member that is not one of these is ignored (ADR-0017).</summary>
 internal sealed class SnapshotAttributes : IResourceAttributes, INamesEvent
 {
     public static string? ResourceType => SnapshotDocuments.TYPE;
@@ -20,16 +20,13 @@ internal sealed class SnapshotAttributes : IResourceAttributes, INamesEvent
     public string? Kind { get; set; }
     public DateTimeOffset? Time { get; set; }
 
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Others { get; set; }
-
     public JsonApiFailure? Invalid()
     {
         return SnapshotRequest.Problem(this);
     }
 }
 
-/// <summary>What an Official says in an Update of a Snapshot they sent: the time it should have had. A member that is not that is kept, to be refused.</summary>
+/// <summary>What an Official says in an Update of a Snapshot they sent: the time it should have had. A member that is not that is ignored (ADR-0017).</summary>
 internal sealed class SnapshotUpdateAttributes : IResourceAttributes
 {
     public static string? ResourceType => SnapshotDocuments.TYPE;
@@ -38,16 +35,8 @@ internal sealed class SnapshotUpdateAttributes : IResourceAttributes
 
     public DateTimeOffset? Time { get; set; }
 
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Others { get; set; }
-
     public JsonApiFailure? Invalid()
     {
-        if (SnapshotRequest.Unsupported(Others) is { } unsupported)
-        {
-            return unsupported;
-        }
-
         return Time is null
             ? SnapshotRequest.Invalid("Say the time the Snapshot should have had: an instant with its offset.")
             : null;
@@ -94,11 +83,6 @@ internal sealed class SnapshotRequest
     /// <summary>What is wrong with the members of a Snapshot, none when they are valid.</summary>
     public static JsonApiFailure? Problem(SnapshotAttributes attributes)
     {
-        if (Unsupported(attributes.Others) is { } unsupported)
-        {
-            return unsupported;
-        }
-
         if (!Guid.TryParse(attributes.EventId, out var eventId) || eventId == Guid.Empty)
         {
             return SnapshotFailures.EventRequired;
@@ -116,14 +100,6 @@ internal sealed class SnapshotRequest
 
         return attributes.Time is null
             ? Invalid("Say the time the Snapshot was captured: an instant with its offset.")
-            : null;
-    }
-
-    /// <summary>The refusal of a member that is not one of the resource's, none when there is none.</summary>
-    public static JsonApiFailure? Unsupported(Dictionary<string, JsonElement>? others)
-    {
-        return others is { Count: > 0 }
-            ? JsonApiFailures.UnsupportedAttribute.With(string.Join(", ", others.Keys))
             : null;
     }
 

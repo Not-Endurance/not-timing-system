@@ -1,8 +1,8 @@
-using System.Text.Json;
 using MediatR;
 using Not.Application.HTTP;
 using Not.Injection;
 using NoTiming.Ui.Features.Account;
+using NoTiming.Ui.Features.Core.Events;
 using NTS.Contracts.Features.Access;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Socket;
@@ -24,14 +24,18 @@ public class WitnessAccessContext
         IScoped
 {
     readonly INtsSocketContext _socketContext;
-    readonly JsonApiClient _api;
+    readonly IEventInformationRepository _events;
     (Guid Person, Guid? Event, bool CanSend)? _said;
 
-    public WitnessAccessContext(INtsSocketContext socketContext, IAccountSession account, JsonApiClient api)
+    public WitnessAccessContext(
+        INtsSocketContext socketContext,
+        IAccountSession account,
+        IEventInformationRepository events
+    )
         : base(account)
     {
         _socketContext = socketContext;
-        _api = api;
+        _events = events;
     }
 
     public bool IsKnown { get; private set; }
@@ -103,14 +107,13 @@ public class WitnessAccessContext
     /// </summary>
     async Task<bool> MaySendTo(Guid eventId)
     {
-        var response = await _api.Send(HttpMethod.Get, $"events/{eventId}/capabilities");
-        if ((int)response.Status >= 500)
+        try
         {
-            throw response.ToException();
+            return (await _events.CapabilitiesOf(eventId)).CanSnapshot;
         }
-
-        return response is { IsSuccess: true, Document: { } document }
-            && document.GetProperty("data").GetProperty("attributes").TryGetProperty("canSnapshot", out var can)
-            && can.ValueKind == JsonValueKind.True;
+        catch (JsonApiException refused) when ((int)refused.Response.Status < 500)
+        {
+            return false; // what the Api refuses, it does not let the caller send
+        }
     }
 }

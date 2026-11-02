@@ -15,13 +15,6 @@ internal static class TenancyFailures
             $"Search with a word of at least {NameSearch.MIN_WORD_LENGTH} characters."
         );
 
-    public static JsonApiFailure UnsupportedAttribute { get; } =
-        new(
-            StatusCodes.Status400BadRequest,
-            "unsupported-attribute",
-            "Only the rules of the Regional competitions of a Tenant can be changed."
-        );
-
     public static JsonApiFailure InvalidRules { get; } =
         new(
             StatusCodes.Status400BadRequest,

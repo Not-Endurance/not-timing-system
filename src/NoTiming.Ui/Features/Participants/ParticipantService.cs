@@ -1,9 +1,11 @@
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Injection;
-using Not.Storage.REST;
+using Not.Blazor.Client.REST;
 using NTS.Contracts.Features.Participants;
 using NTS.Domain.Core.Aggregates;
+using NoTiming.Ui.Storage.REST;
+using NoTiming.Ui.Storage.Core.Repositories;
 
 namespace NoTiming.Ui.Features.Participants;
 
@@ -33,10 +35,10 @@ public interface IParticipationHistory
     Task<IReadOnlyList<ParticipantName>> HorsesRiddenBy(Guid athleteId, CancellationToken ct);
 
     /// <summary>
-    /// A Participation with its Phases, as the Results show it: none when it is not there, and a read that failed says so, which
-    /// is not the same: the person has been told by then, and the Participation may still be there.
+    /// A Participation with its Phases, as the Results show it: none when it is not there. A read that did not come is a
+    /// <c>RepositoryException</c>, and the Participation may still be there.
     /// </summary>
-    Task<RowRead<Participation>> ParticipationOf(Guid id);
+    Task<Participation?> ParticipationOf(Guid id);
 }
 
 public class ParticipantService : IParticipantSearch, IParticipationHistory, IScoped
@@ -59,14 +61,21 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
         return WordsOf(text).Any(x => x.Length >= MIN_CHARACTERS);
     }
 
-    readonly JsonApiClient _api;
-    readonly IRepository<Participation> _participations;
+    readonly ParticipationApiRepository _participations;
+    readonly AthleteApiRepository _athletes;
+    readonly HorseApiRepository _horses;
     readonly ParticipantSearchMemory _searched;
 
-    public ParticipantService(JsonApiClient api, IRepository<Participation> participations, TimeProvider time)
+    public ParticipantService(
+        ParticipationApiRepository participations,
+        AthleteApiRepository athletes,
+        HorseApiRepository horses,
+        TimeProvider time
+    )
     {
-        _api = api;
         _participations = participations;
+        _athletes = athletes;
+        _horses = horses;
         _searched = new ParticipantSearchMemory(time);
     }
 
@@ -96,23 +105,8 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
     )
     {
         var member = kind == ParticipantKind.Athlete ? "athleteId" : "horseId";
-        var query = string.Join(
-            '&',
-            $"filter={Uri.EscapeDataString($"{member} eq {id}")}",
-            $"{Uri.EscapeDataString("page[size]")}={size}",
-            $"{Uri.EscapeDataString("page[number]")}={number}"
-        );
-        var response = await _api.Send(HttpMethod.Get, $"participations/history?{query}", cancellationToken: ct);
-        if (!response.IsSuccess)
-        {
-            throw response.ToException();
-        }
-
-        var document = response.Document!.Value;
-        return new ParticipationHistoryPage(
-            [.. document.GetProperty("data").EnumerateArray().Select(ParticipantJson.ParticipationOf)],
-            response.HasNextPage
-        );
+        var (rows, hasNext) = await _participations.HistoryOf(member, id, size, number, ct);
+        return new ParticipationHistoryPage([.. rows.Select(ParticipantJson.ParticipationOf)], hasNext);
     }
 
     public async Task<IReadOnlyList<ParticipantName>> HorsesRiddenBy(Guid athleteId, CancellationToken ct)
@@ -136,11 +130,9 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
         }
     }
 
-    public async Task<RowRead<Participation>> ParticipationOf(Guid id)
+    public async Task<Participation?> ParticipationOf(Guid id)
     {
-        return _participations is IRowReader<Participation> reader
-            ? await reader.Find(id)
-            : new RowRead<Participation>(await _participations.Read(id), failed: false);
+        return await _participations.Read(id);
     }
 
     async Task<ParticipantSearchAnswer> Ask(
@@ -150,25 +142,17 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
         CancellationToken ct
     )
     {
-        var query = string.Join(
-            '&',
-            $"filter={Uri.EscapeDataString($"contains(name,'{string.Join(' ', words).Replace("'", "''")}')")}",
-            "sort=name",
-            $"{Uri.EscapeDataString("page[size]")}={SEARCH_PAGE_SIZE}",
-            $"{Uri.EscapeDataString("page[number]")}={number}"
+        var query = new ListQuery(
+            filter: $"contains(name,'{string.Join(' ', words).Replace("'", "''")}')",
+            sort: "name",
+            pageSize: SEARCH_PAGE_SIZE,
+            pageNumber: number
         );
-        var registry = kind == ParticipantKind.Athlete ? "athletes" : "horses";
-        var response = await _api.Send(HttpMethod.Get, $"{registry}/all-tenants?{query}", cancellationToken: ct);
-        if (!response.IsSuccess)
-        {
-            throw response.ToException();
-        }
-
-        var document = response.Document!.Value;
-        var answer = new ParticipantSearchAnswer(
-            [.. document.GetProperty("data").EnumerateArray().Select(x => ParticipantJson.FoundOf(kind, x))],
-            response.HasNextPage
-        );
+        var (rows, hasNext) =
+            kind == ParticipantKind.Athlete
+                ? await _athletes.SearchAllTenants(query, ct)
+                : await _horses.SearchAllTenants(query, ct);
+        var answer = new ParticipantSearchAnswer([.. rows.Select(x => ParticipantJson.FoundOf(kind, x))], hasNext);
         _searched.Remember(kind, words, number, answer);
         return answer;
     }

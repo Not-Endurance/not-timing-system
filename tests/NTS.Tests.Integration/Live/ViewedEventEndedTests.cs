@@ -283,8 +283,8 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
             var store = new ParticipationStore(
                 new ParticipationEventScopedApiRepository(json, new EventScopeFactory<Participation>(selected))
             );
-            var account = new AccountSession(json);
-            var sessions = new WitnessUserSessionService(account, json);
+            var account = new AccountSession(new AccountApiRepository(json));
+            var sessions = new WitnessUserSessionService(account, new UserSessionApiRepository(json));
             await sessions.SetEventId(scene.EventId);
             var service = new SnapshotService(
                 selected,
@@ -337,8 +337,8 @@ public sealed class ViewedEventEndedTests : IClassFixture<MongoFixture>
             var dashboard = new ConsoleDashboard(
                 store,
                 new ConsoleParticipationWrites(json),
-                new ServerClock(json, TimeProvider.System),
-                new AccountSession(json),
+                new ServerClock(new AccountApiRepository(json), TimeProvider.System),
+                new AccountSession(new AccountApiRepository(json)),
                 new SnapshotApiPublisher(json)
             );
             await dashboard.Show(view);

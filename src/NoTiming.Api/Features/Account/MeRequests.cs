@@ -22,11 +22,6 @@ internal sealed class SelectionChange : MemberAttributes, IResourceAttributes
 
     public override JsonApiFailure? Invalid()
     {
-        if ((Members ?? []).Keys.Any(x => !string.Equals(x, SELECTED_TENANT_ID, StringComparison.OrdinalIgnoreCase)))
-        {
-            return AccountFailures.MeUnsupportedAttribute.With(SELECTED_TENANT_ID);
-        }
-
         return Choice is { ValueKind: not (JsonValueKind.Null or JsonValueKind.String) }
             ? AccountFailures.MeMalformedRequest
             : null;

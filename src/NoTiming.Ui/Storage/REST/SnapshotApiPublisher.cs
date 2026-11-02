@@ -47,20 +47,13 @@ public sealed class SnapshotApiPublisher : ISnapshotPublisher, IScoped
         CancellationToken cancellationToken = default
     )
     {
-        var document = JsonSerializer.SerializeToElement(
-            new
-            {
-                data = new
-                {
-                    type = "snapshots",
-                    id = snapshotId.ToString(),
-                    attributes = new { time },
-                },
-            },
-            JsonApiClient.WriteOptions
+        var response = await _client.Patch(
+            $"snapshots/{snapshotId}",
+            "snapshots",
+            snapshotId.ToString(),
+            new { time },
+            cancellationToken: cancellationToken
         );
-
-        var response = await _client.Send(HttpMethod.Patch, $"snapshots/{snapshotId}", document, cancellationToken);
         return ReceiptOf(snapshotId, (int)response.Status, response.Document, response.Error);
     }
 
@@ -71,26 +64,23 @@ public sealed class SnapshotApiPublisher : ISnapshotPublisher, IScoped
         CancellationToken cancellationToken
     )
     {
-        var document = JsonSerializer.SerializeToElement(
-            new
-            {
-                data = snapshots.Select(x => new
-                {
-                    type = "snapshots",
-                    id = group.IdOf(x).ToString(),
-                    attributes = new
+        var response = await _client.PostMany(
+            "snapshots/actions/send-group",
+            snapshots.Select(x =>
+                (
+                    Type: "snapshots",
+                    Id: (string?)group.IdOf(x).ToString(),
+                    Model: (object)new
                     {
                         eventId,
                         number = x.Number,
                         kind = group.Type,
                         time = x.Timestamp!.ToDateTimeOffset(),
-                    },
-                }),
-            },
-            JsonApiClient.WriteOptions
+                    }
+                )
+            ),
+            cancellationToken
         );
-
-        var response = await _client.Send(HttpMethod.Post, "snapshots/actions/send-group", document, cancellationToken);
         if (!response.IsSuccess)
         {
             // The request itself was refused (not signed in, a body that is not a group): none of its Snapshots was recorded.
@@ -113,7 +103,7 @@ public sealed class SnapshotApiPublisher : ISnapshotPublisher, IScoped
     }
 
     /// <summary>The answer for one entry of a group: its status, and its resource or its error, as the entry would have had alone.</summary>
-    static SnapshotReceipt ReceiptOfResult(Guid id, JsonElement result)
+    SnapshotReceipt ReceiptOfResult(Guid id, JsonElement result)
     {
         var status = result.TryGetProperty("status", out var said) && said.TryGetInt32(out var number) ? number : 0;
         if (result.TryGetProperty("data", out var data))
@@ -132,17 +122,17 @@ public sealed class SnapshotApiPublisher : ISnapshotPublisher, IScoped
         );
     }
 
-    static SnapshotReceipt ReceiptOf(Guid id, int status, JsonElement? document, JsonApiError? error)
+    SnapshotReceipt ReceiptOf(Guid id, int status, JsonElement? document, JsonApiError? error)
     {
         return error != null || document is not { } body || !body.TryGetProperty("data", out var data)
             ? Failed(id, status, error)
             : Recorded(id, status, data);
     }
 
-    static SnapshotReceipt Recorded(Guid id, int status, JsonElement data)
+    SnapshotReceipt Recorded(Guid id, int status, JsonElement data)
     {
         var recorded = data.TryGetProperty("attributes", out var attributes)
-            ? attributes.Deserialize<RecordedSnapshot>(JsonApiClient.Options)
+            ? attributes.Deserialize<RecordedSnapshot>(_client.Json)
             : null;
         return recorded != null
             ? SnapshotReceipt.Recorded(id, status, recorded)

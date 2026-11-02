@@ -295,7 +295,10 @@ public sealed class PasskeyEndpointTests : IClassFixture<MongoFixture>
             configureServices: services =>
             {
                 services.RemoveAll<IEmailSender>();
-                services.AddSingleton<IEmailSender, OutboxThatCannotSendPasskeyMail>();
+                services.RemoveAll<IEmailOutbox>();
+                services.AddSingleton<OutboxThatCannotSendPasskeyMail>();
+                services.AddSingleton<IEmailSender>(p => p.GetRequiredService<OutboxThatCannotSendPasskeyMail>());
+                services.AddSingleton<IEmailOutbox>(p => p.GetRequiredService<OutboxThatCannotSendPasskeyMail>());
             }
         );
         var page = await SignedInAsAsync(api, UserSeed.NewEmail("mailfails"));

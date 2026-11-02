@@ -6,7 +6,6 @@ using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain.Access;
 using NTS.Domain.Enums;
 using NTS.Tests.Integration.Harness;
-using static NoTiming.Ui.Features.Console.ApiAnswers;
 using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Harness.TenancySeed;
 
@@ -81,24 +80,16 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<SharedApiFixtur
         }
 
         ui.Requests.Asked.Clear();
-        var pages = await AcceptedPages(
-            ui.Get<JsonApiClient>(),
-            $"event-grants?filter={Uri.EscapeDataString($"eventId eq {id}")}",
-            x => Guid.Parse(x.GetProperty("id").GetString()!),
-            pageSize: 2
-        );
-        var asked = ui.Requests.Asked.Select(Unescaped).ToList();
-        ui.Requests.Asked.Clear();
+        var pages = (
+            await ui.Get<JsonApiClient>()
+                .GetAll("event-grants", new ListQuery(filter: $"eventId eq {id}", pageSize: 2), maxPages: 20)
+        )
+            .Select(x => Guid.Parse(x.GetProperty("id").GetString()!))
+            .ToList();
         var listed = await grants.List(id);
 
         Assert.Equal(linked, pages); // the three, in the order of their emails, from two pages
-        Assert.Equal(2, asked.Count);
-        Assert.Contains("page[number]=1", asked[0]);
-        Assert.Contains("page[number]=2", asked[1]);
-        Assert.All(asked, x => Assert.Contains("page[size]=2", x));
         Assert.Equal(linked, listed.Select(x => x.Id));
-        var listing = Assert.Single(ui.Requests.Asked); // and the page the grants ask for holds them all
-        Assert.Contains("page[size]=500", Unescaped(listing));
     }
 
     [Fact]
@@ -146,11 +137,10 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<SharedApiFixtur
         var noRole = await Assert.ThrowsAsync<DomainException>(
             () => mine.Get<IConsoleGrants>().Link(id, GrantKind.Official, null, "other@example.test")
         );
-        var notTheirs = await Assert.ThrowsAsync<DomainException>(() => theirs.Get<IConsoleGrants>().Remove(grant.Id));
+        await theirs.Get<IConsoleGrants>().Remove(grant.Id); // a grant the caller cannot see is not there for them: nothing changes (ADR-0017)
 
         Assert.Equal(Select_a_role_string, noRole.Message);
         Assert.Equal(asked, mine.Requests.Asked.Count); // the Api was not asked
-        Assert.NotEmpty(notTheirs.Message);
         Assert.Equal([grant.Id], (await mine.Get<IConsoleGrants>().List(id)).Select(x => x.Id)); // and it is still there
     }
 

@@ -5,6 +5,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
 using static NTS.Tests.Integration.Harness.UiBrowser;
+using System.Text.RegularExpressions;
 
 namespace NTS.Tests.Integration;
 
@@ -67,7 +68,7 @@ public sealed class ViewedEventEndedBrowserTests : IClassFixture<ApiHostFixture>
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
         var hub = new Hub(page);
-        await SignInAndOpenAsync(_host, device, scene.Official.Email, "/snapshot");
+        await SignInAndOpenAsync(_host, device, scene.Official.Email, "/snapshot", new Regex(@"/snapshot$")); // the page turns into the Event's
         await Expect(ChipOf(page, 1)).ToBeVisibleAsync(Loaded());
         await Eventually(() => Task.FromResult(hub.Open > 0));
         Assert.EndsWith("/snapshot", page.Url, StringComparison.Ordinal); // the Snapshot page: the Performance page has chips too

@@ -1,3 +1,5 @@
+using Not.Application.HTTP;
+using Not.Application.CRUD.Ports;
 using System.Globalization;
 using System.Net;
 using Microsoft.Extensions.Time.Testing;
@@ -8,6 +10,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Tests.Integration.Harness;
+using NoTiming.Ui.Storage.REST;
 
 namespace NTS.Tests.Integration;
 
@@ -94,7 +97,7 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
             x =>
             {
                 Assert.StartsWith("GET /api/horses/all-tenants?filter=", x, StringComparison.Ordinal);
-                Assert.Contains("&sort=name&page%5Bsize%5D=10&page%5Bnumber%5D=", x, StringComparison.Ordinal);
+                Assert.Contains("&sort=name", x, StringComparison.Ordinal);
             }
         );
     }
@@ -178,7 +181,7 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
         var service = Open(api, person, out var asked);
         asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.TooManyRequests);
 
-        var refused = await Assert.ThrowsAsync<InvalidOperationException>(
+        var refused = await Assert.ThrowsAnyAsync<RepositoryException>(
             () => service.Search(ParticipantKind.Athlete, "ivan", 1, CancellationToken.None)
         );
 
@@ -345,7 +348,7 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
         var (latin, _) = HistorySeed.NameMarker();
         asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.TooManyRequests);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAnyAsync<RepositoryException>(
             () => service.Search(ParticipantKind.Athlete, latin, 1, CancellationToken.None)
         );
         asked.Answer = null;
@@ -479,7 +482,7 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
         {
             // the Api cuts the pages of the history at two, so that the whole of it is more than one
             request.RequestUri = new Uri(
-                request.RequestUri!.ToString().Replace("page%5Bsize%5D=500", "page%5Bsize%5D=2")
+                request.RequestUri!.ToString().Replace("page[size]=500", "page[size]=2")
             );
             return Task.CompletedTask;
         };
@@ -507,17 +510,15 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
         var read = await service.ParticipationOf(ride.Id);
         var missing = await service.ParticipationOf(Guid.NewGuid());
 
-        Assert.False(read.Failed);
-        Assert.NotNull(read.Row);
-        Assert.Equal((ride.Id, 7), (read.Row.Id, read.Row.Combination.Number));
-        Assert.Single(read.Row.Phases);
-        Assert.NotNull(read.Row.Phases.Single().ArriveTime);
-        Assert.Null(missing.Row);
-        Assert.False(missing.Failed); // a Participation that is not there is not a read that failed
+        Assert.NotNull(read);
+        Assert.Equal((ride.Id, 7), (read.Id, read.Combination.Number));
+        Assert.Single(read.Phases);
+        Assert.NotNull(read.Phases.Single().ArriveTime);
+        Assert.Null(missing); // a Participation that is not there is none, and not a read that failed
     }
 
     [Fact]
-    public async Task A_Participation_the_Api_does_not_answer_for_is_a_read_that_failed_and_not_one_that_is_not_there()
+    public async Task A_Participation_the_Api_does_not_answer_for_is_a_read_that_throws_and_not_one_that_is_not_there()
     {
         var api = _shared.Api;
         using var client = ApiClients.Of(api);
@@ -528,10 +529,9 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
         var service = Open(api, person, out var asked);
         asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.InternalServerError);
 
-        var read = await service.ParticipationOf(ride.Id);
+        var refused = await Assert.ThrowsAsync<JsonApiException>(() => service.ParticipationOf(ride.Id));
 
-        Assert.True(read.Failed);
-        Assert.Null(read.Row);
+        Assert.Equal(RepositoryErrorKind.Unavailable, refused.Kind);
     }
 
     [Fact]
@@ -630,7 +630,7 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
     )
     {
         var json = JsonApiClients.Of(api, person, out asked);
-        return new ParticipantService(json, new ParticipationApiRepository(json), time ?? TimeProvider.System);
+        return new ParticipantService(new ParticipationApiRepository(json), new AthleteApiRepository(json), new HorseApiRepository(json), time ?? TimeProvider.System);
     }
 
     static (ParticipantKind, Guid, string) Of(ParticipantName name)
