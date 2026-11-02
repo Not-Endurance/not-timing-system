@@ -16,8 +16,8 @@ using NTS.Contracts;
 using NTS.Contracts.Pdf;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Localization.NtsStrings;
 
 namespace NTS.Tests.Integration.EndToEndEventTests.Features;

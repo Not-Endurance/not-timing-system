@@ -14,7 +14,10 @@ public class ClubApiRepository : JsonApiRepository<Club, ClubModel>
         : base("clubs", client) { }
 
     /// <summary>The rows of every Tenant's registry whose name the query finds, a page at a time (ADR-0010, ADR-0012).</summary>
-    public Task<(IReadOnlyList<JsonElement> Rows, bool HasNext)>  SearchAllTenants(ListQuery query, CancellationToken cancellationToken = default)
+    public Task<(IReadOnlyList<JsonElement> Rows, bool HasNext)> SearchAllTenants(
+        ListQuery query,
+        CancellationToken cancellationToken = default
+    )
     {
         return PageOf($"{Collection}/all-tenants", query, cancellationToken);
     }

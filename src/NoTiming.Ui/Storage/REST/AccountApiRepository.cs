@@ -34,7 +34,9 @@ public class AccountApiRepository
             return null;
         }
 
-        return ResourceOf(response.IsSuccess ? response : throw new JsonApiException(response, _client.UnavailableCodes));
+        return ResourceOf(
+            response.IsSuccess ? response : throw new JsonApiException(response, _client.UnavailableCodes)
+        );
     }
 
     /// <summary>Ends the session the browser holds.</summary>

@@ -70,13 +70,14 @@ public sealed class SnapshotApiPublisher : ISnapshotPublisher, IScoped
                 (
                     Type: "snapshots",
                     Id: (string?)group.IdOf(x).ToString(),
-                    Model: (object)new
-                    {
-                        eventId,
-                        number = x.Number,
-                        kind = group.Type,
-                        time = x.Timestamp!.ToDateTimeOffset(),
-                    }
+                    Model: (object)
+                        new
+                        {
+                            eventId,
+                            number = x.Number,
+                            kind = group.Type,
+                            time = x.Timestamp!.ToDateTimeOffset(),
+                        }
                 )
             ),
             cancellationToken

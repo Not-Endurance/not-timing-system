@@ -43,7 +43,11 @@ internal sealed class MemoryLocalStorage : IJSRuntime
         return ValueTask.FromResult(default(TValue)!);
     }
 
-    public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
+    public ValueTask<TValue> InvokeAsync<TValue>(
+        string identifier,
+        CancellationToken cancellationToken,
+        object?[]? args
+    )
     {
         return InvokeAsync<TValue>(identifier, args);
     }

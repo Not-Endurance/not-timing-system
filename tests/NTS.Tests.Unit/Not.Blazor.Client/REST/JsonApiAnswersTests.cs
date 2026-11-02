@@ -12,8 +12,8 @@ public sealed class JsonApiAnswersTests
     {
         var transport = new HttpRequestException("The server did not answer.");
 
-        var failure = await Assert.ThrowsAsync<RepositoryException>(() =>
-            JsonApiAnswers.Reached(() => Task.FromException<int>(transport))
+        var failure = await Assert.ThrowsAsync<RepositoryException>(
+            () => JsonApiAnswers.Reached(() => Task.FromException<int>(transport))
         );
 
         Assert.Equal(RepositoryErrorKind.Unavailable, failure.Kind);

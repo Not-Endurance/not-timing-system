@@ -1,16 +1,16 @@
-using Not.Application.HTTP;
-using Not.Application.CRUD.Ports;
 using System.Globalization;
 using System.Net;
 using Microsoft.Extensions.Time.Testing;
+using Not.Application.CRUD.Ports;
+using Not.Application.HTTP;
 using NoTiming.Ui.Features.Participants;
 using NoTiming.Ui.Storage.Core.Repositories;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Participants;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Tests.Integration.Harness;
-using NoTiming.Ui.Storage.REST;
 
 namespace NTS.Tests.Integration;
 
@@ -375,9 +375,29 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
         var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var spring = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 10);
-        var winter = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Winter ride", "Plovdiv", 200);
-        var autumn = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Autumn ride", "Varna", 400);
-        var latest = await HistorySeed.RideAsync(_shared.MongoConnectionString, tenant, spring, 1, _ana, _wind, rank: 2);
+        var winter = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Winter ride",
+            "Plovdiv",
+            200
+        );
+        var autumn = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Autumn ride",
+            "Varna",
+            400
+        );
+        var latest = await HistorySeed.RideAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            spring,
+            1,
+            _ana,
+            _wind,
+            rank: 2
+        );
         await HistorySeed.CountAlsoAsync(
             _shared.MongoConnectionString,
             tenant,
@@ -472,7 +492,13 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
         var tenant = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
         var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var recent = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Spring ride", "Sofia", 10);
-        var middle = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Winter ride", "Plovdiv", 200);
+        var middle = await HistorySeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            "Winter ride",
+            "Plovdiv",
+            200
+        );
         var old = await HistorySeed.HistoricAsync(_shared.MongoConnectionString, tenant, "Autumn ride", "Varna", 400);
         await HistorySeed.RideAsync(_shared.MongoConnectionString, tenant, recent, 1, _ana, _wind);
         await HistorySeed.RideAsync(_shared.MongoConnectionString, tenant, middle, 1, _ana, _fire);
@@ -481,9 +507,7 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
         asked.Before = request =>
         {
             // the Api cuts the pages of the history at two, so that the whole of it is more than one
-            request.RequestUri = new Uri(
-                request.RequestUri!.ToString().Replace("page[size]=500", "page[size]=2")
-            );
+            request.RequestUri = new Uri(request.RequestUri!.ToString().Replace("page[size]=500", "page[size]=2"));
             return Task.CompletedTask;
         };
 
@@ -630,7 +654,12 @@ public sealed class ParticipantServiceTests : IClassFixture<SharedApiFixture>
     )
     {
         var json = JsonApiClients.Of(api, person, out asked);
-        return new ParticipantService(new ParticipationApiRepository(json), new AthleteApiRepository(json), new HorseApiRepository(json), time ?? TimeProvider.System);
+        return new ParticipantService(
+            new ParticipationApiRepository(json),
+            new AthleteApiRepository(json),
+            new HorseApiRepository(json),
+            time ?? TimeProvider.System
+        );
     }
 
     static (ParticipantKind, Guid, string) Of(ParticipantName name)

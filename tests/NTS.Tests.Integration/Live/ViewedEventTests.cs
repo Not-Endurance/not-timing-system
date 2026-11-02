@@ -3,8 +3,8 @@ using NTS.Contracts.Core;
 using NTS.Contracts.Socket;
 using NTS.Domain.Access;
 using NTS.Domain.Core.Aggregates;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 
 namespace NTS.Tests.Integration;
 

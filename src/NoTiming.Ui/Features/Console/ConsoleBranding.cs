@@ -136,11 +136,7 @@ public class ConsoleBranding : NStatefulService, IConsoleBranding, IScoped
     }
 
     /// <summary>Changes the one logo named, and no other: the Api keeps the logo that is not named as it is.</summary>
-    async Task Change(
-        LogoPosition position,
-        JsonNode? logo,
-        Func<IReadOnlyDictionary<string, JsonNode?>, Task> change
-    )
+    async Task Change(LogoPosition position, JsonNode? logo, Func<IReadOnlyDictionary<string, JsonNode?>, Task> change)
     {
         var name = position == LogoPosition.Left ? LEFT : RIGHT;
         await ApiRefusals.Answered(() => change(new Dictionary<string, JsonNode?> { [name] = logo }));

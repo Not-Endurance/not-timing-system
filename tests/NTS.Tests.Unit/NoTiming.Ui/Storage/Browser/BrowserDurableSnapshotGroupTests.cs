@@ -142,7 +142,10 @@ public sealed class BrowserDurableSnapshotGroupTests
 
     static async Task<SnapshotGroup?> GroupOf(DurableStore store, Guid accountId, Guid eventId)
     {
-        return (await Pending(store, accountId, eventId)).Select(x => x.ToGroup()).OfType<SnapshotGroup>().FirstOrDefault();
+        return (await Pending(store, accountId, eventId))
+            .Select(x => x.ToGroup())
+            .OfType<SnapshotGroup>()
+            .FirstOrDefault();
     }
 
     static SnapshotGroup Group(int number)

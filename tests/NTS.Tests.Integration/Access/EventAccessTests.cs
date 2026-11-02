@@ -260,7 +260,9 @@ public sealed class EventAccessTests : IClassFixture<MongoFixture>
         );
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode); // a member the Api does not take is ignored
-        var id = Guid.Parse((await ApiSessions.ReadJsonAsync(response)).GetProperty("data").GetProperty("id").GetString()!);
+        var id = Guid.Parse(
+            (await ApiSessions.ReadJsonAsync(response)).GetProperty("data").GetProperty("id").GetString()!
+        );
         Assert.Equal(tenant, (await EventSeed.SetupOfAsync(_mongo.ConnectionString, id))!["TenantId"].AsString);
     }
 
@@ -387,7 +389,15 @@ public sealed class EventAccessTests : IClassFixture<MongoFixture>
         Assert.Equal("invalid-event", await ErrorCodeAsync(noEvent));
         Assert.Empty(await GrantsOfAsync(id));
 
-        var extra = await AssignAsync(root, new { eventId = id, accountId = colleague.Id, tenantId = "anything" });
+        var extra = await AssignAsync(
+            root,
+            new
+            {
+                eventId = id,
+                accountId = colleague.Id,
+                tenantId = "anything",
+            }
+        );
         Assert.Equal(HttpStatusCode.Created, extra.StatusCode); // a member the Api does not take is ignored: the grant is the Event's
         Assert.Single(await GrantsOfAsync(id));
     }

@@ -192,16 +192,13 @@ public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext
             Club = Text(attributes, "club"),
             FeiId = Text(attributes, "feiId"),
             Complete =
-                attributes.TryGetProperty("complete", out var complete)
-                && complete.ValueKind == JsonValueKind.True,
+                attributes.TryGetProperty("complete", out var complete) && complete.ValueKind == JsonValueKind.True,
             Athlete =
-                attributes.TryGetProperty("athlete", out var athlete)
-                && athlete.ValueKind == JsonValueKind.Object
+                attributes.TryGetProperty("athlete", out var athlete) && athlete.ValueKind == JsonValueKind.Object
                     ? ParticipantJson.NameIn(athlete)
                     : null,
             Horses =
-                attributes.TryGetProperty("horses", out var horses)
-                && horses.ValueKind == JsonValueKind.Array
+                attributes.TryGetProperty("horses", out var horses) && horses.ValueKind == JsonValueKind.Array
                     ? [.. horses.EnumerateArray().Select(ParticipantJson.NameIn)]
                     : [],
         };
@@ -209,8 +206,7 @@ public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext
 
     static string? Text(JsonElement attributes, string member)
     {
-        return attributes.TryGetProperty(member, out var value)
-            && value.ValueKind == JsonValueKind.String
+        return attributes.TryGetProperty(member, out var value) && value.ValueKind == JsonValueKind.String
             ? value.GetString()
             : null;
     }

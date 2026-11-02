@@ -127,7 +127,9 @@ public sealed class RepositoryArchitectureTests
     [Fact]
     public void The_integration_harness_holds_no_tests()
     {
-        var harness = IntegrationTestFiles().Where(x => x.Path.StartsWith("Harness/", StringComparison.Ordinal)).ToList();
+        var harness = IntegrationTestFiles()
+            .Where(x => x.Path.StartsWith("Harness/", StringComparison.Ordinal))
+            .ToList();
 
         Holds(ArchitectureRules.HarnessHoldsNoTests(harness));
     }

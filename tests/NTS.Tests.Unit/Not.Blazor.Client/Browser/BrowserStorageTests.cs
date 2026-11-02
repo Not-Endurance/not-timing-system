@@ -1,6 +1,6 @@
 using Microsoft.JSInterop;
-using NTS.Tests.Unit.Harness;
 using Not.Blazor.Client.Browser;
+using NTS.Tests.Unit.Harness;
 
 namespace NTS.Tests.Unit.Not.Blazor.Client.Browser;
 
@@ -41,5 +41,4 @@ public sealed class BrowserStorageTests
 
         Assert.Equal(["nts.one", "nts.two"], keys);
     }
-
 }

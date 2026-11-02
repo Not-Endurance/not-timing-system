@@ -35,7 +35,11 @@ public sealed class ParticipantLinksTests : IClassFixture<SharedApiFixture>
             _shared.MongoConnectionString,
             await TenantAsync(_shared.MongoConnectionString)
         );
-        var athlete = await AthleteAsync(await TenantAsync(_shared.MongoConnectionString), "Иван Петров", "Ivan Petrov");
+        var athlete = await AthleteAsync(
+            await TenantAsync(_shared.MongoConnectionString),
+            "Иван Петров",
+            "Ivan Petrov"
+        );
         var path = $"/api/athletes/{athlete}/link";
 
         var before = await person.Page.GetAsync(path);

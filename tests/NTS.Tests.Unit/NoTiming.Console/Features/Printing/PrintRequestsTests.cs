@@ -181,5 +181,4 @@ public sealed class PrintRequestsTests
         var span = new EventSpan(DateTimeOffset.Now.Date, DateTimeOffset.Now.Date.AddDays(1));
         return new EventInformation(country, "Event", "Location", span, null, id: TestId.Of(10));
     }
-
 }

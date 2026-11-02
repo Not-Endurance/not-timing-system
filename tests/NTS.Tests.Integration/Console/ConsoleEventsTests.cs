@@ -430,7 +430,17 @@ public sealed class ConsoleEventsTests : IClassFixture<SharedApiFixture>
         var account = new AccountSession(new AccountApiRepository(json));
         var setups = new ConfigureEventApiRepository(json, new NoDispatcher());
         var events = new EventInformationApiRepository(json, new SelectedEvent(null));
-        return new Opened(account, new ConsoleEvents(account, setups, events, new ConsoleOperatorApiRepository(json), new AccountApiRepository(json), new TenantApiRepository(json)));
+        return new Opened(
+            account,
+            new ConsoleEvents(
+                account,
+                setups,
+                events,
+                new ConsoleOperatorApiRepository(json),
+                new AccountApiRepository(json),
+                new TenantApiRepository(json)
+            )
+        );
     }
 
     sealed class Opened : IDisposable

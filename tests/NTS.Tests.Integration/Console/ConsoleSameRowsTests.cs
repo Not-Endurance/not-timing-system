@@ -174,7 +174,13 @@ public sealed class ConsoleSameRowsTests : IClassFixture<SharedApiFixture>
             $"Faraway {token}",
             "ABC1"
         );
-        var ownHorse = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, $"Свой {token}", null, "XYZ-9");
+        var ownHorse = await RegistrySeed.HorseAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            $"Свой {token}",
+            null,
+            "XYZ-9"
+        );
         var numericHorse = await RegistrySeed.HorseAsync(
             _shared.MongoConnectionString,
             tenant,

@@ -334,5 +334,4 @@ public sealed class AccessPolicyTests
             [Capability.EditCountries] = [Who.Root],
         };
     }
-
 }

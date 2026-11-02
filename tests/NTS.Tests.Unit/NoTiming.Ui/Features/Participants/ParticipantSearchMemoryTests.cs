@@ -268,5 +268,4 @@ public sealed class ParticipantSearchMemoryTests
     {
         return new FoundParticipant(ParticipantKind.Horse, Guid.NewGuid(), name, null, null);
     }
-
 }

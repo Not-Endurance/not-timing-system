@@ -7,7 +7,10 @@ namespace Not.Test;
 public sealed class JourneyFailedException : Exception
 {
     public JourneyFailedException(string feature, string journey, string scenario, JourneyStage stage, Exception inner)
-        : base($"{feature} > {journey} > {scenario} stopped at stage {stage.Number} ({stage.Name}): {inner.Message}", inner)
+        : base(
+            $"{feature} > {journey} > {scenario} stopped at stage {stage.Number} ({stage.Name}): {inner.Message}",
+            inner
+        )
     {
         Feature = feature;
         Journey = journey;

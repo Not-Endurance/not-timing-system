@@ -14,7 +14,12 @@ namespace NTS.Tests.Unit.Harness;
 
 internal sealed class ParticipationTimelineForm : IPhaseState
 {
-    public ParticipationTimelineForm(Guid id, DateTimeOffset? startTime, DateTimeOffset? arriveTime, DateTimeOffset? presentTime)
+    public ParticipationTimelineForm(
+        Guid id,
+        DateTimeOffset? startTime,
+        DateTimeOffset? arriveTime,
+        DateTimeOffset? presentTime
+    )
     {
         Id = id;
         StartTime = startTime;

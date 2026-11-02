@@ -1,12 +1,12 @@
 using System.Net;
 using System.Text.Json;
 using MongoDB.Bson;
+using Not.Application.CRUD.Ports;
 using NoTiming.Ui.Features.Account;
 using NoTiming.Ui.Features.Profile;
 using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Profile;
 using NTS.Tests.Integration.Harness;
-using Not.Application.CRUD.Ports;
 
 namespace NTS.Tests.Integration;
 
@@ -45,7 +45,13 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
         var api = _shared.Api;
         using var client = api.CreateClient();
         var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, name: "Ana Petrova");
+        var person = await TenancySeed.SignedInAsync(
+            api,
+            client,
+            _shared.MongoConnectionString,
+            home,
+            name: "Ana Petrova"
+        );
         using var ui = Open(api, person, out var asked);
         asked.Answer = request =>
             request.RequestUri!.AbsolutePath.EndsWith("/me/profile", StringComparison.Ordinal)
@@ -65,7 +71,13 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
         var api = _shared.Api;
         using var client = api.CreateClient();
         var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, name: "Ana Petrova");
+        var person = await TenancySeed.SignedInAsync(
+            api,
+            client,
+            _shared.MongoConnectionString,
+            home,
+            name: "Ana Petrova"
+        );
         using var ui = Open(api, person, out _);
 
         await ui.Profile.Load();
@@ -139,7 +151,13 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
         using var client = api.CreateClient();
         var iso = CountrySeed.UniqueIsoCode();
         await CountrySeed.AddAsync(_shared.MongoConnectionString, "Testland " + iso, iso, "T" + iso[..2]);
-        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, null, name: "Ana Petrova");
+        var person = await TenancySeed.SignedInAsync(
+            api,
+            client,
+            _shared.MongoConnectionString,
+            null,
+            name: "Ana Petrova"
+        );
         using var ui = Open(api, person, out _);
         await ui.Profile.Load();
         var model = ui.Profile.CreateFormModel();
@@ -158,7 +176,13 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
         var api = _shared.Api;
         using var client = api.CreateClient();
         var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, name: "Ana Petrova");
+        var person = await TenancySeed.SignedInAsync(
+            api,
+            client,
+            _shared.MongoConnectionString,
+            home,
+            name: "Ana Petrova"
+        );
         using var ui = Open(api, person, out var asked);
         await ui.Profile.Load();
         var before = asked.Asked.Count;
@@ -248,11 +272,21 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
         var api = _shared.Api;
         using var client = api.CreateClient();
         var home = await TenancySeed.TenantAsync(_shared.MongoConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, home, name: "Ana Petrova");
+        var person = await TenancySeed.SignedInAsync(
+            api,
+            client,
+            _shared.MongoConnectionString,
+            home,
+            name: "Ana Petrova"
+        );
         var cookie = new JsonApiClients.Cookie(null);
         var json = JsonApiClients.WithCookie(api, cookie, out _);
         using var account = new AccountSession(new AccountApiRepository(json));
-        using var profile = new WitnessProfileContext(account, new CountryApiRepository(json), new AccountApiRepository(json));
+        using var profile = new WitnessProfileContext(
+            account,
+            new CountryApiRepository(json),
+            new AccountApiRepository(json)
+        );
         await profile.Load();
         Assert.Null(profile.Profile); // the app booted as a visitor
 
@@ -283,7 +317,10 @@ public sealed class ProfileContextTests : IClassFixture<SharedApiFixture>
     {
         var json = JsonApiClients.Of(api, person, out asked);
         var account = new AccountSession(new AccountApiRepository(json));
-        return new UiOfAPerson(account, new WitnessProfileContext(account, new CountryApiRepository(json), new AccountApiRepository(json)));
+        return new UiOfAPerson(
+            account,
+            new WitnessProfileContext(account, new CountryApiRepository(json), new AccountApiRepository(json))
+        );
     }
 
     async Task AddCountryAsync(string name, string iso, string nf, string idStartsWith)

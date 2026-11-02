@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using NoTiming.Api.Features.Live;
 using NTS.Contracts.Core;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 
 namespace NTS.Tests.Integration;
 

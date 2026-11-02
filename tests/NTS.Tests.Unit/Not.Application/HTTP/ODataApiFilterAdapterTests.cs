@@ -230,5 +230,4 @@ public class ODataApiFilterAdapterTests
 
         Assert.Equal("NameEnglish eq null", filters["$filter"]);
     }
-
 }

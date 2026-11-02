@@ -82,15 +82,16 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
 
     public async Task<ConsoleEvent> Create(string name, string location, string? feiShowId)
     {
-        var id = await ApiRefusals.Answered(() =>
-            _setups.Make(
-                new ConfigureEventDraft
-                {
-                    Name = name,
-                    Location = location,
-                    FeiShowId = feiShowId,
-                }
-            )
+        var id = await ApiRefusals.Answered(
+            () =>
+                _setups.Make(
+                    new ConfigureEventDraft
+                    {
+                        Name = name,
+                        Location = location,
+                        FeiShowId = feiShowId,
+                    }
+                )
         );
         await ReloadState();
         return _list.Single(x => x.Id == id);
@@ -146,9 +147,7 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
         }
 
         var words = string.Join(' ', ParticipantService.WordsOf(text));
-        var found = await ApiRefusals.Answered(() =>
-            _accounts.Search($"contains(name,'{words.Replace("'", "''")}')")
-        );
+        var found = await ApiRefusals.Answered(() => _accounts.Search($"contains(name,'{words.Replace("'", "''")}')"));
         return
         [
             .. found.Select(x => new AccountMatch(

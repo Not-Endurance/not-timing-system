@@ -1,7 +1,7 @@
-using Not.Application.CRUD.Ports;
-using Not.Application.HTTP;
 using System.Net;
 using System.Text;
+using Not.Application.CRUD.Ports;
+using Not.Application.HTTP;
 using NoTiming.Ui.Features.Access;
 using NoTiming.Ui.Features.Account;
 using NoTiming.Ui.Storage.Core.Repositories;
@@ -9,8 +9,8 @@ using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Access;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
@@ -51,7 +51,9 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
         );
 
         var all = (await participations.ReadMany()).ToList();
-        var refused = await Assert.ThrowsAsync<RepositoryException>(() => participations.ReadMany(x => x.Combination.Number > 1));
+        var refused = await Assert.ThrowsAsync<RepositoryException>(
+            () => participations.ReadMany(x => x.Combination.Number > 1)
+        );
         var one = await participations.Read(first.Id);
 
         Assert.Equal(new[] { first.Id, second.Id }.Order(), all.Select(x => x.Id).Order());
@@ -377,7 +379,9 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
             new EventScopeFactory<Official>(new SelectedEvent(eventId))
         );
 
-        var refused = await Assert.ThrowsAsync<RepositoryException>(() => officials.ReadMany(x => x.Role == OfficialRole.Steward));
+        var refused = await Assert.ThrowsAsync<RepositoryException>(
+            () => officials.ReadMany(x => x.Role == OfficialRole.Steward)
+        );
 
         Assert.Equal(RepositoryErrorKind.Refused, refused.Kind); // an enum is not written for the Api, so the list is refused
         Assert.Empty(requests.Asked.Where(x => x.Contains("role", StringComparison.OrdinalIgnoreCase)));
@@ -399,7 +403,11 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
         var json = JsonApiClients.Of(api, consoleOperator, out var requests);
         using var account = new AccountSession(new AccountApiRepository(json));
         await account.Load();
-        using var context = new WitnessAccessContext(new SelectedEvent(eventId), account, new EventInformationApiRepository(json, new SelectedEvent(eventId)));
+        using var context = new WitnessAccessContext(
+            new SelectedEvent(eventId),
+            account,
+            new EventInformationApiRepository(json, new SelectedEvent(eventId))
+        );
         requests.Answer = _ => throw new HttpRequestException("The Api is down.");
 
         await context.Load();
@@ -415,7 +423,11 @@ public sealed class EventDataRepositoryTests : IClassFixture<SharedApiFixture>
     {
         var json = JsonApiClients.Of(api, person, out _);
         using var account = new AccountSession(new AccountApiRepository(json));
-        using var context = new WitnessAccessContext(new SelectedEvent(eventId), account, new EventInformationApiRepository(json, new SelectedEvent(eventId)));
+        using var context = new WitnessAccessContext(
+            new SelectedEvent(eventId),
+            account,
+            new EventInformationApiRepository(json, new SelectedEvent(eventId))
+        );
 
         await context.Load();
 

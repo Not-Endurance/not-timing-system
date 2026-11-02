@@ -5,15 +5,15 @@ using Not.Events;
 using Not.Notify;
 using NoTiming.Ui.Features.Account;
 using NoTiming.Ui.Features.Console;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Branding;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Console;
 using NTS.Domain.Core.Aggregates;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Harness.TenancySeed;
-using NoTiming.Ui.Storage.REST;
 
 namespace NTS.Tests.Integration;
 
@@ -194,7 +194,11 @@ public sealed class ConsoleBrandingTests : IClassFixture<SharedApiFixture>
         var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var json = JsonApiClients.Of(api, root, out var requests);
         var account = new AccountSession(new AccountApiRepository(json));
-        var branding = new ConsoleBranding(new BrandingApiRepository(json), new ConsoleTenant(account, new TenantApiRepository(json)), new Notifier());
+        var branding = new ConsoleBranding(
+            new BrandingApiRepository(json),
+            new ConsoleTenant(account, new TenantApiRepository(json)),
+            new Notifier()
+        );
 
         var notAnImage = await Assert.ThrowsAsync<DomainException>(
             () => branding.SetOfTenant(LogoPosition.Left, "image/svg+xml", PNG)
@@ -229,7 +233,11 @@ public sealed class ConsoleBrandingTests : IClassFixture<SharedApiFixture>
         var notifier = new Notifier();
         var warned = new List<string>();
         notifier.Warned.Subscribe(warned.Add);
-        var branding = new ConsoleBranding(new BrandingApiRepository(json), new ConsoleTenant(new AccountSession(new AccountApiRepository(json)), new TenantApiRepository(json)), notifier);
+        var branding = new ConsoleBranding(
+            new BrandingApiRepository(json),
+            new ConsoleTenant(new AccountSession(new AccountApiRepository(json)), new TenantApiRepository(json)),
+            notifier
+        );
         await branding.Show(
             new StubViewedEvent(new NoParticipations(), IntegrationPayloadFactory.EventInformation(eventId))
         );

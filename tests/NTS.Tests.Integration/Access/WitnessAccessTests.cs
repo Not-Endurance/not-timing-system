@@ -4,14 +4,14 @@ using MongoDB.Driver;
 using Not.Application.RPC;
 using NoTiming.Ui.Features.Access;
 using NoTiming.Ui.Features.Account;
+using NoTiming.Ui.Storage.Core.Repositories;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Access;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Tests.Integration.Harness.TenancySeed;
-using NoTiming.Ui.Storage.REST;
-using NoTiming.Ui.Storage.Core.Repositories;
 
 namespace NTS.Tests.Integration;
 
@@ -37,7 +37,11 @@ public sealed class WitnessAccessTests : IClassFixture<SharedApiFixture>
         var (eventId, official) = await SceneAsync(api, client);
         var json = JsonApiClients.Of(api, official, out var asked);
         using var account = new AccountSession(new AccountApiRepository(json));
-        using var access = new WitnessAccessContext(new SelectedEvent(eventId), account, new EventInformationApiRepository(json, new SelectedEvent(eventId)));
+        using var access = new WitnessAccessContext(
+            new SelectedEvent(eventId),
+            account,
+            new EventInformationApiRepository(json, new SelectedEvent(eventId))
+        );
         await access.Load();
         Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
         var held = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -67,10 +71,16 @@ public sealed class WitnessAccessTests : IClassFixture<SharedApiFixture>
         var (eventId, official) = await SceneAsync(api, client);
         var json = JsonApiClients.Of(api, official, out _);
         using var account = new AccountSession(new AccountApiRepository(json));
-        using var access = new WitnessAccessContext(new SelectedEvent(eventId), account, new EventInformationApiRepository(json, new SelectedEvent(eventId)));
+        using var access = new WitnessAccessContext(
+            new SelectedEvent(eventId),
+            account,
+            new EventInformationApiRepository(json, new SelectedEvent(eventId))
+        );
         await access.Load();
         Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
-        await EventSeed.Grants(_shared.MongoConnectionString).DeleteManyAsync(new BsonDocument("Email", official.Email));
+        await EventSeed
+            .Grants(_shared.MongoConnectionString)
+            .DeleteManyAsync(new BsonDocument("Email", official.Email));
 
         await account.Refresh();
 
@@ -89,7 +99,11 @@ public sealed class WitnessAccessTests : IClassFixture<SharedApiFixture>
         var (eventId, official) = await SceneAsync(api, client);
         var json = JsonApiClients.Of(api, official, out var asked);
         using var account = new AccountSession(new AccountApiRepository(json));
-        using var access = new WitnessAccessContext(new SelectedEvent(eventId), account, new EventInformationApiRepository(json, new SelectedEvent(eventId)));
+        using var access = new WitnessAccessContext(
+            new SelectedEvent(eventId),
+            account,
+            new EventInformationApiRepository(json, new SelectedEvent(eventId))
+        );
         await access.Load();
         var told = new List<WitnessSays>();
         access.ObservableEvent.Subscribe(() => told.Add(WitnessSays.Of(access)));
@@ -102,7 +116,9 @@ public sealed class WitnessAccessTests : IClassFixture<SharedApiFixture>
         await Eventually(() => told.Count > 0);
 
         Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
-        await EventSeed.Grants(_shared.MongoConnectionString).DeleteManyAsync(new BsonDocument("Email", official.Email));
+        await EventSeed
+            .Grants(_shared.MongoConnectionString)
+            .DeleteManyAsync(new BsonDocument("Email", official.Email));
         asked.Answer = null;
         await account.Refresh();
         await Eventually(() => told.Count > 1);
@@ -119,7 +135,11 @@ public sealed class WitnessAccessTests : IClassFixture<SharedApiFixture>
         var json = JsonApiClients.Of(api, official, out var asked);
         using var account = new AccountSession(new AccountApiRepository(json));
         var followed = new FollowedEvent(eventId);
-        using var access = new WitnessAccessContext(followed, account, new EventInformationApiRepository(json, followed));
+        using var access = new WitnessAccessContext(
+            followed,
+            account,
+            new EventInformationApiRepository(json, followed)
+        );
         await access.Load();
         var told = new List<WitnessSays>();
         access.ObservableEvent.Subscribe(() => told.Add(WitnessSays.Of(access)));
@@ -149,7 +169,11 @@ public sealed class WitnessAccessTests : IClassFixture<SharedApiFixture>
         );
         var json = JsonApiClients.WithCookie(api, cookie, out var asked);
         using var account = new AccountSession(new AccountApiRepository(json));
-        using var access = new WitnessAccessContext(new SelectedEvent(eventId), account, new EventInformationApiRepository(json, new SelectedEvent(eventId)));
+        using var access = new WitnessAccessContext(
+            new SelectedEvent(eventId),
+            account,
+            new EventInformationApiRepository(json, new SelectedEvent(eventId))
+        );
         await access.Load();
         Assert.Equal(WitnessSays.Official, WitnessSays.Of(access));
         var told = new List<WitnessSays>();
@@ -173,7 +197,11 @@ public sealed class WitnessAccessTests : IClassFixture<SharedApiFixture>
         var json = JsonApiClients.Of(api, null, out var asked);
         asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
         using var account = new AccountSession(new AccountApiRepository(json));
-        using var access = new WitnessAccessContext(new SelectedEvent(Guid.NewGuid()), account, new EventInformationApiRepository(json, new SelectedEvent(Guid.NewGuid())));
+        using var access = new WitnessAccessContext(
+            new SelectedEvent(Guid.NewGuid()),
+            account,
+            new EventInformationApiRepository(json, new SelectedEvent(Guid.NewGuid()))
+        );
 
         await access.Load();
 

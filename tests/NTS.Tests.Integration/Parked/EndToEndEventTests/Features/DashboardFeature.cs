@@ -8,8 +8,8 @@ using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
+using NTS.Tests.Integration.Harness.Drivers;
 using WitnessSnapshotService = NTS.Contracts.Features.Snapshots.ISnapshotService;
 
 namespace NTS.Tests.Integration.EndToEndEventTests.Features;

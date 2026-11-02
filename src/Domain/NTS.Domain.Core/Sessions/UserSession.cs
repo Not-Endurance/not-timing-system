@@ -20,7 +20,10 @@ public sealed class UserSession : IEntity
     )
     {
         Id = id == Guid.Empty ? throw new ArgumentException("A session has an id.", nameof(id)) : id;
-        EventId = eventId == Guid.Empty ? throw new ArgumentException("A session is for an Event.", nameof(eventId)) : eventId;
+        EventId =
+            eventId == Guid.Empty
+                ? throw new ArgumentException("A session is for an Event.", nameof(eventId))
+                : eventId;
         SnapshotHistory = (history ?? []).ToArray();
         SnapshotSelections = (selections ?? []).ToArray();
     }

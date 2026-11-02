@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Options;
+using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using NoTiming.Ui.Features.Account;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts;
 using NTS.Contracts.Features.Account;
 using NTS.Tests.Integration.Harness;
-using NoTiming.Ui.Storage.REST;
-using Not.Application.CRUD.Ports;
 
 namespace NTS.Tests.Integration;
 
@@ -75,7 +75,13 @@ public sealed class AccountSessionTests : IClassFixture<SharedApiFixture>
     {
         var api = _shared.Api;
         using var client = api.CreateClient();
-        var person = await TenancySeed.SignedInAsync(api, client, _shared.MongoConnectionString, null, isDeveloper: true);
+        var person = await TenancySeed.SignedInAsync(
+            api,
+            client,
+            _shared.MongoConnectionString,
+            null,
+            isDeveloper: true
+        );
         using var session = new AccountSession(new AccountApiRepository(JsonApiClients.Of(api, person, out _)));
 
         await session.Load();

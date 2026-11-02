@@ -35,8 +35,7 @@ public class ConsoleGrants : IConsoleGrants, ITransient
         {
             EventId = eventId,
             Kind = kind,
-            OfficialRole =
-                kind == GrantKind.Official ? role ?? throw new DomainException(Select_a_role_string) : null,
+            OfficialRole = kind == GrantKind.Official ? role ?? throw new DomainException(Select_a_role_string) : null,
             Email = email.Trim(),
         };
         return RowOf(await ApiRefusals.Answered(() => _grants.Link(grant)));

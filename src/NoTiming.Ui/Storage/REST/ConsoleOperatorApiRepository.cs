@@ -23,15 +23,6 @@ public class ConsoleOperatorApiRepository : JsonApiRepository<EventGrant, Consol
     /// <summary>Assigns the account to the Event as a Console Operator.</summary>
     public async Task Assign(Guid eventId, Guid accountId)
     {
-        await Taken(
-            Client.Post(
-                Collection,
-                new ConsoleOperatorModel
-                {
-                    EventId = eventId,
-                    AccountId = accountId,
-                }
-            )
-        );
+        await Taken(Client.Post(Collection, new ConsoleOperatorModel { EventId = eventId, AccountId = accountId }));
     }
 }

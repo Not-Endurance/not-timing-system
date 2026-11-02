@@ -441,7 +441,12 @@ public sealed class BrandingRoutesTests : IClassFixture<SharedApiFixture>
         var operatorGrant = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var live = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
         var historic = await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
-        var unstarted = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, "Not yet");
+        var unstarted = await EventSeed.SetupAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            consoleOperator.Id,
+            "Not yet"
+        );
         await EventSeed.GrantAsync(
             _shared.MongoConnectionString,
             tenant,

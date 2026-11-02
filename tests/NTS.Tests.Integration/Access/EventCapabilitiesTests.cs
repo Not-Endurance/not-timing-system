@@ -161,7 +161,15 @@ public sealed class EventCapabilitiesTests : IClassFixture<SharedApiFixture>
         )
         {
             var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
-            await EventSeed.GrantAsync(_shared.MongoConnectionString, tenant, live, kind, role, person.Email, person.Id);
+            await EventSeed.GrantAsync(
+                _shared.MongoConnectionString,
+                tenant,
+                live,
+                kind,
+                role,
+                person.Email,
+                person.Id
+            );
 
             var can = (await CapabilitiesAsync(person, live)).GetProperty("canSnapshot").GetBoolean();
 

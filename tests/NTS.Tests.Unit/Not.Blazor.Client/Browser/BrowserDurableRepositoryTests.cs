@@ -2,8 +2,8 @@ using System.Text.Json;
 using Microsoft.JSInterop;
 using Not.Application.CRUD.Ports;
 using Not.Async;
-using NTS.Tests.Unit.Harness;
 using Not.Blazor.Client.Browser;
+using NTS.Tests.Unit.Harness;
 
 namespace NTS.Tests.Unit.Not.Blazor.Client.Browser;
 
@@ -273,5 +273,4 @@ public sealed class BrowserDurableRepositoryTests
             await Task.Delay(1);
         }
     }
-
 }

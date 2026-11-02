@@ -242,5 +242,4 @@ public sealed class ParticipationProcessTests
     {
         return timestamp == null ? null : new Timestamp(timestamp.Value);
     }
-
 }

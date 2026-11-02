@@ -21,8 +21,8 @@ public class DeadlineWaitTests
     [Fact]
     public async Task UntilAsync_times_out_naming_what_it_waited_for()
     {
-        var error = await Assert.ThrowsAsync<TimeoutException>(() =>
-            DeadlineWait.UntilAsync("the order to be paid", () => false, TimeSpan.FromMilliseconds(100))
+        var error = await Assert.ThrowsAsync<TimeoutException>(
+            () => DeadlineWait.UntilAsync("the order to be paid", () => false, TimeSpan.FromMilliseconds(100))
         );
 
         Assert.Contains("the order to be paid", error.Message);

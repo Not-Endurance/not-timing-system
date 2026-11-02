@@ -10,8 +10,11 @@ public sealed class ApiRefusalsTests
     [Fact]
     public async Task A_refusal_is_said_in_the_words_of_the_Api_as_a_domain_error()
     {
-        var error = await Assert.ThrowsAsync<DomainException>(() =>
-            ApiRefusals.Answered(() => throw new RepositoryException(RepositoryErrorKind.Refused, "The Event has ended."))
+        var error = await Assert.ThrowsAsync<DomainException>(
+            () =>
+                ApiRefusals.Answered(
+                    () => throw new RepositoryException(RepositoryErrorKind.Refused, "The Event has ended.")
+                )
         );
 
         Assert.Equal("The Event has ended.", error.Message);
@@ -28,8 +31,9 @@ public sealed class ApiRefusalsTests
     [Fact]
     public async Task A_request_that_got_no_answer_is_said_as_a_domain_error_too()
     {
-        var error = await Assert.ThrowsAsync<DomainException>(() =>
-            ApiRefusals.Answered(() => throw new RepositoryException(RepositoryErrorKind.Unavailable, "No answer."))
+        var error = await Assert.ThrowsAsync<DomainException>(
+            () =>
+                ApiRefusals.Answered(() => throw new RepositoryException(RepositoryErrorKind.Unavailable, "No answer."))
         );
 
         Assert.Equal("No answer.", error.Message);

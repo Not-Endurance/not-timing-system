@@ -15,8 +15,8 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Objects;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Harness.TenancySeed;
 
@@ -261,7 +261,13 @@ public sealed class ConsoleTimelineTests : IClassFixture<SharedApiFixture>
     {
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
-        var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, name: "Marin Main");
+        var consoleOperator = await SignedInAsync(
+            api,
+            client,
+            _shared.MongoConnectionString,
+            tenant,
+            name: "Marin Main"
+        );
         var official = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, name: "Olga Official");
         var eventId = await EventSeed.LiveAsync(
             _shared.MongoConnectionString,
@@ -384,7 +390,12 @@ public sealed class ConsoleTimelineTests : IClassFixture<SharedApiFixture>
             );
             await dashboard.Show(new StubViewedEvent(store, selected.Event!, canWrite));
             dashboard.Selected = dashboard.Participations.Single();
-            return new Tab(dashboard, new ConsoleTimeline(dashboard, new TimeEventActorApiRepository(json)), store, requests);
+            return new Tab(
+                dashboard,
+                new ConsoleTimeline(dashboard, new TimeEventActorApiRepository(json)),
+                store,
+                requests
+            );
         }
 
         Tab(

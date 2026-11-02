@@ -1,11 +1,11 @@
+using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NTS.Domain.Core.Aggregates;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Tests.Integration.Harness.UiBrowser;
-using System.Text.RegularExpressions;
 
 namespace NTS.Tests.Integration;
 

@@ -363,5 +363,4 @@ public sealed class ViewedEventProviderTests
         );
         return new Fixture(provider, socket, store, repository, accessContext);
     }
-
 }

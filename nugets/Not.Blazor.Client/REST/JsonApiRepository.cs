@@ -29,7 +29,11 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
 
     /// <param name="collection">The type of the resource and the path of its collection, such as <c>clubs</c>.</param>
     /// <param name="scopeFactory">What every list is limited to, such as the Event whose rows these are.</param>
-    protected JsonApiRepository(string collection, JsonApiClient client, IRepositoryScopeFactory<T>? scopeFactory = null)
+    protected JsonApiRepository(
+        string collection,
+        JsonApiClient client,
+        IRepositoryScopeFactory<T>? scopeFactory = null
+    )
     {
         Collection = collection;
         Client = client;
@@ -66,7 +70,9 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
     /// </summary>
     protected async Task<IEnumerable<T>> ReadView(string view, string? sort = null)
     {
-        return (await ResourcesOf($"{Collection}/{view}", new ListQuery(sort: sort))).Select(x => EntityOf(x)).OfType<T>();
+        return (await ResourcesOf($"{Collection}/{view}", new ListQuery(sort: sort)))
+            .Select(x => EntityOf(x))
+            .OfType<T>();
     }
 
     /// <summary>
@@ -263,6 +269,8 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
     /// </summary>
     async Task<IReadOnlyList<JsonElement>> ResourcesOf(string path, ListQuery query)
     {
-        return await JsonApiAnswers.Reached(() => Client.GetAll(path, new ListQuery(query.Filter, query.Sort, PAGE_SIZE), MAX_PAGES));
+        return await JsonApiAnswers.Reached(
+            () => Client.GetAll(path, new ListQuery(query.Filter, query.Sort, PAGE_SIZE), MAX_PAGES)
+        );
     }
 }

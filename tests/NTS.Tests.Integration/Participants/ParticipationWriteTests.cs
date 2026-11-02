@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using NoTiming.Api.Features.Live;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;

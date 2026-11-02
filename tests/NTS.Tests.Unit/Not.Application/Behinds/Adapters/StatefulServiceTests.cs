@@ -55,5 +55,4 @@ public sealed class StatefulServiceTests
 
         Assert.Equal(2, service.Runs);
     }
-
 }

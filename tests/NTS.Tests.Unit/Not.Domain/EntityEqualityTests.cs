@@ -115,5 +115,4 @@ public class EntityEqualityTests
         Assert.Equal(2, new HashSet<NUserModel> { user, new("ana@example.test", id: SECOND) }.Count);
         Assert.NotEqual(Guid.Empty, new NUserModel("ana@example.test").Id);
     }
-
 }

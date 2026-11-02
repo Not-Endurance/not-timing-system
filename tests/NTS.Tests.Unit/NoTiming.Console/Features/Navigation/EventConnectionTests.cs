@@ -67,5 +67,4 @@ public sealed class EventConnectionTests
     {
         return new StubSocket(eventId, status);
     }
-
 }

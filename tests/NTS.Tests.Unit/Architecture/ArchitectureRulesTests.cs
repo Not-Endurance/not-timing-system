@@ -373,7 +373,10 @@ public sealed class ArchitectureRulesTests
     [Fact]
     public void The_harness_is_not_checked_against_the_product()
     {
-        var files = new[] { ("Harness/Clock.cs", "namespace NTS.Tests.Unit.Harness;\n\ninternal sealed class Clock { }") };
+        var files = new[]
+        {
+            ("Harness/Clock.cs", "namespace NTS.Tests.Unit.Harness;\n\ninternal sealed class Clock { }"),
+        };
 
         Assert.Empty(ArchitectureRules.TestsMirrorTheProduct(files, []));
     }
@@ -381,7 +384,10 @@ public sealed class ArchitectureRulesTests
     [Fact]
     public void A_test_file_that_declares_a_helper_is_a_violation()
     {
-        var files = new[] { ("Domain/SomeTests.cs", "public sealed class SomeTests\n{\n    sealed class Clock { }\n}") };
+        var files = new[]
+        {
+            ("Domain/SomeTests.cs", "public sealed class SomeTests\n{\n    sealed class Clock { }\n}"),
+        };
 
         var violation = Assert.Single(ArchitectureRules.TestFilesDeclareOnlyTests(files));
         Assert.Equal("Domain/SomeTests.cs declares Clock, which is not a test: move it to the harness.", violation);
@@ -390,7 +396,10 @@ public sealed class ArchitectureRulesTests
     [Fact]
     public void A_test_file_that_declares_only_tests_is_right()
     {
-        var files = new[] { ("Domain/SomeTests.cs", "public sealed class SomeTests\n{\n    [Fact]\n    public void Holds() { }\n}") };
+        var files = new[]
+        {
+            ("Domain/SomeTests.cs", "public sealed class SomeTests\n{\n    [Fact]\n    public void Holds() { }\n}"),
+        };
 
         Assert.Empty(ArchitectureRules.TestFilesDeclareOnlyTests(files));
     }
@@ -443,7 +452,10 @@ public sealed class ArchitectureRulesTests
         var files = new[] { ("ConsoleSmokeTests.cs", "") };
 
         var violation = Assert.Single(ArchitectureRules.IntegrationTestsLiveInFeatures(files, ["Console"]));
-        Assert.Equal("ConsoleSmokeTests.cs sits at the root of the integration tests: move it into the folder of the feature it covers.", violation);
+        Assert.Equal(
+            "ConsoleSmokeTests.cs sits at the root of the integration tests: move it into the folder of the feature it covers.",
+            violation
+        );
     }
 
     [Fact]
@@ -452,7 +464,10 @@ public sealed class ArchitectureRulesTests
         var files = new[] { ("Clocks/ClockTests.cs", "") };
 
         var violation = Assert.Single(ArchitectureRules.IntegrationTestsLiveInFeatures(files, ["Console"]));
-        Assert.Equal("Clocks/ClockTests.cs is in Clocks, which is not a feature of the product or one of the host's own.", violation);
+        Assert.Equal(
+            "Clocks/ClockTests.cs is in Clocks, which is not a feature of the product or one of the host's own.",
+            violation
+        );
     }
 
     [Fact]
@@ -476,6 +491,9 @@ public sealed class ArchitectureRulesTests
     {
         var violation = Assert.Single(ArchitectureRules.ParkedScenariosStayOutOfTheBuild("<Project />"));
 
-        Assert.Equal("The integration project does not remove Parked from the build: add <Compile Remove=\"Parked\\**\" />.", violation);
+        Assert.Equal(
+            "The integration project does not remove Parked from the build: add <Compile Remove=\"Parked\\**\" />.",
+            violation
+        );
     }
 }

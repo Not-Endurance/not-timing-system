@@ -1,6 +1,6 @@
 using MongoDB.Bson;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 
 namespace NTS.Tests.Integration;
 

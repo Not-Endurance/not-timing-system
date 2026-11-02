@@ -1,5 +1,5 @@
-using NTS.Tests.Unit.Harness;
 using Not.Async;
+using NTS.Tests.Unit.Harness;
 
 namespace NTS.Tests.Unit.Not.Async;
 
@@ -178,5 +178,4 @@ public sealed class CoalesceInvokerOfKeyTests
             await Task.Delay(5);
         }
     }
-
 }

@@ -73,7 +73,15 @@ public sealed class RoutesOfTheApiTests : IClassFixture<SharedApiFixture>
         var root = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(tenant));
         var worker = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var live = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, root.Id, DateTimeOffset.UtcNow);
-        await EventSeed.GrantAsync(_shared.MongoConnectionString, tenant, live, "Operator", null, worker.Email, worker.Id);
+        await EventSeed.GrantAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            live,
+            "Operator",
+            null,
+            worker.Email,
+            worker.Id
+        );
         var club = await RegistrySeed.ClubAsync(_shared.MongoConnectionString, tenant, "Reads");
         var horse = await RegistrySeed.HorseAsync(_shared.MongoConnectionString, tenant, "Reads");
         var athlete = await RegistrySeed.AthleteAsync(

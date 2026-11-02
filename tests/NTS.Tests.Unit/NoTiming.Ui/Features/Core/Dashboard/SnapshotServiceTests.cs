@@ -235,7 +235,8 @@ public sealed class SnapshotServiceTests
         using var view = await LiveView(store, canSendSnapshots: true);
         publisher.Answer = (_, id) => SnapshotReceipt.Failed(id, 503, null, "The server could not answer.");
         await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
-        publisher.Answer = (_, id) => SnapshotReceipt.Recorded(id, 201, SnapshotDoubles.Recorded(TimeEventOutcome.Accepted));
+        publisher.Answer = (_, id) =>
+            SnapshotReceipt.Recorded(id, 201, SnapshotDoubles.Recorded(TimeEventOutcome.Accepted));
 
         await service.Publish(view, SnapshotType.Arrive);
 
@@ -370,7 +371,8 @@ public sealed class SnapshotServiceTests
                 ? SnapshotReceipt.Failed(id, 409, "participation-busy", "Too many at once.")
                 : SnapshotReceipt.Recorded(id, 201, SnapshotDoubles.Recorded(TimeEventOutcome.Accepted));
         await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
-        publisher.Answer = (_, id) => SnapshotReceipt.Recorded(id, 201, SnapshotDoubles.Recorded(TimeEventOutcome.Accepted));
+        publisher.Answer = (_, id) =>
+            SnapshotReceipt.Recorded(id, 201, SnapshotDoubles.Recorded(TimeEventOutcome.Accepted));
 
         await service.Publish(view, SnapshotType.Arrive);
 
@@ -797,5 +799,4 @@ public sealed class SnapshotServiceTests
         await service.Load();
         return (service, store, repository, publisher);
     }
-
 }

@@ -180,7 +180,9 @@ internal static class ArchitectureRules
         return
         [
             .. graph
-                .Projects.Where(x => !x.Path.StartsWith("tests/", StringComparison.Ordinal) && !TEST_LIBRARIES.Contains(x.Name))
+                .Projects.Where(x =>
+                    !x.Path.StartsWith("tests/", StringComparison.Ordinal) && !TEST_LIBRARIES.Contains(x.Name)
+                )
                 .SelectMany(x =>
                     x.Packages.Where(y => y.StartsWith("Microsoft.Playwright", StringComparison.OrdinalIgnoreCase))
                         .Select(y => $"{x.Path} takes the package {y}, and printing is the browser's.")
@@ -265,7 +267,9 @@ internal static class ArchitectureRules
         return
         [
             .. library
-                .Projects.Where(x => x.StartsWith("NTS", StringComparison.Ordinal) || x.StartsWith("NoTiming", StringComparison.Ordinal))
+                .Projects.Where(x =>
+                    x.StartsWith("NTS", StringComparison.Ordinal) || x.StartsWith("NoTiming", StringComparison.Ordinal)
+                )
                 .Select(x => $"{library.Path} references {x}, a project of the product."),
         ];
     }
@@ -291,11 +295,15 @@ internal static class ArchitectureRules
 
             if (parts.Length == 1)
             {
-                violations.Add($"{path} sits at the root of the integration tests: move it into the folder of the feature it covers.");
+                violations.Add(
+                    $"{path} sits at the root of the integration tests: move it into the folder of the feature it covers."
+                );
             }
             else if (!features.Contains(parts[0]))
             {
-                violations.Add($"{path} is in {parts[0]}, which is not a feature of the product or one of the host's own.");
+                violations.Add(
+                    $"{path} is in {parts[0]}, which is not a feature of the product or one of the host's own."
+                );
             }
         }
 

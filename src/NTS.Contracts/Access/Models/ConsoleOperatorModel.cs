@@ -18,6 +18,7 @@ public class ConsoleOperatorModel : IKrudModel<EventGrant>
     public string? Email { get; set; }
     public Guid? AccountId { get; set; }
     public string? DisplayName { get; set; }
+
     [JsonPropertyName("pending")]
     public bool IsPending { get; set; }
 

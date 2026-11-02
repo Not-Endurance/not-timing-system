@@ -16,8 +16,8 @@ using NTS.Contracts.Core;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Harness.TenancySeed;
 
@@ -499,7 +499,12 @@ public sealed class ConsolePhaseFormTests : IClassFixture<MongoFixture>
             );
             await dashboard.Show(new StubViewedEvent(store, selected.Event!, true));
             dashboard.Selected = dashboard.Participations.Single();
-            return new Tab(dashboard, new ConsoleTimeline(dashboard, new TimeEventActorApiRepository(json)), store, requests);
+            return new Tab(
+                dashboard,
+                new ConsoleTimeline(dashboard, new TimeEventActorApiRepository(json)),
+                store,
+                requests
+            );
         }
 
         Tab(

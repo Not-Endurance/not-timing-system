@@ -6,6 +6,7 @@ using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Strings;
 using NoTiming.Ui.Features.Participants;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain;
@@ -13,7 +14,6 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.ConfigureEvents;
 using static Not.Blazor.Client.REST.JsonAttributes;
-using NoTiming.Ui.Storage.REST;
 
 namespace NoTiming.Ui.Features.Console.Setup;
 
@@ -73,7 +73,11 @@ public class ConsoleLookups : IConsoleLookups, IScoped
     public async Task<IReadOnlyList<Club>> SearchClubs(string term)
     {
         var own = (await _clubs.ReadMany()).Where(x => string.IsNullOrWhiteSpace(term) || x.Name.NContains(term));
-        var elsewhere = await OtherTenants(query => Rows(_clubs.SearchAllTenants(query)), term, match => new Club(match.Name, match.Id));
+        var elsewhere = await OtherTenants(
+            query => Rows(_clubs.SearchAllTenants(query)),
+            term,
+            match => new Club(match.Name, match.Id)
+        );
         return Merged(own, elsewhere);
     }
 

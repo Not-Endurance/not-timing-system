@@ -22,18 +22,21 @@ public class TimeEventActorApiRepository
 
     public async Task<IReadOnlyDictionary<Guid, string>> NamesOf(Guid eventId)
     {
-        var actors = await JsonApiAnswers.Reached(() =>
-            _client.GetAll(
-                "time-event-actors",
-                new ListQuery(filter: $"eventId eq {eventId}", pageSize: PAGE_SIZE),
-                MAX_PAGES
-            )
+        var actors = await JsonApiAnswers.Reached(
+            () =>
+                _client.GetAll(
+                    "time-event-actors",
+                    new ListQuery(filter: $"eventId eq {eventId}", pageSize: PAGE_SIZE),
+                    MAX_PAGES
+                )
         );
         return actors
-            .Select(x => (
-                Id: Guid.TryParse(x.GetProperty("id").GetString(), out var id) ? id : (Guid?)null,
-                Name: Text(x.GetProperty("attributes"), "displayName") ?? string.Empty
-            ))
+            .Select(x =>
+                (
+                    Id: Guid.TryParse(x.GetProperty("id").GetString(), out var id) ? id : (Guid?)null,
+                    Name: Text(x.GetProperty("attributes"), "displayName") ?? string.Empty
+                )
+            )
             .Where(x => x.Id != null)
             .ToDictionary(x => x.Id!.Value, x => x.Name);
     }

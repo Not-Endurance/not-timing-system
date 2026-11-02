@@ -16,8 +16,8 @@ using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Harness.TenancySeed;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Objects.Competition;
@@ -401,7 +401,12 @@ public sealed class ConsoleDashboardTests : IClassFixture<SharedApiFixture>
         var tenant = await TenantAsync(_shared.MongoConnectionString, withCountry: true);
         _tenant = tenant;
         var person = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
-        var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, person.Id, DateTimeOffset.UtcNow);
+        var eventId = await EventSeed.LiveAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            person.Id,
+            DateTimeOffset.UtcNow
+        );
         var ids = new List<Guid>();
         foreach (
             var make in participations

@@ -21,8 +21,14 @@ public class JourneyRunnerTests
     {
         var ran = new List<int>();
 
-        await Assert.ThrowsAsync<JourneyFailedException>(() =>
-            JourneyRunner.RunAsync(FEATURE, JOURNEY, SCENARIO, [Passing(ran, 1), Failing(ran, 2, new InvalidOperationException("no code")), Passing(ran, 3)])
+        await Assert.ThrowsAsync<JourneyFailedException>(
+            () =>
+                JourneyRunner.RunAsync(
+                    FEATURE,
+                    JOURNEY,
+                    SCENARIO,
+                    [Passing(ran, 1), Failing(ran, 2, new InvalidOperationException("no code")), Passing(ran, 3)]
+                )
         );
 
         Assert.Equal(new[] { 1, 2 }, ran);
@@ -33,8 +39,14 @@ public class JourneyRunnerTests
     {
         var ran = new List<int>();
 
-        var error = await Assert.ThrowsAsync<JourneyFailedException>(() =>
-            JourneyRunner.RunAsync(FEATURE, JOURNEY, SCENARIO, [Passing(ran, 1), Failing(ran, 2, new InvalidOperationException("no code"))])
+        var error = await Assert.ThrowsAsync<JourneyFailedException>(
+            () =>
+                JourneyRunner.RunAsync(
+                    FEATURE,
+                    JOURNEY,
+                    SCENARIO,
+                    [Passing(ran, 1), Failing(ran, 2, new InvalidOperationException("no code"))]
+                )
         );
 
         Assert.Equal(FEATURE, error.Feature);
@@ -53,8 +65,8 @@ public class JourneyRunnerTests
         var failure = new InvalidOperationException("no code");
         var ran = new List<int>();
 
-        var error = await Assert.ThrowsAsync<JourneyFailedException>(() =>
-            JourneyRunner.RunAsync(FEATURE, JOURNEY, SCENARIO, [Failing(ran, 1, failure)])
+        var error = await Assert.ThrowsAsync<JourneyFailedException>(
+            () => JourneyRunner.RunAsync(FEATURE, JOURNEY, SCENARIO, [Failing(ran, 1, failure)])
         );
 
         Assert.Same(failure, error.InnerException);

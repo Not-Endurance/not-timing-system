@@ -195,7 +195,9 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
     [InlineData("isLive")]
     [InlineData("id")]
     [InlineData("nothing")]
-    public async Task What_the_server_owns_or_keeps_or_the_Event_has_not_is_ignored_and_the_rest_of_the_change_is_taken(string member)
+    public async Task What_the_server_owns_or_keeps_or_the_Event_has_not_is_ignored_and_the_rest_of_the_change_is_taken(
+        string member
+    )
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);

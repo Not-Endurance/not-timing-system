@@ -2,10 +2,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
 using Not.Application.HTTP;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
+using Not.Blazor.Client.Browser;
 using Not.Startup;
 using NoTiming.Ui;
 using NoTiming.Ui.Features.Core.Dashboard;
@@ -20,8 +22,6 @@ using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Tests.Integration.Harness;
-using Not.Blazor.Client.Browser;
-using Microsoft.JSInterop;
 
 namespace NTS.Tests.Integration.Harness.Drivers;
 
@@ -53,12 +53,7 @@ internal sealed class ViewerDriver : IAsyncDisposable
     /// <see cref="SignedInAsync"/> or, on a driver made with the fixture, by <see cref="SignIn"/>.
     /// </param>
     /// <param name="browser">What the browser of the Witness keeps of a group that was sent and not answered: another Witness given the same stands for the page being opened again.</param>
-    public ViewerDriver(
-        Uri apiBaseUrl,
-        IntegrationUser? user,
-        string clientName,
-        MemoryLocalStorage? browser = null
-    )
+    public ViewerDriver(Uri apiBaseUrl, IntegrationUser? user, string clientName, MemoryLocalStorage? browser = null)
     {
         if (user != null)
         {

@@ -687,5 +687,4 @@ public sealed class ParticipationTimelineTests
             id
         );
     }
-
 }

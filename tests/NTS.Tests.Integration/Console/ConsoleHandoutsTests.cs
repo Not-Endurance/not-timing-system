@@ -17,8 +17,8 @@ using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Harness.TenancySeed;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Objects.Competition;
@@ -180,7 +180,11 @@ public sealed class ConsoleHandoutsTests : IClassFixture<SharedApiFixture>
         var scene = await SceneAsync(api, [Plain(1), Plain(2), Plain(3)], consoleOperator: false);
         foreach (var id in scene.Ids)
         {
-            await EventSeed.HandoutAsync(_shared.MongoConnectionString, scene.Tenant, new Handout(scene.EventId, id, id));
+            await EventSeed.HandoutAsync(
+                _shared.MongoConnectionString,
+                scene.Tenant,
+                new Handout(scene.EventId, id, id)
+            );
         }
 
         await using var tab = await Tab.OpenAsync(api, scene, opensDashboard: false); // it may not remove them
@@ -412,7 +416,10 @@ public sealed class ConsoleHandoutsTests : IClassFixture<SharedApiFixture>
     async Task<List<BsonDocument>> StoredAsync(Guid eventId)
     {
         var filter = new BsonDocument("EventId", EventSeed.Binary(eventId));
-        return await RegistrySeed.Collection(_shared.MongoConnectionString, "event_handouts").Find(filter).ToListAsync();
+        return await RegistrySeed
+            .Collection(_shared.MongoConnectionString, "event_handouts")
+            .Find(filter)
+            .ToListAsync();
     }
 
     /// <summary>A Participation with its one Phase, the last, that starts at six in the morning.</summary>

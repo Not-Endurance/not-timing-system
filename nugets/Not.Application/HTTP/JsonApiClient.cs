@@ -168,7 +168,11 @@ public class JsonApiClient
     /// A list of a collection, or any route that answers with one: its filter, its sort and one page of it, as the rest-api
     /// skill names them. A route that is not a list is asked with no query.
     /// </summary>
-    public Task<JsonApiResponse> Get(string path, ListQuery? query = null, CancellationToken cancellationToken = default)
+    public Task<JsonApiResponse> Get(
+        string path,
+        ListQuery? query = null,
+        CancellationToken cancellationToken = default
+    )
     {
         var parameters = new List<string>();
         if (query?.Filter is { } filter)
@@ -257,9 +261,7 @@ public class JsonApiClient
         CancellationToken cancellationToken = default
     )
     {
-        var data = new JsonArray(
-            resources.Select(x => (JsonNode?)ResourceData(x.Type, x.Model, x.Id, null)).ToArray()
-        );
+        var data = new JsonArray(resources.Select(x => (JsonNode?)ResourceData(x.Type, x.Model, x.Id, null)).ToArray());
         var document = JsonSerializer.SerializeToElement(new JsonObject { ["data"] = data });
         return Send(HttpMethod.Post, path, document, cancellationToken);
     }

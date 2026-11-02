@@ -1,12 +1,12 @@
 using System.Globalization;
 using System.Net;
 using System.Text;
+using Not.Application.CRUD.Ports;
 using NoTiming.Ui.Features.Account;
 using NoTiming.Ui.Features.Profile;
 using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Participants;
 using NTS.Tests.Integration.Harness;
-using Not.Application.CRUD.Ports;
 
 namespace NTS.Tests.Integration;
 
@@ -295,7 +295,10 @@ public sealed class ProfileLinksTests : IClassFixture<SharedApiFixture>
     {
         var json = JsonApiClients.Of(api, person, out asked);
         var account = new AccountSession(new AccountApiRepository(json));
-        return new UiOfAPerson(account, new WitnessProfileContext(account, new CountryApiRepository(json), new AccountApiRepository(json)));
+        return new UiOfAPerson(
+            account,
+            new WitnessProfileContext(account, new CountryApiRepository(json), new AccountApiRepository(json))
+        );
     }
 
     sealed class UiOfAPerson : IDisposable

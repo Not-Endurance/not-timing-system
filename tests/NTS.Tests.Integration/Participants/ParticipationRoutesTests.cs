@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text.Json;
 using NTS.Domain.Core.Aggregates;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
@@ -94,7 +94,12 @@ public sealed class ParticipationRoutesTests : IClassFixture<SharedApiFixture>
         var otherTenant = await TenantAsync(_shared.MongoConnectionString);
         var eventId = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         var sameTenant = await EventSeed.LiveAsync(_shared.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
-        var elsewhere = await EventSeed.LiveAsync(_shared.MongoConnectionString, otherTenant, null, DateTimeOffset.UtcNow);
+        var elsewhere = await EventSeed.LiveAsync(
+            _shared.MongoConnectionString,
+            otherTenant,
+            null,
+            DateTimeOffset.UtcNow
+        );
         var mine = Ridden(eventId, 1);
         await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, mine);
         await EventSeed.ParticipationAsync(_shared.MongoConnectionString, tenant, Ridden(sameTenant, 2));

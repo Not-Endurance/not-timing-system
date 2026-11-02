@@ -8,8 +8,8 @@ using NTS.Contracts.Core;
 using NTS.Contracts.Features.Console.Rankings;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Tests.Integration.Harness.TenancySeed;
 
 namespace NTS.Tests.Integration;
@@ -114,7 +114,10 @@ public sealed class ConsoleRankingsTests : IClassFixture<SharedApiFixture>
     async Task<List<BsonDocument>> StoredAsync(Guid eventId)
     {
         var filter = new BsonDocument("EventId", EventSeed.Binary(eventId));
-        return await RegistrySeed.Collection(_shared.MongoConnectionString, "event_rankings").Find(filter).ToListAsync();
+        return await RegistrySeed
+            .Collection(_shared.MongoConnectionString, "event_rankings")
+            .Find(filter)
+            .ToListAsync();
     }
 
     sealed class Scene

@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using Not.Application.CRUD.Ports;
 using Microsoft.Extensions.Options;
+using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using NTS.Tests.Unit.Harness;
 
@@ -141,7 +141,8 @@ public sealed class JsonApiClientTests
     public async Task A_row_that_is_not_there_is_an_answer_and_not_an_error_of_the_transport()
     {
         var transport = new FakeJsonApi(_ =>
-            Json(HttpStatusCode.NotFound, Errors("not-found", "There is no such row.")));
+            Json(HttpStatusCode.NotFound, Errors("not-found", "There is no such row."))
+        );
 
         var response = await Client(transport).GetOne("athletes", AN_ATHLETE);
 
@@ -178,8 +179,10 @@ public sealed class JsonApiClientTests
         var settings = new JsonApiSettings { Url = "https://api.test/api" };
         settings.Json = new JsonSerializerOptions(JsonSerializerDefaults.Web) { PropertyNamingPolicy = null };
 
-        await new JsonApiClient(new FakeHttpClientFactory(transport), Options.Create(settings))
-            .Post("athletes", new ResourceSample(AN_ATHLETE, "Ana", null));
+        await new JsonApiClient(new FakeHttpClientFactory(transport), Options.Create(settings)).Post(
+            "athletes",
+            new ResourceSample(AN_ATHLETE, "Ana", null)
+        );
 
         var document = JsonDocument.Parse(transport.Requests.Single().Body!).RootElement;
         Assert.Equal("Ana", document.GetProperty("data").GetProperty("attributes").GetProperty("Name").GetString());
@@ -205,7 +208,8 @@ public sealed class JsonApiClientTests
     {
         var transport = new FakeJsonApi();
 
-        await Client(transport).Patch("tenants/country-bg", "tenants", "country-bg", new ResourceSample(AN_ATHLETE, "Bg", null));
+        await Client(transport)
+            .Patch("tenants/country-bg", "tenants", "country-bg", new ResourceSample(AN_ATHLETE, "Bg", null));
 
         var document = JsonDocument.Parse(transport.Requests.Single().Body!).RootElement.GetProperty("data");
         Assert.Equal("country-bg", document.GetProperty("id").GetString());
@@ -260,8 +264,8 @@ public sealed class JsonApiClientTests
     {
         var transport = new FakeJsonApi(_ => Page(new[] { Guid.NewGuid() }, hasNext: true));
 
-        await Assert.ThrowsAsync<RepositoryException>(() =>
-            Client(transport).GetAll("athletes", new ListQuery(pageSize: 1), maxPages: 2)
+        await Assert.ThrowsAsync<RepositoryException>(
+            () => Client(transport).GetAll("athletes", new ListQuery(pageSize: 1), maxPages: 2)
         );
         Assert.Equal(2, transport.Requests.Count);
     }
@@ -271,8 +275,8 @@ public sealed class JsonApiClientTests
     {
         var transport = new FakeJsonApi(_ => Json(HttpStatusCode.Forbidden, Errors("not-yours", "Not for you.")));
 
-        var refused = await Assert.ThrowsAsync<JsonApiException>(() =>
-            Client(transport).GetAll("athletes", new ListQuery(pageSize: 2), maxPages: 2)
+        var refused = await Assert.ThrowsAsync<JsonApiException>(
+            () => Client(transport).GetAll("athletes", new ListQuery(pageSize: 2), maxPages: 2)
         );
         Assert.Equal("not-yours", refused.Response.Error!.Code);
     }
@@ -299,7 +303,10 @@ public sealed class JsonApiClientTests
         Assert.Equal(HttpMethod.Post, request.Method);
         Assert.Equal("/api/snapshots/actions/send-group", request.Url);
         Assert.Equal(JsonValueKind.Array, data.ValueKind);
-        Assert.Equal(new[] { first.ToString(), second.ToString() }, data.EnumerateArray().Select(x => x.GetProperty("id").GetString()!));
+        Assert.Equal(
+            new[] { first.ToString(), second.ToString() },
+            data.EnumerateArray().Select(x => x.GetProperty("id").GetString()!)
+        );
         Assert.All(data.EnumerateArray(), x => Assert.Equal("snapshots", x.GetProperty("type").GetString()));
     }
 
@@ -337,5 +344,4 @@ public sealed class JsonApiClientTests
     {
         return $$"""{"errors":[{"code":"{{code}}","title":"{{title}}"}]}""";
     }
-
 }

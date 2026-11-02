@@ -241,5 +241,4 @@ public sealed class ResultsDocumentTests
     {
         return new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
     }
-
 }

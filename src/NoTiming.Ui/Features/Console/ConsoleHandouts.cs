@@ -1,5 +1,5 @@
-using Not.Application.CRUD.Ports;
 using Not.Application.Behinds.Adapters;
+using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Notify;
@@ -194,7 +194,10 @@ public class ConsoleHandouts : NStatefulService, IConsoleHandouts, IScoped
     async Task<bool> Make(IViewedEvent view, Guid participationId)
     {
         var eventId = view.Event.Id;
-        var there = await Answered(view, () => _writes.ReadMany(x => x.EventId == eventId && x.ParticipationId == participationId));
+        var there = await Answered(
+            view,
+            () => _writes.ReadMany(x => x.EventId == eventId && x.ParticipationId == participationId)
+        );
         if (there.Any())
         {
             return false;
@@ -223,11 +226,14 @@ public class ConsoleHandouts : NStatefulService, IConsoleHandouts, IScoped
 
     Task Answered(IViewedEvent view, Func<Task> request)
     {
-        return Answered(view, async () =>
-        {
-            await request();
-            return true;
-        });
+        return Answered(
+            view,
+            async () =>
+            {
+                await request();
+                return true;
+            }
+        );
     }
 
     /// <summary>Reads the Handouts of the Event, in what the Api answers. Called with the gate held.</summary>

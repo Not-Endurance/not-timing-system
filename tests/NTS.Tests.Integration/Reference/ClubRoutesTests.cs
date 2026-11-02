@@ -76,7 +76,10 @@ public sealed class ClubRoutesTests : IClassFixture<SharedApiFixture>
         Assert.Equal(HttpStatusCode.OK, again.StatusCode);
         var resource = (await ApiSessions.ReadJsonAsync(again)).GetProperty("data");
         Assert.Equal("First", resource.GetProperty("attributes").GetProperty("name").GetString());
-        Assert.Equal("First", (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString);
+        Assert.Equal(
+            "First",
+            (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString
+        );
     }
 
     [Fact]
@@ -110,9 +113,20 @@ public sealed class ClubRoutesTests : IClassFixture<SharedApiFixture>
         var historicOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var developer = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, isDeveloper: true);
         var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
-        var rootElsewhere = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant, TenantRootOf(other));
+        var rootElsewhere = await SignedInAsync(
+            api,
+            client,
+            _shared.MongoConnectionString,
+            tenant,
+            TenantRootOf(other)
+        );
         await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id);
-        await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, historicOperator.Id, DateTimeOffset.UtcNow);
+        await EventSeed.HistoricAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            historicOperator.Id,
+            DateTimeOffset.UtcNow
+        );
 
         foreach (var who in new[] { root, consoleOperator, developer })
         {
@@ -541,7 +555,10 @@ public sealed class ClubRoutesTests : IClassFixture<SharedApiFixture>
         Assert.Equal("not-console-operator", await ErrorCodeAsync(change));
         Assert.Equal(HttpStatusCode.Forbidden, remove.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
-        Assert.Equal("Kept", (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString);
+        Assert.Equal(
+            "Kept",
+            (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString
+        );
     }
 
     [Fact]

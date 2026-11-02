@@ -1,11 +1,11 @@
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
-using Not.Injection;
 using Not.Blazor.Client.REST;
+using Not.Injection;
+using NoTiming.Ui.Storage.Core.Repositories;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Participants;
 using NTS.Domain.Core.Aggregates;
-using NoTiming.Ui.Storage.REST;
-using NoTiming.Ui.Storage.Core.Repositories;
 
 namespace NoTiming.Ui.Features.Participants;
 

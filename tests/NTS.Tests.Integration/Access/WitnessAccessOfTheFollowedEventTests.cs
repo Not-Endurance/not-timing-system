@@ -1,14 +1,14 @@
 using Not.Application.RPC;
 using NoTiming.Ui.Features.Access;
 using NoTiming.Ui.Features.Account;
+using NoTiming.Ui.Storage.Core.Repositories;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Access;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 using static NTS.Tests.Integration.Harness.TenancySeed;
-using NoTiming.Ui.Storage.REST;
-using NoTiming.Ui.Storage.Core.Repositories;
 
 namespace NTS.Tests.Integration;
 
@@ -37,7 +37,11 @@ public sealed class WitnessAccessOfTheFollowedEventTests : IClassFixture<SharedA
         var json = JsonApiClients.Of(api, official, out var asked);
         using var account = new AccountSession(new AccountApiRepository(json));
         var followed = new FollowedEvent();
-        using var access = new WitnessAccessContext(followed, account, new EventInformationApiRepository(json, followed));
+        using var access = new WitnessAccessContext(
+            followed,
+            account,
+            new EventInformationApiRepository(json, followed)
+        );
 
         await access.Load(); // the page is loaded and no Event is followed
 
@@ -66,7 +70,11 @@ public sealed class WitnessAccessOfTheFollowedEventTests : IClassFixture<SharedA
         using var account = new AccountSession(new AccountApiRepository(json));
         var followed = new FollowedEvent();
         followed.Follow(eventId);
-        using var access = new WitnessAccessContext(followed, account, new EventInformationApiRepository(json, followed));
+        using var access = new WitnessAccessContext(
+            followed,
+            account,
+            new EventInformationApiRepository(json, followed)
+        );
 
         await access.Load();
         await access.Load();

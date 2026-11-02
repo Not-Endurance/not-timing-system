@@ -137,7 +137,12 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<SharedApiFixture>
         var member = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var official = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var rootElsewhere = await SignedInAsync(api, client, _shared.MongoConnectionString, other, TenantRootOf(other));
-        var unstarted = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, "Unstarted");
+        var unstarted = await EventSeed.SetupAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            consoleOperator.Id,
+            "Unstarted"
+        );
         var historic = await EventSeed.HistoricAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id, NOW);
         foreach (var eventId in new[] { unstarted, historic })
         {
@@ -374,7 +379,10 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<SharedApiFixture>
         Assert.Equal("event-started", await ErrorCodeAsync(duringTheEvent));
         Assert.Equal(HttpStatusCode.Conflict, afterTheEvent.StatusCode);
         Assert.Equal("event-ended", await ErrorCodeAsync(afterTheEvent));
-        Assert.StartsWith("Event ", (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, live))!["Name"].AsString);
+        Assert.StartsWith(
+            "Event ",
+            (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, live))!["Name"].AsString
+        );
     }
 
     [Theory]
@@ -434,8 +442,24 @@ public sealed class ConfigureEventRoutesTests : IClassFixture<SharedApiFixture>
         var consoleOperator = await SignedInAsync(api, client, _shared.MongoConnectionString, tenant);
         var id = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id);
         var kept = await EventSeed.SetupAsync(_shared.MongoConnectionString, tenant, consoleOperator.Id);
-        await EventSeed.GrantAsync(_shared.MongoConnectionString, tenant, id, "Operator", null, "one@example.test", null);
-        await EventSeed.GrantAsync(_shared.MongoConnectionString, tenant, kept, "Operator", null, "two@example.test", null);
+        await EventSeed.GrantAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            id,
+            "Operator",
+            null,
+            "one@example.test",
+            null
+        );
+        await EventSeed.GrantAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            kept,
+            "Operator",
+            null,
+            "two@example.test",
+            null
+        );
 
         var refusedForTheConsoleOperator = await consoleOperator.Page.DeleteAsync($"/api/configure-events/{id}");
         var removed = await root.Page.DeleteAsync($"/api/configure-events/{id}");

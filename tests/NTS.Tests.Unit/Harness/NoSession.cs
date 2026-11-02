@@ -27,10 +27,7 @@ internal sealed class NoSession : IWitnessUserSession
         return Task.FromResult(
             Selections == null
                 ? null
-                : new NtsUserSessionStateModel
-                {
-                    SnapshotSelections = [.. Selections.Select(SnapshotModel.MapFrom)],
-                }
+                : new NtsUserSessionStateModel { SnapshotSelections = [.. Selections.Select(SnapshotModel.MapFrom)] }
         );
     }
 

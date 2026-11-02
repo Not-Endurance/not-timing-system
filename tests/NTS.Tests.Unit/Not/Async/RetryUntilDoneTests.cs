@@ -1,5 +1,5 @@
-using NTS.Tests.Unit.Harness;
 using Not.Async;
+using NTS.Tests.Unit.Harness;
 
 namespace NTS.Tests.Unit.Not.Async;
 
@@ -106,5 +106,4 @@ public sealed class RetryUntilDoneTests
             await Task.Delay(1);
         }
     }
-
 }

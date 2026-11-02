@@ -14,9 +14,9 @@ using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Operators;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
 using NTS.Judge.Contracts.Features.Setup.Horses;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 
 namespace NTS.Tests.Integration.EndToEndEventTests.Features;
 

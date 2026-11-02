@@ -110,7 +110,9 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         var clubs = new ClubApiRepository(JsonApiClients.Of(api, member, out var requests));
 
         var byServer = (await clubs.ReadMany(x => x.Name == "Alpha")).ToList();
-        var refused = await Assert.ThrowsAsync<RepositoryException>(() => clubs.ReadMany(x => x.Name.StartsWith("Alp")));
+        var refused = await Assert.ThrowsAsync<RepositoryException>(
+            () => clubs.ReadMany(x => x.Name.StartsWith("Alp"))
+        );
         var first = await clubs.Read(x => x.Name == "Beta");
 
         Assert.Equal(["Alpha"], byServer.Select(x => x.Name));
@@ -192,7 +194,10 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         Assert.False(string.IsNullOrWhiteSpace(refusedCreate.Message));
         Assert.Equal(HttpStatusCode.Unauthorized, notSignedIn.Response.Status);
         Assert.Equal("not-signed-in", notSignedIn.Code);
-        Assert.Equal("Kept", (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString);
+        Assert.Equal(
+            "Kept",
+            (await RegistrySeed.StoredAsync(_shared.MongoConnectionString, "clubs", id))!["Name"].AsString
+        );
         Assert.Equal(1, await RegistrySeed.CountAsync(_shared.MongoConnectionString, "clubs", tenant));
     }
 
@@ -265,8 +270,8 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         var iso = CountrySeed.UniqueIsoCode();
         var id = Guid.NewGuid();
 
-        var refusal = await Assert.ThrowsAsync<JsonApiException>(() =>
-            byRoot.Create(new Country(Guid.NewGuid(), "Refused " + iso, iso, null, null))
+        var refusal = await Assert.ThrowsAsync<JsonApiException>(
+            () => byRoot.Create(new Country(Guid.NewGuid(), "Refused " + iso, iso, null, null))
         );
         await byDeveloper.Create(new Country(id, "Land " + iso, iso, iso[..3], "xx-XX"));
         var read = await byRoot.Read(id);
@@ -328,8 +333,8 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
         var liveSetup = (await setups.Read(live))!;
 
         await setups.Update(SetupFactory.Full(open, "Configured"));
-        var refused = await Assert.ThrowsAsync<JsonApiException>(() =>
-            setups.Update(SetupFactory.Full(live, "Too late"))
+        var refused = await Assert.ThrowsAsync<JsonApiException>(
+            () => setups.Update(SetupFactory.Full(live, "Too late"))
         );
 
         Assert.Equal("Open", openSetup.Name);
@@ -340,8 +345,14 @@ public sealed class JsonApiRepositoryTests : IClassFixture<SharedApiFixture>
             open,
             Assert.Single(dispatcher.Events.OfType<NTS.Domain.Setup.Events.ConfigureEventUpdated>()).EventId
         );
-        Assert.Equal("Configured", (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, open))!["Name"].AsString);
-        Assert.StartsWith("Event ", (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, live))!["Name"].AsString);
+        Assert.Equal(
+            "Configured",
+            (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, open))!["Name"].AsString
+        );
+        Assert.StartsWith(
+            "Event ",
+            (await EventSeed.SetupOfAsync(_shared.MongoConnectionString, live))!["Name"].AsString
+        );
     }
 
     sealed class RecordingDispatcher : IDomainEventDispatcher

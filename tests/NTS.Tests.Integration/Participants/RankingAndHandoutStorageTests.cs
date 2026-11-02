@@ -1,8 +1,8 @@
 using MongoDB.Bson;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Tests.Integration.Harness.Drivers;
 using NTS.Tests.Integration.Harness;
+using NTS.Tests.Integration.Harness.Drivers;
 
 namespace NTS.Tests.Integration;
 

@@ -179,7 +179,9 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
             {
                 if (_environment == "Production")
                 {
-                    throw new InvalidOperationException("Production refuses the outbox: it keeps the one-time codes it sends.");
+                    throw new InvalidOperationException(
+                        "Production refuses the outbox: it keeps the one-time codes it sends."
+                    );
                 }
 
                 UseOutbox(services);

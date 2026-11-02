@@ -71,7 +71,15 @@ public sealed class IdentityFieldsNeverLeaveTests : IClassFixture<SharedApiFixtu
             consoleOperator.Id,
             $"Event {marker}"
         );
-        await EventSeed.GrantAsync(_shared.MongoConnectionString, tenant, eventId, "Operator", null, person.Email, person.Id);
+        await EventSeed.GrantAsync(
+            _shared.MongoConnectionString,
+            tenant,
+            eventId,
+            "Operator",
+            null,
+            person.Email,
+            person.Id
+        );
         var secrets = new[] { stamp, Convert.ToBase64String(credential), Base64Url(credential) };
 
         var routes = new[]

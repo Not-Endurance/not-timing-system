@@ -41,5 +41,4 @@ public sealed class KrudNodeRepositoryTests
 
         Assert.Equal([kept], await repository.ReadMany());
     }
-
 }

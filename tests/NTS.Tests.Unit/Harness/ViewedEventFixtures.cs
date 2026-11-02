@@ -5,6 +5,7 @@ using Not.Domain;
 using Not.Events;
 using NoTiming.Ui.Features.Core.Events;
 using NoTiming.Ui.Features.Core.EventViews;
+using NTS.Contracts.Access.Models;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Access;
 using NTS.Contracts.Socket;
@@ -14,7 +15,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using Country = NTS.Domain.Aggregates.Country;
-using NTS.Contracts.Access.Models;
 
 namespace NTS.Tests.Unit.Harness;
 
