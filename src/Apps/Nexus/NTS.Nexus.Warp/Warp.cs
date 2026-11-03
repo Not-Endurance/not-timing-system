@@ -4,10 +4,10 @@ using Not.Localization;
 using Not.Startup;
 using NTS.Application.Contracts;
 using NTS.Nexus.Warp.ConnectionDiagnostics;
-using NTS.Nexus.Warp.Cors;
 using NTS.Nexus.Warp.Features.Judge;
 using NTS.Nexus.Warp.Features.Witness;
 using NTS.Nexus.Warp.Host;
+using NTS.Nexus.Warp.Host.Cors;
 
 namespace NTS.Nexus.Warp;
 

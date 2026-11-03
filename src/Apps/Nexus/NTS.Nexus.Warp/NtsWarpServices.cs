@@ -10,8 +10,8 @@ using NTS.Application.Mongo;
 using NTS.Nexus.Warp.Api.Errors;
 using NTS.Nexus.Warp.Api.Mongo.Repositories;
 using NTS.Nexus.Warp.Api.Telemetry;
-using NTS.Nexus.Warp.Cors;
 using NTS.Nexus.Warp.Features.Witness.Authorization;
+using NTS.Nexus.Warp.Host.Cors;
 using NTS.Nexus.Warp.Middlewares;
 
 namespace NTS.Nexus.Warp;

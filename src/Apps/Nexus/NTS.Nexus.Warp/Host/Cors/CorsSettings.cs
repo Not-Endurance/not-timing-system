@@ -1,4 +1,4 @@
-namespace NTS.Nexus.Warp.Cors;
+namespace NTS.Nexus.Warp.Host.Cors;
 
 public class CorsSettings
 {
