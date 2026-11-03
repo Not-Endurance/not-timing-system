@@ -56,7 +56,11 @@ public static class Warp
                 if (isHubWebSocketRequest)
                 {
                     var origin = context.Request.Headers.Origin.ToString();
-                    if (!string.IsNullOrWhiteSpace(origin) && !originValidator.IsAllowed(origin))
+                    if (
+                        !string.IsNullOrWhiteSpace(origin)
+                        && !originValidator.IsAllowed(origin)
+                        && !CorsOriginMatcher.IsSameHost(origin, context.Request.Host.Host)
+                    )
                     {
                         logger.LogWarning(
                             "Warp rejected WebSocket request for {Path} because origin {Origin} is not allowed. CorrelationId {CorrelationId}, Client {ClientName}, Version {ClientVersion}, InstanceId {InstanceId}.",
@@ -75,6 +79,20 @@ public static class Warp
                 await next();
             }
         );
+
+        app.Use(
+            async (context, next) =>
+            {
+                if (!IsServerPath(context.Request.Path))
+                {
+                    context.Response.Headers["Blazor-Environment"] = app.Environment.EnvironmentName;
+                }
+
+                await next();
+            }
+        );
+        app.UseBlazorFrameworkFiles();
+        app.UseStaticFiles();
 
         app.UseCors(NtsWarpServices.CORS_POLICY_NAME);
         app.UseAuthentication();
@@ -115,6 +133,7 @@ public static class Warp
         app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
         app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
         app.MapControllers();
+        app.MapFallback(context => ServeWitnessIndex(context, app.Environment));
 
         LocalizationHelper.Configure(app.Services.GetRequiredService<IStringLocalizer>());
 
@@ -124,6 +143,35 @@ public static class Warp
         }
 
         app.Run();
+    }
+
+    static bool IsServerPath(PathString path)
+    {
+        return path.StartsWithSegments("/api")
+            || path.StartsWithSegments("/healthz")
+            || path.StartsWithSegments($"/{ApplicationConstants.JUDGE_HUB}")
+            || path.StartsWithSegments($"/{ApplicationConstants.WITNESS_HUB}");
+    }
+
+    static async Task ServeWitnessIndex(HttpContext context, IWebHostEnvironment environment)
+    {
+        var isReadRequest = HttpMethods.IsGet(context.Request.Method) || HttpMethods.IsHead(context.Request.Method);
+        if (!isReadRequest || IsServerPath(context.Request.Path))
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            return;
+        }
+
+        var index = environment.WebRootFileProvider.GetFileInfo("index.html");
+        if (!index.Exists)
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            return;
+        }
+
+        context.Response.ContentType = "text/html; charset=utf-8";
+        await using var stream = index.CreateReadStream();
+        await stream.CopyToAsync(context.Response.Body);
     }
 
     static bool IsIntegrationAuthEnabled()
