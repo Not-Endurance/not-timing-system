@@ -24,4 +24,25 @@
   <ItemGroup>
   </ItemGroup>
   
+  <!-- Local Debug runs: publish the Witness UI into this project's wwwroot so Warp can serve it. -->
+  <PropertyGroup>
+    <WitnessUiPublishDir>$(BaseIntermediateOutputPath)witness-ui/</WitnessUiPublishDir>
+  </PropertyGroup>
+
+  <Target Name="PublishWitnessUiForLocalRun" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    <MSBuild
+      Projects="$(MSBuildProjectDirectory)/../../Witness/NTS.Witness.Web/NTS.Witness.Web.csproj"
+      Targets="Publish"
+      Properties="Configuration=Debug;PublishDir=$(MSBuildProjectDirectory)/$(WitnessUiPublishDir)"
+    />
+    <ItemGroup>
+      <WitnessUiFile Include="$(MSBuildProjectDirectory)/$(WitnessUiPublishDir)wwwroot/**/*" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(WitnessUiFile)"
+      DestinationFiles="@(WitnessUiFile->'$(MSBuildProjectDirectory)/wwwroot/%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true"
+    />
+  </Target>
+
 </Project>
