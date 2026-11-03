@@ -1,4 +1,4 @@
-using NTS.Nexus.Warp.Cors;
+using NTS.Nexus.Warp.Host.Cors;
 
 namespace NTS.Nexus.Warp.Tests.Cors;
 
