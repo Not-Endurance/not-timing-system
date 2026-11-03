@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Authentication.Abstractions;
+using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Blazor.Client;
 using Not.Krud.ServiceRegistration;
@@ -30,16 +31,19 @@ public static class NtsWitnessServices
             .ConfigureNtsApplication(configuration, rootAssembly)
             .AddSharedCoreDomainServices()
             .ConfigureN()
-            .AddRpcClient(settings =>
-            {
-                if (string.IsNullOrWhiteSpace(settings.Host))
-                {
-                    settings.Host = baseUrl.TrimEnd('/');
-                }
-            })
+            .AddRpcClient()
             .AddDomainEvents()
             .AddHttp(settings => settings.Host = baseUrl)
             .AddUserSessions();
+
+        // Deployed builds leave RpcSettings.Host empty and call the origin the UI is served from.
+        services.PostConfigure<RpcSettings>(settings =>
+        {
+            if (string.IsNullOrWhiteSpace(settings.Host))
+            {
+                settings.Host = baseUrl.TrimEnd('/');
+            }
+        });
 
         return services.AddNts(configuration).NClientSideBlazor(configuration);
     }
