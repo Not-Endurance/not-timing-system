@@ -3,7 +3,7 @@ using Not.Application.DomainEvents;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
-using NTS.Application.UserSession;
+using NoTiming.Ui.Features.Sessions;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;

@@ -90,9 +90,8 @@ internal static class TenantIndexes
                 GRANTS,
                 Plain("grants_of_an_account_on_an_event", new BsonDocument { { "EventId", 1 }, { "AccountId", 1 } })
             ),
+            (GRANTS, Plain("grants_of_an_account_by_kind", new BsonDocument { { "AccountId", 1 }, { "Kind", 1 } })),
             (GRANTS, Plain("grants_waiting_for_an_email", new BsonDocument { { "Email", 1 }, { "AccountId", 1 } })),
-            ("configure_events", Plain("events_by_main_operator", new BsonDocument("MainOperatorId", 1))),
-            ("event_informations", Plain("events_by_main_operator", new BsonDocument("MainOperatorId", 1))),
             (
                 "event_participations",
                 Plain(

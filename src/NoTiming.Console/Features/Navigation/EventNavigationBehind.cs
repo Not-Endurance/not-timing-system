@@ -32,7 +32,7 @@ public class EventNavigationBehind : NStatefulComponent
 
     /// <summary>Whether the connection to the Event is up, said to the person who runs it while it is Live.</summary>
     protected EventConnection? Connection =>
-        Events.Events.FirstOrDefault(x => x.Id == EventId) is { Stage: EventStage.Live, IsMainOperator: true } row
+        Events.Events.FirstOrDefault(x => x.Id == EventId) is { Stage: EventStage.Live, RunsTheConsole: true } row
             ? EventConnection.Of(Socket, row.Id, row.Name)
             : null;
 

@@ -1,12 +1,11 @@
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using Not.Application.HTTP;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using NoTiming.Ui.Features.Account;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Console;
-using static NoTiming.Ui.Features.Console.ApiAnswers;
+using NTS.Contracts.Tenancy.Models;
 
 namespace NoTiming.Ui.Features.Console;
 
@@ -16,18 +15,17 @@ namespace NoTiming.Ui.Features.Console;
 /// </summary>
 public class ConsoleTenant : AccountAwareContext, IConsoleTenant, IScoped
 {
-    readonly JsonApiClient _api;
+    readonly TenantApiRepository _tenants;
 
-    public ConsoleTenant(IAccountSession account, JsonApiClient api)
+    public ConsoleTenant(IAccountSession account, TenantApiRepository tenants)
         : base(account)
     {
-        _api = api;
+        _tenants = tenants;
     }
 
     public string? TenantId { get; private set; }
     public string Name { get; private set; } = string.Empty;
-    public bool CanEditRules { get; private set; }
-    public bool CanEditBranding { get; private set; }
+    public bool CanEdit { get; private set; }
     public bool OnlyAverageLoopSpeed { get; private set; }
     public string? RankerCode { get; private set; }
 
@@ -45,25 +43,27 @@ public class ConsoleTenant : AccountAwareContext, IConsoleTenant, IScoped
             return true;
         }
 
-        var tenant = await _api.Send(HttpMethod.Get, Route(tenantId));
-        var capabilities = await _api.Send(HttpMethod.Get, $"{Route(tenantId)}/capabilities");
-        if (tenant is not { IsSuccess: true, Document: { } document })
+        TenantModel? tenant;
+        try
+        {
+            tenant = await _tenants.Read(tenantId);
+        }
+        catch (JsonApiException)
+        {
+            tenant = null; // a Tenant the Api does not give is none
+        }
+
+        if (tenant == null)
         {
             Clear();
             return true;
         }
 
-        var attributes = document.GetProperty("data").GetProperty("attributes");
         TenantId = tenantId;
-        Name = Text(attributes, "name") ?? tenantId;
-        var rules = attributes.GetProperty("regionalRules");
-        OnlyAverageLoopSpeed = Flag(rules, "onlyAverageLoopSpeed");
-        RankerCode = Text(rules, "rankerCode");
-        var may = capabilities is { IsSuccess: true, Document: { } granted }
-            ? granted.GetProperty("data").GetProperty("attributes")
-            : default;
-        CanEditRules = may.ValueKind == JsonValueKind.Object && Flag(may, "canEditRules");
-        CanEditBranding = may.ValueKind == JsonValueKind.Object && Flag(may, "canEditBranding");
+        Name = string.IsNullOrEmpty(tenant.Name) ? tenantId : tenant.Name;
+        OnlyAverageLoopSpeed = tenant.RegionalRules.OnlyAverageLoopSpeed;
+        RankerCode = tenant.RegionalRules.RankerCode;
+        CanEdit = await CanEditOf(tenantId);
         return true;
     }
 
@@ -71,36 +71,33 @@ public class ConsoleTenant : AccountAwareContext, IConsoleTenant, IScoped
     {
         var tenantId = TenantId ?? throw new DomainException(Federation_not_yours_string);
         // a ranker that is left empty is sent as null, which clears it: a member that is not named stays as it is
-        var rules = new JsonObject
+        var rules = new RegionalRulesModel
         {
-            ["onlyAverageLoopSpeed"] = onlyAverageLoopSpeed,
-            ["rankerCode"] = string.IsNullOrWhiteSpace(rankerCode) ? null : rankerCode.Trim(),
+            OnlyAverageLoopSpeed = onlyAverageLoopSpeed,
+            RankerCode = string.IsNullOrWhiteSpace(rankerCode) ? null : rankerCode.Trim(),
         };
-        var document = new JsonObject
-        {
-            ["data"] = new JsonObject
-            {
-                ["type"] = "tenants",
-                ["id"] = tenantId,
-                ["attributes"] = new JsonObject { ["regionalRules"] = rules },
-            },
-        };
-        Accepted(await _api.Send(HttpMethod.Patch, Route(tenantId), JsonSerializer.SerializeToElement(document)));
+        await ApiRefusals.Answered(() => _tenants.SaveRules(tenantId, rules));
         await ReloadState();
+    }
+
+    async Task<bool> CanEditOf(string tenantId)
+    {
+        try
+        {
+            return (await _tenants.CapabilitiesOf(tenantId)).CanEditTenant;
+        }
+        catch (JsonApiException)
+        {
+            return false; // what the Api does not say, the person may not do
+        }
     }
 
     void Clear()
     {
         TenantId = null;
         Name = string.Empty;
-        CanEditRules = false;
-        CanEditBranding = false;
+        CanEdit = false;
         OnlyAverageLoopSpeed = false;
         RankerCode = null;
-    }
-
-    static string Route(string tenantId)
-    {
-        return $"tenants/{Uri.EscapeDataString(tenantId)}";
     }
 }

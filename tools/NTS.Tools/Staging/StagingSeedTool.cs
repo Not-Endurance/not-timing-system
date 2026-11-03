@@ -34,7 +34,7 @@ public static class StagingSeedTool
                 Apply = options.Apply,
                 Environment = options.Environment,
                 TenantRoot = options.TenantRoot,
-                MainOperator = options.MainOperator,
+                ConsoleOperator = options.ConsoleOperator,
                 Officials = options.Officials,
                 Operators = options.Operators,
                 EventName = options.EventName,
@@ -66,8 +66,8 @@ public static class StagingSeedTool
                 case "--tenant-root" when i + 1 < args.Length:
                     options.TenantRoot = args[++i];
                     break;
-                case "--main-operator" when i + 1 < args.Length:
-                    options.MainOperator = args[++i];
+                case "--console-operator" when i + 1 < args.Length:
+                    options.ConsoleOperator = args[++i];
                     break;
                 case "--operator" when i + 1 < args.Length:
                     options.Operators.Add(args[++i]);
@@ -146,12 +146,12 @@ public static class StagingSeedTool
         output.WriteLine(
             """
             Usage:
-              dotnet run --project tools/NTS.Tools -- seed-staging --connection-string <mongo> --tenant-root <email> --main-operator <email>
+              dotnet run --project tools/NTS.Tools -- seed-staging --connection-string <mongo> --tenant-root <email> --console-operator <email>
                   [--official <email>:<Role>]... [--operator <email>]... [--environment Staging|Development] [--database nts]
                   [--event-name <name>] [--days 7] [--start 00:00] [--apply]
 
             Makes, in the Tenant of Bulgaria, what a person who tries the platform on a staging database needs: a Tenant Root (which
-            makes the Tenant operational), a Main Operator, Officials and Operators, and a Live Event with twelve Participations that
+            makes the Tenant operational), a Console Operator, Officials and Operators, and a Live Event with twelve Participations that
             the Officials and Operators may send Snapshots to. The accounts are named by their email and made when they are not there:
             each person signs in with a code sent to the address. A dry run reports all of it and changes nothing. It refuses a
             database that is marked Production, and one with no marker unless --environment says which it is (which marks it), and it
@@ -160,7 +160,7 @@ public static class StagingSeedTool
             Options:
               --connection-string <mongo>   MongoDB connection string. Never paste it anywhere but the command line.
               --tenant-root <email>         The Tenant Root of the Tenant of Bulgaria.
-              --main-operator <email>       The Main Operator of the Event.
+              --console-operator <email>    A Console Operator of the Event.
               --official <email>:<Role>     An Official of the Event: Steward, ChiefSteward, GroundJury, GroundJuryPresident and the other roles.
               --operator <email>            An Operator of the Event.
               --environment <name>          Staging or Development: marks a database that has no marker.
@@ -179,7 +179,7 @@ public static class StagingSeedTool
         public string Database { get; set; } = DEFAULT_DATABASE;
         public string? Environment { get; set; }
         public string? TenantRoot { get; set; }
-        public string? MainOperator { get; set; }
+        public string? ConsoleOperator { get; set; }
         public List<(string Email, OfficialRole Role)> Officials { get; } = [];
         public List<string> Operators { get; } = [];
         public string EventName { get; set; } = "Staging Seed Event";

@@ -100,7 +100,6 @@ public static class StagingDataset
         DateTimeOffset start,
         Country country,
         string tenantId,
-        Guid mainOperatorId,
         IReadOnlyList<SeededPerson> officials,
         IReadOnlyList<SeededPerson> operators
     )
@@ -189,8 +188,7 @@ public static class StagingDataset
             combinations,
             eventId,
             setupOperators,
-            tenantId,
-            mainOperatorId
+            tenantId
         );
     }
 }

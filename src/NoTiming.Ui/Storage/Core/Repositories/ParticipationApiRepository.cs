@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using NoTiming.Ui.Storage.REST;
@@ -10,7 +11,7 @@ namespace NoTiming.Ui.Storage.Core.Repositories;
 /// The Participations as the Api serves them (#604, ADR-0006, ADR-0013): the <c>participations</c> resource, which counts its
 /// writes. What a list reads shows the version of each Participation, and a change is made against it: the Api refuses one
 /// that was made on a version that has changed since, with the code <c>participation-changed</c> in
-/// <see cref="Not.Storage.REST.JsonApiRepository{T, TModel}.LastError"/>, and the Ui reads the Participation again.
+/// <see cref="Not.Blazor.Client.REST.JsonApiRepository{T, TModel}.LastError"/>, and the Ui reads the Participation again.
 /// </summary>
 public class ParticipationApiRepository : EventDataApiRepository<Participation, ParticipationModel>
 {
@@ -19,4 +20,23 @@ public class ParticipationApiRepository : EventDataApiRepository<Participation, 
 
     public ParticipationApiRepository(JsonApiClient client)
         : base("participations", client, null) { }
+
+    /// <summary>
+    /// One page of the Participations of an Athlete or of a Horse, the history of the Athlete or the Horse (#604): the rows, and
+    /// whether another page follows.
+    /// </summary>
+    public Task<(IReadOnlyList<JsonElement> Rows, bool HasNext)> HistoryOf(
+        string member,
+        Guid id,
+        int size,
+        int number,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return PageOf(
+            "participations/history",
+            new ListQuery(filter: $"{member} eq {id}", pageSize: size, pageNumber: number),
+            cancellationToken
+        );
+    }
 }

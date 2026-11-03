@@ -1,4 +1,5 @@
 using Not.Application.Behinds.Adapters;
+using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Notify;
@@ -110,8 +111,11 @@ public class ConsoleHandouts : NStatefulService, IConsoleHandouts, IScoped
         {
             foreach (var document in documents)
             {
-                await _writes.Delete(document.Id);
-                if (_writes.LastError is { } error)
+                try
+                {
+                    await _writes.Delete(document.Id);
+                }
+                catch (RepositoryException error)
                 {
                     view.Refused(error.Code);
                     refused = error.Message;
@@ -190,35 +194,53 @@ public class ConsoleHandouts : NStatefulService, IConsoleHandouts, IScoped
     async Task<bool> Make(IViewedEvent view, Guid participationId)
     {
         var eventId = view.Event.Id;
-        var there = await _writes.ReadMany(x => x.EventId == eventId && x.ParticipationId == participationId);
-        Refuse(view);
+        var there = await Answered(
+            view,
+            () => _writes.ReadMany(x => x.EventId == eventId && x.ParticipationId == participationId)
+        );
         if (there.Any())
         {
             return false;
         }
 
-        await _writes.Create(new Handout(eventId, participationId, participationId));
-        Refuse(view);
+        await Answered(view, () => _writes.Create(new Handout(eventId, participationId, participationId)));
         return true;
+    }
+
+    /// <summary>
+    /// What the Api answers to a request of the Console: its answer, or what it refused, which is said in its words, and the
+    /// view is told its code (#631).
+    /// </summary>
+    async Task<T> Answered<T>(IViewedEvent view, Func<Task<T>> request)
+    {
+        try
+        {
+            return await request();
+        }
+        catch (RepositoryException refused)
+        {
+            view.Refused(refused.Code);
+            throw new DomainException(refused.Message);
+        }
+    }
+
+    Task Answered(IViewedEvent view, Func<Task> request)
+    {
+        return Answered(
+            view,
+            async () =>
+            {
+                await request();
+                return true;
+            }
+        );
     }
 
     /// <summary>Reads the Handouts of the Event, in what the Api answers. Called with the gate held.</summary>
     async Task Read(IViewedEvent view)
     {
         var eventId = view.Event.Id;
-        var read = await _writes.ReadMany(x => x.EventId == eventId);
-        Refuse(view);
-        _handouts = [.. read];
-    }
-
-    /// <summary>What the Api refused is said in its words, and the view is told its code (#631).</summary>
-    void Refuse(IViewedEvent view)
-    {
-        if (_writes.LastError is { } refused)
-        {
-            view.Refused(refused.Code);
-            throw new DomainException(refused.Message);
-        }
+        _handouts = [.. await Answered(view, () => _writes.ReadMany(x => x.EventId == eventId))];
     }
 
     void Release(IViewedEvent view)

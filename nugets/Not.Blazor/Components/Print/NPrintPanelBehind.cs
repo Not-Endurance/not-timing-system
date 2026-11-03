@@ -119,20 +119,6 @@ public class NPrintPanelBehind : NComponent
         }
     }
 
-    internal static NPrintBatchRequest EncodeStaticImageSources(
-        NPrintBatchRequest request,
-        IReadOnlyList<string> assetRootPaths
-    )
-    {
-        return new NPrintBatchRequest
-        {
-            FileName = request.FileName,
-            Documents = request
-                .Documents.Select(document => EncodeStaticImageSources(document, assetRootPaths))
-                .ToList(),
-        };
-    }
-
     internal static NPrintDocumentRequest EncodeStaticImageSources(
         NPrintDocumentRequest request,
         IReadOnlyList<string> assetRootPaths
@@ -177,16 +163,6 @@ public class NPrintPanelBehind : NComponent
             case NPrintPanelActionKind.PrintPdf:
                 var printRequest = EncodeStaticImageSources(await action.GetDocumentRequest(context), assetRootPaths);
                 await PrintService.PrintPdf(printRequest);
-                await action.AfterSuccess();
-                break;
-            case NPrintPanelActionKind.DownloadPdf:
-                var pdfRequest = EncodeStaticImageSources(await action.GetDocumentRequest(context), assetRootPaths);
-                await PrintService.DownloadPdf(pdfRequest);
-                await action.AfterSuccess();
-                break;
-            case NPrintPanelActionKind.DownloadZip:
-                var zipRequest = EncodeStaticImageSources(await action.GetBatchRequest(context), assetRootPaths);
-                await PrintService.DownloadZip(zipRequest);
                 await action.AfterSuccess();
                 break;
             case NPrintPanelActionKind.DownloadFile:

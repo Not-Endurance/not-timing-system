@@ -2,9 +2,9 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
+using Not.Blazor.Client.REST;
 using Not.Domain.Abstractions;
 using Not.Krud.Abstractions;
-using Not.Storage.REST;
 using NTS.Contracts.Shared;
 using NTS.Domain.Core.Aggregates;
 
@@ -14,25 +14,16 @@ namespace NoTiming.Ui.Storage.REST;
 /// What an Event keeps as the Api serves it (#604, ADR-0008): the Participations, Rankings, Officials and Handouts are flat
 /// resources with the Event as an attribute, and the Api asks every list of them to start with the Event. A repository that
 /// is scoped has the Event the Ui has selected at the head of every list, and one that is not reads what the filter of a
-/// call names, as the view of a Historic Event does (#630). The Event of a row is written when the row is
-/// made and a change leaves it as it is. A resource that counts its writes shows the count in its <c>meta</c>, and a change
-/// of it names the one it was read at, so that the Api can refuse a change that was made on what has changed since.
+/// call names, as the view of a Historic Event does (#630). The Event of a row is written when the row is made and a change
+/// leaves it as it is. A resource that counts its writes shows the count in its <c>meta</c>, and a change of it names the one
+/// it was read at, so that the Api can refuse a change that was made on what has changed since.
 /// </summary>
 public abstract class EventDataApiRepository<T, TModel> : JsonApiRepository<T, TModel>
     where T : class, IEntity, IEventScoped
     where TModel : class, IEventScoped, IKrudModel<T>, new()
 {
-    /// <summary>What the Api keeps of a document for itself, and tells in the meta or not at all.</summary>
-    static readonly string[] KEPT_BY_THE_API = ["isDeleted", "deletedVersion", "version"];
-
-    /// <param name="notSent">The members this family keeps to itself, besides the ones of every family.</param>
-    protected EventDataApiRepository(
-        string collection,
-        JsonApiClient client,
-        IRepositoryScopeFactory<T>? scopeFactory,
-        params string[] notSent
-    )
-        : base(collection, client, scopeFactory, [.. KEPT_BY_THE_API, .. notSent]) { }
+    protected EventDataApiRepository(string collection, JsonApiClient client, IRepositoryScopeFactory<T>? scopeFactory)
+        : base(collection, client, scopeFactory) { }
 
     protected override IReadOnlyCollection<string> NotChanged => ["eventId"];
 

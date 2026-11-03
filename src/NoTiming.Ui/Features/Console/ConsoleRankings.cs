@@ -1,3 +1,4 @@
+using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Krud.Abstractions;
@@ -9,7 +10,7 @@ using NTS.Domain.Core.Aggregates;
 namespace NoTiming.Ui.Features.Console;
 
 /// <summary>
-/// The Rankings of a Live Event as the Main Operator changes them (#646): a Ranking of Participations it chooses is written to
+/// The Rankings of a Live Event as the Console Operator changes them (#646): a Ranking of Participations it chooses is written to
 /// the Api for the Event the view shows, one is removed, and the view reads its Rankings again, so that what is shown is what
 /// is stored. A Ranking that is not taken is said in the Api's words, and the form that made it keeps what was typed.
 /// </summary>
@@ -50,8 +51,16 @@ public class ConsoleRankings : IConsoleRankings, IKrudFormService<CustomRankingM
 
     async Task Write(IViewedEvent view, Func<Task> write)
     {
-        await write();
-        var refused = _writes.LastError;
+        RepositoryException? refused = null;
+        try
+        {
+            await write();
+        }
+        catch (RepositoryException error)
+        {
+            refused = error;
+        }
+
         await view.Refresh();
         if (refused != null)
         {

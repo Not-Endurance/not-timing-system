@@ -13,7 +13,7 @@ internal static class ApiTelemetry
     /// <summary>
     /// Traces and metrics for requests, outgoing calls and the live hub. Azure Monitor receives them when the App
     /// Service has an Application Insights connection string, and an OTLP collector (for example the Aspire dashboard
-    /// of docker/nexus.yaml) when OTEL_EXPORTER_OTLP_ENDPOINT is set. With neither, nothing is exported.
+    /// of docker/compose.yaml) when OTEL_EXPORTER_OTLP_ENDPOINT is set. With neither, nothing is exported.
     /// </summary>
     public static IServiceCollection AddApiTelemetry(this IServiceCollection services, IConfiguration configuration)
     {

@@ -127,16 +127,11 @@ public static class ODataApiFilterAdapter
             return true;
         }
 
-        if (expression is BinaryExpression comparison && TryGetOperator(comparison.NodeType, out var oDataOperator))
+        // The Api reads equality only (ADR-0017): any other comparison is refused, and the repository filters what it reads.
+        if (expression is BinaryExpression { NodeType: ExpressionType.Equal } equal)
         {
-            return TryCreateComparison(comparison.Left, comparison.Right, oDataOperator, naming, out oDataFilter)
-                || TryCreateComparison(
-                    comparison.Right,
-                    comparison.Left,
-                    ReverseOperator(oDataOperator),
-                    naming,
-                    out oDataFilter
-                );
+            return TryCreateComparison(equal.Left, equal.Right, "eq", naming, out oDataFilter)
+                || TryCreateComparison(equal.Right, equal.Left, "eq", naming, out oDataFilter);
         }
 
         // A member that is a boolean is a condition by itself, and so is the negation of one.
@@ -258,34 +253,6 @@ public static class ODataApiFilterAdapter
 
         propertyName = "";
         return false;
-    }
-
-    static bool TryGetOperator(ExpressionType nodeType, out string oDataOperator)
-    {
-        oDataOperator = nodeType switch
-        {
-            ExpressionType.Equal => "eq",
-            ExpressionType.NotEqual => "ne",
-            ExpressionType.GreaterThan => "gt",
-            ExpressionType.GreaterThanOrEqual => "ge",
-            ExpressionType.LessThan => "lt",
-            ExpressionType.LessThanOrEqual => "le",
-            _ => "",
-        };
-
-        return oDataOperator != "";
-    }
-
-    static string ReverseOperator(string oDataOperator)
-    {
-        return oDataOperator switch
-        {
-            "gt" => "lt",
-            "ge" => "le",
-            "lt" => "gt",
-            "le" => "ge",
-            _ => oDataOperator,
-        };
     }
 
     static string FormatValue(object? value)

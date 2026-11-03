@@ -22,75 +22,53 @@ internal sealed partial class ReferenceQuery<T>
 {
     const string FILTER = "filter";
     const string SORT = "sort";
-    const string PAGE_SIZE = "page[size]";
-    const string PAGE_NUMBER = "page[number]";
     static readonly ConcurrentDictionary<string, IEdmModel> MODELS = new();
     public const int DEFAULT_PAGE_SIZE = 100;
     public const int MAX_PAGE_SIZE = 500;
 
     public static ReferenceQuery<T> Read(HttpRequest request, IReadOnlyCollection<string> hiddenMembers)
     {
-        foreach (var parameter in request.Query.Keys)
-        {
-            if (parameter is not (FILTER or SORT or PAGE_SIZE or PAGE_NUMBER))
-            {
-                return Refused(
-                    StatusCodes.Status400BadRequest,
-                    "unsupported-parameter",
-                    "The parameter is not supported.",
-                    parameter
-                );
-            }
-        }
-
-        var size = DEFAULT_PAGE_SIZE;
-        var number = 1;
         if (
-            !JsonApiPaging.TryRead(request, PAGE_SIZE, MAX_PAGE_SIZE, ref size)
-            || !JsonApiPaging.TryRead(request, PAGE_NUMBER, int.MaxValue / MAX_PAGE_SIZE, ref number)
+            JsonApiQuery.Unsupported(request, FILTER, SORT, JsonApiPaging.PAGE_SIZE, JsonApiPaging.PAGE_NUMBER) is
+            { } unsupported
         )
         {
-            return Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-page",
-                "A page is a number of at least 1 and a size of 1 to 500."
-            );
+            return Refused(unsupported);
+        }
+
+        if (JsonApiPaging.Read(request, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, out var size, out var number) is { } page)
+        {
+            return Refused(page);
         }
 
         var filter = request.Query.TryGetValue(FILTER, out var filterValues) ? filterValues.ToString().Trim() : null;
         var orderBy = ToOrderBy(request.Query.TryGetValue(SORT, out var sortValues) ? sortValues.ToString() : null);
         if (orderBy == "")
         {
-            return Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-sort",
-                "Sort by members, with a - for descending: sort=-name,id."
-            );
+            return Refused(ReferenceFailures.InvalidSortMembers);
         }
 
         var model = ModelOf(hiddenMembers);
         if (filter == "")
         {
-            return Refused(StatusCodes.Status400BadRequest, "invalid-filter", "The filter is empty.");
+            return Refused(ReferenceFailures.EmptyFilter);
         }
 
         if (filter != null && !TryBuild(request, model, "$filter", filter, out _))
         {
             return Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-filter",
-                "The filter is not valid.",
-                "Use an expression of the OData filter grammar over the members of the resource."
+                JsonApiFailures.InvalidFilter.With(
+                    "Use an expression of the OData filter grammar over the members of the resource."
+                )
             );
         }
 
         if (orderBy != null && !TryBuild(request, model, "$orderby", orderBy, out _))
         {
             return Refused(
-                StatusCodes.Status400BadRequest,
-                "invalid-sort",
-                "The sort is not valid.",
-                "Sort by the members of the resource, with a - for descending: sort=-name,id."
+                JsonApiFailures.InvalidSort.With(
+                    "Sort by the members of the resource, with a - for descending: sort=-name,id."
+                )
             );
         }
 
@@ -123,9 +101,14 @@ internal sealed partial class ReferenceQuery<T>
 
     public int Take => Size + 1;
 
-    static ReferenceQuery<T> Refused(int status, string code, string title, string? detail = null)
+    static ReferenceQuery<T> Refused(JsonApiFailure failure)
     {
-        return new ReferenceQuery<T>(null, DEFAULT_PAGE_SIZE, 1, JsonApiResults.Error(status, code, title, detail));
+        return Refused(failure.AsResult());
+    }
+
+    static ReferenceQuery<T> Refused(IResult refusal)
+    {
+        return new ReferenceQuery<T>(null, DEFAULT_PAGE_SIZE, 1, refusal);
     }
 
     /// <summary>

@@ -21,7 +21,7 @@ namespace NoTiming.Console.Features.Rankings;
 /// <summary>
 /// The Rankings of the Event the page opened, and the Results of the one the person picked (#646): printed through the
 /// browser with the logos of the Tenant, exported for the FEI as a file the browser downloads, made new from the Participations
-/// the Main Operator chooses while the Event is Live, and removed. The Results are composed from the Participations whenever
+/// the Console Operator chooses while the Event is Live, and removed. The Results are composed from the Participations whenever
 /// they are shown (ADR-0006), so the page shows a Live Event as it is now and a Historic Event as a record.
 /// </summary>
 public class RankingsPageBehind : NStatefulComponent

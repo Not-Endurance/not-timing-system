@@ -11,7 +11,7 @@ using NTS.Domain.Setup.Services.StartValidation;
 namespace NoTiming.Console.Features.Home;
 
 /// <summary>
-/// The home of the Console (#646): the Events the person runs or, for a Tenant Root, the Tenant's, each at its stage with
+/// The home of the Console (#646): the Events the person runs or, for Root, the Tenant's, each at its stage with
 /// the actions the Api says the person may take (<see cref="ConsoleEvent"/>), and the making of an Event.
 /// </summary>
 public class ConsoleHomeContentBehind : NStatefulComponent
@@ -35,7 +35,7 @@ public class ConsoleHomeContentBehind : NStatefulComponent
     protected bool CanCreate => Events.CanCreate;
 
     /// <summary>Whether the person has anything to do about the federation they act in, which is what the Api says of them.</summary>
-    protected bool ShowFederation => Federation.CanEditRules || Federation.CanEditBranding;
+    protected bool ShowFederation => Federation.CanEdit;
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,23 +65,23 @@ public class ConsoleHomeContentBehind : NStatefulComponent
 
     protected static bool ShowSetup(ConsoleEvent row)
     {
-        return row is { Stage: EventStage.Unstarted, IsMainOperator: true };
+        return row is { Stage: EventStage.Unstarted, RunsTheConsole: true };
     }
 
     protected static bool ShowStart(ConsoleEvent row)
     {
-        return row is { Stage: EventStage.Unstarted, CanConfigure: true, IsMainOperator: true };
+        return row is { Stage: EventStage.Unstarted, CanConfigure: true };
     }
 
     protected static bool ShowDashboard(ConsoleEvent row)
     {
-        return row is { Stage: EventStage.Live, IsMainOperator: true };
+        return row is { Stage: EventStage.Live, RunsTheConsole: true };
     }
 
     /// <summary>The Results of an Event that is over, or of a Live one that the person does not run: the Console's page of them prints and exports.</summary>
     protected static bool ShowResults(ConsoleEvent row)
     {
-        return row.Stage == EventStage.Historic || row is { Stage: EventStage.Live, IsMainOperator: false };
+        return row.Stage == EventStage.Historic || row is { Stage: EventStage.Live, RunsTheConsole: false };
     }
 
     protected void OpenHistoricEvents()
@@ -165,40 +165,12 @@ public class ConsoleHomeContentBehind : NStatefulComponent
         });
     }
 
-    protected async Task Assign(ConsoleEvent row)
-    {
-        await ChooseMainOperator(
-            Assign_main_operator_string,
-            async account =>
-            {
-                await Events.AssignMainOperator(row.Id, account.Id);
-                Notifier.Success(Main_operator_assigned_string);
-            }
-        );
-    }
-
-    protected async Task HandOver(ConsoleEvent row)
-    {
-        await ChooseMainOperator(
-            Hand_over_event_string,
-            async account =>
-            {
-                await Events.HandOver(row.Id, account.Id);
-                Notifier.Success(Event_handed_over_string);
-            }
-        );
-    }
-
-    async Task ChooseMainOperator(string title, Func<AccountMatch, Task> act)
+    protected async Task ChooseConsoleOperators(ConsoleEvent row)
     {
         await Safely(async () =>
         {
-            var dialog = await DialogService.ShowAsync<MainOperatorDialog>(title);
-            var result = await dialog.Result;
-            if (result is { Canceled: false, Data: AccountMatch account })
-            {
-                await act(account);
-            }
+            var parameters = new DialogParameters<ConsoleOperatorsDialog> { { x => x.EventId, row.Id } };
+            await DialogService.ShowAsync<ConsoleOperatorsDialog>(Console_operators_string, parameters);
         });
     }
 

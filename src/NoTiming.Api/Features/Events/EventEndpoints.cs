@@ -1,328 +1,282 @@
+using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Not.Identity;
 using NoTiming.Api.Features.Access;
-using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
+using NTS.Contracts.Core.Models;
 using NTS.Contracts.Setup.Models;
 using NTS.Domain.Access;
+using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NoTiming.Api.Features.Events;
 
 /// <summary>
-/// Creating an Event, and who runs it (#643, ADR-0012). A Tenant Root makes an Event in the Tenant it is acting in and is
-/// its Main Operator; it assigns another account while the Event has not started, and once the Event is Live only the
-/// Main Operator hands it over. What a person may do about an Event is told by <c>GET /api/events/{id}/capabilities</c>
-/// from the same policy that refuses it. The Event is made with its Setup, of which a name and a location are all it needs
-/// and what is not sent is what a new Setup has: nothing configured, and the country of the Tenant. It cannot be given a
-/// Tenant or a Main Operator by what is sent.
+/// The Event, the <c>events</c> resource (#628, ADR-0007, ADR-0012, ADR-0008): what an Event is once it has started. It
+/// is read by anybody, of every Tenant, because anybody may follow an Event; the named collections
+/// <c>/api/events/live</c> and <c>/api/events/historic</c> split the Events by the clock of the host, and every Event
+/// carries <c>isLive</c>, the same rule told as an attribute. An Event is Live until the end of its last day and Historic
+/// from then on: liveness is derived and never stored. Who runs an Event is not part of what the public sees.
+/// <para>
+/// A <c>POST</c> names the Setup an Event is started from, as the id of the resource, and starts it (<see cref="EventStarter"/>):
+/// a Console Operator's or Root's, before the Event starts, and the same Setup again is the Event that was started. A
+/// <c>PATCH</c> changes what the Event shows, while it is Live, and a <c>DELETE</c> resets it to its Setup, while it is Live;
+/// both are theirs, and neither can end the Event, because an Event is over when its last day is.
+/// </para>
 /// </summary>
 internal static class EventEndpoints
 {
-    const string CONFIGURE_EVENTS = "configure-events";
-    const string MAIN_OPERATORS = "main-operators";
+    const string EVENTS = "events";
     const string CAPABILITIES = "capabilities";
-    const int MAX_NAME_LENGTH = 100;
-    const int MAX_FEI_SHOW_ID_LENGTH = 20;
 
     public static IEndpointRouteBuilder MapEvents(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/configure-events", Create).RequireAuthorization();
-        app.MapPost("/api/events/{id}/actions/assign-main-operator", AssignMainOperator).RequireAuthorization();
-        app.MapPost("/api/events/{id}/actions/hand-over", HandOver).RequireAuthorization();
-        app.MapGet("/api/events/{id}/capabilities", ReadCapabilities).RequireAuthorization();
+        app.MapGet(
+            "/api/events",
+            (HttpContext context, CrossTenantReads reads, TimeProvider time) => ListAsync(null, context, reads, time)
+        );
+        app.MapGet(
+            "/api/events/live",
+            (HttpContext context, CrossTenantReads reads, TimeProvider time) =>
+                ListAsync(EventStage.Live, context, reads, time)
+        );
+        app.MapGet(
+            "/api/events/historic",
+            (HttpContext context, CrossTenantReads reads, TimeProvider time) =>
+                ListAsync(EventStage.Historic, context, reads, time)
+        );
+        app.MapGet("/api/events/{id}", GetEventsById);
+        app.MapPost("/api/events", PostEvents);
+        app.MapPatch("/api/events/{id}", PatchEventsById);
+        app.MapDelete("/api/events/{id}", DeleteEventsById);
+        app.MapGet("/api/events/{id}/capabilities", GetEventsByIdCapabilities);
         return app;
     }
 
-    static async Task<IResult> Create(
+    /// <summary>The attributes of an Event at the instant: what it has, and whether it is Live then.</summary>
+    public static Dictionary<string, JsonElement> AttributesOf(EventInformationModel model, DateTimeOffset now)
+    {
+        var attributes = Members.AttributesOf(model);
+        attributes["isLive"] = JsonSerializer.SerializeToElement(
+            EventStageRule.Of(true, model.EndDay, now) == EventStage.Live
+        );
+        return attributes;
+    }
+
+    /// <summary>What an Event shows, and what a change of it may name: the rules the Tenant had when it started are shown and not written.</summary>
+    public static ReferenceMembers<EventInformationModel> Members { get; } =
+        new(["IsDeleted", "DeletedVersion"], ["RegionalRules"]);
+
+    static async Task<IResult> ListAsync(
+        EventStage? stage,
         HttpContext context,
-        UserManager<NIdentityUser> users,
-        TenantStore tenants,
-        TenantCollections collections,
-        EventStore events,
-        TenancyLog log
+        CrossTenantReads reads,
+        TimeProvider time
     )
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, CONFIGURE_EVENTS);
-        if (read.Error != null)
+        var query = ReferenceQuery<EventInformationModel>.Read(context.Request, Members.Hidden);
+        if (query.Refusal != null)
         {
-            return read.Error;
+            return query.Refusal;
         }
 
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        // What the account does in is its current Tenant: nothing that is sent names another.
-        var tenantId = AccountRoles.CurrentTenantOf(user);
-        if (tenantId == null || await tenants.FindAsync(tenantId, context.RequestAborted) is null)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status409Conflict,
-                "no-current-tenant",
-                "Choose a country on your profile before you make an Event: an Event belongs to the Tenant of one."
-            );
-        }
-
-        var verdict = AccessPolicy.Decide(
-            Capability.CreateEvent,
-            AccountRoles.CallerOf(user),
-            AccessScope.ForTenant(tenantId, await tenants.IsOperationalAsync(tenantId, context.RequestAborted))
+        var now = time.GetUtcNow();
+        var rows = await reads.ReadPublicEventsAsync(
+            stage,
+            now,
+            query.Options,
+            query.Skip,
+            query.Take,
+            context.RequestAborted
         );
-        if (!verdict.IsAllowed)
+        return JsonApiResults.Page(
+            EVENTS,
+            rows.Take(query.Size).Select(x => (x.Id.ToString(), (object)AttributesOf(x, now))),
+            context.Request,
+            query.Size,
+            query.Number,
+            rows.Count > query.Size,
+            itemLink: id => $"/api/{EVENTS}/{id}"
+        );
+    }
+
+    static async Task<IResult> GetEventsById(string id, HttpContext context, CrossTenantReads reads, TimeProvider time)
+    {
+        var model = Guid.TryParse(id, out var eventId)
+            ? await reads.FindPublicEventAsync(eventId, context.RequestAborted)
+            : null;
+        return model is null ? JsonApiResults.NotFound() : Resource(model, time.GetUtcNow(), StatusCodes.Status200OK);
+    }
+
+    // The Event is its Setup, so the document names the Setup and nothing else.
+    [Requires(Capability.ConfigureEvent, PlaceIn.EventInDocument)]
+    static async Task<IResult> PostEvents(
+        JsonApiBody<EventStart> body,
+        AccessContext access,
+        EventStarter starter,
+        TenantStore tenantStore,
+        TenantCollections tenants,
+        CrossTenantReads reads,
+        TenancyLog log,
+        TimeProvider time,
+        CancellationToken cancellationToken
+    )
+    {
+        var facts = access.Event;
+        var id = facts.Id;
+        var now = time.GetUtcNow();
+        if (facts.Record.IsStarted)
         {
-            return AccessResults.Refused(verdict);
+            return await ThatEventAsync(id, reads, now, cancellationToken);
         }
 
-        var setup = new ConfigureEventModel
+        var tenant = await tenantStore.FindAsync(facts.TenantId, cancellationToken);
+        if (tenant is null)
         {
-            Competitions = [],
-            Officials = [],
-            Loops = [],
-            Combinations = [],
-        };
-        if (SetupEndpoints.Members.Apply(setup, read.Attributes!.Members ?? [], []) is { } malformed)
+            return EventsFailures.TenantNotFound.AsResult();
+        }
+
+        var setup = await tenants
+            .Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, facts.TenantId)
+            .FindAsync(id, cancellationToken);
+        if (setup is null)
+        {
+            return JsonApiResults.NotFound();
+        }
+
+        if (ReferenceRows.Invalid<ConfigureEventModel, ConfigureEvent>(setup) is { } invalid)
+        {
+            return invalid;
+        }
+
+        var (plan, refusal) = EventStartPlans.Create(setup.MapToEntity(), tenant.RegionalRules);
+        if (refusal != null)
+        {
+            return refusal;
+        }
+
+        if (!await starter.StartAsync(plan!, facts.TenantId, cancellationToken))
+        {
+            return await ThatEventAsync(id, reads, now, cancellationToken);
+        }
+
+        log.EventStarted(access.User.Id, id, facts.TenantId);
+        return Resource(plan!.EventInformation, now, StatusCodes.Status201Created, $"/api/{EVENTS}/{id}");
+    }
+
+    [Requires(Capability.ConfigureEvent, PlaceIn.StartedEventRoute)]
+    static async Task<IResult> PatchEventsById(
+        JsonApiBody<EventChange> body,
+        AccessContext access,
+        TenantCollections tenants,
+        TimeProvider time,
+        CancellationToken cancellationToken
+    )
+    {
+        var facts = access.Event;
+        var eventId = facts.Id;
+        var collection = tenants.Of<EventInformationModel>(TenantOwned.EVENT_INFORMATIONS, facts.TenantId);
+        var row = await collection.FindAsync(eventId, cancellationToken);
+        if (row is null)
+        {
+            return JsonApiResults.NotFound();
+        }
+
+        var named = new List<PropertyInfo>();
+        if (Members.Apply(row, body.Attributes.Members ?? [], named) is { } malformed)
         {
             return malformed;
         }
 
-        if (Unacceptable(setup) is { } unacceptable)
+        if (ReferenceRows.Invalid<EventInformationModel, EventInformation>(row) is { } invalid)
         {
-            return unacceptable;
+            return invalid;
         }
 
-        var id = Guid.NewGuid();
-        if (read.Id != null && !Guid.TryParse(read.Id, out id))
+        var now = time.GetUtcNow();
+        if (named.Any(x => x.Name is nameof(EventInformationModel.StartDay) or nameof(EventInformationModel.EndDay)))
         {
-            return JsonApiResults.InvalidId();
-        }
-
-        setup.Id = id;
-        setup.MainOperatorId = user.Id;
-        var setups = collections.Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, tenantId);
-        try
-        {
-            var country = await events.CountryOfAsync(tenantId, context.RequestAborted);
-            setup.Country ??= country;
-            if (ReferenceEndpoints.Invalid<ConfigureEventModel, ConfigureEvent>(setup) is { } invalid)
+            // The days are whole days in the offset they are given in, as the span of an Event makes them, and the
+            // Event is over when its last day is: an Event is not ended by changing its days.
+            var span = new EventSpan(row.StartDay, row.EndDay);
+            if (EventStageRule.Of(true, span.EndDay, now) != EventStage.Live)
             {
-                return invalid;
+                return EventsFailures.EventNotEndedByItsDays.AsResult();
             }
 
-            if (await setups.InsertAsync(setup, context.RequestAborted))
+            if (span.StartDay > span.EndDay)
             {
-                log.EventCreated(user.Id, id, tenantId);
-                return JsonApiResults.Resource(
-                    StatusCodes.Status201Created,
-                    CONFIGURE_EVENTS,
-                    id.ToString(),
-                    SetupEndpoints.Members.AttributesOf(setup),
-                    $"/api/{CONFIGURE_EVENTS}/{id}"
-                );
+                return EventsFailures.EventStartsAfterItsEnd.AsResult();
             }
 
-            // The same id again is the Event that was made. An Event of another Tenant with it is not told about.
-            var existing = await setups.FindAsync(id, context.RequestAborted);
-            return existing is null
-                ? JsonApiResults.IdTaken()
-                : JsonApiResults.Resource(
-                    StatusCodes.Status200OK,
-                    CONFIGURE_EVENTS,
-                    id.ToString(),
-                    SetupEndpoints.Members.AttributesOf(existing)
-                );
+            if (named.Any(x => x.Name == nameof(EventInformationModel.StartDay)))
+            {
+                row.StartDay = span.StartDay;
+            }
+
+            if (named.Any(x => x.Name == nameof(EventInformationModel.EndDay)))
+            {
+                row.EndDay = span.EndDay;
+            }
         }
-        catch (TenantCountryMissingException)
+
+        var update = Members.UpdateOf(row, named);
+        if (update.ElementCount > 0 && !await collection.UpdateAsync(eventId, update, cancellationToken))
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status409Conflict,
-                "tenant-country-missing",
-                "The country of the Tenant is not among the countries, so no Event can be made in it."
-            );
+            return JsonApiResults.NotFound();
         }
+
+        return Resource(row, now, StatusCodes.Status200OK);
     }
 
-    /// <summary>
-    /// What an Event needs whatever else it is made with: a name and a location of one line each, and a FEI show ID that
-    /// is no longer than one can be. What is accepted is put into the Setup trimmed.
-    /// </summary>
-    static IResult? Unacceptable(ConfigureEventModel setup)
-    {
-        var name = setup.Name?.Trim();
-        if (string.IsNullOrEmpty(name) || !OneLineText.IsValid(name, MAX_NAME_LENGTH))
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-name",
-                "An Event needs a name of one line of at most 100 characters."
-            );
-        }
-
-        var location = setup.Location?.Trim();
-        if (string.IsNullOrEmpty(location) || !OneLineText.IsValid(location, MAX_NAME_LENGTH))
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-location",
-                "An Event needs a location of one line of at most 100 characters."
-            );
-        }
-
-        var feiShowId = string.IsNullOrWhiteSpace(setup.FeiShowId) ? null : setup.FeiShowId.Trim();
-        if (feiShowId != null && !OneLineText.IsValid(feiShowId, MAX_FEI_SHOW_ID_LENGTH))
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-fei-show-id",
-                "An FEI show ID is at most 20 characters of one line."
-            );
-        }
-
-        setup.Name = name;
-        setup.Location = location;
-        setup.FeiShowId = feiShowId;
-        return null;
-    }
-
-    static Task<IResult> AssignMainOperator(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventStore events,
-        TenancyLog log
-    )
-    {
-        return ChangeMainOperator(id, Capability.AssignMainOperator, context, users, events, log, assign: true);
-    }
-
-    static Task<IResult> HandOver(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventStore events,
-        TenancyLog log
-    )
-    {
-        return ChangeMainOperator(id, Capability.HandOverMainOperator, context, users, events, log, assign: false);
-    }
-
-    static async Task<IResult> ChangeMainOperator(
-        string id,
-        Capability capability,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventStore events,
+    [Requires(Capability.RunEvent, PlaceIn.EventRoute)]
+    static async Task<IResult> DeleteEventsById(
+        AccessContext access,
+        EventStarter starter,
         TenancyLog log,
-        bool assign
+        CancellationToken cancellationToken
     )
     {
-        var read = await JsonApiRequests.ReadAsync<MainOperatorAttributes>(context.Request, MAIN_OPERATORS);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var facts = Guid.TryParse(id, out var eventId) ? await events.FindAsync(eventId, context.RequestAborted) : null;
-        if (facts is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var verdict = AccessPolicy.Decide(capability, AccountRoles.CallerOf(user), facts.ScopeFor(CallerGrants.None));
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
-        var attributes = read.Attributes!;
-        if (attributes.Others is { Count: > 0 })
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "unsupported-attribute",
-                "The account that is to be the Main Operator is sent as accountId, and nothing else.",
-                string.Join(", ", attributes.Others.Keys)
-            );
-        }
-
-        if (attributes.AccountId is not { } accountId)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "malformed-request",
-                "Send the account that is to be the Main Operator as accountId."
-            );
-        }
-
-        var account = await users.FindByIdAsync(accountId.ToString());
-        if (account is null)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status422UnprocessableEntity,
-                "account-not-found",
-                "There is no such account."
-            );
-        }
-
-        var changed = assign
-            ? await events.AssignMainOperatorAsync(facts.Record, account.Id, context.RequestAborted)
-            : await events.HandOverAsync(facts.Record, account.Id, context.RequestAborted);
-        if (!changed)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        if (assign)
-        {
-            log.MainOperatorAssigned(user.Id, eventId, account.Id);
-        }
-        else
-        {
-            log.EventHandedOver(user.Id, eventId, account.Id);
-        }
-
+        var facts = access.Event;
+        await starter.ResetAsync(facts.Id, facts.TenantId, cancellationToken);
+        log.EventReset(access.User.Id, facts.Id, facts.TenantId);
         return Results.NoContent();
     }
 
-    static async Task<IResult> ReadCapabilities(
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventStore events,
-        EventGrantStore grants,
-        TenantStore tenants
+    /// <summary>The Event that was started already, as the answer to starting it again: the first outcome, 200.</summary>
+    static async Task<IResult> ThatEventAsync(
+        Guid id,
+        CrossTenantReads reads,
+        DateTimeOffset now,
+        CancellationToken cancellationToken
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
+        var model = await reads.FindPublicEventAsync(id, cancellationToken);
+        return model is null ? JsonApiResults.NotFound() : Resource(model, now, StatusCodes.Status200OK);
+    }
 
-        var facts = Guid.TryParse(id, out var eventId) ? await events.FindAsync(eventId, context.RequestAborted) : null;
-        if (facts is null)
-        {
-            return JsonApiResults.NotFound();
-        }
+    static IResult Resource(EventInformationModel model, DateTimeOffset now, int status, string? location = null)
+    {
+        return JsonApiResults.Resource(status, EVENTS, model.Id.ToString(), AttributesOf(model, now), location);
+    }
 
-        var caller = AccountRoles.CallerOf(user);
-        var scope = facts.ScopeFor(await grants.GrantsOfAsync(facts.Record, user.Id, context.RequestAborted));
-        var tenant = AccessScope.ForTenant(
-            facts.TenantId,
-            await tenants.IsOperationalAsync(facts.TenantId, context.RequestAborted)
-        );
+    // What a person may do about an Event is the policy's own answer, so that a screen and the server cannot differ.
+    [Requires(Capability.SignedIn, PlaceIn.EventRoute)]
+    static async Task<IResult> GetEventsByIdCapabilities(
+        AccessContext access,
+        TenantStore tenants,
+        StandingReader standings,
+        CancellationToken cancellationToken
+    )
+    {
+        var facts = access.Event;
+        var standing = await standings.AtEventAsync(access.User, facts, cancellationToken);
+        var inTheTenant = await standings.AtTenantAsync(access.User, facts.TenantId, cancellationToken);
+        var tenant = PlaceState.OfTenant(await tenants.IsOperationalAsync(facts.TenantId, cancellationToken));
         return JsonApiResults.Resource(
             StatusCodes.Status200OK,
             CAPABILITIES,
@@ -330,27 +284,16 @@ internal static class EventEndpoints
             new
             {
                 stage = facts.Stage.ToString().ToLowerInvariant(),
-                isMainOperator = AccessPolicy.IsMainOperator(caller, scope),
-                canSnapshot = AccessPolicy.Decide(Capability.SendSnapshot, caller, scope).IsAllowed,
-                canHandOver = AccessPolicy.Decide(Capability.HandOverMainOperator, caller, scope).IsAllowed,
-                canAssignMainOperator = AccessPolicy.Decide(Capability.AssignMainOperator, caller, scope).IsAllowed,
-                canCreateEvents = AccessPolicy.Decide(Capability.CreateEvent, caller, tenant).IsAllowed,
-                canConfigure = AccessPolicy.Decide(Capability.ConfigureEvent, caller, scope).IsAllowed,
-                canEditSetup = AccessPolicy.Decide(Capability.EditSetup, caller, scope).IsAllowed,
-                canEditData = AccessPolicy.Decide(Capability.EditEventData, caller, scope).IsAllowed,
-                canLinkAccounts = AccessPolicy.Decide(Capability.LinkAccounts, caller, scope).IsAllowed,
-                canEditBranding = AccessPolicy.Decide(Capability.EditEventBranding, caller, scope).IsAllowed,
-                canReset = AccessPolicy.Decide(Capability.ResetEvent, caller, scope).IsAllowed,
+                level = AccessLevelText.Of(standing.Level),
+                canSnapshot = AccessPolicy.Decide(Capability.SendSnapshot, standing, facts.State).IsAllowed,
+                canConfigure = AccessPolicy.Decide(Capability.ConfigureEvent, standing, facts.State).IsAllowed,
+                canEditSetup = AccessPolicy.Decide(Capability.EditSetup, standing, facts.State).IsAllowed,
+                canRun = AccessPolicy.Decide(Capability.RunEvent, standing, facts.State).IsAllowed,
+                canAssignConsoleOperators = AccessPolicy
+                    .Decide(Capability.AssignConsoleOperators, standing, facts.State)
+                    .IsAllowed,
+                canCreateEvents = AccessPolicy.Decide(Capability.CreateEvent, inTheTenant, tenant).IsAllowed,
             }
         );
     }
-}
-
-/// <summary>The account that is to be the Main Operator. A member that is not it is kept, to be refused.</summary>
-internal sealed class MainOperatorAttributes
-{
-    public Guid? AccountId { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Others { get; set; }
 }

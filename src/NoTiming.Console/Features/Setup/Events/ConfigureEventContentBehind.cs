@@ -4,7 +4,7 @@ using NTS.Contracts.Features.Console;
 namespace NoTiming.Console.Features.Setup.Events;
 
 /// <summary>
-/// The Setup of an Event, opened by its Main Operator (#646): the form of the Event and, under it, the lists of what the
+/// The Setup of an Event, opened by its Console Operator (#646): the form of the Event and, under it, the lists of what the
 /// Event is made of. The address names the Event, so the page is the same after a reload, and it is read from the Api each
 /// time it is opened. Whoever else opens the address finds nothing there: the Api says who runs the Event, and the Console
 /// shows only that.

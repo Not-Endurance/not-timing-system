@@ -1,43 +1,47 @@
-using System.Text.Json;
-using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using NoTiming.Ui.Features.Account;
+using NoTiming.Ui.Features.Core.Events;
 using NoTiming.Ui.Features.Participants;
-using NTS.Application.Core;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Console;
-using NTS.Domain.Access;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
-using static NoTiming.Ui.Features.Console.ApiAnswers;
+using static Not.Blazor.Client.REST.JsonAttributes;
 
 namespace NoTiming.Ui.Features.Console;
 
 /// <summary>
 /// The Events of the Console's home (#646). What the person sees is what the Api lists for them, and what they may do about
 /// each is what the Api says for the person and the Event as they are now (<c>GET /api/events/{id}/capabilities</c>): the
-/// Ui keeps no rule of its own about who may configure, start, reset or hand over. It follows the account.
+/// Ui keeps no rule of its own about who may configure, start, reset or assign. It follows the account.
 /// </summary>
 public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
 {
-    readonly IRepository<ConfigureEvent> _setups;
+    readonly ConfigureEventApiRepository _setups;
     readonly IEventInformationRepository _events;
-    readonly JsonApiClient _api;
+    readonly ConsoleOperatorApiRepository _operators;
+    readonly AccountApiRepository _accounts;
+    readonly TenantApiRepository _tenants;
     IReadOnlyList<ConsoleEvent> _list = [];
 
     public ConsoleEvents(
         IAccountSession account,
-        IRepository<ConfigureEvent> setups,
+        ConfigureEventApiRepository setups,
         IEventInformationRepository events,
-        JsonApiClient api
+        ConsoleOperatorApiRepository operators,
+        AccountApiRepository accounts,
+        TenantApiRepository tenants
     )
         : base(account)
     {
         _setups = setups;
         _events = events;
-        _api = api;
+        _operators = operators;
+        _accounts = accounts;
+        _tenants = tenants;
     }
 
     public IReadOnlyList<ConsoleEvent> Events => _list;
@@ -78,22 +82,17 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
 
     public async Task<ConsoleEvent> Create(string name, string location, string? feiShowId)
     {
-        var response = await _api.Send(
-            HttpMethod.Post,
-            "configure-events",
-            Document(
-                "configure-events",
-                null,
-                new
-                {
-                    name,
-                    location,
-                    feiShowId,
-                }
-            )
+        var id = await ApiRefusals.Answered(
+            () =>
+                _setups.Make(
+                    new ConfigureEventDraft
+                    {
+                        Name = name,
+                        Location = location,
+                        FeiShowId = feiShowId,
+                    }
+                )
         );
-        var made = Accepted(response).Document!.Value.GetProperty("data");
-        var id = Guid.Parse(made.GetProperty("id").GetString()!);
         await ReloadState();
         return _list.Single(x => x.Id == id);
     }
@@ -106,38 +105,38 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
 
     public async Task Start(Guid setupId)
     {
-        await _events.Start(setupId);
+        await ApiRefusals.Answered(() => _events.Start(setupId));
         await ReloadState();
     }
 
     public async Task Reset(Guid eventId)
     {
-        Accepted(await _api.Send(HttpMethod.Delete, $"events/{eventId}"));
+        await ApiRefusals.Answered(() => _events.Remove(eventId));
         await ReloadState();
     }
 
-    public async Task AssignMainOperator(Guid eventId, Guid accountId)
+    public async Task<IReadOnlyList<ConsoleOperatorRow>> ConsoleOperators(Guid eventId)
     {
-        Accepted(
-            await _api.Send(
-                HttpMethod.Post,
-                $"events/{eventId}/actions/assign-main-operator",
-                Document("main-operators", null, new { accountId })
-            )
-        );
-        await ReloadState();
+        var operators = await ApiRefusals.Answered(() => _operators.ListOf(eventId));
+        return
+        [
+            .. operators.Select(x => new ConsoleOperatorRow(
+                x.Id,
+                x.DisplayName ?? string.Empty,
+                x.Email ?? string.Empty,
+                x.IsPending
+            )),
+        ];
     }
 
-    public async Task HandOver(Guid eventId, Guid accountId)
+    public async Task AssignConsoleOperator(Guid eventId, Guid accountId)
     {
-        Accepted(
-            await _api.Send(
-                HttpMethod.Post,
-                $"events/{eventId}/actions/hand-over",
-                Document("main-operators", null, new { accountId })
-            )
-        );
-        await ReloadState();
+        await ApiRefusals.Answered(() => _operators.Assign(eventId, accountId));
+    }
+
+    public async Task RemoveConsoleOperator(Guid consoleOperatorId)
+    {
+        await ApiRefusals.Answered(() => _operators.Delete(consoleOperatorId));
     }
 
     public async Task<IReadOnlyList<AccountMatch>> FindAccounts(string text)
@@ -148,41 +147,31 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
         }
 
         var words = string.Join(' ', ParticipantService.WordsOf(text));
-        var filter = Uri.EscapeDataString($"contains(name,'{words.Replace("'", "''")}')");
-        var found = Accepted(await _api.Send(HttpMethod.Get, $"accounts?filter={filter}"));
+        var found = await ApiRefusals.Answered(() => _accounts.Search($"contains(name,'{words.Replace("'", "''")}')"));
         return
         [
-            .. found
-                .Document!.Value.GetProperty("data")
-                .EnumerateArray()
-                .Select(x => new AccountMatch(
-                    Guid.Parse(x.GetProperty("id").GetString()!),
-                    Text(x.GetProperty("attributes"), "displayName") ?? string.Empty,
-                    Text(x.GetProperty("attributes"), "email") ?? string.Empty
-                )),
+            .. found.Select(x => new AccountMatch(
+                Guid.Parse(x.GetProperty("id").GetString()!),
+                Text(x.GetProperty("attributes"), "displayName") ?? string.Empty,
+                Text(x.GetProperty("attributes"), "email") ?? string.Empty
+            )),
         ];
     }
 
     async Task<ConsoleEvent> RowOf(ConfigureEvent setup)
     {
-        var capabilities = Accepted(await _api.Send(HttpMethod.Get, $"events/{setup.Id}/capabilities"))
-            .Document!.Value.GetProperty("data")
-            .GetProperty("attributes");
+        var may = await ApiRefusals.Answered(() => _events.CapabilitiesOf(setup.Id));
         return new ConsoleEvent
         {
             Id = setup.Id,
             Name = setup.Name,
             Location = setup.Location,
-            Stage = Enum.Parse<EventStage>(capabilities.GetProperty("stage").GetString()!, ignoreCase: true),
-            IsMainOperator = Flag(capabilities, "isMainOperator"),
-            CanConfigure = Flag(capabilities, "canConfigure"),
-            CanEditSetup = Flag(capabilities, "canEditSetup"),
-            CanEditData = Flag(capabilities, "canEditData"),
-            CanLinkAccounts = Flag(capabilities, "canLinkAccounts"),
-            CanEditBranding = Flag(capabilities, "canEditBranding"),
-            CanReset = Flag(capabilities, "canReset"),
-            CanHandOver = Flag(capabilities, "canHandOver"),
-            CanAssignMainOperator = Flag(capabilities, "canAssignMainOperator"),
+            Stage = may.Stage,
+            Level = may.Level,
+            CanConfigure = may.CanConfigure,
+            CanEditSetup = may.CanEditSetup,
+            CanRun = may.CanRun,
+            CanAssignConsoleOperators = may.CanAssignConsoleOperators,
         };
     }
 
@@ -194,29 +183,14 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
             return (false, false);
         }
 
-        var response = await _api.Send(HttpMethod.Get, $"tenants/{Uri.EscapeDataString(tenantId)}/capabilities");
-        if (response is not { IsSuccess: true, Document: { } document })
+        try
         {
-            return (false, false);
+            var may = await _tenants.CapabilitiesOf(tenantId);
+            return (may.CanCreateEvents, may.CanEditRegistry);
         }
-
-        var may = document.GetProperty("data").GetProperty("attributes");
-        return (Flag(may, "canCreateEvents"), Flag(may, "canEditRegistry"));
-    }
-
-    static JsonElement Document(string type, string? id, object attributes)
-    {
-        return JsonSerializer.SerializeToElement(
-            new
-            {
-                data = new
-                {
-                    type,
-                    id,
-                    attributes,
-                },
-            },
-            JsonApiClient.Options
-        );
+        catch (JsonApiException)
+        {
+            return (false, false); // what the Api does not say, the person may not do
+        }
     }
 }

@@ -5,11 +5,13 @@ using Microsoft.Net.Http.Headers;
 using Not.Domain.Abstractions;
 using Not.Identity;
 using Not.Krud.Abstractions;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
 using NTS.Contracts.Shared;
+using NTS.Domain.Access;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Api.Features.EventData;
@@ -19,9 +21,11 @@ namespace NoTiming.Api.Features.EventData;
 /// rows of one Event, with the <c>filter</c> that starts with it, <c>sort</c> and <c>page[...]</c>, and <c>GET /api/{type}/{id}</c>
 /// reads one. Anybody reads (ADR-0001): what an Event keeps is what its public views show, and the Tenant of a row is the
 /// Tenant of its Event, which is told by the Event and never by the caller. <c>POST</c> makes a row with the id the client
-/// made for it, <c>PATCH</c> changes the members it names and <c>DELETE</c> removes it, for the Main Operator of the Event
-/// while it is Live (ADR-0012), and a row that counts its writes is changed against the version it was read at, which the
-/// change names in its <c>meta</c> (ADR-0013). Every write that was stored is announced to the viewers of the Event once.
+/// made for it, <c>PATCH</c> changes the members it names and <c>DELETE</c> removes it, for a Console Operator of the Event, or
+/// Root, while it is Live (ADR-0012), and a row that counts its writes is changed against the version it was read at, which the
+/// change names in its <c>meta</c> (ADR-0013). Every write that was stored is announced to the viewers of the Event once. A
+/// write declares what it needs and the endpoint filter decides it (#671): the Event is the one the document names, or the one
+/// the row belongs to, and the handler is reached by a caller who may run it, with the row the route names found once.
 /// </summary>
 internal static class EventDataEndpoints
 {
@@ -53,22 +57,33 @@ internal static class EventDataEndpoints
         );
         app.MapPost(
                 path,
-                (HttpContext context, UserManager<NIdentityUser> users, EventDataAccess access) =>
-                    CreateAsync(family, context, users, access)
+                [Requires(Capability.RunEvent, PlaceIn.EventInBody)]
+                (
+                    JsonApiBody<NewRow> body,
+                    AccessContext access,
+                    EventDataAccess data,
+                    CancellationToken cancellationToken
+                ) => CreateAsync(family, body, access, data, cancellationToken)
             )
-            .RequireAuthorization();
+            .WithMetadata(new ResourceAttribute(family.Route));
         app.MapPatch(
                 path + "/{id}",
-                (string id, HttpContext context, UserManager<NIdentityUser> users, EventDataAccess access) =>
-                    ChangeAsync(family, id, context, users, access)
+                [Requires(Capability.RunEvent, PlaceIn.EventOfRow)]
+                (
+                    JsonApiBody<MemberChange> body,
+                    AccessContext access,
+                    EventDataAccess data,
+                    CancellationToken cancellationToken
+                ) => ChangeAsync(family, body, access, data, cancellationToken)
             )
-            .RequireAuthorization();
+            .WithMetadata(new ResourceAttribute(family.Route), new EventRowsOf<TModel>(family.Collection));
         app.MapDelete(
                 path + "/{id}",
-                (string id, HttpContext context, UserManager<NIdentityUser> users, EventDataAccess access) =>
-                    RemoveAsync(family, id, context, users, access)
+                [Requires(Capability.RunEvent, PlaceIn.EventOfRow)]
+                (AccessContext access, EventDataAccess data, CancellationToken cancellationToken) =>
+                    RemoveAsync(family, access, data, cancellationToken)
             )
-            .RequireAuthorization();
+            .WithMetadata(new EventRowsOf<TModel>(family.Collection));
     }
 
     static async Task<IResult> ListAsync<TModel, TEntity>(
@@ -93,12 +108,7 @@ internal static class EventDataEndpoints
         var eventId = EventFilter.EventOf(filter);
         if (eventId is not { } id)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "event-required",
-                "Name the Event the rows are of.",
-                "Start the filter with the Event and join anything else to it with and: filter=eventId eq <id> and ..."
-            );
+            return EventDataFailures.EventRequired.AsResult();
         }
 
         var query = ReferenceQuery<TModel>.Read(context.Request, family.Made.Hidden);
@@ -108,39 +118,28 @@ internal static class EventDataEndpoints
         }
 
         var facts = await events.FindAsync(id, context.RequestAborted);
-        IReadOnlyList<TModel>? rows = [];
+        IReadOnlyList<TModel> rows = [];
         if (facts != null)
         {
-            var collection = tenants.Of<TModel>(family.Collection, facts.TenantId);
-            IResult? unsupported;
-            (rows, unsupported) = await ReferenceEndpoints.ReadPageAsync(
-                () =>
-                    collection.ReadAsync(
-                        x => x.EventId == id,
-                        query.Options,
-                        query.Skip,
-                        query.Take,
-                        context.RequestAborted
-                    )
-            );
-            if (unsupported != null)
-            {
-                return unsupported;
-            }
+            rows = await tenants
+                .Of<TModel>(family.Collection, facts.TenantId)
+                .ReadAsync(x => x.EventId == id, query.Options, query.Skip, query.Take, context.RequestAborted);
         }
 
-        var page = rows!.Take(query.Size).ToList();
+        var page = rows.Take(query.Size).ToList();
         var byId = page.ToDictionary(x => x.Id.ToString());
         var sees =
             facts != null
             && family.ShownTo != null
             && await viewers.MaySeeAsync(context, users, facts, context.RequestAborted);
         VaryByCaller(family, context);
-        return JsonApiResults.Collection(
+        return JsonApiResults.Page(
             family.Route,
             page.Select(x => (x.Id.ToString(), (object)family.Made.AttributesOf(Shown(family, x, sees)))),
-            links: ReferenceEndpoints.Links(context.Request, query, rows!.Count > query.Size),
-            meta: new { page = new { size = query.Size, number = query.Number } },
+            context.Request,
+            query.Size,
+            query.Number,
+            rows.Count > query.Size,
             itemMeta: key => EventDataFamily<TModel, TEntity>.MetaOf(byId[key])
         );
     }
@@ -180,70 +179,43 @@ internal static class EventDataEndpoints
 
     static async Task<IResult> CreateAsync<TModel, TEntity>(
         EventDataFamily<TModel, TEntity> family,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventDataAccess access
+        JsonApiBody<NewRow> body,
+        AccessContext access,
+        EventDataAccess data,
+        CancellationToken cancellationToken
     )
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, family.Route);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var id = Guid.NewGuid();
-        if (read.Id != null && !Guid.TryParse(read.Id, out id))
-        {
-            return JsonApiResults.InvalidId();
-        }
-
+        var id = body.Id is null ? Guid.NewGuid() : Guid.Parse(body.Id);
         var row = new TModel();
-        if (family.Made.Apply(row, read.Attributes!.Members ?? [], []) is { } malformed)
+        if (family.Made.Apply(row, body.Attributes.Members ?? [], []) is { } malformed)
         {
             return malformed;
         }
 
-        // The Event says whose the row is and who may write it, so the document has to name it.
-        if (row.EventId == Guid.Empty)
+        // The Event the caller was allowed to run is the Event of the row: a document cannot say one and be let in by another.
+        if (row.EventId != access.Event.Id)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "event-required",
-                "Name the Event the row is of.",
-                "The Event is the eventId attribute of the document."
-            );
+            throw new InvalidOperationException("The Event of the row is not the Event the caller was let in to.");
         }
 
-        var (facts, refusal) = await access.OpenAsync(user, row.EventId, context.RequestAborted);
-        if (refusal != null)
-        {
-            return refusal;
-        }
-
-        ReferenceEndpoints.SetId(row, id);
-        if (ReferenceEndpoints.Invalid<TModel, TEntity>(row) is { } invalid)
+        ReferenceRows.SetId(row, id);
+        if (ReferenceRows.Invalid<TModel, TEntity>(row) is { } invalid)
         {
             return invalid;
         }
 
-        var collection = access.Collection(family, facts!);
-        if (await collection.InsertAsync(row, context.RequestAborted))
+        var collection = data.Collection(family, access.Event);
+        if (await collection.InsertAsync(row, cancellationToken))
         {
-            await access.AnnounceAsync(family, row);
+            await data.AnnounceAsync(family, row);
             return Resource(family, row, StatusCodes.Status201Created, true, $"/api/{family.Route}/{id}");
         }
 
         // The same id again is the row that was made, as it is for anything a client makes the id of; the id of a row of
         // another Event, or of another Tenant, is not that, and is not told about.
-        var existing = await collection.FindAsync(id, context.RequestAborted);
+        var existing = await collection.FindAsync(id, cancellationToken);
         return existing is not null && existing.EventId == row.EventId
             ? Resource(family, existing, StatusCodes.Status200OK, true)
             : JsonApiResults.IdTaken();
@@ -251,47 +223,16 @@ internal static class EventDataEndpoints
 
     static async Task<IResult> ChangeAsync<TModel, TEntity>(
         EventDataFamily<TModel, TEntity> family,
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventDataAccess access
+        JsonApiBody<MemberChange> body,
+        AccessContext access,
+        EventDataAccess data,
+        CancellationToken cancellationToken
     )
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var read = await JsonApiRequests.ReadAsync<MemberAttributes>(context.Request, family.Route);
-        if (read.Error != null)
-        {
-            return read.Error;
-        }
-
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        if (!Guid.TryParse(id, out var rowId))
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        if (read.Id != null && read.Id != id)
-        {
-            return JsonApiResults.IdMismatch();
-        }
-
-        var row = await access.FindAsync(family, rowId, context.RequestAborted);
-        if (row is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var (facts, refusal) = await access.OpenAsync(user, row.EventId, context.RequestAborted);
-        if (refusal != null)
-        {
-            return refusal;
-        }
+        // The members are checked against the row they are applied to, which is the one the filter found.
+        var row = access.RowOf<TModel>();
 
         // A row that counts its writes is changed against the version the change was made on, and a change that was made on
         // another one changes nothing: the caller reads the row again and makes the change on what it is now.
@@ -299,7 +240,7 @@ internal static class EventDataEndpoints
         var basedOn = 0;
         if (counted != null)
         {
-            var (given, unusable) = VersionOf(read.Meta);
+            var (given, unusable) = VersionOf(body.Meta);
             if (unusable != null)
             {
                 return unusable;
@@ -314,12 +255,12 @@ internal static class EventDataEndpoints
         }
 
         var named = new List<PropertyInfo>();
-        if (family.Changed.Apply(row, read.Attributes!.Members ?? [], named) is { } malformed)
+        if (family.Changed.Apply(row, body.Attributes.Members ?? [], named) is { } malformed)
         {
             return malformed;
         }
 
-        if (ReferenceEndpoints.Invalid<TModel, TEntity>(row) is { } invalid)
+        if (ReferenceRows.Invalid<TModel, TEntity>(row) is { } invalid)
         {
             return invalid;
         }
@@ -330,66 +271,46 @@ internal static class EventDataEndpoints
             return Resource(family, row, StatusCodes.Status200OK, true);
         }
 
-        var collection = access.Collection(family, facts!);
+        var collection = data.Collection(family, access.Event);
         if (counted != null)
         {
-            if (!await collection.UpdateAtVersionAsync(rowId, update, basedOn, context.RequestAborted))
+            if (!await collection.UpdateAtVersionAsync(row.Id, update, basedOn, cancellationToken))
             {
                 return StaleParticipation();
             }
 
             counted.Version = basedOn + 1;
         }
-        else if (!await collection.UpdateAsync(rowId, update, context.RequestAborted))
+        else if (!await collection.UpdateAsync(row.Id, update, cancellationToken))
         {
             return JsonApiResults.NotFound();
         }
 
-        await access.AnnounceAsync(family, row);
+        await data.AnnounceAsync(family, row);
         return Resource(family, row, StatusCodes.Status200OK, true);
     }
 
     static async Task<IResult> RemoveAsync<TModel, TEntity>(
         EventDataFamily<TModel, TEntity> family,
-        string id,
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        EventDataAccess access
+        AccessContext access,
+        EventDataAccess data,
+        CancellationToken cancellationToken
     )
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var row = Guid.TryParse(id, out var rowId)
-            ? await access.FindAsync(family, rowId, context.RequestAborted)
-            : null;
-        if (row is null)
-        {
-            return JsonApiResults.NotFound();
-        }
-
-        var (facts, refusal) = await access.OpenAsync(user, row.EventId, context.RequestAborted);
-        if (refusal != null)
-        {
-            return refusal;
-        }
-
-        if (await access.IsReferencedAsync(family, row, facts!, context.RequestAborted))
+        var row = access.RowOf<TModel>();
+        if (await data.IsReferencedAsync(family, row, access.Event, cancellationToken))
         {
             return InUse();
         }
 
-        if (!await access.Collection(family, facts!).DeleteAsync(rowId, context.RequestAborted))
+        if (!await data.Collection(family, access.Event).DeleteAsync(row.Id, cancellationToken))
         {
             return JsonApiResults.NotFound();
         }
 
-        await access.AnnounceAsync(family, row);
+        await data.AnnounceAsync(family, row);
         return Results.NoContent();
     }
 
@@ -409,45 +330,22 @@ internal static class EventDataEndpoints
             return (version, null);
         }
 
-        return (
-            0,
-            JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "malformed-request",
-                "The request is malformed.",
-                "The version is a whole number, from 0."
-            )
-        );
+        return (0, JsonApiFailures.MalformedRequest.With("The version is a whole number, from 0.").AsResult());
     }
 
     static IResult VersionRequired()
     {
-        return JsonApiResults.Error(
-            StatusCodes.Status400BadRequest,
-            "version-required",
-            "Say which version of the Participation the change is based on.",
-            "Send the version it was read at as the version of the meta of the document."
-        );
+        return EventDataFailures.VersionRequired.AsResult();
     }
 
     static IResult InUse()
     {
-        return JsonApiResults.Error(
-            StatusCodes.Status409Conflict,
-            "participation-in-use",
-            "A Ranking still counts the Participation, or a Handout is still of it.",
-            "Take it out of the Rankings that count it and remove the Handouts that are of it first: what they show could not be composed without it."
-        );
+        return EventDataFailures.ParticipationInUse.AsResult();
     }
 
     static IResult StaleParticipation()
     {
-        return JsonApiResults.Error(
-            StatusCodes.Status409Conflict,
-            "participation-changed",
-            "The Participation changed since it was read.",
-            "Read it again and make the change on what it is now."
-        );
+        return EventDataFailures.ParticipationChanged.AsResult();
     }
 
     /// <summary>A read that answers by the caller says so, so that nothing between the Api and the person keeps one caller's answer for another.</summary>
@@ -461,7 +359,7 @@ internal static class EventDataEndpoints
         }
     }
 
-    /// <summary>The row as the caller reads it. A write is answered with the row as Staff read it, because it is the Main Operator that writes.</summary>
+    /// <summary>The row as the caller reads it. A write is answered with the row as Staff read it, because it is a Console Operator or Root that writes.</summary>
     static TModel Shown<TModel, TEntity>(EventDataFamily<TModel, TEntity> family, TModel row, bool seesTimeEvents)
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity

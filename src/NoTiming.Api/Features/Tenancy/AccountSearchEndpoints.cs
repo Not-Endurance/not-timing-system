@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Identity;
-using Not.Identity;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.JsonApi;
 using NTS.Domain.Access;
@@ -7,102 +5,82 @@ using NTS.Domain.Access;
 namespace NoTiming.Api.Features.Tenancy;
 
 /// <summary>
-/// The search of accounts by name (#643, ADR-0012), which is how a Tenant Root or a Main Operator finds the person to link
-/// or to assign. <c>GET /api/accounts</c> looks among the members of the Tenant the account acts in, and
+/// The search of accounts by name (#643, ADR-0012), which is how Root or a Console Operator finds the person to link or to
+/// assign. <c>GET /api/accounts</c> looks among the members of the Tenant the account acts in, and
 /// <c>GET /api/accounts/all-tenants</c> is the named view that reaches across Tenants for the people who may search at all:
 /// no parameter turns the first into the second. Both take <c>filter=contains(name,'text')</c>, whose words have to be parts of
 /// the name in any order and in any case, with one of at least two characters, the <c>sort</c> of the names and the pages
-/// of every list (ten matches a page, twenty-five at most), and nothing else. A request is answered in this order: who is
-/// asking, whether they may, what they asked, and whether they have searched too often, a page being a search.
+/// of every list (ten matches a page, twenty-five at most), and nothing else. A request is answered in this order: the query,
+/// who is asking, whether they may, the length of the words, and whether they have searched too often, a page being a search.
 /// </summary>
 internal static class AccountSearchEndpoints
 {
     const string ACCOUNT_MATCHES = "account-matches";
-    const string NAME = "name";
 
     public static IEndpointRouteBuilder MapAccountSearch(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/accounts", SearchInTheTenant).RequireAuthorization();
-        app.MapGet("/api/accounts/all-tenants", SearchEveryTenant).RequireAuthorization();
+        app.MapGet("/api/accounts", GetAccounts);
+        app.MapGet("/api/accounts/all-tenants", GetAccountsAllTenants);
         return app;
     }
 
-    static async Task<IResult> SearchInTheTenant(
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        CallerReader callers,
-        TenantStore tenants,
+    // With no Tenant there is nobody to find, but whether the caller may search is still told as it is anywhere.
+    [Requires(Capability.EditRegistry, PlaceIn.CurrentTenant, WithoutTenant = Capability.SetUpAcrossTenants)]
+    static Task<IResult> GetAccounts(
+        SearchQuery query,
+        HttpRequest request,
+        AccessContext access,
         AccountSearch search,
-        SearchRateLimiter limiter
+        SearchRateLimiter limiter,
+        CancellationToken cancellationToken
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var caller = await callers.ReadAsync(user, context.RequestAborted);
-        var tenantId = AccountRoles.CurrentTenantOf(user);
-
-        // With no Tenant there is nobody to find, but whether the caller may search is still told as it is anywhere.
-        var verdict =
-            tenantId == null
-                ? AccessPolicy.Decide(Capability.SearchAccountsAcrossTenants, caller, AccessScope.Platform)
-                : AccessPolicy.Decide(
-                    Capability.SearchAccounts,
-                    caller,
-                    AccessScope.ForTenant(tenantId, await tenants.IsOperationalAsync(tenantId, context.RequestAborted))
-                );
-        return await AnswerAsync(context, user, verdict, tenantId, search, limiter);
+        return AnswerAsync(
+            query.Search,
+            request,
+            access,
+            access.HasTenant ? access.Tenant.Id : null,
+            search,
+            limiter,
+            acrossTenants: false,
+            cancellationToken
+        );
     }
 
-    static async Task<IResult> SearchEveryTenant(
-        HttpContext context,
-        UserManager<NIdentityUser> users,
-        CallerReader callers,
+    [Requires(Capability.SetUpAcrossTenants)]
+    static Task<IResult> GetAccountsAllTenants(
+        SearchQuery query,
+        HttpRequest request,
+        AccessContext access,
         AccountSearch search,
-        SearchRateLimiter limiter
+        SearchRateLimiter limiter,
+        CancellationToken cancellationToken
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
-        var caller = await callers.ReadAsync(user, context.RequestAborted);
-        var verdict = AccessPolicy.Decide(Capability.SearchAccountsAcrossTenants, caller, AccessScope.Platform);
-        return await AnswerAsync(context, user, verdict, null, search, limiter, acrossTenants: true);
+        return AnswerAsync(
+            query.Search,
+            request,
+            access,
+            null,
+            search,
+            limiter,
+            acrossTenants: true,
+            cancellationToken
+        );
     }
 
     static async Task<IResult> AnswerAsync(
-        HttpContext context,
-        NIdentityUser user,
-        Verdict verdict,
+        JsonApiSearch query,
+        HttpRequest request,
+        AccessContext access,
         string? tenantId,
         AccountSearch search,
         SearchRateLimiter limiter,
-        bool acrossTenants = false
+        bool acrossTenants,
+        CancellationToken cancellationToken
     )
     {
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
-        var query = JsonApiQuery.ReadSearch(context.Request, NAME);
-        if (query.Refusal != null)
-        {
-            return query.Refusal;
-        }
-
-        if (!NameSearch.HasLongWord(query.Words!))
-        {
-            return RegistrySearchEndpoints.TooShort();
-        }
-
-        if (limiter.TrySearch(user.Id) is { } refusal)
+        if (limiter.TrySearch(access.User.Id) is { } refusal)
         {
             return JsonApiResults.RateLimited(refusal.RetryAfter);
         }
@@ -111,14 +89,16 @@ internal static class AccountSearchEndpoints
         var found =
             tenantId == null && !acrossTenants
                 ? []
-                : await search.SearchAsync(NameSearch.Of(query), tenantId, context.RequestAborted);
-        return JsonApiResults.Collection(
+                : await search.SearchAsync(NameSearch.Of(query), tenantId, cancellationToken);
+        return JsonApiResults.Page(
             ACCOUNT_MATCHES,
             found
                 .Take(query.Size)
                 .Select(x => (x.Id.ToString(), (object)new { displayName = x.DisplayName, email = x.MaskedEmail })),
-            links: JsonApiPaging.Links(context.Request, query.Number, found.Count > query.Size),
-            meta: JsonApiPaging.Meta(query.Size, query.Number)
+            request,
+            query.Size,
+            query.Number,
+            found.Count > query.Size
         );
     }
 }

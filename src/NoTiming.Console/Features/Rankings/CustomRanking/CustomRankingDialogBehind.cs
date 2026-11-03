@@ -8,7 +8,7 @@ using NTS.Domain.Core.Aggregates;
 namespace NoTiming.Console.Features.Rankings.CustomRanking;
 
 /// <summary>
-/// A Ranking that the Main Operator makes of the Participations it chooses (#646), over the settings of a Ranking it may copy
+/// A Ranking that the Console Operator makes of the Participations it chooses (#646), over the settings of a Ranking it may copy
 /// (the name is its own, to be given). The Participations are those of the Event the page shows; the Ranking is made and
 /// stored by the form, and the Api's refusal stays in the dialog with what was typed.
 /// </summary>

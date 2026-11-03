@@ -2,6 +2,7 @@ using System.Globalization;
 using Not.Identity;
 using NoTiming.Api.Features.Tenancy;
 using NTS.Contracts.Features.Participants;
+using NTS.Domain.Access;
 
 namespace NoTiming.Api.Features.Participants;
 
@@ -43,14 +44,18 @@ internal sealed class LinkedParticipants
     )
     {
         var links = await _store.FindAsync(user.Id, cancellationToken);
-        var caller = AccountRoles.CallerOf(user);
         var athlete = links.AthleteId is { } id
             ? (
-                await _reads.FindParticipantsAsync(caller, ParticipantKind.Athlete, [id], cancellationToken)
+                await _reads.FindParticipantsAsync(Standing.Account, ParticipantKind.Athlete, [id], cancellationToken)
             ).FirstOrDefault()
             : null;
         var horses = (
-            await _reads.FindParticipantsAsync(caller, ParticipantKind.Horse, links.HorseIds, cancellationToken)
+            await _reads.FindParticipantsAsync(
+                Standing.Account,
+                ParticipantKind.Horse,
+                links.HorseIds,
+                cancellationToken
+            )
         ).ToDictionary(x => x.Id);
         return new LinkedNames(
             athlete?.NameIn(null, culture),

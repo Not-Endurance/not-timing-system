@@ -65,7 +65,7 @@ internal static class LocalhostSignIn
         }
 
         app.MapGet("/" + PAGE, (HttpContext context) => Page(context, configuration));
-        app.MapPost("/" + SESSIONS, SignInAsync);
+        app.MapPost("/" + SESSIONS, PostDevSessions);
         return app;
     }
 
@@ -75,7 +75,7 @@ internal static class LocalhostSignIn
             new PublicEndpoint(EndpointAccess.SignIn, "POST", SESSIONS),
         ];
 
-    static async Task<IResult> SignInAsync(
+    static async Task<IResult> PostDevSessions(
         HttpContext context,
         IConfiguration configuration,
         UserManager<NIdentityUser> users,

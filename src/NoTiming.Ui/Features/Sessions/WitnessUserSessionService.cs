@@ -1,9 +1,9 @@
 using System.Net;
-using System.Text.Json;
 using Not.Application.HTTP;
 using Not.Injection;
-using NTS.Application.UserSession;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Account;
+using NTS.Contracts.Sessions.Models;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Objects;
@@ -19,16 +19,14 @@ namespace NoTiming.Ui.Features.Sessions;
 /// </summary>
 public class WitnessUserSessionService : IWitnessUserSession, IScoped
 {
-    const string USER_SESSIONS = "user-sessions";
-
     readonly IAccountSession _account;
-    readonly JsonApiClient _api;
+    readonly UserSessionApiRepository _sessions;
     Guid? _eventId;
 
-    public WitnessUserSessionService(IAccountSession account, JsonApiClient api)
+    public WitnessUserSessionService(IAccountSession account, UserSessionApiRepository sessions)
     {
         _account = account;
-        _api = api;
+        _sessions = sessions;
     }
 
     public async Task<NtsUserSessionStateModel?> GetCurrent()
@@ -99,7 +97,7 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
 
         if (await Find(eventId) is { } kept)
         {
-            await Send(HttpMethod.Delete, $"{USER_SESSIONS}/{kept.Id}");
+            await AnsweredUnit(() => _sessions.Delete(kept.Id));
         }
     }
 
@@ -115,22 +113,24 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
             return;
         }
 
-        var made = await Send(HttpMethod.Post, USER_SESSIONS, Document(null, new { eventId }));
-        if (made == null)
+        UserSessionModel kept;
+        try
         {
+            kept = await _sessions.Make(eventId);
+        }
+        catch (JsonApiException refused) when (IsSessionEnded(refused))
+        {
+            await _account.Refresh();
             return;
         }
 
-        var kept = KeptOf(made.Document!.Value.GetProperty("data"));
         change(kept.State);
-        await Send(HttpMethod.Patch, $"{USER_SESSIONS}/{kept.Id}", Document(kept.Id, new { state = kept.State }));
+        await AnsweredUnit(() => _sessions.Save(kept));
     }
 
-    async Task<Kept?> Find(Guid eventId)
+    async Task<UserSessionModel?> Find(Guid eventId)
     {
-        var filter = Uri.EscapeDataString($"eventId eq {eventId}");
-        var listed = await Send(HttpMethod.Get, $"{USER_SESSIONS}?filter={filter}");
-        return listed?.Document!.Value.GetProperty("data").EnumerateArray().Select(KeptOf).FirstOrDefault();
+        return await Answered(() => _sessions.FindOf(eventId));
     }
 
     /// <summary>
@@ -146,53 +146,34 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
     }
 
     /// <summary>The answer of the host, none when the session has ended: the account is asked again, and a visitor keeps nothing.</summary>
-    async Task<JsonApiResponse?> Send(HttpMethod method, string endpoint, JsonElement? document = null)
+    async Task<T?> Answered<T>(Func<Task<T?>> request)
+        where T : class
     {
-        var response = await _api.Send(method, endpoint, document);
-        if (response.Status == HttpStatusCode.Unauthorized)
+        try
+        {
+            return await request();
+        }
+        catch (JsonApiException refused) when (IsSessionEnded(refused))
         {
             await _account.Refresh();
             return null;
         }
-
-        return response.IsSuccess ? response : throw response.ToException();
     }
 
-    static JsonElement Document(string? id, object attributes)
+    async Task AnsweredUnit(Func<Task> request)
     {
-        return JsonSerializer.SerializeToElement(
-            new
-            {
-                data = new
-                {
-                    type = USER_SESSIONS,
-                    id,
-                    attributes,
-                },
-            },
-            JsonApiClient.Options
-        );
-    }
-
-    static Kept KeptOf(JsonElement resource)
-    {
-        var state =
-            resource.TryGetProperty("attributes", out var attributes)
-            && attributes.TryGetProperty("state", out var kept)
-                ? kept.Deserialize<NtsUserSessionStateModel>(JsonApiClient.Options)
-                : null;
-        return new Kept(resource.GetProperty("id").GetString()!, state ?? new NtsUserSessionStateModel());
-    }
-
-    sealed class Kept
-    {
-        public Kept(string id, NtsUserSessionStateModel state)
+        try
         {
-            Id = id;
-            State = state;
+            await request();
         }
+        catch (JsonApiException refused) when (IsSessionEnded(refused))
+        {
+            await _account.Refresh();
+        }
+    }
 
-        public string Id { get; }
-        public NtsUserSessionStateModel State { get; }
+    static bool IsSessionEnded(JsonApiException refused)
+    {
+        return refused.Response.Status == HttpStatusCode.Unauthorized;
     }
 }

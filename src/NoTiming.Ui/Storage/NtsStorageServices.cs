@@ -3,10 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.CRUD.Ports;
 using Not.Storage;
+using NoTiming.Ui.Features.Core.Events;
 using NoTiming.Ui.Storage.Core.Repositories;
 using NoTiming.Ui.Storage.REST;
-using NTS.Application.Core;
-using NTS.Application.Settings;
 using NTS.Contracts.Core;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
@@ -38,7 +37,6 @@ public static class NtsStorageServices
             _services.AddTransient(typeof(EventScopeFactory<>));
 
             _services.AddTransient<IEventInformationRepository, EventInformationApiRepository>();
-            _services.AddTransient<ISettingRepository, SettingApiRepository>();
             _services.AddTransient<IRepository<Participation>, ParticipationApiRepository>();
             _services.AddTransient<IRepository<Ranking>, RankingApiRepository>();
             _services.AddTransient<IRepository<Official>, OfficialApiRepository>();
@@ -48,6 +46,18 @@ public static class NtsStorageServices
             _services.AddTransient<IRepository<Horse>, HorseApiRepository>();
             _services.AddTransient<IRepository<Athlete>, AthleteApiRepository>();
             _services.AddTransient<IRepository<ConfigureEvent>, ConfigureEventApiRepository>();
+            _services.AddTransient<ConfigureEventApiRepository>();
+            _services.AddTransient<EventGrantApiRepository>();
+            _services.AddTransient<ConsoleOperatorApiRepository>();
+            _services.AddTransient<UserSessionApiRepository>();
+            _services.AddTransient<TenantApiRepository>();
+            _services.AddTransient<BrandingApiRepository>();
+            _services.AddTransient<AccountApiRepository>();
+            _services.AddTransient<ParticipationApiRepository>();
+            _services.AddTransient<AthleteApiRepository>();
+            _services.AddTransient<HorseApiRepository>();
+            _services.AddTransient<ClubApiRepository>();
+            _services.AddTransient<TimeEventActorApiRepository>();
 
             AddEventScopedRepository<Participation, ParticipationEventScopedApiRepository>();
             AddEventScopedRepository<Ranking, RankingEventScopedApiRepository>();

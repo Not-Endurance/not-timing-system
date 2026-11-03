@@ -48,11 +48,6 @@ internal sealed class AccessBaselineMiddleware
     {
         return decision == AccessDecision.NotSignedIn
             ? JsonApiResults.NotSignedIn()
-            : JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "request-header-required",
-                "Send the header the pages send with every write.",
-                $"{AccessBaseline.WRITE_HEADER}: {AccessBaseline.WRITE_HEADER_VALUE}"
-            );
+            : AccessFailures.RequestHeaderRequired.AsResult();
     }
 }

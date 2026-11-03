@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using Not.Identity;
+using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Participants;
 using NoTiming.Api.Features.Reference;
 using NTS.Contracts.Core.Models;
@@ -14,21 +15,19 @@ using NTS.Domain.Aggregates;
 
 namespace NoTiming.Api.Features.Tenancy;
 
-/// <summary>An Event as the Api needs to know it to decide who may do what: where it belongs, who runs it, and when it ends.</summary>
+/// <summary>An Event as the Api needs to know it to decide who may do what: where it belongs, and when it ends.</summary>
 internal sealed class EventRecord
 {
-    public EventRecord(Guid id, string tenantId, Guid? mainOperatorId, bool isStarted, DateTimeOffset? endDay)
+    public EventRecord(Guid id, string tenantId, bool isStarted, DateTimeOffset? endDay)
     {
         Id = id;
         TenantId = tenantId;
-        MainOperatorId = mainOperatorId;
         IsStarted = isStarted;
         EndDay = endDay;
     }
 
     public Guid Id { get; }
     public string TenantId { get; }
-    public Guid? MainOperatorId { get; }
 
     /// <summary>Whether the Event has been made from its Setup, which is whether a Core document of it exists.</summary>
     public bool IsStarted { get; }
@@ -45,7 +44,7 @@ internal sealed class EventRecord
 /// <summary>
 /// A row of a registry found across Tenants: the fields that are meant to leave, and the Tenant that owns the row. The
 /// account an Athlete is linked to, and anything else the document has, never does. The row of an Athlete or a Horse leaves whole
-/// only to the people who set an Event up (<see cref="Capability.ReadRegistryDetailsAcrossTenants"/>); to any other account it
+/// only to the people who set an Event up (<see cref="Capability.SetUpAcrossTenants"/>); to any other account it
 /// tells the name and the name in English, which is all it is meant to tell of a person.
 /// </summary>
 internal sealed class RegistryMatch
@@ -101,7 +100,7 @@ internal sealed class CrossTenantRefusedException : InvalidOperationException
 
 /// <summary>
 /// What reaches across Tenants, each read a named capability of a collection and never a flag of a general one
-/// (ADR-0012, #643): an Event by its id, the Events a Main Operator runs, whether a Participation refers to a row of the
+/// (ADR-0012, #643): an Event by its id, the Tenants of the Events a Console Operator runs, whether a Participation refers to a row of the
 /// registry (#635), the search of the registries of Athletes, Horses, Clubs and Officials, and what the history of a
 /// Participant, an Athlete or a Horse, is made of (#638): the Participations of the Participant, the Events and the Rankings those
 /// are in. They are the only reads that open a collection of a Tenant without one: each takes only what it needs, a search
@@ -123,8 +122,8 @@ internal sealed class CrossTenantReads
 
     /// <summary>
     /// The Event with the id, from the Core once it has started and from the Setup before. None when there is no such
-    /// Event. A document from before Tenants has the constant Tenant and nobody to run it. Only the fields that say who
-    /// may do what are read: a Setup holds the whole configuration of the Event.
+    /// Event. A document from before Tenants has the constant Tenant. Only the fields that say who may do what are read: a
+    /// Setup holds the whole configuration of the Event.
     /// </summary>
     public async Task<EventRecord?> FindEventAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -147,7 +146,6 @@ internal sealed class CrossTenantReads
         return new EventRecord(
             id,
             TextOf(source, TenantOwned.TENANT_ID) ?? Tenant.LEGACY_ID,
-            BsonGuids.Of(source, "MainOperatorId"),
             core != null,
             core != null && core.TryGetValue("EndDay", out var end) && end.IsBsonDateTime
                 ? new DateTimeOffset(end.ToUniversalTime(), TimeSpan.Zero)
@@ -285,7 +283,7 @@ internal sealed class CrossTenantReads
     /// Participant is for signed-in accounts alone, and the policy is asked here as a second guard behind the route.
     /// </summary>
     public async Task<IReadOnlyList<HistoryRide>> ReadHistoryAsync(
-        Caller caller,
+        Standing standing,
         ParticipantKind kind,
         Guid id,
         DateTimeOffset now,
@@ -295,7 +293,7 @@ internal sealed class CrossTenantReads
         CancellationToken cancellationToken
     )
     {
-        Allow("history of a Participant", caller);
+        Allow("history of a Participant", standing);
         var participations = _database
             .GetCollection<ParticipationModel>(TenantOwned.EVENT_PARTICIPATIONS)
             .AsQueryable()
@@ -413,13 +411,13 @@ internal sealed class CrossTenantReads
     /// the answer.
     /// </summary>
     public async Task<IReadOnlyList<Participant>> FindParticipantsAsync(
-        Caller caller,
+        Standing standing,
         ParticipantKind kind,
         IReadOnlyCollection<Guid> ids,
         CancellationToken cancellationToken
     )
     {
-        Allow("registry names", caller);
+        Allow("registry names", standing);
         if (ids.Count == 0)
         {
             return [];
@@ -444,89 +442,90 @@ internal sealed class CrossTenantReads
     }
 
     /// <summary>
-    /// The Tenants of the Events the account runs that are not yet Historic: the ones it was made the Main Operator of that
-    /// have not started, and the started ones it holds now that have not ended. A started Event is the Core's, so what
-    /// the Setup says of its Main Operator does not count once it has started.
+    /// The Tenants of the Events the account is a Console Operator of that have not ended: the ones its grants are of that
+    /// have not started, and the started ones that are still Live. A grant that is pending gives nothing, and one of an
+    /// Event that is gone is of no Event.
     /// </summary>
     public async Task<IReadOnlyList<string>> OpenEventTenantsOfAsync(
-        Guid mainOperatorId,
+        Guid account,
         DateTimeOffset now,
         CancellationToken cancellationToken
     )
     {
-        var mine = new BsonDocument("MainOperatorId", BsonGuids.Binary(mainOperatorId));
-        var setups = await Raw(TenantOwned.CONFIGURE_EVENTS)
-            .Find(mine)
-            .Project(EventFields())
+        var grants = await Raw(TenantOwned.EVENT_GRANTS)
+            .Find(
+                new BsonDocument
+                {
+                    { GrantDocuments.ACCOUNT_ID, BsonGuids.Binary(account) },
+                    { GrantDocuments.KIND, nameof(GrantKind.ConsoleOperator) },
+                }
+            )
+            .Project(new BsonDocument { { GrantDocuments.EVENT_ID, 1 }, { TenantOwned.TENANT_ID, 1 } })
             .ToListAsync(cancellationToken);
+        if (grants.Count == 0)
+        {
+            return [];
+        }
+
+        var named = new BsonDocument(
+            STANDARD_ID,
+            new BsonDocument("$in", new BsonArray(grants.Select(x => x[GrantDocuments.EVENT_ID]).Distinct()))
+        );
         var cores = await Raw(TenantOwned.EVENT_INFORMATIONS)
-            .Find(mine)
+            .Find(named)
             .Project(EventFields())
             .ToListAsync(cancellationToken);
+        var setups = await Raw(TenantOwned.CONFIGURE_EVENTS)
+            .Find(named)
+            .Project(new BsonDocument(STANDARD_ID, 1))
+            .ToListAsync(cancellationToken);
 
-        var started = new HashSet<BsonValue>();
-        if (setups.Count > 0)
-        {
-            var ids = new BsonArray(setups.Select(x => x[STANDARD_ID]));
-            var hasCore = await Raw(TenantOwned.EVENT_INFORMATIONS)
-                .Find(new BsonDocument(STANDARD_ID, new BsonDocument("$in", ids)))
-                .Project(new BsonDocument(STANDARD_ID, 1))
-                .ToListAsync(cancellationToken);
-            started.UnionWith(hasCore.Select(x => x[STANDARD_ID]));
-        }
+        var ended = cores
+            .Where(x => EventStageRule.Of(true, EndOf(x), now) != EventStage.Live)
+            .Select(x => x[STANDARD_ID])
+            .ToHashSet();
+        var exist = cores.Concat(setups).Select(x => x[STANDARD_ID]).ToHashSet();
 
-        var tenants = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var setup in setups.Where(x => !started.Contains(x[STANDARD_ID])))
-        {
-            tenants.Add(TextOf(setup, TenantOwned.TENANT_ID) ?? Tenant.LEGACY_ID);
-        }
-
-        foreach (var core in cores)
-        {
-            var end =
-                core.TryGetValue("EndDay", out var value) && value.IsBsonDateTime
-                    ? new DateTimeOffset(value.ToUniversalTime(), TimeSpan.Zero)
-                    : (DateTimeOffset?)null;
-            if (EventStageRule.Of(true, end, now) == EventStage.Live)
-            {
-                tenants.Add(TextOf(core, TenantOwned.TENANT_ID) ?? Tenant.LEGACY_ID);
-            }
-        }
-
-        return [.. tenants];
+        return
+        [
+            .. grants
+                .Where(x => exist.Contains(x[GrantDocuments.EVENT_ID]) && !ended.Contains(x[GrantDocuments.EVENT_ID]))
+                .Select(x => TextOf(x, TenantOwned.TENANT_ID) ?? Tenant.LEGACY_ID)
+                .Distinct(StringComparer.Ordinal),
+        ];
     }
 
     /// <summary>
     /// The page of Athletes whose name or name in English has the words of the search in it, and, for the people who set an Event up
-    /// (<see cref="Capability.ReadRegistryDetailsAcrossTenants"/>), whose FEI ID has them too, each with the whole row. To any other
+    /// (<see cref="Capability.SetUpAcrossTenants"/>), whose FEI ID has them too, each with the whole row. To any other
     /// account a row is its name and its name in English, and the FEI ID is not matched, so that a search cannot tell who has which.
     /// </summary>
     public Task<IReadOnlyList<RegistryMatch>> SearchAthletesAsync(
-        Caller caller,
+        Standing standing,
         NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        return SearchPeopleAsync("athletes", caller, search, cancellationToken);
+        return SearchPeopleAsync("athletes", standing, search, cancellationToken);
     }
 
     /// <summary>The same for the Horses.</summary>
     public Task<IReadOnlyList<RegistryMatch>> SearchHorsesAsync(
-        Caller caller,
+        Standing standing,
         NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        return SearchPeopleAsync("horses", caller, search, cancellationToken);
+        return SearchPeopleAsync("horses", standing, search, cancellationToken);
     }
 
     public Task<IReadOnlyList<RegistryMatch>> SearchClubsAsync(
-        Caller caller,
+        Standing standing,
         NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        return SearchAsync("clubs", "clubs", ["Name"], true, caller, search, cancellationToken);
+        return SearchAsync("clubs", "clubs", ["Name"], true, standing, search, cancellationToken);
     }
 
     /// <summary>
@@ -535,12 +534,12 @@ internal sealed class CrossTenantReads
     /// English and role, so those three are what orders them.
     /// </summary>
     public async Task<IReadOnlyList<RegistryMatch>> SearchOfficialsAsync(
-        Caller caller,
+        Standing standing,
         NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        Admit("officials", caller, search);
+        Admit("officials", standing, search);
         var rows = await Raw("event_officials")
             .Aggregate()
             .Match(search.Matching("Name", "NameEnglish"))
@@ -585,20 +584,18 @@ internal sealed class CrossTenantReads
     /// <summary>The Athletes or the Horses: the whole row for the people who set an Event up, the name for every other account.</summary>
     Task<IReadOnlyList<RegistryMatch>> SearchPeopleAsync(
         string collection,
-        Caller caller,
+        Standing standing,
         NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        var whole = AccessPolicy
-            .Decide(Capability.ReadRegistryDetailsAcrossTenants, caller, AccessScope.Platform)
-            .IsAllowed;
+        var whole = AccessPolicy.Decide(Capability.SetUpAcrossTenants, standing, PlaceState.Platform).IsAllowed;
         return SearchAsync(
             collection,
             collection,
             whole ? ["Name", "NameEnglish", "FeiId"] : ["Name", "NameEnglish"],
             whole,
-            caller,
+            standing,
             search,
             cancellationToken
         );
@@ -610,12 +607,12 @@ internal sealed class CrossTenantReads
         string collection,
         string[] fields,
         bool whole,
-        Caller caller,
+        Standing standing,
         NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        Admit(read, caller, search);
+        Admit(read, standing, search);
         var projection = new BsonDocument
         {
             { STANDARD_ID, 1 },
@@ -671,16 +668,16 @@ internal sealed class CrossTenantReads
     /// The second guards of a search: the policy has to allow it, and its words have to be enough. A search for less than a
     /// word of a few characters would be a list, and a list is what the registries are not.
     /// </summary>
-    static void Admit(string read, Caller caller, NameSearch search)
+    static void Admit(string read, Standing standing, NameSearch search)
     {
-        Allow(read, caller);
+        Allow(read, standing);
         search.EnsureEnough();
     }
 
     /// <summary>The second guard of a read of what the registries hold: the policy has to allow it to the caller, which it does for any account.</summary>
-    static void Allow(string read, Caller caller)
+    static void Allow(string read, Standing standing)
     {
-        var verdict = AccessPolicy.Decide(Capability.ReadRegistryAcrossTenants, caller, AccessScope.Platform);
+        var verdict = AccessPolicy.Decide(Capability.SignedIn, standing, PlaceState.Platform);
         if (!verdict.IsAllowed)
         {
             throw new CrossTenantRefusedException(read, verdict.Reason!.Value);
@@ -743,16 +740,23 @@ internal sealed class CrossTenantReads
         return _database.GetCollection<BsonDocument>(collection);
     }
 
-    /// <summary>What an Event's document is read for here: where it belongs, who runs it and when it ends.</summary>
+    /// <summary>What an Event's document is read for here: where it belongs and when it ends.</summary>
     static BsonDocument EventFields()
     {
         return new BsonDocument
         {
             { STANDARD_ID, 1 },
             { TenantOwned.TENANT_ID, 1 },
-            { "MainOperatorId", 1 },
             { "EndDay", 1 },
         };
+    }
+
+    /// <summary>The end of the last day of a started Event, as the Core stores it; none when the document does not say.</summary>
+    static DateTimeOffset? EndOf(BsonDocument core)
+    {
+        return core.TryGetValue("EndDay", out var value) && value.IsBsonDateTime
+            ? new DateTimeOffset(value.ToUniversalTime(), TimeSpan.Zero)
+            : null;
     }
 
     static string? TextOf(BsonDocument document, string field)

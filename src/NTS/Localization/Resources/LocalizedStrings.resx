@@ -1068,26 +1068,26 @@
   <data name="Results_string" xml:space="preserve">
     <value>Results</value>
   </data>
-  <data name="Assign_main_operator_string" xml:space="preserve">
-    <value>Assign the Main Operator</value>
+  <data name="Console_operators_string" xml:space="preserve">
+    <value>Console Operators</value>
   </data>
-  <data name="Hand_over_string" xml:space="preserve">
-    <value>Hand over</value>
+  <data name="Console_operators_description_string" xml:space="preserve">
+    <value>Console Operators run this Event from the Console. An administrator of the federation runs every Event of it and needs no assignment.</value>
   </data>
-  <data name="Hand_over_event_string" xml:space="preserve">
-    <value>Hand the Event over</value>
+  <data name="Console_operators_empty_string" xml:space="preserve">
+    <value>No Console Operator is assigned yet.</value>
+  </data>
+  <data name="Assign_console_operator_string" xml:space="preserve">
+    <value>Assign</value>
   </data>
   <data name="Find_account_string" xml:space="preserve">
     <value>Find an account by name (at least two letters)</value>
   </data>
-  <data name="Main_operator_string" xml:space="preserve">
-    <value>Main Operator</value>
+  <data name="Console_operator_assigned_string" xml:space="preserve">
+    <value>The Console Operator was assigned.</value>
   </data>
-  <data name="Main_operator_assigned_string" xml:space="preserve">
-    <value>The Main Operator was assigned.</value>
-  </data>
-  <data name="Event_handed_over_string" xml:space="preserve">
-    <value>The Event was handed over.</value>
+  <data name="Console_operator_removed_string" xml:space="preserve">
+    <value>The Console Operator was removed.</value>
   </data>
   <data name="Event_started_string" xml:space="preserve">
     <value>The Event was started.</value>
@@ -1102,7 +1102,7 @@
     <value>Competition not found</value>
   </data>
   <data name="Event_not_yours_to_run_string" xml:space="preserve">
-    <value>Only the Main Operator of an Event opens its Setup.</value>
+    <value>Only a Console Operator of an Event, or an administrator of the federation, opens its Setup.</value>
   </data>
   <data name="Access_string" xml:space="preserve">
     <value>Access</value>

@@ -1,0 +1,148 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity;
+using Not.Identity;
+using NoTiming.Api.Features.Access;
+using NoTiming.Api.Features.Account;
+using NoTiming.Api.Features.Tenancy;
+using NoTiming.Api.JsonApi;
+using NTS.Domain.Access;
+
+namespace NoTiming.Api.Features.Events;
+
+/// <summary>
+/// Root assigns the Console Operators of an Event (#671, ADR-0012): the <c>console-operators</c> resource, a grant of its own
+/// kind, named by the exact email or by the id of an account found by name. An email that has an account gives that account
+/// the grant at once, and one that has none is a pending invitation that attaches when the person registers. An Event has
+/// none until Root assigns one, and needs none. Root and the Console Operators of an Event list them, in the order of the
+/// emails or the other way round (<c>sort</c>), a page at a time; only Root assigns and removes, until the Event ends. The
+/// emails that come back are masked. Who may do what is declared on each handler and decided by the endpoint filter.
+/// </summary>
+internal static class ConsoleOperatorEndpoints
+{
+    const string CONSOLE_OPERATORS = "console-operators";
+    const string EVENT_ID = "eventId";
+    const string EMAIL = "email";
+
+    public static IEndpointRouteBuilder MapConsoleOperators(this IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/console-operators", PostConsoleOperators);
+        app.MapGet("/api/console-operators", GetConsoleOperators);
+        app.MapDelete("/api/console-operators/{id}", DeleteConsoleOperatorsById);
+        return app;
+    }
+
+    [Requires(Capability.AssignConsoleOperators, PlaceIn.EventInBody)]
+    static async Task<IResult> PostConsoleOperators(
+        JsonApiBody<ConsoleOperatorAttributes> body,
+        AccessContext access,
+        UserManager<NIdentityUser> users,
+        EventGrantStore grants,
+        TenancyLog log,
+        CancellationToken cancellationToken
+    )
+    {
+        var attributes = body.Attributes;
+        NIdentityUser? account;
+        string email;
+        if (attributes.AccountId is { } accountId)
+        {
+            account = await users.FindByIdAsync(accountId.ToString());
+            if (account?.Email is null)
+            {
+                return EventsFailures.AccountNotFound.AsResult();
+            }
+
+            email = account.Email;
+        }
+        else
+        {
+            email = attributes.Email!.Trim();
+            account = await users.FindByEmailAsync(users.NormalizeEmail(email)!);
+        }
+
+        var (grant, created, attached) = await grants.LinkAsync(
+            access.Event.Record,
+            GrantKind.ConsoleOperator,
+            null,
+            email,
+            account?.Id,
+            cancellationToken
+        );
+        if (created || attached)
+        {
+            log.GrantLinked(access.User.Id, grant);
+        }
+
+        return JsonApiResults.Resource(
+            created ? StatusCodes.Status201Created : StatusCodes.Status200OK,
+            CONSOLE_OPERATORS,
+            grant.Id.ToString(),
+            AttributesOf(grant, account)
+        );
+    }
+
+    [Requires(Capability.ReadConfiguration, PlaceIn.EventInFilter)]
+    static async Task<IResult> GetConsoleOperators(
+        [ListOf(EMAIL, EVENT_ID)] ListQuery query,
+        HttpRequest request,
+        AccessContext access,
+        UserManager<NIdentityUser> users,
+        EventGrantStore grants,
+        CancellationToken cancellationToken
+    )
+    {
+        var items = new List<(string Id, object Attributes)>();
+        var (page, hasMore) = await grants.ListAsync(
+            access.Event.Record,
+            consoleOperators: true,
+            query.Descending,
+            query.Skip,
+            query.Size,
+            cancellationToken
+        );
+        foreach (var grant in page)
+        {
+            var account = grant.AccountId is { } id ? await users.FindByIdAsync(id.ToString()) : null;
+            items.Add((grant.Id.ToString(), AttributesOf(grant, account)));
+        }
+
+        return JsonApiResults.Page(CONSOLE_OPERATORS, items, request, query.Size, query.Number, hasMore);
+    }
+
+    // A Console Operator is a Console Operator's and Root's to see: to anybody else it is not there, as it is not for a
+    // missing one. One who sees it and is not Root is told what is missing.
+    [Requires(
+        Capability.AssignConsoleOperators,
+        PlaceIn.EventOfConsoleOperator,
+        SeenWith = Capability.ReadConfiguration
+    )]
+    static async Task<IResult> DeleteConsoleOperatorsById(
+        AccessContext access,
+        EventGrantStore grants,
+        TenancyLog log,
+        CancellationToken cancellationToken
+    )
+    {
+        var grant = access.Grant!;
+        if (!await grants.RemoveAsync(grant, cancellationToken))
+        {
+            return JsonApiResults.NotFound();
+        }
+
+        log.GrantRemoved(access.User.Id, grant.Id, grant.EventId);
+        return Results.NoContent();
+    }
+
+    static object AttributesOf(EventGrant grant, NIdentityUser? account)
+    {
+        return new
+        {
+            eventId = grant.EventId,
+            pending = grant.IsPending,
+            accountId = grant.AccountId,
+            displayName = account?.TextOf("Name"),
+            email = EmailMask.Of(grant.Email),
+        };
+    }
+}

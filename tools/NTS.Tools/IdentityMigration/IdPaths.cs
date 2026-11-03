@@ -115,7 +115,6 @@ public static class IdPaths
 
         // a Setup: the Event it will be, and everything embedded in it, scoped to it
         yield return Row(CONFIGURE_EVENTS, ID, EVENT);
-        yield return Row(CONFIGURE_EVENTS, "MainOperatorId", USER, role: IdRole.Born);
         yield return Row(CONFIGURE_EVENTS, "Country._id", COUNTRY);
         yield return Row(CONFIGURE_EVENTS, "Competitions._id", "Competition", IdScope.Document);
         yield return Row(CONFIGURE_EVENTS, "Competitions.Phases._id", "SetupPhase", IdScope.Document);
@@ -138,7 +137,6 @@ public static class IdPaths
 
         // an Event that has started, and what it keeps: each document names the Event, and the copies it shares with the Setup are the Event's
         yield return Row(EVENT_INFORMATIONS, ID, EVENT);
-        yield return Row(EVENT_INFORMATIONS, "MainOperatorId", USER, role: IdRole.Born);
         yield return Row(EVENT_INFORMATIONS, "Country._id", COUNTRY);
         yield return Row("event_officials", ID, "Official", IdScope.Event);
         yield return Row("event_officials", "EventId", EVENT, target: EVENT_INFORMATIONS);

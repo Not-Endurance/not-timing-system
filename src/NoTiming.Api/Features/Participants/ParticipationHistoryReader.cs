@@ -43,7 +43,7 @@ internal sealed class ParticipationHistoryReader
     /// <param name="skip">How many rides to leave out.</param>
     /// <param name="size">How many rides the page holds at most.</param>
     public async Task<HistoryPage> ReadAsync(
-        Caller caller,
+        Standing standing,
         ParticipantKind kind,
         Guid id,
         CultureInfo culture,
@@ -55,7 +55,7 @@ internal sealed class ParticipationHistoryReader
     )
     {
         // one ride more than the page is read, to know whether another page follows
-        var read = await _reads.ReadHistoryAsync(caller, kind, id, now, options, skip, size + 1, cancellationToken);
+        var read = await _reads.ReadHistoryAsync(standing, kind, id, now, options, skip, size + 1, cancellationToken);
         var rides = read.Take(size).ToList();
         var models = (
             await _reads.ReadParticipationsAsync([.. rides.Select(x => x.Id)], cancellationToken)

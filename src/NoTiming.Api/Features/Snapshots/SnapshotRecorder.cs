@@ -1,14 +1,12 @@
 using System.Reflection;
 using Not.Exceptions;
 using Not.Identity;
-using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
 using NTS.Contracts.Core.Models;
-using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
@@ -22,8 +20,9 @@ namespace NoTiming.Api.Features.Snapshots;
 /// <summary>
 /// The server records every time (#644, ADR-0013, ADR-0005): the Snapshot of an Official or an Operator of a Live Event is
 /// placed by the rule of ADR-0004, recorded as a time event on the Participation with its outcome, saved, and announced to
-/// the viewers of the Event, and an Update of one is recorded the same way. The caller is asked of the policy on every
-/// request, and the grants are read on it, so that a person whose access was removed is refused on the next request.
+/// the viewers of the Event, and an Update of one is recorded the same way. The caller was asked of the policy on every
+/// request by the endpoint filter (#671), which reads the grants on it, so that a person whose access was removed is refused
+/// on the next request, and the recorder is reached only for a caller who may send a Snapshot to the Event now.
 /// <para>
 /// A Participation is written against the version it was read at and the version is one more in the same write, so that of
 /// two Snapshots for one Participation at once one is taken and the other finds the Participation as it is now: it is read
@@ -43,44 +42,33 @@ internal sealed class SnapshotRecorder
         typeof(ParticipationModel).GetProperty(nameof(ParticipationModel.Eliminated))!,
     ];
 
-    readonly EventStore _events;
-    readonly EventGrantStore _grants;
     readonly TenantCollections _tenants;
     readonly CrossTenantReads _reads;
     readonly IParticipationChanges _changes;
     readonly TimeProvider _time;
 
     public SnapshotRecorder(
-        EventStore events,
-        EventGrantStore grants,
         TenantCollections tenants,
         CrossTenantReads reads,
         IParticipationChanges changes,
         TimeProvider time
     )
     {
-        _events = events;
-        _grants = grants;
         _tenants = tenants;
         _reads = reads;
         _changes = changes;
         _time = time;
     }
 
-    /// <summary>Records the Snapshot, or says what it has been recorded as before, or why it cannot be.</summary>
+    /// <summary>Records the Snapshot in the Event the caller was let in to, or says what it has been recorded as before, or why it cannot be.</summary>
     public async Task<SnapshotAnswer> RecordAsync(
         NIdentityUser user,
         SnapshotRequest request,
+        EventFacts facts,
         CancellationToken cancellationToken
     )
     {
-        var (facts, refusal) = await OpenAsync(user, request.EventId, cancellationToken);
-        if (refusal != null)
-        {
-            return refusal;
-        }
-
-        var collection = ParticipationsOf(facts!);
+        var collection = ParticipationsOf(facts);
         var checkedElsewhere = false;
         for (var attempt = 0; attempt < MAX_ATTEMPTS; attempt++)
         {
@@ -95,13 +83,7 @@ internal sealed class SnapshotRecorder
             ).FirstOrDefault();
             if (model is null)
             {
-                return SnapshotAnswer.Failed(
-                    new JsonApiFailure(
-                        StatusCodes.Status404NotFound,
-                        "participation-not-found",
-                        "The Event has no Participation with that start number."
-                    )
-                );
+                return SnapshotAnswer.Failed(SnapshotFailures.ParticipationNotFound);
             }
 
             var participation = model.MapToEntity();
@@ -147,29 +129,19 @@ internal sealed class SnapshotRecorder
     }
 
     /// <summary>
-    /// Records an Update of a Snapshot that was sent: the time it should have had. The Snapshot is found by its id, which
-    /// says which Participation it is in and so which Event, and the Update is asked of the policy like a Snapshot is.
+    /// Records an Update of a Snapshot that was sent: the time it should have had. The Snapshot was found by its id, which says
+    /// which Participation holds it and so which Event, and the Update was asked of the policy like a Snapshot is.
     /// </summary>
     public async Task<SnapshotAnswer> UpdateAsync(
         NIdentityUser user,
+        ParticipationModel held,
         Guid snapshotId,
         DateTimeOffset time,
+        EventFacts facts,
         CancellationToken cancellationToken
     )
     {
-        var held = await _reads.FindParticipationOfTimeEventAsync(snapshotId, cancellationToken);
-        if (held is null)
-        {
-            return SnapshotAnswer.Failed(NotFound());
-        }
-
-        var (facts, refusal) = await OpenAsync(user, held.EventId, cancellationToken);
-        if (refusal != null)
-        {
-            return refusal;
-        }
-
-        var collection = ParticipationsOf(facts!);
+        var collection = ParticipationsOf(facts);
         var model = held;
         for (var attempt = 0; attempt < MAX_ATTEMPTS; attempt++)
         {
@@ -256,28 +228,17 @@ internal sealed class SnapshotRecorder
 
     static JsonApiFailure IdTaken()
     {
-        return new JsonApiFailure(
-            StatusCodes.Status409Conflict,
-            "id-taken",
-            "An event with that id was recorded for another Participation, or is not a Snapshot."
-        );
+        return SnapshotFailures.IdTaken;
     }
 
     static JsonApiFailure NotFound()
     {
-        return new JsonApiFailure(StatusCodes.Status404NotFound, "not-found", "Not found");
+        return JsonApiFailures.NotFound;
     }
 
     static SnapshotAnswer Busy()
     {
-        return SnapshotAnswer.Failed(
-            new JsonApiFailure(
-                StatusCodes.Status409Conflict,
-                "participation-busy",
-                "The Participation was being changed by too many at once.",
-                "Send it again: a Snapshot is recorded once whatever the number of times it is sent."
-            )
-        );
+        return SnapshotAnswer.Failed(SnapshotFailures.ParticipationBusy);
     }
 
     /// <summary>The write of what a time changed, against the version the Participation was read at: false when it was written since.</summary>
@@ -290,33 +251,6 @@ internal sealed class SnapshotRecorder
     {
         var update = MEMBERS.UpdateOf(ParticipationModel.MapFrom(changed), CHANGED_BY_A_TIME);
         return await collection.UpdateAtVersionAsync(read.Id, update, read.Version, cancellationToken);
-    }
-
-    /// <summary>
-    /// The Event, when the caller may send a Snapshot to it at the stage it is in, and the answer that refuses it when not:
-    /// 404 for an Event that is not there, and the policy's for a caller who is not an Operator or an Official that sends
-    /// them, or the Main Operator, or whose Event is not Live (ADR-0012).
-    /// </summary>
-    async Task<(EventFacts? Event, SnapshotAnswer? Refusal)> OpenAsync(
-        NIdentityUser user,
-        Guid eventId,
-        CancellationToken cancellationToken
-    )
-    {
-        var facts = await _events.FindAsync(eventId, cancellationToken);
-        if (facts is null)
-        {
-            return (null, SnapshotAnswer.Failed(NotFound()));
-        }
-
-        var verdict = AccessPolicy.Decide(
-            Capability.SendSnapshot,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(await _grants.GrantsOfAsync(facts.Record, user.Id, cancellationToken))
-        );
-        return verdict.IsAllowed
-            ? (facts, null)
-            : (null, SnapshotAnswer.Failed(AccessResults.FailureOf(verdict.Reason!.Value)));
     }
 
     TypedTenantCollection<ParticipationModel> ParticipationsOf(EventFacts facts)

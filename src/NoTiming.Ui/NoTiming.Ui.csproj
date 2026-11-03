@@ -18,7 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\nugets\Not.Blazor.Client\Not.Blazor.Client.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Storage\Not.Storage.csproj" />
-    <ProjectReference Include="..\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\NTS.Blazor\NTS.Blazor.csproj" />
     <ProjectReference Include="..\NoTiming.Console\NoTiming.Console.csproj" />
     <ProjectReference Include="..\NTS.Contracts\NTS.Contracts.csproj" />

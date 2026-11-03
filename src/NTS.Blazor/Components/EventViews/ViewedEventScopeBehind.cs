@@ -134,6 +134,11 @@ public class ViewedEventScopeBehind : NStatefulComponent
                 return;
             }
 
+            if (eventId != _openedFor)
+            {
+                HasEnded = false; // the banner is the one of the Event that ended, and not of the Event the page opens next
+            }
+
             _opened = true;
             _openedFor = eventId;
             IsNotFound = false;

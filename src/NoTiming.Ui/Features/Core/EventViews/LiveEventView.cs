@@ -36,7 +36,7 @@ public sealed class LiveEventView : EventView
         Observe(access, EmitChanged);
     }
 
-    protected override bool MayWrite => WitnessAccessPolicy.CanViewSnapshots(_access.AccessLevel);
+    protected override bool MayWrite => _access.CanSendSnapshots;
 
     public override IReadOnlyList<Participation> Participations => _store.Participations;
 

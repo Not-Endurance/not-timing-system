@@ -33,8 +33,8 @@ public class NavMenuBehind : NStatefulComponent
     [CascadingParameter(Name = "CloseResponsiveDrawer")]
     Func<Task>? CloseResponsiveDrawer { get; set; }
 
-    protected bool ShowSnapshots => WitnessAccessPolicy.CanViewSnapshots(AccessState.AccessLevel);
-    protected bool ShowSignin => WitnessAccessPolicy.CanSignIn(AccessState.AccessLevel);
+    protected bool ShowSnapshots => AccessState.CanSendSnapshots;
+    protected bool ShowSignin => AccessState.IsKnown && !AccessState.IsSignedIn;
     protected bool ShowProfileHeader => Account.IsSignedIn;
     protected bool HasLiveEvent => SocketService.IsConnected && SocketService.Event != null;
     protected string LiveEventTitle => SocketService.Event?.Name ?? Event_string;

@@ -1,22 +1,13 @@
 using Microsoft.Extensions.Localization;
 using Not.Localization;
 using NoTiming.Api.Features.Access;
-using NoTiming.Api.Features.Account;
-using NoTiming.Api.Features.Branding;
-using NoTiming.Api.Features.EventData;
-using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
-using NoTiming.Api.Features.Localhost;
-using NoTiming.Api.Features.Participants;
-using NoTiming.Api.Features.Profile;
-using NoTiming.Api.Features.Reference;
-using NoTiming.Api.Features.Snapshots;
-using NoTiming.Api.Features.Tenancy;
-using NoTiming.Api.Features.UserSessions;
-using NTS.Contracts;
 
 namespace NoTiming.Api.Hosting;
 
+/// <summary>
+/// The middleware of the host, in the order it runs, and then its endpoints (<see cref="ApiEndpoints"/>).
+/// </summary>
 internal static class ApiPipeline
 {
     public static WebApplication UseNoTimingApi(this WebApplication app)
@@ -45,66 +36,7 @@ internal static class ApiPipeline
         app.UseMiddleware<AccessBaselineMiddleware>();
         app.UseAuthorization();
 
-        app.MapGet(
-            "/healthz",
-            () =>
-                Results.Ok(
-                    new
-                    {
-                        status = "ok",
-                        environment = app.Environment.EnvironmentName,
-                        instanceId = ConnectionDiagnostics.GetInstanceId(),
-                        hub = ConnectionDiagnostics.HubPath.Value,
-                    }
-                )
-        );
-        app.MapAccount();
-        app.MapLocalhost();
-        app.MapProfile();
-        app.MapTenancy();
-        app.MapBranding();
-        app.MapEvents();
-        app.MapEventResources();
-        app.MapHistoricEventRedirects();
-        app.MapSetups();
-        app.MapEventGrants();
-        app.MapAccountSearch();
-        app.MapRegistrySearch();
-        app.MapParticipationHistory();
-        app.MapParticipantLinks();
-        app.MapReference();
-        app.MapEventData();
-        app.MapTimeEventActors();
-        app.MapSnapshots();
-        app.MapUserSessions();
-        app.MapHub<LiveHub>(ApplicationConstants.LIVE_HUB).RequireCors(ApiServices.CORS_POLICY_NAME);
-
-        // An unknown API route is a 404 in the error format of the rest-api skill, never the Ui's page.
-        app.Map(
-            "/api/{**rest}",
-            () =>
-                Results.Json(
-                    new
-                    {
-                        errors = new[]
-                        {
-                            new
-                            {
-                                status = "404",
-                                code = "not-found",
-                                title = "Not found",
-                            },
-                        },
-                    },
-                    statusCode: StatusCodes.Status404NotFound,
-                    contentType: "application/vnd.api+json"
-                )
-        );
-
-        // Deep links into the Ui. A path that looks like a file (it has an extension) that is missing stays a 404.
-        app.MapFallbackToFile("{**path:nonfile}", "index.html");
-
-        return app;
+        return app.MapNoTimingApi();
     }
 
     static void BindAzurePort(WebApplication app)

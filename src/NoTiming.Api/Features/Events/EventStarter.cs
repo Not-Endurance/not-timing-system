@@ -1,10 +1,10 @@
 using System.Text;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using NoTiming.Api.Features.Events.Factories;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.Features.UserSessions;
 using NoTiming.Api.JsonApi;
-using NTS.Application.Factories;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
@@ -49,12 +49,9 @@ internal static class EventStartPlans
         {
             return (
                 null,
-                JsonApiResults.Error(
-                    StatusCodes.Status422UnprocessableEntity,
-                    "invalid-setup",
-                    Start_validation_invalid_setup_title_string,
-                    StartValidationDetail(issues)
-                )
+                EventsFailures
+                    .InvalidSetup(Start_validation_invalid_setup_title_string, StartValidationDetail(issues))
+                    .AsResult()
             );
         }
 
@@ -63,12 +60,11 @@ internal static class EventStartPlans
         {
             return (
                 null,
-                JsonApiResults.Error(
-                    StatusCodes.Status422UnprocessableEntity,
-                    "incomplete-fei-configuration",
-                    "The FEI export is only partly configured.",
-                    string.Format(Missing_FEI_export_configurations_colon__, Environment.NewLine + Lines(missing))
-                )
+                EventsFailures
+                    .IncompleteFeiConfiguration.With(
+                        string.Format(Missing_FEI_export_configurations_colon__, Environment.NewLine + Lines(missing))
+                    )
+                    .AsResult()
             );
         }
 

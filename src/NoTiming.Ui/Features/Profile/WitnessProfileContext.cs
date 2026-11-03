@@ -5,6 +5,7 @@ using Not.Application.HTTP;
 using Not.Injection;
 using NoTiming.Ui.Features.Account;
 using NoTiming.Ui.Features.Participants;
+using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Profile;
 using NTS.Domain.Aggregates;
@@ -19,15 +20,15 @@ namespace NoTiming.Ui.Features.Profile;
 public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext, IScoped
 {
     readonly IRepository<Country> _countries;
-    readonly JsonApiClient _api;
+    readonly AccountApiRepository _accounts;
     readonly SemaphoreSlim _linking = new(1, 1); // a link is made after the one before it, so that the profile that is kept is the latest
     IReadOnlyList<Country> _countryList = [];
 
-    public WitnessProfileContext(IAccountSession account, IRepository<Country> countries, JsonApiClient api)
+    public WitnessProfileContext(IAccountSession account, IRepository<Country> countries, AccountApiRepository accounts)
         : base(account)
     {
         _countries = countries;
-        _api = api;
+        _accounts = accounts;
     }
 
     public AccountProfile? Profile { get; private set; }
@@ -44,22 +45,12 @@ public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext
             return false; // the host has not said who is signed in: ask again
         }
 
-        if (Account.IsSignedIn)
+        if (Account.IsSignedIn && await ProfileOfSignedIn() is { } profile)
         {
-            var response = await _api.Send(HttpMethod.Get, "me/profile");
-            if (response.IsSuccess)
-            {
-                // What was there is replaced once the new is known, so that nothing is shown as a visitor's meanwhile.
-                var profile = ProfileOf(response.Document!.Value);
-                _countryList = [.. (await _countries.ReadMany()).OrderBy(country => country.Name)];
-                Profile = profile;
-                return true;
-            }
-
-            if (response.Status != HttpStatusCode.Unauthorized)
-            {
-                throw response.ToException();
-            }
+            // What was there is replaced once the new is known, so that nothing is shown as a visitor's meanwhile.
+            _countryList = [.. (await _countries.ReadMany()).OrderBy(country => country.Name)];
+            Profile = profile;
+            return true;
         }
 
         Profile = null; // a visitor, or a session that ended meanwhile, which the account is told of by its own refresh
@@ -102,33 +93,20 @@ public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext
         }
 
         // Every member is named, so that one the person emptied is taken away, as a change names what it changes.
-        var document = JsonSerializer.SerializeToElement(
-            new
-            {
-                data = new
+        var saved = ProfileOf(
+            await _accounts.SaveProfile(
+                account.Id,
+                new
                 {
-                    type = "profiles",
-                    id = account.Id.ToString(),
-                    attributes = new
-                    {
-                        givenName = model.GivenName?.Trim(),
-                        middleName = model.MiddleName?.Trim(),
-                        surname = model.Surname?.Trim(),
-                        countryId = model.Country!.Id,
-                        club = model.Club?.Trim(),
-                        feiId = model.FeiId?.Trim(),
-                    },
-                },
-            },
-            JsonApiClient.WriteOptions
+                    givenName = model.GivenName?.Trim(),
+                    middleName = model.MiddleName?.Trim(),
+                    surname = model.Surname?.Trim(),
+                    countryId = model.Country!.Id,
+                    club = model.Club?.Trim(),
+                    feiId = model.FeiId?.Trim(),
+                }
+            )
         );
-        var response = await _api.Send(HttpMethod.Patch, "me/profile", document);
-        if (!response.IsSuccess)
-        {
-            throw response.ToException();
-        }
-
-        var saved = ProfileOf(response.Document!.Value);
         Profile = saved;
         EmitChanged();
         await Account.Refresh(); // the account says whether the profile is complete, and the host may have placed the person
@@ -137,32 +115,32 @@ public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext
 
     public Task LinkAthlete(Guid athleteId)
     {
-        return Change(HttpMethod.Post, $"athletes/{athleteId}/link");
+        return Change(() => _accounts.LinkAthlete(athleteId));
     }
 
     public async Task UnlinkAthlete()
     {
         if (Profile?.Athlete is { } athlete)
         {
-            await Change(HttpMethod.Delete, $"athletes/{athlete.Id}/link");
+            await Change(() => _accounts.UnlinkAthlete(athlete.Id));
         }
     }
 
     public Task AddHorse(Guid horseId)
     {
-        return Change(HttpMethod.Post, $"horses/{horseId}/link");
+        return Change(() => _accounts.LinkHorse(horseId));
     }
 
     public Task RemoveHorse(Guid horseId)
     {
-        return Change(HttpMethod.Delete, $"horses/{horseId}/link");
+        return Change(() => _accounts.UnlinkHorse(horseId));
     }
 
     /// <summary>
     /// Makes or takes away a link at the host and reads the profile again, so that what is shown is what the host keeps and
     /// not what the person asked for. A link that is gone when it is taken away is taken away all the same.
     /// </summary>
-    async Task Change(HttpMethod method, string link)
+    async Task Change(Func<Task> change)
     {
         if (Profile == null)
         {
@@ -172,24 +150,26 @@ public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext
         await _linking.WaitAsync();
         try
         {
-            var changed = await _api.Send(method, link);
-            if (!changed.IsSuccess && !(method == HttpMethod.Delete && changed.IsNotFound))
-            {
-                throw changed.ToException();
-            }
-
-            var read = await _api.Send(HttpMethod.Get, "me/profile");
-            if (!read.IsSuccess)
-            {
-                throw read.ToException();
-            }
-
-            Profile = ProfileOf(read.Document!.Value);
+            await change();
+            Profile = ProfileOf(await _accounts.Profile());
             EmitChanged();
         }
         finally
         {
             _linking.Release();
+        }
+    }
+
+    /// <summary>The profile the host keeps of the person who is signed in; none when the session has ended meanwhile (the Api answers 401).</summary>
+    async Task<AccountProfile?> ProfileOfSignedIn()
+    {
+        try
+        {
+            return ProfileOf(await _accounts.Profile());
+        }
+        catch (JsonApiException refused) when (refused.Response.Status == HttpStatusCode.Unauthorized)
+        {
+            return null;
         }
     }
 
@@ -199,9 +179,9 @@ public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext
             ?? _countryList.FirstOrDefault(country => country.Matches(profile?.CountryRegion));
     }
 
-    static AccountProfile ProfileOf(JsonElement document)
+    static AccountProfile ProfileOf(JsonElement data)
     {
-        var attributes = document.GetProperty("data").GetProperty("attributes");
+        var attributes = data.GetProperty("attributes");
         return new AccountProfile
         {
             GivenName = Text(attributes, "givenName"),

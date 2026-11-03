@@ -28,14 +28,15 @@ Certified personnel appointed to an event: Ground Jury, Veterinary Commission, S
 _Avoid_: Judge, referee, personnel
 
 **Operator**:
-A person who works an Event with Snapshot access, like an Official, and is expected to exceed Official access over time. An Operator is *never* named in Results, FEI exports, or any other produced document; they exist for the system, not for the record. An Operator is not a Developer.
+A person who works an Event with Snapshot access, like an Official. An Operator is *never* named in Results, FEI exports, or any other produced document; they exist for the system, not for the record. An Operator is not a Developer.
 _Avoid_: Admin, superuser, sysadmin
 
-**Main Operator**:
-The one Operator of an Event who runs it from the Console: the highest authority in the Event's scope, with full access, writes included. An Event has exactly one at a time. It is the Tenant Root who created the Event until that Tenant Root assigns it to someone else, which is only possible while the Event is not yet Live; once the Event is Live only the Main Operator can hand it over, to a named account. The Main Operator links accounts to the Event's Officials and Operators.
+**Console Operator**:
+An Operator who also works the Console of one Event: configures and starts it, edits what it keeps, links its Staff, brands it and resets it, and records Snapshots. Root assigns a Console Operator to an Event, as a Grant, and an Event has as many as Root assigns, none included: Root runs an Event that has none. Several may work the Console at once, because the Console is one more viewer of what the server records.
+_Avoid_: Main Operator (the retired name, from when an Event had exactly one), admin
 
 **Staff**:
-Operators and Officials together — the people who work an Event and may see how its times were recorded: its time events, who recorded them and when. Everyone else, signed in or not, sees only the recorded times.
+Operators (Console Operators among them) and Officials together — the people who work an Event and may see how its times were recorded: its time events, who recorded them and when. Root sees them too. Everyone else, signed in or not, sees only the recorded times.
 
 ### Tenancy
 
@@ -55,27 +56,34 @@ An Account's standing in one Tenant: the Tenant and the roles held there. Regist
 _Avoid_: Tenant role, affiliation
 
 **Tenant Root**:
-A role within one Tenant, held by one or more accounts and created by the Developer — a Tenant Root cannot add another. A Tenant Root creates the Tenant's Events and is each one's Main Operator until it assigns that role to someone else, usually so the configuration and running of that single Event is done by another person. Once an Event is Live, a Tenant Root who is not its Main Operator cannot take the role over, and the Tenant Root role itself gives no right to run a Live Event.
+A role within one Tenant, held by one or more accounts and created by the Developer — a Tenant Root cannot add another. A Tenant Root holds the Root Level in its own Tenant: it creates the Tenant's Events and may run any of them, before they start and while they are Live, or assign Console Operators to run them.
 _Avoid_: Admin, owner
 
 **Developer**:
-A platform-level role reserved for the platform owner, with full rights across every Tenant, except acting as the Main Operator of a Live Event: what the Main Operator does there is the Main Operator's alone, and a Live Event whose Main Operator is locked out is a database fix, not an action of the product. It is not granted through a Tenant, and only by command: no route gives it, or a Tenant Root.
+A platform-level role reserved for the platform owner, with the Root Level in every Tenant and the platform's own reference data, such as the countries, to itself. It is not granted through a Tenant, and only by command: no route gives it, or a Tenant Root.
 _Avoid_: Admin, superuser
 
+**Root**:
+The highest Level, held by the Developer and, within its own Tenant, by a Tenant Root: every right over the Events and the registry of the Tenants in reach, at every stage the action allows, a Live Event included. Root assigns Console Operators to Events and does not need to be one to run an Event.
+
+**Level**:
+How far a caller reaches at one place — an Event, a Tenant, or the platform — from the lowest: Anonymous (not signed in), Account (signed in, holding nothing there), Staff, Console Operator, Root. Each Level holds everything the ones below it do. An Account stands at a Level per place, not once: a Tenant Root in one Tenant can be an Operator of an Event in another and a Console Operator of a third. The stage of an Event then decides which rights of a Level are open.
+_Avoid_: User (for the Account that holds nothing), permission
+
 **Grant**:
-The access the Main Operator gives to a person for one Event: as an Operator, or as an Official of a role. A grant names the person by their exact email. When the email has an Account the grant is that Account's at once; when it has none it is a pending invitation, which gives nothing until the person registers with that email and then attaches to the new Account. A grant belongs to the Tenant of its Event and ends the moment it is removed. The Main Operator is not a grant: the Event names it.
+The access given to a person for one Event: as a Console Operator, as an Operator, or as an Official of a role. Root gives a Console Operator grant; a Console Operator gives the Operator and Official ones. A grant names the person by their exact email. When the email has an Account the grant is that Account's at once; when it has none it is a pending invitation, which gives nothing until the person registers with that email and then attaches to the new Account. A grant belongs to the Tenant of its Event and ends the moment it is removed.
 _Avoid_: Permission, role assignment, invite
 
 **Regional rules**:
 How a Tenant's Regional competitions are judged: whether the speed of a loop is judged on the average only, and which ranker applies. A Tenant Root sets them on the Tenant, and an Event copies them when it starts, so what an Event was judged by never changes when the Tenant edits them. An Event that started without any is judged by the FEI's rules.
 
 **Capabilities**:
-What the caller may do about an Event, or in a Tenant, told by the same access policy that refuses the action: `canSnapshot`, `isMainOperator`, `canHandOver`, `canAssignMainOperator`, `canConfigure`, `canEditSetup`, `canEditData`, `canLinkAccounts`, `canEditBranding`, `canReset` for an Event; `canCreateEvents`, `canEditRules`, `canEditBranding`, `canEditRegistry` for a Tenant. A screen shows controls from these and never works them out for itself.
+What the caller may do about an Event, or in a Tenant, told by the same access policy that refuses the action. A screen shows controls from these and never works them out for itself.
 
 ### Data
 
 **Setup**:
-The reference data and Event configuration prepared before an Event, such as its Athletes, Horses and Clubs. An Athlete or Horse is registered in Setup once. The Setup of an Event is changed by its Main Operator until the Event starts and by nobody from then on, because the Console works on the copies Core made of it; the registries and the countries it is made from go on changing.
+The reference data and Event configuration prepared before an Event, such as its Athletes, Horses and Clubs. An Athlete or Horse is registered in Setup once. The Setup of an Event is changed by Root and its Console Operators until the Event starts and by nobody from then on, because the Console works on the copies Core made of it; the registries and the countries it is made from go on changing.
 
 **Core**:
 What an Event produces while it runs and afterwards: its Participations, Rankings, Handouts and Officials. Core holds copies of Setup data as entered when the Event started, so a later Setup change does not rewrite a finished Event.
@@ -99,14 +107,14 @@ An Event that has ended, viewed as a record: nothing about it can be changed, an
 _Avoid_: Past event, archived event
 
 **Console**:
-The Operator's workspace for configuring and running an Event: Setup, the live dashboard, startlist, handouts and rankings. Only the Main Operator reaches it, from as many tabs or devices as they like: the Console is one more viewer of what the server records.
+The workspace of Root and the Console Operators for configuring and running an Event: Setup, the live dashboard, startlist, handouts and rankings. Each reaches it from as many tabs or devices as they like, and several at once: the Console is one more viewer of what the server records.
 _Avoid_: Judge, Judge app
 
 **Participation**:
 One Combination's ride at an Event — its category, phases, and outcome: the act of Participants competing, recorded. A record of competing, not a competitor and not a person. The same ride can count in the Rankings of more than one Competition.
 _Avoid_: entry, run
 
-> **A Participant is an Athlete or a Horse, not the pair and not the ride.** The competing pair is a **Combination**; its ride is a **Participation**. A thing named `Participant` that means the pair, the ride or a signed-in account is a misnomer to be corrected: `WitnessAccessLevel.Participant` was one such misnomer and is now `Registered` — "signed in without a write role" (see #592).
+> **A Participant is an Athlete or a Horse, not the pair and not the ride.** The competing pair is a **Combination**; its ride is a **Participation**. A thing named `Participant` that means the pair, the ride or a signed-in account is a misnomer to be corrected: `WitnessAccessLevel.Participant` was one such misnomer and became `Registered` — "signed in without a write role" (see #592); the Ui has no such level any more (#671), and is told by the Api whether the person may send a Snapshot.
 
 **Ranking**:
 The Participations that compete for placement in one Competition and Category, each marked ranked or not ranked. While its Event is Live it holds no placings and Results derive them; once the Event is Historic it keeps its final placings.
@@ -118,10 +126,10 @@ The placings of a Ranking. While the Event is Live they are derived from its Par
 The printable sheet of one Combination's times, produced for it after each Phase. It is a live view of the Participation, not a snapshot: it prints the times as they stand then.
 
 **Logos**:
-The two images at the head of every document an Event prints, one at the left and one at the right. A Tenant Root keeps the Tenant's own, and the Main Operator of an Event may put its own in place of either until the Event ends; a place the Event has none for is printed with the Tenant's. An image is a PNG, JPEG, GIF or WebP of at most 512 KiB, kept by the server, so that every browser that prints the Event's documents prints the same.
+The two images at the head of every document an Event prints, one at the left and one at the right. Root keeps the Tenant's own, and a Console Operator of an Event, or Root, may put the Event's own in place of either until the Event ends; a place the Event has none for is printed with the Tenant's. An image is a PNG, JPEG, GIF or WebP of at most 512 KiB, kept by the server, so that every browser that prints the Event's documents prints the same.
 _Avoid_: Branding (the name of the Api's resource, not of the thing), letterhead
 
-> **Write access is not "Official".** Snapshot writes are granted to an Official whose role is one of {Steward, ChiefSteward, GroundJury, GroundJuryPresident}, **or** to any Operator. "Official" alone is not the boundary.
+> **Write access is not "Official".** Snapshot writes are granted to an Official whose role is one of {Steward, ChiefSteward, GroundJury, GroundJuryPresident}, **or** to any Operator, a Console Operator among them, **or** to Root. "Official" alone is not the boundary.
 
 ### Timing
 
@@ -135,21 +143,54 @@ A Combination presenting at the vet gate, captured as a time. Presenting again a
 A time an Official captures for a Combination, by start number, and sends in for the Event as an Arrival or a Presentation. It is an input, not part of the Participation: the server records every Snapshot as a time event on a Phase, accepted or rejected, and answers with it. The device makes its id, which is the id of the event, so that a Snapshot sent again is the same Snapshot and is recorded once.
 
 **Time event**:
-A past-tense fact recorded on a Phase — Arrived or Presented, an Update of one, or the Main Operator's edit of the Phase form (a PhaseUpdated, which lists the several times it changed) — with an outcome: accepted, or rejected with a reason (including a manual reject by the Main Operator). A Phase's times are the latest accepted time event that lists each of them (a time that an edit cleared is listed with none); rejected ones stay in its history. A time that breaks the order Start, Arrival, Presentation, Representation, compared among the times that exist, is rejected as an invalid time and never thrown at; a Presentation without an Arrival is legal, because a delayed Arrival looks exactly like that.
+A past-tense fact recorded on a Phase — Arrived or Presented, an Update of one, or an edit of the Phase form in the Console (a PhaseUpdated, which lists the several times it changed) — with an outcome: accepted, or rejected with a reason (including a manual reject made in the Console). A Phase's times are the latest accepted time event that lists each of them (a time that an edit cleared is listed with none); rejected ones stay in its history. A time that breaks the order Start, Arrival, Presentation, Representation, compared among the times that exist, is rejected as an invalid time and never thrown at; a Presentation without an Arrival is legal, because a delayed Arrival looks exactly like that.
 _Avoid_: Event (that is the show), phase event, snapshot event
 
 **Update**:
-Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, named by the Snapshot's id (an ArriveUpdated or a PresentUpdated), or the Main Operator editing the Phase in the Console (a PhaseUpdated, which lists only the times the Save changed, a cleared one as listed with none, and edits Start in place). It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history. It sets an absolute value, so the last one wins. Name the source when writing about it: a PhaseUpdated is the Phase form, a PresentUpdated is an Official's.
+Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, named by the Snapshot's id (an ArriveUpdated or a PresentUpdated), or someone editing the Phase in the Console (a PhaseUpdated, which lists only the times the Save changed, a cleared one as listed with none, and edits Start in place). It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history. It sets an absolute value, so the last one wins. Name the source when writing about it: a PhaseUpdated is the Phase form, a PresentUpdated is an Official's.
 
 **Disable**:
-The Main Operator negating a time event: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again, and it keeps when it was disabled. The event stays in the history and can be enabled again. Only an accepted event is disabled and only a disabled one is enabled: what the rules rejected stays as it is. The choices are made in the timeline of the Console and saved as one change.
+Negating a time event in the Console: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again, and it keeps when it was disabled. The event stays in the history and can be enabled again. Only an accepted event is disabled and only a disabled one is enabled: what the rules rejected stays as it is. The choices are made in the timeline of the Console and saved as one change.
 
 **Timeline**:
-The Console's dialog for one Participation: every time event of every Phase, in the order they were recorded, with what became of it, how it was acquired, who recorded it and when. The Main Operator chooses in it the events to disable and to enable, and saves the choice as one change; only Staff may read how times were recorded.
+The Console's dialog for one Participation: every time event of every Phase, in the order they were recorded, with what became of it, how it was acquired, who recorded it and when. Whoever works the Console chooses in it the events to disable and to enable, and saves the choice as one change; only Staff may read how times were recorded.
 
 **Change notification**:
 The signal sent to everyone viewing an Event when a Participation has been changed and saved. It names the Participation, never describes it: receivers read the Participation again.
 _Avoid_: Event (that is the show), Update (that is a correction of times)
+
+### Testing
+
+**Unit test**:
+A test of domain logic, and of application logic where it is judged necessary, that needs no host, database, network, browser or real clock.
+_Avoid_: Fast test, mock test
+
+**Integration test**:
+A test of a whole feature through its real entry points (HTTP, the live connection, the browser) against a real database. It doubles only what lies at the border of the system.
+_Avoid_: End-to-end test
+
+**Feature**:
+One capability of the product, and the folder that holds its integration tests.
+_Avoid_: Feature slice
+
+**Journey**:
+The path a feature takes from its entry point to its outcome, written as numbered stages. A feature has one or more journeys.
+_Avoid_: Flow, workflow
+
+**Stage**:
+One numbered, named step of a journey, such as "3 Enter code". A failure names the stage it stopped at.
+_Avoid_: Step
+
+**Scenario**:
+One case of how a journey goes: every stage succeeds, or it stops at one stage, or it runs under different rules, such as the FEI or the Regional ruleset. A journey has one or more scenarios.
+_Avoid_: Case, example
+
+**Border**:
+The edge of the system an integration test runs. What the product does not own, such as the clock and outbound email, is replaced by a double there; everything inside it is real.
+
+**Harness**:
+Code that tests use but that is not itself a test: fixtures, drivers, seeds, fakes and the rules that architecture tests check. It is kept apart from the tests that use it.
+_Avoid_: Helpers, test support
 
 ## Not* projects
 They are separated by function - Blazor, Storage, Application. etcs. *Not* is shared amongs them. These are intended to packaged up and used in other projects to bootsrap functionality, ensure consistent behavior and allow for easier maintenance. Elements of Not should be completely stripped of business logic and should provide a streamlined, generic API striving for a ballance between strict, conssitent behavior and enough configurability to be multi-purposed.
@@ -161,7 +202,7 @@ Notes:
 # NTS* projects
 NTS stands for *No Timing System*, the Brand of the current product - a cheap alternative to full-fledged Endurance timing systems.
 - Domain Model - hardcode business logic and validation is contained within the `NTS.Domain.*` namespace, which holds the domain model. It has to be as pure as reasonably possible. Some "pollution" is acceptable - like coupling with `MediatR.INotification` or `Not.Krud` framework, however there are no references to repositories or other infrastructure.
-- Projects - `NTS` (localization), `NTS.Domain` (shared, with Tenant and the Account), `NTS.Domain.Setup`, `NTS.Domain.Core`, `NTS.Contracts`, and the two hosts `NoTiming.Api` and `NoTiming.Ui`. The Api references the Ui to serve it, the Ui never references the Api, and the domain references no infrastructure.
+- Projects - `NTS` (localization), `NTS.Domain` (shared, with Tenant and the Account), `NTS.Domain.Setup`, `NTS.Domain.Core`, `NTS.Contracts`, the two hosts `NoTiming.Api` (the server) and `NoTiming.Ui` (the app), and the Razor libraries of the Ui, `NoTiming.Console` (the pages of the Console, fetched when a signed-in person goes there) and `NTS.Blazor` (what the Console and the viewers share). The Api references the Ui to serve it, the Ui never references the Api, and the domain references no infrastructure; the architecture tests read the project files and say so. Nothing else is deployed: the Functions API, Warp and the Static Web Apps are gone (ADR-0011).
 - Secondary business logic - the so-called application level, which lives in the hosts: server write-side services and access policies in `NoTiming.Api`, one folder per feature, and client view services in `NoTiming.Ui`. It handles interactions between domain boundaries and infrastructure. The key component here and entry point should be the Service. Services should be suffixed with `*Service` and usually implement multiple segregated interfaces (conforms to Interface segregation principle)
 - Storage - contains operations related to storing something: the Mongo wiring in the Api and the REST repositories in the Ui. All of the storage should be conform to the `IRepository<T>` abstraction.
 - Blazor - the Ui is one Blazor WebAssembly app. The layout is composed of a Header, Drawer and Main content. Components that are navigated to via Router should be suffixed with `*Content.razor`.

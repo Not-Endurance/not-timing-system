@@ -9,7 +9,7 @@ namespace NoTiming.Api.Features.Tenancy;
 /// What a user document says about the account in the Tenants (ADR-0012): its home Tenant, its Memberships and their
 /// roles, the Developer flag, and the Tenant it has selected. They are fields of the application's part of the document,
 /// read as the Api wrote them. Only the Developer's command (<c>tools/NTS.Tools</c>) writes a role or the flag: no route
-/// does. Reading is tolerant, as the documents are shared with the Functions API: a member that is not the shape it
+/// does. Reading is tolerant, as the documents were written by the Functions API before: a member that is not the shape it
 /// should be is not there.
 /// </summary>
 internal static class AccountRoles
@@ -19,18 +19,10 @@ internal static class AccountRoles
     public const string MEMBERSHIPS = "Memberships";
     public const string IS_DEVELOPER = "IsDeveloper";
 
-    /// <summary>
-    /// The account as the access policy needs to know it. The Tenants of the Events it is the Main Operator of, which only
-    /// some questions need, are read by whoever asks them and given here.
-    /// </summary>
-    public static Caller CallerOf(NIdentityUser user, IEnumerable<string>? openMainOperatorIn = null)
+    /// <summary>What the document says the account is apart from any place: the Developer, and the Tenants it is a Tenant Root of.</summary>
+    public static Roles RolesOf(NIdentityUser user)
     {
-        return Caller.Of(
-            user.Id,
-            IsDeveloper(user),
-            MembershipsOf(user).Where(x => x.IsTenantRoot).Select(x => x.TenantId),
-            openMainOperatorIn
-        );
+        return Roles.Of(IsDeveloper(user), MembershipsOf(user).Where(x => x.IsTenantRoot).Select(x => x.TenantId));
     }
 
     public static IReadOnlyList<Membership> MembershipsOf(NIdentityUser user)

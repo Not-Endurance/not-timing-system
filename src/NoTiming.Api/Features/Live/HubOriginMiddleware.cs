@@ -1,4 +1,4 @@
-using NTS.Application.Cors;
+using NoTiming.Api.Hosting.Cors;
 
 namespace NoTiming.Api.Features.Live;
 

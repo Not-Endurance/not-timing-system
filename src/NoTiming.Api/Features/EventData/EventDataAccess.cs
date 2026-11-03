@@ -1,97 +1,39 @@
 using MongoDB.Bson;
 using Not.Domain.Abstractions;
-using Not.Identity;
 using Not.Krud.Abstractions;
-using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
 using NoTiming.Api.Features.Tenancy;
-using NoTiming.Api.JsonApi;
 using NTS.Contracts.Shared;
-using NTS.Domain.Access;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Api.Features.EventData;
 
 /// <summary>
-/// What the writes of every family of what an Event keeps need (#604), in one place: the Event a row belongs to and the
-/// policy's answer to whether the caller may change what it keeps, the Tenant's collection a row is in, which is the
-/// Tenant of its Event, and the notice to the viewers of the Event that a Participation changed.
+/// What the writes of every family of what an Event keeps need (#604), in one place: the Tenant's collection a row is in,
+/// which is the Tenant of its Event, whether another row still names it, and the notice to the viewers of the Event that a
+/// Participation changed. Whether the caller may write is not asked here: the endpoint filter has decided it (#671).
 /// </summary>
 internal sealed class EventDataAccess
 {
     readonly EventStore _events;
     readonly TenantCollections _tenants;
-    readonly CrossTenantReads _reads;
     readonly IParticipationChanges _changes;
 
-    public EventDataAccess(
-        EventStore events,
-        TenantCollections tenants,
-        CrossTenantReads reads,
-        IParticipationChanges changes
-    )
+    public EventDataAccess(EventStore events, TenantCollections tenants, IParticipationChanges changes)
     {
         _events = events;
         _tenants = tenants;
-        _reads = reads;
         _changes = changes;
     }
 
     /// <summary>
-    /// The Event, when the caller may change what it keeps, and the answer that refuses it when not: 404 for an Event that
-    /// is not there, and the policy's for a caller who may not, whether the Event has started or ended or the caller is
-    /// not its Main Operator (ADR-0012).
+    /// The Event with the id and the stage it is in now, none when it is not there. The host's own jobs ask this, with
+    /// nobody to ask the policy for, and see to it themselves that they touch only the stage they are for (#629, ADR-0007).
     /// </summary>
-    public async Task<(EventFacts? Event, IResult? Refusal)> OpenAsync(
-        NIdentityUser user,
-        Guid eventId,
-        CancellationToken cancellationToken
-    )
+    public Task<EventFacts?> FindAsync(Guid eventId, CancellationToken cancellationToken)
     {
-        var facts = await _events.FindAsync(eventId, cancellationToken);
-        if (facts is null)
-        {
-            return (null, JsonApiResults.NotFound());
-        }
-
-        var verdict = AccessPolicy.Decide(
-            Capability.EditEventData,
-            AccountRoles.CallerOf(user),
-            facts.ScopeFor(CallerGrants.None)
-        );
-        return verdict.IsAllowed ? (facts, null) : (null, AccessResults.Refused(verdict));
-    }
-
-    /// <summary>
-    /// The Event, when the host may do the operation to it at the stage it is in (#629, ADR-0007), and none when it is not
-    /// there or the operation is not let through to that stage. The host asks this where a person's write asks
-    /// <see cref="OpenAsync"/>, so that what an Event that is no longer Live takes from the host is the one row of
-    /// <see cref="HostPolicy"/>, and no route of the Api reaches it.
-    /// </summary>
-    public async Task<EventFacts?> OpenForHostAsync(
-        HostOperation operation,
-        Guid eventId,
-        CancellationToken cancellationToken
-    )
-    {
-        var facts = await _events.FindAsync(eventId, cancellationToken);
-        return facts is not null && HostPolicy.IsAllowed(operation, facts.Stage) ? facts : null;
-    }
-
-    /// <summary>
-    /// The row with the id, whichever Tenant it is in, which is how a row is found when only its id is known, as a reader
-    /// finds it; and the Tenant it is in is then the Tenant of its Event, which is the one a write is made in.
-    /// </summary>
-    public Task<TModel?> FindAsync<TModel, TEntity>(
-        EventDataFamily<TModel, TEntity> family,
-        Guid id,
-        CancellationToken cancellationToken
-    )
-        where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
-        where TEntity : class, IEntity
-    {
-        return _reads.FindEventRowAsync<TModel>(family.Collection, id, cancellationToken);
+        return _events.FindAsync(eventId, cancellationToken);
     }
 
     public TypedTenantCollection<TModel> Collection<TModel, TEntity>(

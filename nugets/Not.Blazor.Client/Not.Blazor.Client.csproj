@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Not.Application\Not.Application.csproj" />
     <ProjectReference Include="..\Not.Blazor\Not.Blazor.csproj" />
+    <ProjectReference Include="..\Not.Krud\Not.Krud.csproj" />
   </ItemGroup>
 
 </Project>

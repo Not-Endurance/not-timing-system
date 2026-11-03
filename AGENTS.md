@@ -2,12 +2,12 @@
 1. Don't execute commands that would create, delete or modify files outside of this working directory. Exceptions of this rule are commands which could cause side effects scoped to the utility that owns the command:
 - dotnet msbuild/nugget/workload or similar caches and or build artifacts
 - docker commands which would modify containers, volumes, images or similar
-2. Always dotnet `build`, `restore` with silent output `-v:q` unless instructed otherwise. Don't modify worklfows to use queit mode. This applies only for localhost verification
+2. Run dotnet `build` and `restore` with silent output `-v:q` unless instructed otherwise. Don't change the workflows to quiet mode: this is for local verification only.
 3. Run dotnet `test` with minimal output `-v:m`. 
-4. Verify each feature with successful NTS.Test.Integration run. If the indegration tests fail, don't change them directly. Instead report why they are failing.
-5. Changes and features should be represented in the Integration tests if reasonably possible.
+4. Verify a change with the unit tests, which include the architecture tests (`tests/NTS.Tests.Unit`, whose architecture checks are in its `Architecture` folder). Build with `-v:q`, then run `dotnet test tests/NTS.Tests.Unit/NTS.Tests.Unit.csproj --no-build -v:m`. When a package under `nugets/` changes, also run `nugets/Not.Test.Tests/Not.Test.Tests.csproj` the same way. The integration tests (`tests/NTS.Tests.Integration`, ADR-0016) are not part of the default verification: they need Docker and a browser, so they run only when the user asks for them, by hand, or in CI for pull requests into `master` (ADR-0016). When one fails, report the test and why it fails, and change it only when the user asks.
+5. A change that needs integration coverage is written in the integration tests as a journey with a scenario for each outcome, where reasonably possible. Writing it does not make those tests part of the default verification (rule 4).
 6. Domain logic should be tested in the NTS.Tests.Unit.Domain namespace.
-7. If unit tests would be a useful task evaluation step, create those tests in NTS.Tests.Unit.Temporary. Expect those tests to be deleted regularly.
+7. Test support (fixtures, fakes, drivers, seeds, and the rules that architecture tests check) lives in a `Harness` folder, apart from the tests that use it. Throwaway checks are not committed: keep them in `.tmp/`, or delete them before the change is committed.
 8. Always use RTK
 9. Multi-line strings must match the shell you are actually in. `@'...'@` is a **PowerShell** here-string; in Bash it is not special syntax and silently becomes a literal `@` on the first and last lines. Passed to `git commit -m`, that makes `@` the commit subject and demotes the real subject into the body. In Bash use a heredoc; reserve `@'...'@` for the PowerShell tool.
 
@@ -29,8 +29,9 @@ rtk git commit -F .tmp/msg.txt
 After committing, check `rtk git log --oneline -1` and confirm the subject is the real subject.
 
 10. Temporary files (drafts, fetched issue bodies, commit message files, backups, intermediate output) go in `.tmp/` at the repository root, which is gitignored. Do not use the system temp directory, AppData, `/tmp` or any scratchpad a tool suggests: they are outside the working directory (rule 1). Create the folder if it is missing and keep what you create in a subfolder named for the task. Delete it as the last step of that task; when the task produces a spec, delete the drafts once the spec is published. Never delete anything in `.tmp/` that you did not create.
-11. Solve a problem at its root cause. A workaround is delivered only when the user asks for one by name; when the cause is out of scope or its fix is large, report the cause and the options for the user to choose from.
-12. Push back on bespoke behaviour that has no practical reason. When a request, issue, spec, ADR or an earlier change in the code asks for a special case, restriction or compensating step that the general behaviour would already cover, don't build it or build on it. Examples: a create that accepts only part of what an update accepts, a client that splits one write into two requests, an override that exists only to work around a narrowed contract. Say what the general version is, ask the user for the explicit reason the special case is wanted, and wait for the answer. If a reason is given, record it next to the special case (the ADR or a comment) so the next reader does not have to ask again.
+11. Code that is not NoTiming business logic goes into a `Not*` package in `nugets/`, never into `src/` or `tools/`. Business logic is what NoTiming does for timing and sport: its Events, Participants, Rankings and Snapshots and the rules of their stages. Anything another product on the same platform would carry too belongs in the package of its layer. A `Not*` package names no NoTiming type and references no NoTiming project. The layer map and the test are in `docs/agents/shared-packages.md`.
+12. Solve a problem at its root cause. A workaround is delivered only when the user asks for one by name; when the cause is out of scope or its fix is large, report the cause and the options for the user to choose from.
+13. Push back on bespoke behaviour that has no practical reason. When a request, issue, spec, ADR or an earlier change in the code asks for a special case, restriction or compensating step that the general behaviour would already cover, don't build it or build on it. Examples: a create that accepts only part of what an update accepts, a client that splits one write into two requests, an override that exists only to work around a narrowed contract. Say what the general version is, ask the user for the explicit reason the special case is wanted, and wait for the answer. If a reason is given, record it next to the special case (the ADR or a comment) so the next reader does not have to ask again.
 
 <!-- rtk-instructions v2 -->
 # RTK (Rust Token Killer) - Token-Optimized Commands
@@ -176,6 +177,7 @@ Overall average: **60-90% token reduction** on common development operations.
 
 ## Context
 - Primary sln file is src/not-timing-system.sln
+- One host serves everything: `src/NoTiming.Api` serves `src/NoTiming.Ui` (Blazor WebAssembly). The Api references the Ui, never the other way round; the domain references no infrastructure; nothing references Azure Functions; every project is .NET 10. `tests/NTS.Tests.Unit/Architecture` checks it from the project files. README.md has the layout.
 
 ## MongoDB times
 - A time the server filters, sorts or expires on is a `DateTime` named `…Utc` with `[BsonDateTimeOptions(Kind = DateTimeKind.Utc)]`, converted with `DateTimeOffset.UtcDateTime`.
@@ -200,8 +202,18 @@ Overall average: **60-90% token reduction** on common development operations.
 
 ## WSL
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker
-2. When func is not resolved - ask the user to lift Rule #1 so you can set it up
-3. Ignore MAUI builds in WSL
+
+## Endpoints
+1. Authorization and validation are never written in a handler. A route declares what it needs with `[Requires(Capability, PlaceIn)]`; the one endpoint filter (`AccessFilter`) finds the caller and the place, asks `AccessPolicy` and validates the request (`JsonApiBody<T>`, `ListQuery`, `SearchQuery`), and the handler takes the `AccessContext` and a request that is valid. A route that is neither in `PublicEndpoints` nor declares a requirement stops the host (`EndpointGuard`), and an architecture test fails a handler that asks the policy or reads the session itself.
+2. The shape of a route, its documents, status codes and query are in `.claude/skills/rest-api/SKILL.md` and ADR-0008, the order of its answers in ADR-0012. The routes are listed by `ApiEndpoints`, one `<Resource>Endpoints` class to a resource; there is no other catalogue.
+3. A handler is named from its method and route (`GET /api/me/profile` is `GetMeProfile`, a parameter is `By<Param>`, no `Async`), so a route that is not plain CRUD says what it is in its URL. Only PATCH changes a resource. The routes a family makes from a lambda are not held to it. `EndpointNamesTests` fails a handler that is named otherwise; ADR-0015 has the rule.
+4. A request type is in `<Resource>Requests.cs`, and the status, code and title of an answer are a property of the feature's `<Feature>Failures` (`.With(detail)` for what is wrong this time): a handler holds no code string. Nothing but `ApiEndpoints` calls an endpoint class.
+
+## Clients
+
+- The Ui reaches the Api only through a repository: a service calls its repository, the repository calls `JsonApiClient`, and nothing else builds a URL, a document or a page (ADR-0017).
+- A repository throws `RepositoryException`. A route that is not a row of a collection is a method on the nearest repository, and a change names only what it changes.
+- The shape of the requests and of the answers is in `.claude/skills/rest-api/SKILL.md`.
 
 ## Agent skills
 
@@ -212,3 +224,7 @@ Issues and specs live as GitHub issues in Not-Endurance/not-timing-system, via t
 ### Domain docs
 
 Single-context layout — `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+### Shared packages
+
+Where code belongs, between NoTiming and the `Not*` packages in `nugets/` (rule 11). See `docs/agents/shared-packages.md`.

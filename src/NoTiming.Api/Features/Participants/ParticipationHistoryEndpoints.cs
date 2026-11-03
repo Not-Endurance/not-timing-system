@@ -1,11 +1,11 @@
 using System.Globalization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Net.Http.Headers;
-using Not.Identity;
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
+using NTS.Domain.Access;
 
 namespace NoTiming.Api.Features.Participants;
 
@@ -23,43 +23,22 @@ internal static class ParticipationHistoryEndpoints
 
     public static IEndpointRouteBuilder MapParticipationHistory(this IEndpointRouteBuilder app)
     {
-        app.MapGet(
-                "/api/participations/history",
-                (
-                    HttpContext context,
-                    UserManager<NIdentityUser> users,
-                    ParticipationHistoryReader reader,
-                    AccountText text,
-                    TimeProvider time
-                ) => ListAsync(context, users, reader, text, time)
-            )
-            .RequireAuthorization();
+        app.MapGet("/api/participations/history", GetParticipationsHistory);
         return app;
     }
 
-    static async Task<IResult> ListAsync(
+    [Requires(Capability.SignedIn)]
+    static async Task<IResult> GetParticipationsHistory(
         HttpContext context,
-        UserManager<NIdentityUser> users,
         ParticipationHistoryReader reader,
         AccountText text,
         TimeProvider time
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
-        {
-            return JsonApiResults.NotSignedIn();
-        }
-
         // The Participant says whose rides to read, before anything else is looked at.
         if (HistoryFilter.SubjectOf(context.Request.Query["filter"].ToString()) is not { } subject)
         {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "subject-required",
-                "Name the Athlete or the Horse the rides are of.",
-                "Start the filter with the Athlete or the Horse and join anything else to it with and: filter=athleteId eq <id> and ..."
-            );
+            return ParticipantFailures.SubjectRequired.AsResult();
         }
 
         var query = ReferenceQuery<HistoryRide>.Read(context.Request, HistoryRide.Hidden);
@@ -69,32 +48,27 @@ internal static class ParticipationHistoryEndpoints
         }
 
         var culture = CultureInfo.GetCultureInfo(text.Resolve(context.Request));
-        var (page, refusal) = await ReferenceEndpoints.ReadPageAsync(
-            () =>
-                reader.ReadAsync(
-                    AccountRoles.CallerOf(user),
-                    subject.Kind,
-                    subject.Id,
-                    culture,
-                    time.GetUtcNow(),
-                    query.Options,
-                    query.Skip,
-                    query.Size,
-                    context.RequestAborted
-                )
+        var page = await reader.ReadAsync(
+            Standing.Account,
+            subject.Kind,
+            subject.Id,
+            culture,
+            time.GetUtcNow(),
+            query.Options,
+            query.Skip,
+            query.Size,
+            context.RequestAborted
         );
-        if (refusal != null)
-        {
-            return refusal;
-        }
 
         // The names are told in the language of the request.
         context.Response.Headers.Append(HeaderNames.Vary, HeaderNames.AcceptLanguage);
-        return JsonApiResults.Collection(
+        return JsonApiResults.Page(
             PARTICIPATION_HISTORIES,
-            page!.Lines.Select(x => (x.Id.ToString(), x.Attributes())),
-            links: ReferenceEndpoints.Links(context.Request, query, page.HasMore),
-            meta: JsonApiPaging.Meta(query.Size, query.Number),
+            page.Lines.Select(x => (x.Id.ToString(), x.Attributes())),
+            context.Request,
+            query.Size,
+            query.Number,
+            page.HasMore,
             itemLink: id => $"/api/participations/{id}"
         );
     }

@@ -144,13 +144,7 @@ public class ParticipationHistoryListBehind : NComponent
                 return;
             }
 
-            if (read.Failed)
-            {
-                _open.Remove(row.Id); // the person was told when it was read, and opening the row asks again
-                return;
-            }
-
-            _read[row.Id] = read.Row;
+            _read[row.Id] = read;
         }
         catch (Exception ex)
         {

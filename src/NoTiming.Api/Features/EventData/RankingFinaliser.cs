@@ -36,9 +36,9 @@ internal sealed class RankingFinalisationReport
 
 /// <summary>
 /// Stores the final placings of the Rankings of the Events that have ended (#640, ADR-0006, ADR-0007). It is the host's own
-/// write, the only one an Event that has ended takes, and it is let through by one named rule and no other: the Event is
-/// opened for <see cref="HostOperation.RankingFinalisation"/>, which gives it only when the clock of the host says it is
-/// Historic, and what is written is written in the Tenant of the Event. What it stores is composed by the code that composes
+/// write, the only one an Event that has ended takes, and nothing authorizes it: it is written to be accurate. It goes on
+/// only with an Event that the clock of the host says is Historic, the domain refuses to finalise any other stage, and what
+/// is written is written in the Tenant of the Event. What it stores is composed by the code that composes
 /// the Results (<see cref="Ranking.Finalise"/>), from data that can no longer change, and it writes a Ranking only while no
 /// entry of it holds a rank, so that a second run, or a second host, changes nothing. No route reaches it.
 /// </summary>
@@ -72,12 +72,8 @@ internal sealed class RankingFinaliser
             report.Events++;
             try
             {
-                var facts = await _access.OpenForHostAsync(
-                    HostOperation.RankingFinalisation,
-                    eventId,
-                    cancellationToken
-                );
-                if (facts is null)
+                var facts = await _access.FindAsync(eventId, cancellationToken);
+                if (facts is not { Stage: EventStage.Historic })
                 {
                     report.Skipped++;
                     continue;

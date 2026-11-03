@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+    container_name: aspire-dashboard
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
+    ports:
+      - "18888:18888"
+      - "18889:18889"
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  nts-api:
+    container_name: nts-api
+    build:
+      context: ../
+      dockerfile: src/NoTiming.Api/Dockerfile
+    environment:
+      PORT: "80"
+      MONGO_CONNECTION_STRING: mongodb://mongodb:27017
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://aspire-dashboard:18889
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+    depends_on:
+      - aspire-dashboard
+      - mongodb
+    ports:
+      - "11337:80"
+
+volumes:
+  mongodb_data:

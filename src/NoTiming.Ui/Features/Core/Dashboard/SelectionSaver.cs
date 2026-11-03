@@ -1,5 +1,5 @@
 using Not.Async;
-using NTS.Application.UserSession;
+using NoTiming.Ui.Features.Sessions;
 using NTS.Domain.Core.Objects.Snapshots;
 
 namespace NoTiming.Ui.Features.Core.Dashboard;

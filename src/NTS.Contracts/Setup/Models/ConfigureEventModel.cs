@@ -18,7 +18,6 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
 
     public Guid Id { get; set; } = default!;
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public Guid? MainOperatorId { get; set; }
     public string Location { get; set; } = default!;
     public CountryModel Country { get; set; } = default!;
     public string? FeiShowId { get; set; }
@@ -48,8 +47,7 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
             combinations,
             Id,
             operators,
-            TenantId,
-            MainOperatorId
+            TenantId
         );
     }
 
@@ -57,7 +55,6 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
     {
         Id = @event.Id;
         TenantId = @event.TenantId;
-        MainOperatorId = @event.MainOperatorId;
         Name = @event.Name;
         Location = @event.Location;
         Country = CountryModel.From(@event.Country);

@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\nugets\Not.Storage\Not.Storage.csproj" />
-    <ProjectReference Include="..\..\src\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming.Api\NoTiming.Api.csproj" />
     <ProjectReference Include="..\..\src\NTS.Contracts\NTS.Contracts.csproj" />
   </ItemGroup>
 
