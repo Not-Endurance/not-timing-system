@@ -1,3 +1,7 @@
+using System.ComponentModel;
+using System.Diagnostics;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 using NTS.Application.Contracts;
 
 namespace NTS.Nexus.Warp.Host;
@@ -8,6 +12,8 @@ internal static class WitnessUiHosting
 {
     public static WebApplication UseWitnessUi(this WebApplication app)
     {
+        var uiFiles = ResolveUiFiles(app);
+
         app.Use(
             async (context, next) =>
             {
@@ -19,11 +25,56 @@ internal static class WitnessUiHosting
                 await next();
             }
         );
-        app.UseBlazorFrameworkFiles();
-        app.UseStaticFiles();
-        app.MapFallback(context => ServeIndex(context, app.Environment));
+        if (uiFiles != app.Environment.WebRootFileProvider)
+        {
+            app.UseStaticFiles(new StaticFileOptions { FileProvider = uiFiles, ServeUnknownFileTypes = true });
+        }
+        else
+        {
+            app.UseBlazorFrameworkFiles();
+            app.UseStaticFiles();
+        }
+
+        app.MapFallback(context => ServeIndex(context, uiFiles));
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.Lifetime.ApplicationStarted.Register(OpenLocalUi);
+        }
 
         return app;
+    }
+
+    // Development only: open the UI in the default browser once Warp is listening.
+    // Done here rather than in launchSettings, because `dotnet run` ignores launchBrowser.
+    static void OpenLocalUi()
+    {
+        var port = Environment.GetEnvironmentVariable("PORT");
+        if (string.IsNullOrWhiteSpace(port))
+        {
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo($"http://localhost:{port}/") { UseShellExecute = true });
+        }
+        catch (Win32Exception)
+        {
+            // No desktop browser available (for example a headless machine). Warp keeps running.
+        }
+    }
+
+    // Development only: WITNESS_UI_PATH serves a locally published UI instead of this project's wwwroot.
+    static IFileProvider ResolveUiFiles(WebApplication app)
+    {
+        var localUi = Environment.GetEnvironmentVariable("WITNESS_UI_PATH");
+        if (app.Environment.IsDevelopment() && !string.IsNullOrWhiteSpace(localUi))
+        {
+            return new PhysicalFileProvider(Path.GetFullPath(localUi, app.Environment.ContentRootPath));
+        }
+
+        return app.Environment.WebRootFileProvider;
     }
 
     static bool IsServerPath(PathString path)
@@ -34,7 +85,7 @@ internal static class WitnessUiHosting
             || path.StartsWithSegments($"/{ApplicationConstants.WITNESS_HUB}");
     }
 
-    static async Task ServeIndex(HttpContext context, IWebHostEnvironment environment)
+    static async Task ServeIndex(HttpContext context, IFileProvider uiFiles)
     {
         var isReadRequest = HttpMethods.IsGet(context.Request.Method) || HttpMethods.IsHead(context.Request.Method);
         if (!isReadRequest || IsServerPath(context.Request.Path))
@@ -43,7 +94,7 @@ internal static class WitnessUiHosting
             return;
         }
 
-        var index = environment.WebRootFileProvider.GetFileInfo("index.html");
+        var index = uiFiles.GetFileInfo("index.html");
         if (!index.Exists)
         {
             context.Response.StatusCode = StatusCodes.Status404NotFound;

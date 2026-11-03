@@ -369,5 +369,3 @@ src/**/judge-settings.json
 # VS Code
 .vscode
 
-# Witness UI copied into Warp for local Debug runs (see NTS.Nexus.Warp.csproj)
-src/Apps/Nexus/NTS.Nexus.Warp/wwwroot/

@@ -2,11 +2,12 @@
   "profiles": {
     "Development": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "PORT": "11337",
-        "MONGO_CONNECTION_STRING": "mongodb://localhost:27017/nts"
+        "MONGO_CONNECTION_STRING": "mongodb://localhost:27017/nts",
+        "WITNESS_UI_PATH": "obj/witness-ui/wwwroot"
       },
       "applicationUrl": "http://localhost:11337"
     }
