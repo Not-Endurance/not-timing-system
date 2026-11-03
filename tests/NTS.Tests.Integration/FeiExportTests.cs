@@ -18,7 +18,7 @@ public sealed class FeiExportTests
     [Fact]
     public async Task Create_GeneratesSingleShowWithMultipleEnduranceEvents()
     {
-        await using var judge = new JudgeDriver(new Uri("http://127.0.0.1:1"), new Uri("http://127.0.0.1:2"));
+        await using var judge = new JudgeDriver(new Uri("http://127.0.0.1:1"));
         var service = judge.GetRequiredService<IFeiExportService>();
         var eventInformation = CreateEventInformation();
         var rankings = new[]
@@ -68,7 +68,7 @@ public sealed class FeiExportTests
     [Fact]
     public async Task Create_RejectsPartialFeiRankingConfiguration()
     {
-        await using var judge = new JudgeDriver(new Uri("http://127.0.0.1:1"), new Uri("http://127.0.0.1:2"));
+        await using var judge = new JudgeDriver(new Uri("http://127.0.0.1:1"));
         var service = judge.GetRequiredService<IFeiExportService>();
         var ranking = CreateRanking(
             "CEI 1*",
@@ -89,7 +89,7 @@ public sealed class FeiExportTests
     [Fact]
     public async Task Create_RejectsMissingParticipantFeiIds()
     {
-        await using var judge = new JudgeDriver(new Uri("http://127.0.0.1:1"), new Uri("http://127.0.0.1:2"));
+        await using var judge = new JudgeDriver(new Uri("http://127.0.0.1:1"));
         var service = judge.GetRequiredService<IFeiExportService>();
         var ranking = CreateRanking("CEI 1*", "FEI-EVENT-1", "CEI1", "FEI-COMP-1", "01", 1, horseFeiId: null);
 

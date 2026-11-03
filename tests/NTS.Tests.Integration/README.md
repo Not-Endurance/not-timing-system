@@ -11,44 +11,21 @@ dotnet test .\tests\NTS.Tests.Integration\NTS.Tests.Integration.csproj -c Debug
 Requirements:
 
 - Docker must be running.
-- Azure Functions Core Tools v4 must be installed and `func` must be on `PATH`.
-- Azurite must be running for the Functions host storage connection (`UseDevelopmentStorage=true`).
-- Chromium must be installed for the Nexus HTTP PDF backend. The harness uses `NTS_INTEGRATION_PLAYWRIGHT_BROWSERS_PATH` when set, otherwise it keeps a valid `PLAYWRIGHT_BROWSERS_PATH`, then probes `/ms-playwright`, `.tools/ms-playwright`, and `.tmp/ms-playwright` for a browser matching the current OS.
 - The test harness starts a MongoDB container with Testcontainers.
-- The test harness starts `NTS.Nexus.HTTP` as a child `func start` process on a random localhost port.
-- The test harness starts `NTS.Nexus.Warp` as a child `dotnet run --no-build` process on a random localhost port.
-
-## PDF Browser Setup
-
-Use one browser cache per operating system. For example:
-
-```powershell
-$env:PLAYWRIGHT_BROWSERS_PATH = "$PWD\.tmp\ms-playwright"
-pwsh .\src\Apps\Nexus\NTS.Nexus.HTTP\bin\Debug\net8.0\playwright.ps1 install chromium
-dotnet test .\tests\NTS.Tests.Integration\NTS.Tests.Integration.csproj -c Debug
-```
-
-```bash
-export PLAYWRIGHT_BROWSERS_PATH="$PWD/.tools/ms-playwright"
-pwsh ./src/Apps/Nexus/NTS.Nexus.HTTP/bin/Debug/net8.0/playwright.ps1 install chromium
-dotnet test ./tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -c Debug
-```
-
-On WSL/Linux, Chromium also needs native OS packages. If the PDF step fails with a missing shared library such as `libnspr4.so`, run `pwsh ./src/Apps/Nexus/NTS.Nexus.HTTP/bin/Debug/net8.0/playwright.ps1 install-deps chromium` once, or run the suite in a container image that already includes those dependencies.
-
-The Nexus HTTP container image uses `/ms-playwright`; keep `PLAYWRIGHT_BROWSERS_PATH=/ms-playwright` for container runs.
+- The test harness starts `NTS.Nexus.Warp` as a child `dotnet run --no-build` process on a random localhost port. Warp serves the REST API and the Judge and Witness hubs.
 
 ## Current Coverage
 
-- Boots MongoDB, real Nexus HTTP, and real Warp.
-- Seeds events, participations, officials, and users through the actual Nexus HTTP API.
+- Boots MongoDB and real Warp.
+- Seeds events, participations, officials, and users through the actual Warp REST API.
 - Builds one real Judge application service provider and two real Witness application service providers.
 - Wires Judge and Witness to the same REST storage registration used by the apps.
 - Connects all three app instances to the same event through their real `INtsSocketService` implementations.
 - Drives Judge through `ISnapshotService.Record`, so phase completion is produced by the Judge domain/application layer.
 - Verifies both Witness application instances update their real participation state through `WitnessRpcClient` and domain-event handlers.
 - Verifies one Witness resolves official access while the other resolves participant/default access.
-- Reads the persisted participation and snapshot results back through the Nexus HTTP API.
+- Reads the persisted participation and snapshot results back through the Warp REST API.
+- Verifies Warp's CORS preflight allows the PATCH and DELETE methods used by the Witness.
 
 ## Next Expansion
 

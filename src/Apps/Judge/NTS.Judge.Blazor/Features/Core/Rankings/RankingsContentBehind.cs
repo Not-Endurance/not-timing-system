@@ -59,14 +59,7 @@ public class RankingsContentBehind : NStatefulComponent
     protected Ranking CurrentRanking => RankingService.Current;
     protected decimal PrintFontScale { get; set; } = DEFAULT_PRINT_SCALE;
     protected IReadOnlyList<NPrintPanelAction> ResultActions =>
-        [
-            NPrintPanelAction.PrintPdf(Print_string, CreateCurrentRanklistPrintRequest, Icons.Material.Outlined.Print),
-            NPrintPanelAction.DownloadZip(
-                Download_file_string,
-                CreateResultsZipRequest,
-                Icons.Material.Filled.Download
-            ),
-        ];
+        [NPrintPanelAction.PrintPdf(Print_string, CreateCurrentRanklistPrintRequest, Icons.Material.Outlined.Print)];
 
     protected override async Task OnInitializedAsync()
     {
@@ -196,22 +189,6 @@ public class RankingsContentBehind : NStatefulComponent
             document,
             context,
             PdfFileNameHelper.RanklistPdf(RankingService.Current.Id, RankingService.Current.Name),
-            HeaderLogo.Left,
-            HeaderLogo.Right
-        );
-    }
-
-    Task<NPrintBatchRequest> CreateResultsZipRequest(NPrintPanelContext context)
-    {
-        if (!CanRunResultAction || SocketService.Event == null)
-        {
-            throw new InvalidOperationException("Ranklist download is not available.");
-        }
-        return PrintRequests.CreateRanklistsZip(
-            RankingService.Rankings,
-            DocumentService.Create,
-            context,
-            PdfFileNameHelper.ResultsZip(SocketService.Event.Id),
             HeaderLogo.Left,
             HeaderLogo.Right
         );

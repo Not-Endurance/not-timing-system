@@ -28,11 +28,6 @@ public static class PdfFileNameHelper
         return $"{SanitizeName(name, $"ranklist-{rankingId}")}.pdf";
     }
 
-    public static string ResultsZip(int eventId)
-    {
-        return $"results-{eventId}.zip";
-    }
-
     public static IReadOnlyList<(PdfNamedResult Result, string EntryName)> ResultPdfEntries(
         IEnumerable<PdfNamedResult> results
     )

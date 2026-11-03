@@ -11,8 +11,19 @@
 5. Changes and features should be represented in the Integration tests if reasonably possible.
 6. Domain logic should be tested in the NTS.Tests.Unit.Domain namespace.
 7. If unit tests would be a useful task evaluation step, create those tests in NTS.Tests.Unit.Temporary. Expect those tests to be deleted regularly.
+8. Don't be concerned with code formatting. CSharpier formats code via CI, so don't run or check formatting locally.
 
 ## WSL
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker
 2. When func is not resolved - ask the user to lift Rule #1 so you can set it up
 3. Ignore MAUI builds in WSL
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues in `Not-Endurance/not-timing-system`, managed with the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root, created lazily. See `docs/agents/domain.md`.

@@ -1,13 +1,16 @@
 using System.Reflection;
 using Microsoft.AspNetCore.SignalR;
+using Not.Application.Authentication.User;
 using Not.Application.UdpHandshake;
-using Not.Localization;
 using Not.Serialization.JSON;
 using Not.Server.Authentication;
 using Not.Storage;
 using NTS.Application;
 using NTS.Application.Cors;
 using NTS.Application.Mongo;
+using NTS.Nexus.Warp.Api.Errors;
+using NTS.Nexus.Warp.Api.Mongo.Repositories;
+using NTS.Nexus.Warp.Api.Telemetry;
 using NTS.Nexus.Warp.Features.Witness.Authorization;
 using NTS.Nexus.Warp.Middlewares;
 
@@ -27,7 +30,7 @@ internal static class NtsWarpServices
                 policy =>
                     policy
                         .SetIsOriginAllowed(originValidator.IsAllowed)
-                        .WithMethods("GET", "POST")
+                        .WithMethods("GET", "POST", "PATCH", "DELETE")
                         .AllowAnyHeader()
                         .AllowCredentials()
             )
@@ -43,12 +46,16 @@ internal static class NtsWarpServices
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = NJsonSettings.ConfigureServerSerialization());
 
         services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly());
+        services.AddNts(configuration);
         services.AddPendingSnapshotsMongoStorage(configuration);
         services.NJwtTokenValidation(configuration);
         services.AddSingleton<IReceiveSnapshotAccessPolicy, MongoWitnessWriteAccessPolicy>();
         services.AddSingleton<IWitnessReceiveAuthorizer, WitnessReceiveAuthorizer>();
+        services.AddSingleton<ITelemetryService, TelemetryService>();
+        services.AddTransient<IUserRepository, UserMongoRepository>();
+        services.AddControllers(options => options.Filters.Add<ApiExceptionFilter>());
 
-        return services.AddDummyLocalizer().AddTransient<INetworkBroadcastService, JudgeHandshakeService>();
+        return services.AddTransient<INetworkBroadcastService, JudgeHandshakeService>();
     }
 
     static void AddPendingSnapshotsMongoStorage(this IServiceCollection services, IConfiguration configuration)

@@ -35,9 +35,8 @@ public sealed class CoreFeatureEndToEndTests
     public async Task Event_snapshot_runs_end_to_end(string snapshotName)
     {
         var snapshot = EndToEndEventSnapshot.Load(snapshotName);
-        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
-        using var nexusApi = new NexusApiDriver(_fixture.NexusBaseUrl);
-        using var print = new EndToEndPrintFeature(nexusApi);
+        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl);
+        using var nexusApi = new NexusApiDriver(_fixture.WarpBaseUrl);
         var configureEvent = new ConfigureEventFeature(judge, nexusApi);
         var startEvent = new StartCoreEventFeature(judge, nexusApi);
 
@@ -61,7 +60,6 @@ public sealed class CoreFeatureEndToEndTests
 
         await using var witness = new WitnessDriver(
             _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
             setup.WitnessOperator,
             $"CoreEndToEndOperatorWitness-{snapshot.Name}"
         );
@@ -73,7 +71,7 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(snapshot.PhasesWithSnapshots.Count, phaseWaves.Sum(x => x.Count));
         Assert.All(phaseWaves, AssertWaveFitsThirtyMinuteWindow);
 
-        var dashboard = new DashboardFeature(judge, witness, nexusApi, print, eventInformation);
+        var dashboard = new DashboardFeature(judge, witness, nexusApi, eventInformation);
         await CoreAssertions.AssertArrivelistMatchesPersisted(nexusApi, witness, eventInformation.Id);
         var processedPhases = 0;
         var publishedSnapshotGroups = 0;
@@ -88,7 +86,6 @@ public sealed class CoreFeatureEndToEndTests
         Assert.True(publishedSnapshotGroups > 0);
 
         await AssertFinalStateMatchesSnapshots(nexusApi, eventInformation, setup, snapshot);
-        await print.PrintFinalRanklists(eventInformation);
         await AssertCompletedEventCanBeDeactivatedAndExported(judge, nexusApi, eventInformation);
     }
 

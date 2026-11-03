@@ -47,14 +47,7 @@ public class PastEventDetailsContentBehind : NStatefulComponent
     protected bool CanRunResultAction => Service.Event != null && Service.Rankings.Any();
     protected decimal PrintFontScale { get; set; } = DEFAULT_PRINT_SCALE;
     protected IReadOnlyList<NPrintPanelAction> ResultActions =>
-        [
-            NPrintPanelAction.PrintPdf(Print_string, CreateCurrentRanklistPrintRequest, Icons.Material.Outlined.Print),
-            NPrintPanelAction.DownloadZip(
-                Download_file_string,
-                CreateResultsZipRequest,
-                Icons.Material.Filled.Download
-            ),
-        ];
+        [NPrintPanelAction.PrintPdf(Print_string, CreateCurrentRanklistPrintRequest, Icons.Material.Outlined.Print)];
 
     [Parameter]
     public int EventId { get; set; }
@@ -130,24 +123,6 @@ public class PastEventDetailsContentBehind : NStatefulComponent
             Document,
             context,
             PdfFileNameHelper.RanklistPdf(CurrentRanking.Id, CurrentRanking.Name),
-            HeaderLogoLeft,
-            HeaderLogoRight
-        );
-    }
-
-    Task<NPrintBatchRequest> CreateResultsZipRequest(NPrintPanelContext context)
-    {
-        if (Service.Event == null || !Service.Rankings.Any())
-        {
-            throw new InvalidOperationException("Ranklist download is not available.");
-        }
-        return PrintRequests.CreateRanklistsZip(
-            Service.Rankings,
-            ranking =>
-                Service.CreateDocument(ranking)
-                ?? throw new InvalidOperationException($"Cannot create print document for ranking '{ranking.Id}'."),
-            context,
-            PdfFileNameHelper.ResultsZip(Service.Event.Id),
             HeaderLogoLeft,
             HeaderLogoRight
         );

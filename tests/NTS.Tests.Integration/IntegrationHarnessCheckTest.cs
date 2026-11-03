@@ -74,7 +74,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             maxAverageSpeed: 20,
             startTime: arrivelistStart
         );
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new NexusApiDriver(_fixture.WarpBaseUrl);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
         await api.RegisterUser(PARTICIPANT_USER);
@@ -91,16 +91,14 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             $"Nexus API list endpoint did not return participation #{participationNumber}. Raw response: {seededParticipationsRaw}"
         );
 
-        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
+        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl);
         await using var officialWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
             OFFICIAL_USER,
             "IntegrationOfficialWitness"
         );
         await using var participantWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
             PARTICIPANT_USER,
             "IntegrationParticipantWitness"
         );
@@ -208,7 +206,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         var manualNumber = 73;
         var start = DateTimeOffset.UtcNow.Date.AddHours(8);
         var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new NexusApiDriver(_fixture.WarpBaseUrl);
 
         await api.Create(eventInformation);
         await api.Create(
@@ -221,7 +219,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             IntegrationPayloadFactory.ActiveParticipation(eventId, manualNumber, id: 5903, startTime: start)
         );
 
-        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
+        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl);
         await judge.Start();
         await judge.Connect(eventInformation);
 
@@ -307,19 +305,14 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             id: 5701,
             startTime: timestamp.AddHours(-2)
         );
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new NexusApiDriver(_fixture.WarpBaseUrl);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
         await api.Create(eventInformation);
         await api.Create(participation);
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6701));
 
-        await using var witness = new WitnessDriver(
-            _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
-            OFFICIAL_USER,
-            "SnapshotSessionWitness"
-        );
+        await using var witness = new WitnessDriver(_fixture.WarpBaseUrl, OFFICIAL_USER, "SnapshotSessionWitness");
 
         await witness.Start();
         await witness.Connect(eventInformation);
@@ -357,7 +350,6 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         await using var restoredWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
             OFFICIAL_USER,
             "SnapshotSessionRestoredWitness"
         );
@@ -403,7 +395,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         var criNumber = 54;
         var baseTime = DateTimeOffset.UtcNow.Date.AddHours(10);
         var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new NexusApiDriver(_fixture.WarpBaseUrl);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
         await api.RegisterUser(PARTICIPANT_USER);
@@ -443,16 +435,14 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         );
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6601));
 
-        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
+        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl);
         await using var officialWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
             OFFICIAL_USER,
             "PresentlistOfficialWitness"
         );
         await using var participantWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
             PARTICIPANT_USER,
             "PresentlistParticipantWitness"
         );
@@ -609,7 +599,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             "operator-participant-witness-user",
             "Operator Participant Witness"
         );
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new NexusApiDriver(_fixture.WarpBaseUrl);
 
         var operatorUser = ToSetupUser(await api.RegisterUser(operatorIdentity));
         var eligibleOfficialUser = ToSetupUser(await api.RegisterUser(eligibleOfficialIdentity));
@@ -636,25 +626,21 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         await using var operatorWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
             operatorIdentity,
             "IntegrationOperatorWitness"
         );
         await using var eligibleOfficialWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
             eligibleOfficialIdentity,
             "IntegrationEligibleOfficialWitness"
         );
         await using var ineligibleOfficialWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
             ineligibleOfficialIdentity,
             "IntegrationIneligibleOfficialWitness"
         );
         await using var participantWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
             participantIdentity,
             "IntegrationOperatorParticipantWitness"
         );
@@ -697,10 +683,9 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             "10101010",
             "Rosa Display"
         );
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new NexusApiDriver(_fixture.WarpBaseUrl);
         await using var witness = new WitnessDriver(
             _fixture.WarpBaseUrl,
-            _fixture.NexusBaseUrl,
             registeringUser,
             "IntegrationRegisteringWitness"
         );
@@ -742,7 +727,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             "profile-completion-witness-user",
             "Profile Completion"
         );
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new NexusApiDriver(_fixture.WarpBaseUrl);
 
         var registered = await api.RegisterUser(profileUser);
 

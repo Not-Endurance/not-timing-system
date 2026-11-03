@@ -23,21 +23,6 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          package-manager-cache: false
-
-      - name: Install Azure Functions tools
-        run: npm install -g azure-functions-core-tools@4 --unsafe-perm true azurite
-
-      - name: Start Azurite
-        shell: bash
-        run: |
-          mkdir -p "$RUNNER_TEMP/azurite"
-          nohup azurite --location "$RUNNER_TEMP/azurite" --silent > "$RUNNER_TEMP/azurite.log" 2>&1 &
-
       - name: Restore
         run: dotnet restore ${{ env.TEST_PROJECT_PATH }}
 

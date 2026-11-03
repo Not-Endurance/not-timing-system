@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using Microsoft.Extensions.Localization;
+using Not.Localization;
 using Not.Startup;
 using NTS.Application.Contracts;
 using NTS.Application.Cors;
@@ -112,6 +114,9 @@ public static class Warp
         );
         app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
         app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
+        app.MapControllers();
+
+        LocalizationHelper.Configure(app.Services.GetRequiredService<IStringLocalizer>());
 
         foreach (var initializer in app.Services.GetServices<IStartupInitializer>())
         {
