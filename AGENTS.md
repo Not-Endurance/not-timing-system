@@ -8,18 +8,17 @@
 - docker commands which would modify containers, volumes, images or similar
 2. Always dotnet `build`, `restore` with silent output `-v:q` unless instructed otherwise. Don't modify worklfows to use queit mode. This applies only for localhost verification
 3. Run dotnet `test` with minimal output `-v:m`.
-4. Verify each feature with a successful NTS.Tests.Integration run. If the integration tests fail, don't change them directly. Instead report why they are failing.
 5. Changes and features should be represented in the Integration tests if reasonably possible.
 6. Domain logic is unit tested in the test project that mirrors its source project (for example NTS.Domain.Core.Tests and NTS.Domain.Setup.Tests). See Testing below.
 7. Don't concern yourself with code formatting. CSharpier formats code via CI, so don't run or check formatting locally.
 
 ## Verification
-- After each change, build and run the unit test project that mirrors the changed source project, for example `dotnet build tests/NoTiming.Tests.sln -v:q` followed by `dotnet test tests/NTS.Domain.Core.Tests/NTS.Domain.Core.Tests.csproj -v:m`.
-- Verify each feature with a successful run of `dotnet test tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -v:m`. This needs Docker.
+- After individual atomic changes build and run the unit test project that mirrors the changed source project, for example `dotnet build tests/NoTiming.Tests.sln -v:q` followed by `dotnet test tests/NTS.Domain.Core.Tests/NTS.Domain.Core.Tests.csproj -v:m`.
+- Verify each complete feature with a successful run of `dotnet test tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -v:m`. This needs Docker.
 
 ## Testing
 Conventions for unit tests (Integration tests are not subject to these rules):
-- Test projects: one per source project, named `<SourceProject>.Tests` and placed in `tests/`. Example: `src/NTS.Application` is tested by `tests/NTS.Application.Tests`.
+- Test projects: one per source project, named `<SourceProject>.Tests` and placed in `tests/` and referenced by the tests/ solution. Example: `src/NTS.Application` is tested by `tests/NTS.Application.Tests`.
 - Test class: named `<TestedClass>Tests`, where `<TestedClass>` is the class under test.
 - Test location: mirror the source directory. A class at `src/Domain/NTS.Domain.Core/Objects/Startlists/Startlist.cs` is tested by `tests/NTS.Domain.Core.Tests/Objects/Startlists/StartlistTests.cs`. Namespaces follow the folder.
 - Test method: `<Method>_When<Condition>_<Result>`, for example `Create_WhenInvalid_ShouldReturnError`. The result starts with `Should`. For constructors, `<Method>` is `Constructor`.
