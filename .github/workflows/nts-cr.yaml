@@ -6,7 +6,7 @@ on:
     types: [opened, reopened, synchronize, ready_for_review]
 
 env:
-  DOTNET_CORE_VERSION: 8.0.x
+  DOTNET_CORE_VERSION: 10.0.x
   SOURCE_DIR: src
   CONFIGURATION: Release
   SOLUTION_FILE: not-timing-system.sln

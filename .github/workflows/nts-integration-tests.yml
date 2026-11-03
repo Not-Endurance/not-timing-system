@@ -1,10 +1,10 @@
-name: "[net8] Integration Tests"
+name: "[net10] Integration Tests"
 
 on:
   workflow_dispatch:
 
 env:
-  DOTNET_CORE_VERSION: 8.0.x
+  DOTNET_CORE_VERSION: 10.0.x
   CONFIGURATION: Release
   TEST_PROJECT_PATH: tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj
   DOTNET_CLI_HOME: ${{ github.workspace }}/.tmp/dotnet-home
