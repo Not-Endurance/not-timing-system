@@ -1,6 +1,6 @@
 using NTS.Application.Contracts;
 
-namespace NTS.Nexus.Warp.Features.Witness;
+namespace NTS.Nexus.Warp.Host;
 
 // Everything that serves the Witness WebAssembly UI from Warp lives here.
 // To host the UI elsewhere, remove the UseWitnessUi() call in Warp.Start.

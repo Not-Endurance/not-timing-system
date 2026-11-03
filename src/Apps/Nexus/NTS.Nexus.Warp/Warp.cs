@@ -7,6 +7,7 @@ using NTS.Nexus.Warp.ConnectionDiagnostics;
 using NTS.Nexus.Warp.Cors;
 using NTS.Nexus.Warp.Features.Judge;
 using NTS.Nexus.Warp.Features.Witness;
+using NTS.Nexus.Warp.Host;
 
 namespace NTS.Nexus.Warp;
 
