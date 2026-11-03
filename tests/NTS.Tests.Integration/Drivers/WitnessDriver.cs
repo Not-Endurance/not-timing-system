@@ -33,20 +33,12 @@ internal sealed class WitnessDriver : IAsyncDisposable
     public WitnessDriver(Uri warpBaseUrl, IntegrationUser user, string clientName)
     {
         _clientName = clientName;
-        var configuration = CreateConfiguration(
-            warpBaseUrl,
-            ApplicationConstants.WITNESS_HUB,
-            clientName
-        );
+        var configuration = CreateConfiguration(warpBaseUrl, ApplicationConstants.WITNESS_HUB, clientName);
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
-        services.AddNtsWitness(
-            configuration,
-            warpBaseUrl.ToString().TrimEnd('/'),
-            typeof(NtsWitnessServices).Assembly
-        );
+        services.AddNtsWitness(configuration, warpBaseUrl.ToString().TrimEnd('/'), typeof(NtsWitnessServices).Assembly);
         services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, IntegrationRpcAccessTokenProvider>());
         services.AddScoped<AuthenticationStateProvider>(_ => new IntegrationAuthenticationStateProvider(user));
 
