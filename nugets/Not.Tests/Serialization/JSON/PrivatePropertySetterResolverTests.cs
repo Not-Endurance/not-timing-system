@@ -1,6 +1,6 @@
-using Xunit;
 using Newtonsoft.Json;
 using Not.Serialization.JSON;
+using Xunit;
 
 namespace Not.Tests.Serialization.JSON;
 
