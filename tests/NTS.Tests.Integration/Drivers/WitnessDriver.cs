@@ -30,12 +30,11 @@ internal sealed class WitnessDriver : IAsyncDisposable
     readonly IWitnessAccessContext _accessContext;
     readonly string _clientName;
 
-    public WitnessDriver(Uri warpBaseUrl, Uri nexusBaseUrl, IntegrationUser user, string clientName)
+    public WitnessDriver(Uri warpBaseUrl, IntegrationUser user, string clientName)
     {
         _clientName = clientName;
         var configuration = CreateConfiguration(
             warpBaseUrl,
-            nexusBaseUrl,
             ApplicationConstants.WITNESS_HUB,
             clientName
         );
@@ -45,7 +44,7 @@ internal sealed class WitnessDriver : IAsyncDisposable
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
         services.AddNtsWitness(
             configuration,
-            nexusBaseUrl.ToString().TrimEnd('/'),
+            warpBaseUrl.ToString().TrimEnd('/'),
             typeof(NtsWitnessServices).Assembly
         );
         services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, IntegrationRpcAccessTokenProvider>());
@@ -138,7 +137,7 @@ internal sealed class WitnessDriver : IAsyncDisposable
         }
     }
 
-    static IConfiguration CreateConfiguration(Uri warpBaseUrl, Uri nexusBaseUrl, string hub, string clientName)
+    static IConfiguration CreateConfiguration(Uri warpBaseUrl, string hub, string clientName)
     {
         return new ConfigurationBuilder()
             .AddInMemoryCollection(
@@ -149,7 +148,7 @@ internal sealed class WitnessDriver : IAsyncDisposable
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = clientName,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ConnectTimeoutSeconds)}"] = "10",
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = nexusBaseUrl.ToString().TrimEnd('/'),
+                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = warpBaseUrl.ToString().TrimEnd('/'),
                     [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.EndpointPrefix)}"] = "api",
                     ["NClientAuthenticationSettings:ClientId"] = "integration-client",
                     ["NClientAuthenticationSettings:Instance"] = "https://login.microsoftonline.com",

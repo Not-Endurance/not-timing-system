@@ -5,7 +5,7 @@
     "Scope": "nts-client-scope"
   },
   "NHttpSettings": {
-    "Url": "https://production-url/api"
+    "Url": "https://nts-warp-prod-bwddbpc3ayg5guet.westeurope-01.azurewebsites.net/api"
   },
   "RpcSettings": {
     "Host": "https://production-url"

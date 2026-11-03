@@ -13,7 +13,7 @@ public sealed class JudgeDependencyInjectionTests
     [Fact]
     public async Task JudgeDriver_ResolvesSetupRootRepositoriesFromRestStorage()
     {
-        await using var judge = new JudgeDriver(new Uri("http://127.0.0.1:1"), new Uri("http://127.0.0.1:2"));
+        await using var judge = new JudgeDriver(new Uri("http://127.0.0.1:1"));
 
         _ = judge.GetRequiredService<IKrudFormService<ClubFormModel>>();
         var repository = judge.GetRequiredService<IRepository<Club>>();

@@ -13,7 +13,6 @@
     <ProjectReference Include="..\..\nugets\Not.Blazor\Not.Blazor.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Krud\Not.Krud.csproj" />
     <ProjectReference Include="..\..\src\Apps\Judge\NTS.Judge\NTS.Judge.csproj" />
-    <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.HTTP\NTS.Nexus.HTTP.csproj" />
     <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.Warp\NTS.Nexus.Warp.csproj" />
     <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.Warp.Contracts\NTS.Nexus.Warp.Contracts.csproj" />
     <ProjectReference Include="..\..\src\Apps\Witness\NTS.Witness\NTS.Witness.csproj" />

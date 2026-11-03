@@ -61,28 +61,6 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
         return CreateRanklistRequest(fileName, html, context);
     }
 
-    public async Task<NPrintBatchRequest> CreateRanklistsZip(
-        IReadOnlyList<Ranking> rankings,
-        Func<Ranking, ResultsDocument> createDocument,
-        NPrintPanelContext context,
-        string fileName,
-        string? leftLogo,
-        string? rightLogo
-    )
-    {
-        var entries = PdfFileNameHelper.ResultPdfEntries(rankings.Select(x => new PdfNamedResult(x.Id, x.Name)));
-        var documents = new List<NPrintDocumentRequest>();
-        foreach (var (result, entryName) in entries)
-        {
-            var ranking = rankings.Single(x => x.Id == result.Id);
-            var document = createDocument(ranking);
-            var html = await RenderResult(document, leftLogo, rightLogo);
-            documents.Add(CreateRanklistRequest(entryName, html, context));
-        }
-
-        return new NPrintBatchRequest { FileName = EnsureExtension(fileName, ".zip"), Documents = documents };
-    }
-
     async Task<string> RenderResult(ResultsDocument document, string? leftLogo, string? rightLogo)
     {
         return await _renderer.Render<ResultComponent>(
@@ -146,15 +124,6 @@ public interface INtsPrintRequestFactory
 
     Task<NPrintDocumentRequest> CreateRanklist(
         ResultsDocument document,
-        NPrintPanelContext context,
-        string fileName,
-        string? leftLogo,
-        string? rightLogo
-    );
-
-    Task<NPrintBatchRequest> CreateRanklistsZip(
-        IReadOnlyList<Ranking> rankings,
-        Func<Ranking, ResultsDocument> createDocument,
         NPrintPanelContext context,
         string fileName,
         string? leftLogo,

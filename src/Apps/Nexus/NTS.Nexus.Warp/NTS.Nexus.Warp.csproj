@@ -13,6 +13,11 @@
     <ProjectReference Include="..\..\..\..\nugets\Not.Storage\Not.Storage.csproj" />
     <ProjectReference Include="..\..\..\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\NTS.Nexus.Warp.Contracts\NTS.Nexus.Warp.Contracts.csproj" />
+    <ProjectReference Include="..\..\Witness\NTS.Witness.Contracts\NTS.Witness.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.4.1" />
   </ItemGroup>
 
   <ItemGroup>

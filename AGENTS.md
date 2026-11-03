@@ -11,6 +11,7 @@
 5. Changes and features should be represented in the Integration tests if reasonably possible.
 6. Domain logic should be tested in the NTS.Tests.Unit.Domain namespace.
 7. If unit tests would be a useful task evaluation step, create those tests in NTS.Tests.Unit.Temporary. Expect those tests to be deleted regularly.
+8. Don't be concerned with code formatting. CSharpier formats code via CI, so don't run or check formatting locally.
 
 ## WSL
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker
