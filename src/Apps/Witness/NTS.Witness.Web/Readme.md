@@ -20,5 +20,8 @@ Localhost-only overrides are loaded when running from localhost:
 
 The `Development`, `Staging`, and `Production` launch profiles pass `?environment=...` so localhost can choose
 the target environment file while still running from `localhost`. If no environment is supplied, the client uses
-Blazor's configured application environment. Azure Static Web Apps deployments set this by writing the
-`Blazor-Environment` header to `staticwebapp.config.json` during the workflow run.
+Blazor's configured application environment. Deployed builds are served by NTS Warp, which sends the
+`Blazor-Environment` header from its own `ASPNETCORE_ENVIRONMENT`.
+
+Deployed builds do not set `RpcSettings.Host` or `NHttpSettings.Url`. They call the origin the UI is served from, which is
+the NTS Warp instance. `localhostsettings.*.json` and `appsettings.Development.json` point at a Warp instance for localhost runs.

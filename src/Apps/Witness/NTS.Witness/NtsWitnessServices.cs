@@ -30,7 +30,13 @@ public static class NtsWitnessServices
             .ConfigureNtsApplication(configuration, rootAssembly)
             .AddSharedCoreDomainServices()
             .ConfigureN()
-            .AddRpcClient()
+            .AddRpcClient(settings =>
+            {
+                if (string.IsNullOrWhiteSpace(settings.Host))
+                {
+                    settings.Host = baseUrl.TrimEnd('/');
+                }
+            })
             .AddDomainEvents()
             .AddHttp(settings => settings.Host = baseUrl)
             .AddUserSessions();

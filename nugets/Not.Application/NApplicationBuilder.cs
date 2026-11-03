@@ -30,12 +30,13 @@ public class NApplicationBuilder
         return this;
     }
 
-    public NApplicationBuilder AddRpcClient()
+    public NApplicationBuilder AddRpcClient(Action<RpcSettings>? configure = null)
     {
         _services.AddScoped<IRpcSocket, SignalRSocket>();
         _services.AddSettings<RpcSettings>(
             _configuration,
-            x => !string.IsNullOrWhiteSpace(x.Host) || !string.IsNullOrWhiteSpace(x.HubPattern)
+            x => !string.IsNullOrWhiteSpace(x.Host) || !string.IsNullOrWhiteSpace(x.HubPattern),
+            configure
         );
         return this;
     }

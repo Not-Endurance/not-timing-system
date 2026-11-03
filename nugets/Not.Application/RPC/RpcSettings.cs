@@ -2,7 +2,7 @@ namespace Not.Application.RPC;
 
 public class RpcSettings
 {
-    public string Host { get; init; } = default!;
+    public string Host { get; set; } = default!;
     public string HubPattern { get; init; } = default!;
     public int? Port { get; init; }
     public int ConnectTimeoutSeconds { get; init; } = 30;
