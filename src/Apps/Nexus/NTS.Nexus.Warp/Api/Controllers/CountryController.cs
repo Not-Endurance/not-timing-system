@@ -23,7 +23,7 @@ public class CountryController : ApiControllerBase
         _countries = countries;
     }
 
-    [HttpPost("api/countries")]
+    [HttpPost("countries")]
     public async Task<IActionResult> Insert()
     {
         var request = Request;
@@ -36,7 +36,7 @@ public class CountryController : ApiControllerBase
         return Ok();
     }
 
-    [HttpPatch("api/countries")]
+    [HttpPatch("countries")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -49,7 +49,7 @@ public class CountryController : ApiControllerBase
         return Ok();
     }
 
-    [HttpGet("api/countries")]
+    [HttpGet("countries")]
     public async Task<IActionResult> List()
     {
         var request = Request;

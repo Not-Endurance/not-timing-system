@@ -23,7 +23,7 @@ public class SettingController : ApiControllerBase
         _settings = settings;
     }
 
-    [HttpPost("api/settings")]
+    [HttpPost("settings")]
     public async Task<IActionResult> Insert()
     {
         var request = Request;
@@ -36,7 +36,7 @@ public class SettingController : ApiControllerBase
         return Ok();
     }
 
-    [HttpPatch("api/settings")]
+    [HttpPatch("settings")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -49,7 +49,7 @@ public class SettingController : ApiControllerBase
         return Ok();
     }
 
-    [HttpGet("api/settings/{accountId}")]
+    [HttpGet("settings/{accountId}")]
     public async Task<IActionResult> GetOne(string accountId)
     {
         var request = Request;

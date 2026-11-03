@@ -25,7 +25,7 @@ public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
         _sessions = sessions;
     }
 
-    [HttpPost("api/user-sessions")]
+    [HttpPost("user-sessions")]
     public async Task<IActionResult> Create()
     {
         var request = Request;
@@ -35,7 +35,7 @@ public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
         return await CreateCore(request);
     }
 
-    [HttpPatch("api/user-sessions")]
+    [HttpPatch("user-sessions")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -45,7 +45,7 @@ public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
         return await UpdateCore(request);
     }
 
-    [HttpDelete("api/user-sessions/{id:int}")]
+    [HttpDelete("user-sessions/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -55,7 +55,7 @@ public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
         return await DeleteCore(id);
     }
 
-    [HttpDelete("api/user-sessions/{eventId:int}/{id:int}")]
+    [HttpDelete("user-sessions/{eventId:int}/{id:int}")]
     public async Task<IActionResult> DeleteForEvent(int eventId, int id)
     {
         var request = Request;
@@ -67,7 +67,7 @@ public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
         return Ok();
     }
 
-    [HttpDelete("api/user-sessions")]
+    [HttpDelete("user-sessions")]
     public async Task<IActionResult> DeleteMany()
     {
         var request = Request;
@@ -77,7 +77,7 @@ public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
         return await DeleteManyCore(request);
     }
 
-    [HttpGet("api/user-sessions/{id:int}")]
+    [HttpGet("user-sessions/{id:int}")]
     public async Task<IActionResult> Read(int id)
     {
         var request = Request;
@@ -87,7 +87,7 @@ public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
         return await ReadCore(id);
     }
 
-    [HttpGet("api/user-sessions/by-user-identifier/{userIdentifier}")]
+    [HttpGet("user-sessions/by-user-identifier/{userIdentifier}")]
     public async Task<IActionResult> ReadByUserIdentifier(string userIdentifier)
     {
         var request = Request;
@@ -98,7 +98,7 @@ public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
         return Ok(await _sessions.ReadByUserIdentifier(Uri.UnescapeDataString(userIdentifier)));
     }
 
-    [HttpGet("api/user-sessions/{eventId:int}/by-user-identifier/{userIdentifier}")]
+    [HttpGet("user-sessions/{eventId:int}/by-user-identifier/{userIdentifier}")]
     public async Task<IActionResult> ReadByUserIdentifierAndEvent(int eventId, string userIdentifier)
     {
         var request = Request;
@@ -109,7 +109,7 @@ public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
         return Ok(await _sessions.ReadByUserIdentifier(Uri.UnescapeDataString(userIdentifier), eventId));
     }
 
-    [HttpGet("api/user-sessions")]
+    [HttpGet("user-sessions")]
     public async Task<IActionResult> ReadMany()
     {
         var request = Request;

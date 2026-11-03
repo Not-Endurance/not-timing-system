@@ -18,7 +18,7 @@ public class AthleteController : CrudControllerBase<AthleteModel>
     )
         : base(logger, athletes, telemetry) { }
 
-    [HttpPost("api/athletes")]
+    [HttpPost("athletes")]
     public async Task<IActionResult> Create()
     {
         var request = Request;
@@ -28,7 +28,7 @@ public class AthleteController : CrudControllerBase<AthleteModel>
         return await CreateCore(request);
     }
 
-    [HttpPatch("api/athletes")]
+    [HttpPatch("athletes")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -38,7 +38,7 @@ public class AthleteController : CrudControllerBase<AthleteModel>
         return await UpdateCore(request);
     }
 
-    [HttpDelete("api/athletes/{id:int}")]
+    [HttpDelete("athletes/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -48,7 +48,7 @@ public class AthleteController : CrudControllerBase<AthleteModel>
         return await DeleteCore(id);
     }
 
-    [HttpDelete("api/athletes")]
+    [HttpDelete("athletes")]
     public async Task<IActionResult> DeleteMany()
     {
         var request = Request;
@@ -58,7 +58,7 @@ public class AthleteController : CrudControllerBase<AthleteModel>
         return await DeleteManyCore(request);
     }
 
-    [HttpGet("api/athletes/{id:int}")]
+    [HttpGet("athletes/{id:int}")]
     public async Task<IActionResult> Read(int id)
     {
         var request = Request;
@@ -68,7 +68,7 @@ public class AthleteController : CrudControllerBase<AthleteModel>
         return await ReadCore(id);
     }
 
-    [HttpGet("api/athletes")]
+    [HttpGet("athletes")]
     public async Task<IActionResult> ReadMany()
     {
         var request = Request;

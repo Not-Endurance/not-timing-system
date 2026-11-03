@@ -26,7 +26,7 @@ public class ConfigureEventController : ApiControllerBase
         _mutationGuard = mutationGuard;
     }
 
-    [HttpPost("api/configure-event")]
+    [HttpPost("configure-event")]
     public async Task<IActionResult> Insert()
     {
         var request = Request;
@@ -39,7 +39,7 @@ public class ConfigureEventController : ApiControllerBase
         return Ok();
     }
 
-    [HttpGet("api/configure-event")]
+    [HttpGet("configure-event")]
     public async Task<IActionResult> List()
     {
         var request = Request;
@@ -50,7 +50,7 @@ public class ConfigureEventController : ApiControllerBase
         return Ok(await _configureEvents.ReadMany() ?? []);
     }
 
-    [HttpGet("api/configure-event/{id:int}")]
+    [HttpGet("configure-event/{id:int}")]
     public async Task<IActionResult> QueryById(int id)
     {
         var request = Request;
@@ -61,7 +61,7 @@ public class ConfigureEventController : ApiControllerBase
         return Ok(await _configureEvents.Read(id));
     }
 
-    [HttpPatch("api/configure-event")]
+    [HttpPatch("configure-event")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -75,7 +75,7 @@ public class ConfigureEventController : ApiControllerBase
         return Ok();
     }
 
-    [HttpDelete("api/configure-event/{id:int}")]
+    [HttpDelete("configure-event/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -94,7 +94,7 @@ public class ConfigureEventController : ApiControllerBase
         return Ok();
     }
 
-    [HttpDelete("api/configure-event")]
+    [HttpDelete("configure-event")]
     public async Task<IActionResult> DeleteMany()
     {
         var request = Request;

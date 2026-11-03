@@ -17,7 +17,7 @@ public class ParticipationController : CrudControllerBase<ParticipationModel>
     )
         : base(logger, participations, telemetry) { }
 
-    [HttpPost("api/participations")]
+    [HttpPost("participations")]
     public async Task<IActionResult> Create()
     {
         var request = Request;
@@ -27,7 +27,7 @@ public class ParticipationController : CrudControllerBase<ParticipationModel>
         return await CreateCore(request);
     }
 
-    [HttpPatch("api/participations")]
+    [HttpPatch("participations")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -37,7 +37,7 @@ public class ParticipationController : CrudControllerBase<ParticipationModel>
         return await UpdateCore(request);
     }
 
-    [HttpDelete("api/participations/{id:int}")]
+    [HttpDelete("participations/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -47,7 +47,7 @@ public class ParticipationController : CrudControllerBase<ParticipationModel>
         return await DeleteCore(id);
     }
 
-    [HttpDelete("api/participations")]
+    [HttpDelete("participations")]
     public async Task<IActionResult> DeleteMany()
     {
         var request = Request;
@@ -57,7 +57,7 @@ public class ParticipationController : CrudControllerBase<ParticipationModel>
         return await DeleteManyCore(request);
     }
 
-    [HttpGet("api/participations/{id:int}")]
+    [HttpGet("participations/{id:int}")]
     public async Task<IActionResult> Read(int id)
     {
         var request = Request;
@@ -67,7 +67,7 @@ public class ParticipationController : CrudControllerBase<ParticipationModel>
         return await ReadCore(id);
     }
 
-    [HttpGet("api/participations")]
+    [HttpGet("participations")]
     public async Task<IActionResult> ReadMany()
     {
         var request = Request;

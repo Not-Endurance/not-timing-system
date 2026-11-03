@@ -17,7 +17,7 @@ public class OfficialController : CrudControllerBase<OfficialModel>
     )
         : base(logger, officials, telemetry) { }
 
-    [HttpPost("api/officials")]
+    [HttpPost("officials")]
     public async Task<IActionResult> Create()
     {
         var request = Request;
@@ -27,7 +27,7 @@ public class OfficialController : CrudControllerBase<OfficialModel>
         return await CreateCore(request);
     }
 
-    [HttpPatch("api/officials")]
+    [HttpPatch("officials")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -37,7 +37,7 @@ public class OfficialController : CrudControllerBase<OfficialModel>
         return await UpdateCore(request);
     }
 
-    [HttpDelete("api/officials/{id:int}")]
+    [HttpDelete("officials/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -47,7 +47,7 @@ public class OfficialController : CrudControllerBase<OfficialModel>
         return await DeleteCore(id);
     }
 
-    [HttpDelete("api/officials")]
+    [HttpDelete("officials")]
     public async Task<IActionResult> DeleteMany()
     {
         var request = Request;
@@ -57,7 +57,7 @@ public class OfficialController : CrudControllerBase<OfficialModel>
         return await DeleteManyCore(request);
     }
 
-    [HttpGet("api/officials/{id:int}")]
+    [HttpGet("officials/{id:int}")]
     public async Task<IActionResult> Read(int id)
     {
         var request = Request;
@@ -67,7 +67,7 @@ public class OfficialController : CrudControllerBase<OfficialModel>
         return await ReadCore(id);
     }
 
-    [HttpGet("api/officials")]
+    [HttpGet("officials")]
     public async Task<IActionResult> ReadMany()
     {
         var request = Request;

@@ -23,7 +23,7 @@ public class HorseController : ApiControllerBase
         _horses = horses;
     }
 
-    [HttpPost("api/horses")]
+    [HttpPost("horses")]
     public async Task<IActionResult> Insert()
     {
         var request = Request;
@@ -36,7 +36,7 @@ public class HorseController : ApiControllerBase
         return Ok();
     }
 
-    [HttpPatch("api/horses")]
+    [HttpPatch("horses")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -49,7 +49,7 @@ public class HorseController : ApiControllerBase
         return Ok();
     }
 
-    [HttpDelete("api/horses/{id:int}/safe")]
+    [HttpDelete("horses/{id:int}/safe")]
     public async Task<IActionResult> SafeDelete(int id)
     {
         var request = Request;
@@ -67,7 +67,7 @@ public class HorseController : ApiControllerBase
         return Ok();
     }
 
-    [HttpDelete("api/horses/{id:int}")]
+    [HttpDelete("horses/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -85,7 +85,7 @@ public class HorseController : ApiControllerBase
         return Ok();
     }
 
-    [HttpDelete("api/horses")]
+    [HttpDelete("horses")]
     public async Task<IActionResult> DeleteMany()
     {
         var request = Request;
@@ -98,7 +98,7 @@ public class HorseController : ApiControllerBase
         return Ok();
     }
 
-    [HttpGet("api/horses/{id:int}")]
+    [HttpGet("horses/{id:int}")]
     public async Task<IActionResult> GetOne(int id)
     {
         var request = Request;
@@ -109,7 +109,7 @@ public class HorseController : ApiControllerBase
         return Ok(await _horses.Read(id));
     }
 
-    [HttpGet("api/horses")]
+    [HttpGet("horses")]
     public async Task<IActionResult> List()
     {
         var request = Request;

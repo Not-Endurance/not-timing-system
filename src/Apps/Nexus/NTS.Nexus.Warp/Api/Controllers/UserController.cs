@@ -19,7 +19,7 @@ public class UserController : ApiControllerBase
         _users = users;
     }
 
-    [HttpGet("api/users")]
+    [HttpGet("users")]
     public async Task<IActionResult> ReadMany()
     {
         var request = Request;
@@ -30,7 +30,7 @@ public class UserController : ApiControllerBase
         return Ok(await _users.ReadMany() ?? []);
     }
 
-    [HttpGet("api/users/{email}")]
+    [HttpGet("users/{email}")]
     public async Task<IActionResult> ReadByEmail(string email)
     {
         var request = Request;
@@ -41,7 +41,7 @@ public class UserController : ApiControllerBase
         return Ok(await _users.ReadByEmail(email));
     }
 
-    [HttpPost("api/users/register")]
+    [HttpPost("users/register")]
     public async Task<IActionResult> Register()
     {
         var request = Request;
@@ -72,7 +72,7 @@ public class UserController : ApiControllerBase
         return Ok(user);
     }
 
-    [HttpPatch("api/users/{email}/profile")]
+    [HttpPatch("users/{email}/profile")]
     public async Task<IActionResult> UpdateProfile(string email)
     {
         var request = Request;

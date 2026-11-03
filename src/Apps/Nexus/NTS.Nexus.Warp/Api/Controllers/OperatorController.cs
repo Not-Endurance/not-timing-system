@@ -17,7 +17,7 @@ public class OperatorController : CrudControllerBase<OperatorModel>
     )
         : base(logger, operators, telemetry) { }
 
-    [HttpPost("api/operators")]
+    [HttpPost("operators")]
     public async Task<IActionResult> Create()
     {
         var request = Request;
@@ -27,7 +27,7 @@ public class OperatorController : CrudControllerBase<OperatorModel>
         return await CreateCore(request);
     }
 
-    [HttpPatch("api/operators")]
+    [HttpPatch("operators")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -37,7 +37,7 @@ public class OperatorController : CrudControllerBase<OperatorModel>
         return await UpdateCore(request);
     }
 
-    [HttpDelete("api/operators/{id:int}")]
+    [HttpDelete("operators/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -47,7 +47,7 @@ public class OperatorController : CrudControllerBase<OperatorModel>
         return await DeleteCore(id);
     }
 
-    [HttpDelete("api/operators")]
+    [HttpDelete("operators")]
     public async Task<IActionResult> DeleteMany()
     {
         var request = Request;
@@ -57,7 +57,7 @@ public class OperatorController : CrudControllerBase<OperatorModel>
         return await DeleteManyCore(request);
     }
 
-    [HttpGet("api/operators/{id:int}")]
+    [HttpGet("operators/{id:int}")]
     public async Task<IActionResult> Read(int id)
     {
         var request = Request;
@@ -67,7 +67,7 @@ public class OperatorController : CrudControllerBase<OperatorModel>
         return await ReadCore(id);
     }
 
-    [HttpGet("api/operators")]
+    [HttpGet("operators")]
     public async Task<IActionResult> ReadMany()
     {
         var request = Request;

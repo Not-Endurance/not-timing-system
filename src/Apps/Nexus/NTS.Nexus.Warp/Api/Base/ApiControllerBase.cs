@@ -8,6 +8,7 @@ using NTS.Nexus.Warp.Api.Telemetry;
 
 namespace NTS.Nexus.Warp.Api.Base;
 
+[Route("api")]
 public abstract class ApiControllerBase : ControllerBase
 {
     readonly IFunctionLogger<ApiControllerBase> _logger;

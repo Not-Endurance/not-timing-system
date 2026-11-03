@@ -17,7 +17,7 @@ public class HandoutController : CrudControllerBase<HandoutModel>
     )
         : base(logger, handouts, telemetry) { }
 
-    [HttpPost("api/handouts")]
+    [HttpPost("handouts")]
     public async Task<IActionResult> Create()
     {
         var request = Request;
@@ -27,7 +27,7 @@ public class HandoutController : CrudControllerBase<HandoutModel>
         return await CreateCore(request);
     }
 
-    [HttpPatch("api/handouts")]
+    [HttpPatch("handouts")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -37,7 +37,7 @@ public class HandoutController : CrudControllerBase<HandoutModel>
         return await UpdateCore(request);
     }
 
-    [HttpDelete("api/handouts/{id:int}")]
+    [HttpDelete("handouts/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -47,7 +47,7 @@ public class HandoutController : CrudControllerBase<HandoutModel>
         return await DeleteCore(id);
     }
 
-    [HttpDelete("api/handouts")]
+    [HttpDelete("handouts")]
     public async Task<IActionResult> DeleteMany()
     {
         var request = Request;
@@ -57,7 +57,7 @@ public class HandoutController : CrudControllerBase<HandoutModel>
         return await DeleteManyCore(request);
     }
 
-    [HttpGet("api/handouts/{id:int}")]
+    [HttpGet("handouts/{id:int}")]
     public async Task<IActionResult> Read(int id)
     {
         var request = Request;
@@ -67,7 +67,7 @@ public class HandoutController : CrudControllerBase<HandoutModel>
         return await ReadCore(id);
     }
 
-    [HttpGet("api/handouts")]
+    [HttpGet("handouts")]
     public async Task<IActionResult> ReadMany()
     {
         var request = Request;

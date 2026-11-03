@@ -29,7 +29,7 @@ public class EventInformationController : ApiControllerBase
         _businessService = businessService;
     }
 
-    [HttpPost("api/event")]
+    [HttpPost("event")]
     public async Task<IActionResult> Create()
     {
         var request = Request;
@@ -42,7 +42,7 @@ public class EventInformationController : ApiControllerBase
         return Ok();
     }
 
-    [HttpPatch("api/event")]
+    [HttpPatch("event")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -55,7 +55,7 @@ public class EventInformationController : ApiControllerBase
         return Ok();
     }
 
-    [HttpGet("api/event/{id:int}")]
+    [HttpGet("event/{id:int}")]
     public async Task<IActionResult> Read(int id)
     {
         var request = Request;
@@ -66,7 +66,7 @@ public class EventInformationController : ApiControllerBase
         return Ok(await _events.Read(x => x.Id == id));
     }
 
-    [HttpGet("api/event")]
+    [HttpGet("event")]
     public async Task<IActionResult> List()
     {
         var request = Request;
@@ -77,7 +77,7 @@ public class EventInformationController : ApiControllerBase
         return Ok(await _events.ReadMany() ?? []);
     }
 
-    [HttpGet("api/event/active")]
+    [HttpGet("event/active")]
     public async Task<IActionResult> ListActive()
     {
         var request = Request;
@@ -88,7 +88,7 @@ public class EventInformationController : ApiControllerBase
         return Ok(await _businessService.ReadActive());
     }
 
-    [HttpGet("api/event/past")]
+    [HttpGet("event/past")]
     public async Task<IActionResult> ListPast()
     {
         var request = Request;
@@ -100,7 +100,7 @@ public class EventInformationController : ApiControllerBase
         return Ok(events);
     }
 
-    [HttpDelete("api/event/{id:int}")]
+    [HttpDelete("event/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -118,7 +118,7 @@ public class EventInformationController : ApiControllerBase
         return Ok();
     }
 
-    [HttpDelete("api/event/{id:int}/reset")]
+    [HttpDelete("event/{id:int}/reset")]
     public async Task<IActionResult> Reset(int id)
     {
         var request = Request;
@@ -130,7 +130,7 @@ public class EventInformationController : ApiControllerBase
         return Ok();
     }
 
-    [HttpPost("api/event/{id:int}/deactivate")]
+    [HttpPost("event/{id:int}/deactivate")]
     public async Task<IActionResult> Deactivate(int id)
     {
         var request = Request;
@@ -142,7 +142,7 @@ public class EventInformationController : ApiControllerBase
         return Ok();
     }
 
-    [HttpPost("api/event/{id:int}/start")]
+    [HttpPost("event/{id:int}/start")]
     public async Task<IActionResult> Start(int id)
     {
         var request = Request;

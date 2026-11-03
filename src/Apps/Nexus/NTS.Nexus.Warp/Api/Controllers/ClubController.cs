@@ -18,7 +18,7 @@ public class ClubController : CrudControllerBase<ClubModel>
     )
         : base(logger, clubs, telemetry) { }
 
-    [HttpPost("api/clubs")]
+    [HttpPost("clubs")]
     public async Task<IActionResult> Insert()
     {
         var request = Request;
@@ -28,7 +28,7 @@ public class ClubController : CrudControllerBase<ClubModel>
         return await CreateCore(request);
     }
 
-    [HttpPatch("api/clubs")]
+    [HttpPatch("clubs")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -38,7 +38,7 @@ public class ClubController : CrudControllerBase<ClubModel>
         return await UpdateCore(request);
     }
 
-    [HttpDelete("api/clubs/{id:int}")]
+    [HttpDelete("clubs/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -48,7 +48,7 @@ public class ClubController : CrudControllerBase<ClubModel>
         return await DeleteCore(id);
     }
 
-    [HttpDelete("api/clubs")]
+    [HttpDelete("clubs")]
     public async Task<IActionResult> DeleteMany()
     {
         var request = Request;
@@ -58,7 +58,7 @@ public class ClubController : CrudControllerBase<ClubModel>
         return await DeleteManyCore(request);
     }
 
-    [HttpGet("api/clubs/{id:int}")]
+    [HttpGet("clubs/{id:int}")]
     public async Task<IActionResult> GetOne(int id)
     {
         var request = Request;
@@ -68,7 +68,7 @@ public class ClubController : CrudControllerBase<ClubModel>
         return await ReadCore(id);
     }
 
-    [HttpGet("api/clubs")]
+    [HttpGet("clubs")]
     public async Task<IActionResult> List()
     {
         var request = Request;

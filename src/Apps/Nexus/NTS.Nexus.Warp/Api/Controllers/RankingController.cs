@@ -17,7 +17,7 @@ public class RankingController : CrudControllerBase<RankingModel>
     )
         : base(logger, rankings, telemetry) { }
 
-    [HttpPost("api/rankings")]
+    [HttpPost("rankings")]
     public async Task<IActionResult> Create()
     {
         var request = Request;
@@ -27,7 +27,7 @@ public class RankingController : CrudControllerBase<RankingModel>
         return await CreateCore(request);
     }
 
-    [HttpPatch("api/rankings")]
+    [HttpPatch("rankings")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -37,7 +37,7 @@ public class RankingController : CrudControllerBase<RankingModel>
         return await UpdateCore(request);
     }
 
-    [HttpDelete("api/rankings/{id:int}")]
+    [HttpDelete("rankings/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -47,7 +47,7 @@ public class RankingController : CrudControllerBase<RankingModel>
         return await DeleteCore(id);
     }
 
-    [HttpDelete("api/rankings")]
+    [HttpDelete("rankings")]
     public async Task<IActionResult> DeleteMany()
     {
         var request = Request;
@@ -57,7 +57,7 @@ public class RankingController : CrudControllerBase<RankingModel>
         return await DeleteManyCore(request);
     }
 
-    [HttpGet("api/rankings/{id:int}")]
+    [HttpGet("rankings/{id:int}")]
     public async Task<IActionResult> Read(int id)
     {
         var request = Request;
@@ -67,7 +67,7 @@ public class RankingController : CrudControllerBase<RankingModel>
         return await ReadCore(id);
     }
 
-    [HttpGet("api/rankings")]
+    [HttpGet("rankings")]
     public async Task<IActionResult> ReadMany()
     {
         var request = Request;

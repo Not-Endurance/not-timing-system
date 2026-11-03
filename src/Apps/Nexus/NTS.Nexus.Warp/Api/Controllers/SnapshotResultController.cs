@@ -17,7 +17,7 @@ public class SnapshotResultController : CrudControllerBase<SnapshotResultModel>
     )
         : base(logger, snapshotResults, telemetry) { }
 
-    [HttpPost("api/snapshot-results")]
+    [HttpPost("snapshot-results")]
     public async Task<IActionResult> Create()
     {
         var request = Request;
@@ -27,7 +27,7 @@ public class SnapshotResultController : CrudControllerBase<SnapshotResultModel>
         return await CreateCore(request);
     }
 
-    [HttpPatch("api/snapshot-results")]
+    [HttpPatch("snapshot-results")]
     public async Task<IActionResult> Update()
     {
         var request = Request;
@@ -37,7 +37,7 @@ public class SnapshotResultController : CrudControllerBase<SnapshotResultModel>
         return await UpdateCore(request);
     }
 
-    [HttpDelete("api/snapshot-results/{id:int}")]
+    [HttpDelete("snapshot-results/{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var request = Request;
@@ -47,7 +47,7 @@ public class SnapshotResultController : CrudControllerBase<SnapshotResultModel>
         return await DeleteCore(id);
     }
 
-    [HttpDelete("api/snapshot-results")]
+    [HttpDelete("snapshot-results")]
     public async Task<IActionResult> DeleteMany()
     {
         var request = Request;
@@ -57,7 +57,7 @@ public class SnapshotResultController : CrudControllerBase<SnapshotResultModel>
         return await DeleteManyCore(request);
     }
 
-    [HttpGet("api/snapshot-results/{id:int}")]
+    [HttpGet("snapshot-results/{id:int}")]
     public async Task<IActionResult> Read(int id)
     {
         var request = Request;
@@ -67,7 +67,7 @@ public class SnapshotResultController : CrudControllerBase<SnapshotResultModel>
         return await ReadCore(id);
     }
 
-    [HttpGet("api/snapshot-results")]
+    [HttpGet("snapshot-results")]
     public async Task<IActionResult> ReadMany()
     {
         var request = Request;
