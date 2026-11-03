@@ -5,7 +5,7 @@ solution_dir="$(cd "$script_dir/../../.." && pwd)"
 cd "$script_dir"
 
 # Configuration
-target="net8.0-windows10.0.19041.0"
+target="net10.0-windows10.0.19041.0"
 build="Release"
 platform="x64"
 runtime_identifier="win-x64"
