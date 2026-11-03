@@ -312,11 +312,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         await api.Create(participation);
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6701));
 
-        await using var witness = new WitnessDriver(
-            _fixture.WarpBaseUrl,
-            OFFICIAL_USER,
-            "SnapshotSessionWitness"
-        );
+        await using var witness = new WitnessDriver(_fixture.WarpBaseUrl, OFFICIAL_USER, "SnapshotSessionWitness");
 
         await witness.Start();
         await witness.Connect(eventInformation);
