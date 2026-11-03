@@ -1,6 +1,6 @@
-using NTS.Application.Cors;
+using NTS.Nexus.Warp.Cors;
 
-namespace NTS.Application.Tests.Cors;
+namespace NTS.Nexus.Warp.Tests.Cors;
 
 public sealed class CorsOriginMatcherTests
 {

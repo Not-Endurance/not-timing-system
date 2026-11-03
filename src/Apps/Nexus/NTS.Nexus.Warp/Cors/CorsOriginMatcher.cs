@@ -1,4 +1,4 @@
-namespace NTS.Application.Cors;
+namespace NTS.Nexus.Warp.Cors;
 
 public static class CorsOriginMatcher
 {
