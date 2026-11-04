@@ -1,32 +1,75 @@
-## Overview
-This project employs a Domain Driven Design architecture with strict layer and boundary separations. The codebase consists of two parts:
-- Not* "nugets", located in /nugets
-- NTS* - stands for No Timing System - the name of the product. 
+# NoTiming
 
-You can see a clear corelation between Not and NTS projects and they are layered identically. 
+The domain glossary for NoTiming. Each term is the name used in code, issues and discussion. Architecture and layering rules live in `docs/architecture.md`.
 
-## Not* projects
-They are separated by function - Blazor, Storage, Application. etcs. *Not* is shared amongs them. These are intended to packaged up and used in other projects to bootsrap functionality, ensure consistent behavior and allow for easier maintenance. Elements of Not should be completely stripped of business logic and should provide a streamlined, generic API striving for a ballance between strict, conssitent behavior and enough configurability to be multi-purposed.
-Notes:
-- Notable exception is `Not.Krud` - as of now this is a standalone framework designed to streamline CRUD operations of complex Domain aggregates. It allows each aggregate entity to be editable individualy via simple `IRepository<T>` interface without it's Aggregate root yielding the final control.
-- Service registration - services in Not* should be registered manually, using the `N*Builder` pattern (see `NApplicationBuilder`) for example
-- Components defined in `Not.Blazor` should begin with `N` - `NTable`, `NNotifier`, `NTextField` etc
+## Language
 
-# NTS* projects
-NTS stands for *No Timing System*, the Brand of the current product - a cheap alternative to full-fledged Endurance timing systems.
-- Domain Model - hardcode business logic and validation is contained within the `NTS.Domain.*` namespace, which holds the domain model. It has to be as pure as reasonably possible. Some "pollution" is acceptable - like coupling with `MediatR.INotification` or `Not.Krud` framework, however there are no references to repositories or other infrastructure.
-- Secondary business logic - contained in `NTS.Application`, `NTS.Judge`, `NTS.Witness` or the so-called applicaiton level. It handles interactions between domain boundaries and infrastructure. The key component here and entry point should be the Service. Services should be suffixed with `*Service` and usually implement multiple segregated interfaces (conforms to Interface segregation principle)
-- Storage - contains operations related to storing something. All of the storage should be conform to the `IRepository<T>` abstraction.
-- Blazor - the layout is composed of a Header, Drawer and Main content. Components that are navigated to via Router should be suffixed with `*Content.razor`.
-- Service registration - services in NTS projects should be registed to the container via the `ITransient`, `IScoped` and `ISingleton` marker interfaces. Those interfaces shouldn't be inherited by other interfaces, but implemented by the classes implementing those interfaces. Services should not be registered manually
-- *Exceptions*: `NTS.Application` - we need to keep service registraiton manual for NTS.Application as it's also being used by NTS.Warp application in order to share RPC contracts. 
+### Product and people
 
-## Blazor
-Component rules
-- Components should inherit from `NComponent` or one of it's derivatives almost always. Exceptions can be made for example if exteding an external component such as `ErrorBoundary` or `MudTextField`. 
-- Component `.razor` files should not contain code-behind, instead they should *inherit* from a `Behind.cs` class of the same name - i.e `Component.razor` inherits `ComponentBehind.cs`. Components shouldn't use `partial` code behinds as this inheritance offers a better control on what to expose to the razor file. 
-- Component behinds should never expose services directly, as exception in service execution leads to poor Blazor experience - `ErrorBoundaries` cannot handle some async exceptions gracefully in my experience. Instead `NComponent` defines a `Handle(Exception ex)` method which is used to that end. 
-- Component behinds should expose only properties and not fields 
-- Component behinds should expose only *Safe* methods - a method is safe if it's wrapped with a `try-catch` that users `NComponentHandle` or if its name is suffixed with `Safe`. The latter should only be used if the method is passed to a Safe component parameter (also suffixed by safe).
-- Base classes for internal use should be suffixed with `Base` - example `Event : EventBase`. Base classes that are intended to be implemented by the user don't have to follow that rule - example `KrudShell`
-- Base classes and interfaces should be in `Abstractions`zw
+**Product**:
+A deployable system with its own user store and its own passkeys, such as NoTiming or mass-driver.
+_Avoid_: app, project
+
+**Event**:
+A competition with its own event ID. Witness follows it and Judge runs it.
+
+**Witness**:
+The phone-facing web app that followers use to follow an event, and that event staff use to send snapshots.
+
+**Judge**:
+The desktop client that runs an event and receives snapshots from Witness.
+
+**Visitor**:
+Someone who is not signed in. Visitors can follow events.
+_Avoid_: anonymous user, guest
+
+**User**:
+A person known to a product by one email address. One record holds the sign-in credentials and the profile, and event roles refer to it.
+_Avoid_: account, profile
+
+**Official**:
+A User holding an official role for one event. An official with an allowed role can send snapshots for that event.
+
+**Operator**:
+A User assigned to one event. A steward operator can send snapshots for that event.
+
+### Sign-in
+
+**Sign-in**:
+Proving control of a User's email address, with a passkey or an emailed code, to start a sign-in session.
+_Avoid_: login
+
+**Registration**:
+Creating a User by proving an email address with a code. Registering an address that already has a User signs that User in instead.
+
+**Passkey**:
+A discoverable, user-verified WebAuthn credential that signs a User in. A User can hold several.
+_Avoid_: security key
+
+**Code challenge**:
+A pending request for an emailed six-digit code. It holds the registration details until the code is entered.
+
+**Sign-in session**:
+The server-side state created by a successful sign-in and referenced by a host-only cookie. Sign-out or a revoked User ends it.
+_Avoid_: session, login session, UserSession
+
+### Event data
+
+**Snapshot**:
+A group of entries that Witness sends to Judge for an event.
+
+**UserSession**:
+A Witness user's per-event record of the snapshots they have sent and selected. It is not a sign-in session.
+
+**Tenant**:
+A `TenantId` field on documents. It is not an entity, and tenant-based authorization is out of scope for sign-in.
+
+### Transition
+
+**Legacy user**:
+A User created before sign-in codes existed, whose email has never been proved.
+_Avoid_: old user, unverified user
+
+**Adoption**:
+Attaching a legacy user to a sign-in by emailed code, keeping its existing Id so event roles still apply. Transitional: removed by hand once no legacy users are left.
+_Avoid_: migration, link
