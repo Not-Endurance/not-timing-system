@@ -1,40 +1,30 @@
 using System.Diagnostics;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
+using Not.Server.UiClient;
 using NTS.Application.Contracts;
 
 namespace NTS.Nexus.Warp.Host;
 
-// Everything that serves the Witness WebAssembly UI from Warp lives here.
-// To host the UI elsewhere, remove the UseWitnessUi() call in Warp.Start.
+// Hosts the Witness WebAssembly UI from Warp. The serving itself lives in Not.Server (ServeUiClient); this
+// class only decides what Warp serves. To host the UI elsewhere, remove the UseWitnessUi() call in Warp.Start.
 internal static class WitnessUiHosting
 {
     public static WebApplication UseWitnessUi(this WebApplication app)
     {
-        var uiFiles = ResolveUiFiles(app);
+        var localUi = ResolveLocalUi(app);
 
-        app.Use(
-            async (context, next) =>
-            {
-                if (!IsServerPath(context.Request.Path))
-                {
-                    context.Response.Headers["Blazor-Environment"] = app.Environment.EnvironmentName;
-                }
-
-                await next();
-            }
-        );
-        if (uiFiles != app.Environment.WebRootFileProvider)
+        app.ServeUiClient(settings =>
         {
-            app.UseStaticFiles(new StaticFileOptions { FileProvider = uiFiles, ServeUnknownFileTypes = true });
-        }
-        else
-        {
-            app.UseBlazorFrameworkFiles();
-            app.UseStaticFiles();
-        }
-
-        app.MapFallback(context => ServeIndex(context, uiFiles));
+            settings.FileProvider = localUi;
+            settings.ReservedPathPrefixes =
+            [
+                "/api",
+                "/healthz",
+                $"/{ApplicationConstants.JUDGE_HUB}",
+                $"/{ApplicationConstants.WITNESS_HUB}",
+            ];
+            settings.ResponseHeaders["Blazor-Environment"] = app.Environment.EnvironmentName;
+        });
 
         if (app.Environment.IsDevelopment())
         {
@@ -80,7 +70,7 @@ internal static class WitnessUiHosting
     }
 
     // Development only: WITNESS_UI_PATH serves a locally published UI instead of this project's wwwroot.
-    static IFileProvider ResolveUiFiles(WebApplication app)
+    static IFileProvider? ResolveLocalUi(WebApplication app)
     {
         var localUi = Environment.GetEnvironmentVariable("WITNESS_UI_PATH");
         if (app.Environment.IsDevelopment() && !string.IsNullOrWhiteSpace(localUi))
@@ -88,35 +78,6 @@ internal static class WitnessUiHosting
             return new PhysicalFileProvider(Path.GetFullPath(localUi, app.Environment.ContentRootPath));
         }
 
-        return app.Environment.WebRootFileProvider;
-    }
-
-    static bool IsServerPath(PathString path)
-    {
-        return path.StartsWithSegments("/api")
-            || path.StartsWithSegments("/healthz")
-            || path.StartsWithSegments($"/{ApplicationConstants.JUDGE_HUB}")
-            || path.StartsWithSegments($"/{ApplicationConstants.WITNESS_HUB}");
-    }
-
-    static async Task ServeIndex(HttpContext context, IFileProvider uiFiles)
-    {
-        var isReadRequest = HttpMethods.IsGet(context.Request.Method) || HttpMethods.IsHead(context.Request.Method);
-        if (!isReadRequest || IsServerPath(context.Request.Path))
-        {
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            return;
-        }
-
-        var index = uiFiles.GetFileInfo("index.html");
-        if (!index.Exists)
-        {
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            return;
-        }
-
-        context.Response.ContentType = "text/html; charset=utf-8";
-        await using var stream = index.CreateReadStream();
-        await stream.CopyToAsync(context.Response.Body);
+        return null;
     }
 }
