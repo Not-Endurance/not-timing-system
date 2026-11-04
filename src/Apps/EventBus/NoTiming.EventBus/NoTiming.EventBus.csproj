@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\nugets\Not.Application\Not.Application.csproj" />
-    <ProjectReference Include="..\..\..\..\nugets\Not.Server\Not.Server.csproj" />
+    <ProjectReference Include="..\..\..\..\nugets\Not.Server\NC.Server.csproj" />
     <ProjectReference Include="..\..\Api\NoTiming.Api.Application\NoTiming.Api.Application.csproj" />
     <ProjectReference Include="..\NoTiming.EventBus.Contracts\NoTiming.EventBus.Contracts.csproj" />
     <ProjectReference Include="..\..\..\Shared\NTS.Application.Contracts\NTS.Application.Contracts.csproj" />

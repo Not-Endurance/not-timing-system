@@ -70,10 +70,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\nugets\Not.MAUI\Not.MAUI.csproj" />
-    <ProjectReference Include="..\..\..\Shared\NTS.Storage\NTS.Storage.csproj" />
-    <ProjectReference Include="..\NTS.Judge.Blazor\NTS.Judge.Blazor.csproj" />
-    <ProjectReference Include="..\NTS.Judge\NTS.Judge.csproj" />
+    <ProjectReference Include="..\..\..\..\nugets\Not.MAUI\NC.MAUI.csproj" />
+    <ProjectReference Include="..\..\..\Shared\NTS.Storage\NoTiming.Storage.csproj" />
+    <ProjectReference Include="..\NTS.Judge.Blazor\NoTiming.Judge.Blazor.csproj" />
+    <ProjectReference Include="..\NTS.Judge\NoTiming.Judge.csproj" />
   </ItemGroup>
 
   <ItemGroup>

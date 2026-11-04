@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NTS.Judge.Contracts\NTS.Judge.Contracts.csproj" />
+    <ProjectReference Include="..\NTS.Judge.Contracts\NoTiming.Judge.Contracts.csproj" />
     <ProjectReference Include="..\..\..\Shared\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\..\EventBus\NoTiming.EventBus.Contracts\NoTiming.EventBus.Contracts.csproj" />
   </ItemGroup>

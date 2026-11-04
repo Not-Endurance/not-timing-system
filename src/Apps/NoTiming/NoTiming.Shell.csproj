@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\nugets\Not.Server\Not.Server.csproj" />
+    <ProjectReference Include="..\..\..\nugets\Not.Server\NC.Server.csproj" />
     <ProjectReference Include="..\..\Shared\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\Api\NoTiming.Api\NoTiming.Api.csproj" />
     <ProjectReference Include="..\Api\NoTiming.Api.Application\NoTiming.Api.Application.csproj" />
@@ -27,11 +27,7 @@
   </PropertyGroup>
 
   <Target Name="PublishUiForLocalRun" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
-    <MSBuild
-      Projects="$(MSBuildProjectDirectory)/../Ui/NoTiming.Ui/NoTiming.Ui.csproj"
-      Targets="Publish"
-      Properties="Configuration=Debug;PublishDir=$(MSBuildProjectDirectory)/$(UiPublishDir);BlazorEnableCompression=false"
-    />
+    <MSBuild Projects="$(MSBuildProjectDirectory)/../Ui/NoTiming.Ui/NoTiming.Ui.csproj" Targets="Publish" Properties="Configuration=Debug;PublishDir=$(MSBuildProjectDirectory)/$(UiPublishDir);BlazorEnableCompression=false" />
   </Target>
 
 </Project>

@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Not.Krud\Not.Krud.csproj" />
+    <ProjectReference Include="..\Not.Krud\NC.Krud.csproj" />
   </ItemGroup>
 
 </Project>
