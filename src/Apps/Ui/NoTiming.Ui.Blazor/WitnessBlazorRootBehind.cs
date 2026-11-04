@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Not.Blazor.Client.Authentication;
 using Not.Blazor.Components.Abstractions;
 
-namespace NTS.Witness.Blazor;
+namespace NoTiming.Ui.Blazor;
 
 public class WitnessBlazorRootBehind : NComponent
 {

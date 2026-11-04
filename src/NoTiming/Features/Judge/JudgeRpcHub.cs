@@ -1,15 +1,15 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Nexus.Warp.Abstractions;
-using NTS.Nexus.Warp.ConnectionDiagnostics;
-using NTS.Nexus.Warp.Contracts;
-using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
-using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
-using NTS.Nexus.Warp.Features.Witness;
-using NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
+using NoTiming.Abstractions;
+using NoTiming.ConnectionDiagnostics;
+using NoTiming.EventBus.Contracts;
+using NoTiming.EventBus.Contracts.Features.Judge.Procedures;
+using NoTiming.EventBus.Contracts.Features.Witness.Procedures;
+using NoTiming.Features.Witness;
+using NoTiming.Features.Witness.PendingSnapshots;
 
-namespace NTS.Nexus.Warp.Features.Judge;
+namespace NoTiming.Features.Judge;
 
 internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 {

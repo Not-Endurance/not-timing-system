@@ -1,11 +1,11 @@
 using MongoDB.Driver;
 using Not.Application.Authentication.User;
 using Not.Storage.Mongo;
-using NTS.Nexus.Warp.Api.Mongo.Models;
-using NTS.Nexus.Warp.Api.Telemetry;
-using NTS.Witness.Contracts.API;
+using NoTiming.Api.Mongo.Models;
+using NoTiming.Api.Telemetry;
+using NoTiming.Ui.Contracts.API;
 
-namespace NTS.Nexus.Warp.Api.Mongo.Repositories;
+namespace NoTiming.Api.Mongo.Repositories;
 
 public class UserMongoRepository : IUserRepository
 {

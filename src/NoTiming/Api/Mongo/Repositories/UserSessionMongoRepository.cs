@@ -5,9 +5,9 @@ using Not.Storage.Mongo;
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Application.UserSession;
-using NTS.Nexus.Warp.Api.Telemetry;
+using NoTiming.Api.Telemetry;
 
-namespace NTS.Nexus.Warp.Api.Mongo.Repositories;
+namespace NoTiming.Api.Mongo.Repositories;
 
 public class UserSessionMongoRepository
     : MongoRepository<NtsUserSessionModel>,

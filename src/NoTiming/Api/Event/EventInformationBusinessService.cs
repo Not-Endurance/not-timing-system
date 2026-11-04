@@ -16,7 +16,7 @@ using CoreParticipationModel = NTS.Application.Contracts.Core.Models.Participati
 using CoreRankingModel = NTS.Application.Contracts.Core.Models.RankingModel;
 using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
 
-namespace NTS.Nexus.Warp.Api.Event;
+namespace NoTiming.Api.Event;
 
 public interface IEventInformationBusinessService
 {
@@ -156,7 +156,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         return validationBuilder.ToString().TrimEnd();
     }
 
-    async Task<Domain.Setup.Aggregates.ConfigureEvent> GetSetupEvent(int configureEventId)
+    async Task<NTS.Domain.Setup.Aggregates.ConfigureEvent> GetSetupEvent(int configureEventId)
     {
         var configureEvent = await _configureEvents.Read(configureEventId);
         return configureEvent?.MapToEntity()
@@ -175,7 +175,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
     }
 
     (IEnumerable<Participation> Participations, IEnumerable<Ranking> Rankings) CreateParticipationsAndRankings(
-        Domain.Setup.Aggregates.ConfigureEvent setupEvent
+        NTS.Domain.Setup.Aggregates.ConfigureEvent setupEvent
     )
     {
         var participations = new List<Participation>();
@@ -199,7 +199,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
     }
 
     static Ranking CreateRanking(
-        Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
+        NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
         KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory,
         int eventId
     )
@@ -218,7 +218,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         );
     }
 
-    static void ValidateFeiConfiguration(Domain.Setup.Aggregates.ConfigureEvent setupEvent)
+    static void ValidateFeiConfiguration(NTS.Domain.Setup.Aggregates.ConfigureEvent setupEvent)
     {
         if (!HasAnyFeiConfiguration(setupEvent))
         {
@@ -275,13 +275,13 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         }
     }
 
-    static bool HasAnyFeiConfiguration(Domain.Setup.Aggregates.ConfigureEvent setupEvent)
+    static bool HasAnyFeiConfiguration(NTS.Domain.Setup.Aggregates.ConfigureEvent setupEvent)
     {
         return !string.IsNullOrWhiteSpace(setupEvent.FeiShowId)
             || setupEvent.Competitions.Any(HasAnyCompetitionFeiConfiguration);
     }
 
-    static bool HasAnyCompetitionFeiConfiguration(Domain.Setup.Aggregates.ConfigureEvents.Competition competition)
+    static bool HasAnyCompetitionFeiConfiguration(NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition competition)
     {
         return !string.IsNullOrWhiteSpace(competition.FeiEventId)
             || !string.IsNullOrWhiteSpace(competition.FeiEventCode)

@@ -3,9 +3,9 @@ using MongoDB.Driver;
 using Not.Storage.Mongo;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Core.Models;
-using NTS.Nexus.Warp.Api.Telemetry;
+using NoTiming.Api.Telemetry;
 
-namespace NTS.Nexus.Warp.Api.Mongo.Repositories;
+namespace NoTiming.Api.Mongo.Repositories;
 
 public class SnapshotResultEventScopedMongoRepository : EventScopedMongoRepository<SnapshotResultModel>
 {

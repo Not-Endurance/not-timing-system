@@ -1,6 +1,6 @@
 using NTS.Domain.Watcher;
 
-namespace NTS.Witness.Features.Core.Dashboard;
+namespace NoTiming.Ui.Application.Features.Core.Dashboard;
 
 public interface ISnapshotPublisher
 {

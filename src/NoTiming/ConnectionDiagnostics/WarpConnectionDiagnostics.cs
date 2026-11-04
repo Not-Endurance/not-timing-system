@@ -1,7 +1,7 @@
 using Not.Application.RPC;
 using NTS.Application.Contracts;
 
-namespace NTS.Nexus.Warp.ConnectionDiagnostics;
+namespace NoTiming.ConnectionDiagnostics;
 
 internal static class WarpConnectionDiagnostics
 {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Not.Injection;
 
-namespace NTS.Nexus.Warp.Api.Logging;
+namespace NoTiming.Api.Logging;
 
 internal class FunctionLogger<T> : IFunctionLogger<T>
 {

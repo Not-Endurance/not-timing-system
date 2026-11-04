@@ -5,16 +5,17 @@ using Not.Application.UdpHandshake;
 using Not.Serialization.JSON;
 using Not.Server.Authentication;
 using Not.Storage;
+using NTS;
 using NTS.Application;
 using NTS.Application.Mongo;
-using NTS.Nexus.Warp.Api.Errors;
-using NTS.Nexus.Warp.Api.Mongo.Repositories;
-using NTS.Nexus.Warp.Api.Telemetry;
-using NTS.Nexus.Warp.Features.Witness.Authorization;
-using NTS.Nexus.Warp.Host.Cors;
-using NTS.Nexus.Warp.Middlewares;
+using NoTiming.Api.Errors;
+using NoTiming.Api.Mongo.Repositories;
+using NoTiming.Api.Telemetry;
+using NoTiming.Features.Witness.Authorization;
+using NoTiming.Host.Cors;
+using NoTiming.Middlewares;
 
-namespace NTS.Nexus.Warp;
+namespace NoTiming;
 
 internal static class NtsWarpServices
 {

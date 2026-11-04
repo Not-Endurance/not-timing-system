@@ -3,9 +3,9 @@ using MongoDB.Driver;
 using Not.Storage.Mongo;
 using NTS.Application.Contracts.Shared;
 using NTS.Application.Contracts.Shared.Models;
-using NTS.Nexus.Warp.Api.Telemetry;
+using NoTiming.Api.Telemetry;
 
-namespace NTS.Nexus.Warp.Api.Mongo.Repositories;
+namespace NoTiming.Api.Mongo.Repositories;
 
 public class CountryMongoRepository : MongoRepository<CountryModel>
 {

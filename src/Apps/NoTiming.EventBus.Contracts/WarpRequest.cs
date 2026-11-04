@@ -1,4 +1,4 @@
-namespace NTS.Nexus.Warp.Contracts;
+namespace NoTiming.EventBus.Contracts;
 
 public class WarpRequest
 {

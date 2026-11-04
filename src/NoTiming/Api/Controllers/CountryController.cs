@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Not.Application.CRUD.Ports;
 using NTS.Application.Contracts.Shared;
 using NTS.Application.Contracts.Shared.Models;
-using NTS.Nexus.Warp.Api.Base;
-using NTS.Nexus.Warp.Api.Logging;
-using NTS.Nexus.Warp.Api.Telemetry;
+using NoTiming.Api.Base;
+using NoTiming.Api.Logging;
+using NoTiming.Api.Telemetry;
 
-namespace NTS.Nexus.Warp.Api.Controllers;
+namespace NoTiming.Api.Controllers;
 
 public class CountryController : ApiControllerBase
 {

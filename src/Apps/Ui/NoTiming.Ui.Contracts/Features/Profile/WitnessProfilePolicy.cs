@@ -1,6 +1,6 @@
 using Not.Application.Authentication.User;
 
-namespace NTS.Witness.Contracts.Features.Profile;
+namespace NoTiming.Ui.Contracts.Features.Profile;
 
 public static class WitnessProfilePolicy
 {

@@ -1,6 +1,6 @@
 using NTS.Storage;
 
-namespace NTS.Witness.Web;
+namespace NoTiming.Ui;
 
 public static class NtsWitnessWebServices
 {

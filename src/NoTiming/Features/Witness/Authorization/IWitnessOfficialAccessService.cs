@@ -1,4 +1,4 @@
-namespace NTS.Nexus.Warp.Features.Witness.Authorization;
+namespace NoTiming.Features.Witness.Authorization;
 
 internal interface IReceiveSnapshotAccessPolicy
 {

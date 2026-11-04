@@ -4,11 +4,11 @@ using Not.Notify;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Watcher;
-using NTS.Witness.Blazor.Features.Socket;
-using NTS.Witness.Contracts.Features.Access;
-using NTS.Witness.Contracts.Features.Snapshots;
+using NoTiming.Ui.Blazor.Features.Socket;
+using NoTiming.Ui.Contracts.Features.Access;
+using NoTiming.Ui.Contracts.Features.Snapshots;
 
-namespace NTS.Witness.Blazor.Features.Core.Snapshots;
+namespace NoTiming.Ui.Blazor.Features.Core.Snapshots;
 
 public class SnapshotContentBehind : NStatefulComponent
 {

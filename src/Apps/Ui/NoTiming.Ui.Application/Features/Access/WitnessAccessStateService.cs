@@ -10,7 +10,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects;
 
-namespace NTS.Witness.Features.Access;
+namespace NoTiming.Ui.Application.Features.Access;
 
 public class WitnessAccessContext
     : NStatefulService,

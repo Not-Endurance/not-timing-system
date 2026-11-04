@@ -10,7 +10,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
 
-namespace NTS.Witness.Features.Core.Dashboard;
+namespace NoTiming.Ui.Application.Features.Core.Dashboard;
 
 public class ParticipationService
     : NStatefulService<ObservableList<Participation>>,

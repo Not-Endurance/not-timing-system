@@ -13,9 +13,9 @@ using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
-using NTS.Witness.Contracts.Features.Snapshots;
+using NoTiming.Ui.Contracts.Features.Snapshots;
 
-namespace NTS.Witness.Features.Core.Dashboard;
+namespace NoTiming.Ui.Application.Features.Core.Dashboard;
 
 public class SnapshotService
     : NStatefulService<ObservableList<Participation>>,

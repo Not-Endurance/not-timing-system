@@ -1,7 +1,7 @@
 using Not.Injection;
 using Not.Safe;
 
-namespace NTS.Witness.Blazor.Features.Socket;
+namespace NoTiming.Ui.Blazor.Features.Socket;
 
 public class BlazorSocketService : IScoped
 {

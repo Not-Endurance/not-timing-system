@@ -4,11 +4,11 @@ using Not.Storage.Mongo;
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Application.UserSession;
-using NTS.Nexus.Warp.Api.Base;
-using NTS.Nexus.Warp.Api.Logging;
-using NTS.Nexus.Warp.Api.Telemetry;
+using NoTiming.Api.Base;
+using NoTiming.Api.Logging;
+using NoTiming.Api.Telemetry;
 
-namespace NTS.Nexus.Warp.Api.Controllers;
+namespace NoTiming.Api.Controllers;
 
 public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
 {

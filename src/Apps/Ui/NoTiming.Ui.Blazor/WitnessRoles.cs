@@ -1,4 +1,4 @@
-namespace NTS.Witness.Blazor;
+namespace NoTiming.Ui.Blazor;
 
 public static class WitnessRoles
 {

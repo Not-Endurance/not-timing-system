@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Not.Serialization.JSON;
 using Not.Structures;
-using NTS.Nexus.Warp.Api.Logging;
-using NTS.Nexus.Warp.Api.Telemetry;
+using NoTiming.Api.Logging;
+using NoTiming.Api.Telemetry;
 
-namespace NTS.Nexus.Warp.Api.Base;
+namespace NoTiming.Api.Base;
 
 [Route("api")]
 public abstract class ApiControllerBase : ControllerBase

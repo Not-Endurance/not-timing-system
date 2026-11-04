@@ -1,7 +1,7 @@
 using Not.Blazor.Components.Abstractions;
-using NTS.Witness.Blazor.Features.Socket;
+using NoTiming.Ui.Blazor.Features.Socket;
 
-namespace NTS.Witness.Blazor.Features.Core.Presentlist;
+namespace NoTiming.Ui.Blazor.Features.Core.Presentlist;
 
 public class PresentlistContentBehind : NComponent
 {

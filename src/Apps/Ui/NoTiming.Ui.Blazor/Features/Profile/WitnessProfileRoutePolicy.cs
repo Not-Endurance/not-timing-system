@@ -1,8 +1,8 @@
 using Not.Application.Authentication.User;
 using Not.Blazor.Client.Authentication;
-using NTS.Witness.Contracts.Features.Profile;
+using NoTiming.Ui.Contracts.Features.Profile;
 
-namespace NTS.Witness.Blazor.Features.Profile;
+namespace NoTiming.Ui.Blazor.Features.Profile;
 
 public static class WitnessProfileRoutePolicy
 {

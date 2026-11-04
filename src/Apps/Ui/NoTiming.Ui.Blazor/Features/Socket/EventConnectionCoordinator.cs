@@ -4,7 +4,7 @@ using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 
-namespace NTS.Witness.Blazor.Features.Socket;
+namespace NoTiming.Ui.Blazor.Features.Socket;
 
 public class EventConnectionCoordinator : IEventConnectionCoordinator, IScoped
 {

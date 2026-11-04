@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Not.Storage.Mongo;
 using NTS.Application.Contracts.Setup;
 using NTS.Application.Contracts.Setup.Models;
-using NTS.Nexus.Warp.Api.Base;
-using NTS.Nexus.Warp.Api.Logging;
-using NTS.Nexus.Warp.Api.Telemetry;
+using NoTiming.Api.Base;
+using NoTiming.Api.Logging;
+using NoTiming.Api.Telemetry;
 
-namespace NTS.Nexus.Warp.Api.Controllers;
+namespace NoTiming.Api.Controllers;
 
 public class AthleteController : CrudControllerBase<AthleteModel>
 {

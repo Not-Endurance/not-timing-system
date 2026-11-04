@@ -4,9 +4,9 @@ using Not.Application.CRUD.Ports;
 using Not.Storage.Mongo;
 using NTS.Application.Contracts.Setup;
 using NTS.Application.Contracts.Setup.Models;
-using NTS.Nexus.Warp.Api.Telemetry;
+using NoTiming.Api.Telemetry;
 
-namespace NTS.Nexus.Warp.Api.Mongo.Repositories;
+namespace NoTiming.Api.Mongo.Repositories;
 
 public class ConfigureEventMongoRepository : MongoRepository<ConfigureEventModel>, IRepository<ConfigureEventModel>
 {

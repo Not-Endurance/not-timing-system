@@ -11,16 +11,16 @@ COPY .editorconfig /nexus/.editorconfig
 
 WORKDIR /nexus/src/NoTiming
 
-RUN dotnet restore "NTS.Nexus.Warp.csproj"
-RUN dotnet build "NTS.Nexus.Warp.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
+RUN dotnet restore "NoTiming.csproj"
+RUN dotnet build "NoTiming.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "NTS.Nexus.Warp.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "NoTiming.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 
 COPY --from=publish /app/publish .
 
-ENTRYPOINT ["dotnet", "NTS.Nexus.Warp.dll"]
+ENTRYPOINT ["dotnet", "NoTiming.Shell.dll"]

@@ -8,7 +8,7 @@ using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 
-namespace NTS.Witness.Features.Socket;
+namespace NoTiming.Ui.Application.Features.Socket;
 
 public class WitnessSocketService : NStatefulService, INtsSocketService, IScoped, IDisposable
 {

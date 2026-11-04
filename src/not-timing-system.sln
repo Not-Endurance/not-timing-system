@@ -39,9 +39,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Domain.Watcher", "Domai
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Judge", "Judge", "{2C1DE028-5379-4E90-8D73-7020BD8FF922}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Witness", "Witness", "{0B1034D7-3A6A-48F9-BBB3-411A4BA87446}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ui", "Ui", "{0B1034D7-3A6A-48F9-BBB3-411A4BA87446}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nexus", "Nexus", "{79119FC8-F05F-4218-A46B-5AD800FA29E3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NoTiming", "NoTiming", "{79119FC8-F05F-4218-A46B-5AD800FA29E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Judge", "Apps\Judge\NTS.Judge\NTS.Judge.csproj", "{3BBFD7F7-5EBB-9FA4-B788-AF45E4960208}"
 EndProject
@@ -49,13 +49,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Judge.Blazor", "Apps\Ju
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Judge.MAUI", "Apps\Judge\NTS.Judge.MAUI\NTS.Judge.MAUI.csproj", "{83AF25AC-E8A1-7177-6B05-518A4717C909}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Nexus.Warp", "NoTiming\NTS.Nexus.Warp.csproj", "{E66FA455-5DF5-521A-0370-A6CC46640A1E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming", "NoTiming\NoTiming.csproj", "{E66FA455-5DF5-521A-0370-A6CC46640A1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Witness", "Apps\Ui\NoTiming.Ui.Application\NTS.Witness.csproj", "{E842970D-48A2-4FB1-4F74-8D70B91DA00B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.Ui.Application", "Apps\Ui\NoTiming.Ui.Application\NoTiming.Ui.Application.csproj", "{E842970D-48A2-4FB1-4F74-8D70B91DA00B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Witness.Blazor", "Apps\Ui\NoTiming.Ui.Blazor\NTS.Witness.Blazor.csproj", "{570DD9C4-E2DD-A3DF-5CDA-2C157DFB956B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.Ui.Blazor", "Apps\Ui\NoTiming.Ui.Blazor\NoTiming.Ui.Blazor.csproj", "{570DD9C4-E2DD-A3DF-5CDA-2C157DFB956B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Witness.Web", "Apps\Ui\NoTiming.Ui\NTS.Witness.Web.csproj", "{6F19DF71-6B99-9353-E19B-443585A9C8F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.Ui", "Apps\Ui\NoTiming.Ui\NoTiming.Ui.csproj", "{6F19DF71-6B99-9353-E19B-443585A9C8F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not", "..\nugets\Not\Not.csproj", "{442BC1DE-FF67-A4FE-D759-C77D13FDC05C}"
 EndProject
@@ -71,9 +71,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Storage", "..\nugets\No
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Krud", "..\nugets\Not.Krud\Not.Krud.csproj", "{F436B1E5-91EB-4671-9C2E-448BF1864C2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Witness.Contracts", "Apps\Ui\NoTiming.Ui.Contracts\NTS.Witness.Contracts.csproj", "{81DAFA13-F85F-4E19-9259-5B72EFD70D1F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.Ui.Contracts", "Apps\Ui\NoTiming.Ui.Contracts\NoTiming.Ui.Contracts.csproj", "{81DAFA13-F85F-4E19-9259-5B72EFD70D1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Nexus.Warp.Contracts", "Apps\NoTiming.EventBus.Contracts\NTS.Nexus.Warp.Contracts.csproj", "{1064F25D-273E-483A-9EDE-33F7A4CCC632}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.EventBus.Contracts", "Apps\NoTiming.EventBus.Contracts\NoTiming.EventBus.Contracts.csproj", "{1064F25D-273E-483A-9EDE-33F7A4CCC632}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Server", "..\nugets\Not.Server\Not.Server.csproj", "{F7BBFBE0-A6DF-4650-BCFA-74A97D2C8B1E}"
 EndProject

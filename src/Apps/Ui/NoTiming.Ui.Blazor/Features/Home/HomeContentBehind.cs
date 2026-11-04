@@ -1,8 +1,8 @@
 using Not.Blazor.Components.Abstractions;
-using NTS.Witness.Blazor.Features.Socket;
-using NTS.Witness.Contracts.Features.Access;
+using NoTiming.Ui.Blazor.Features.Socket;
+using NoTiming.Ui.Contracts.Features.Access;
 
-namespace NTS.Witness.Blazor.Features.Home;
+namespace NoTiming.Ui.Blazor.Features.Home;
 
 public class HomeContentBehind : NStatefulComponent
 {

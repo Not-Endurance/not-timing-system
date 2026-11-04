@@ -2,7 +2,7 @@ using Microsoft.Extensions.FileProviders;
 using Not.Server.UiClient;
 using NTS.Application.Contracts;
 
-namespace NTS.Nexus.Warp.Host;
+namespace NoTiming.Host;
 
 // Hosts the Witness WebAssembly UI from Warp. The serving itself lives in Not.Server (ServeUiClient); this
 // class only decides what Warp serves. To host the UI elsewhere, remove the UseWitnessUi() call in Warp.Start.

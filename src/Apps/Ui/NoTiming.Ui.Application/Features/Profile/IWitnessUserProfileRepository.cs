@@ -1,8 +1,8 @@
 using Not.Application.Authentication.User;
 using Not.Structures;
-using NTS.Witness.Contracts.API;
+using NoTiming.Ui.Contracts.API;
 
-namespace NTS.Witness.Features.Profile;
+namespace NoTiming.Ui.Application.Features.Profile;
 
 public interface IWitnessUserProfileRepository
 {

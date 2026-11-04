@@ -3,7 +3,7 @@ using Not.Exceptions;
 using Not.Storage.Mongo;
 using NTS.Application.Contracts.Core.Models;
 
-namespace NTS.Nexus.Warp.Api.Mongo.Repositories;
+namespace NoTiming.Api.Mongo.Repositories;
 
 public class EventInformationMongoRepository : MongoRepository<EventInformationModel>, IEventResetRepository
 {

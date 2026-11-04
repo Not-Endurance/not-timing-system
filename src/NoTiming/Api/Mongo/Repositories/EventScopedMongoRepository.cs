@@ -3,7 +3,7 @@ using Not.Storage.Mongo;
 using Not.Structures;
 using NTS.Domain.Core.Aggregates;
 
-namespace NTS.Nexus.Warp.Api.Mongo.Repositories;
+namespace NoTiming.Api.Mongo.Repositories;
 
 public abstract class EventScopedMongoRepository<T> : MongoRepository<T>, IEventResetRepository
     where T : class, IEventScoped, IIdentifiable

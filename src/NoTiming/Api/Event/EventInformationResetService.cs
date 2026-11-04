@@ -1,7 +1,7 @@
 using Not.Injection;
-using NTS.Nexus.Warp.Api.Mongo.Repositories;
+using NoTiming.Api.Mongo.Repositories;
 
-namespace NTS.Nexus.Warp.Api.Event;
+namespace NoTiming.Api.Event;
 
 public interface IEventInformationResetService
 {

@@ -3,7 +3,7 @@ using Not.Random;
 using NTS.Application.Contracts.Shared;
 using NTS.Application.Contracts.Shared.Models;
 
-namespace NTS.Nexus.Warp.Api.Mongo.Models;
+namespace NoTiming.Api.Mongo.Models;
 
 public class NUserDocument : IDocument
 {

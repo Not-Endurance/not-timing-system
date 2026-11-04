@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Not.Application.Authentication.User;
 using Not.Server.Authentication;
 
-namespace NTS.Nexus.Warp.Features.Witness.Authorization;
+namespace NoTiming.Features.Witness.Authorization;
 
 internal sealed class WitnessReceiveAuthorizer : IWitnessReceiveAuthorizer
 {

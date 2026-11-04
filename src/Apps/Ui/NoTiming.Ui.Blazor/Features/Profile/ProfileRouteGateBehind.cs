@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components.Routing;
 using Not.Blazor.Components.Abstractions;
-using NTS.Witness.Contracts.Features.Profile;
+using NoTiming.Ui.Contracts.Features.Profile;
 
-namespace NTS.Witness.Blazor.Features.Profile;
+namespace NoTiming.Ui.Blazor.Features.Profile;
 
 public class ProfileRouteGateBehind : NComponent
 {

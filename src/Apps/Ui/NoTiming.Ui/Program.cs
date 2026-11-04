@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Not.Application.Configurations;
 using Not.Application.Environments;
-using NTS.Witness;
-using NTS.Witness.Web;
+using NoTiming.Ui.Application;
+using NoTiming.Ui;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 

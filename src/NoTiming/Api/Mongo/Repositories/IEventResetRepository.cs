@@ -1,4 +1,4 @@
-namespace NTS.Nexus.Warp.Api.Mongo.Repositories;
+namespace NoTiming.Api.Mongo.Repositories;
 
 public interface IEventResetRepository
 {

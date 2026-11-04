@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Not.Injection;
 
-namespace NTS.Witness.Features.Socket;
+namespace NoTiming.Ui.Application.Features.Socket;
 
 public interface IWitnessAuthenticationRedirector
 {

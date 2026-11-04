@@ -16,9 +16,9 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Watcher;
 using NTS.Storage;
 using NTS.Tests.Integration.Infrastructure;
-using NTS.Witness;
-using NTS.Witness.Contracts.Features.Access;
-using NTS.Witness.Features.Core.Dashboard;
+using NoTiming.Ui.Application;
+using NoTiming.Ui.Contracts.Features.Access;
+using NoTiming.Ui.Application.Features.Core.Dashboard;
 
 namespace NTS.Tests.Integration.Drivers;
 

@@ -1,6 +1,6 @@
-using NTS.Witness.Contracts.Features.Access;
+using NoTiming.Ui.Contracts.Features.Access;
 
-namespace NTS.Witness.Blazor.Features;
+namespace NoTiming.Ui.Blazor.Features;
 
 public static class WitnessAccessPolicy
 {

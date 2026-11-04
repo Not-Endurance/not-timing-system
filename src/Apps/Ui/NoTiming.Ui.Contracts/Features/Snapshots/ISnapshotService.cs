@@ -5,7 +5,7 @@ using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 
-namespace NTS.Witness.Contracts.Features.Snapshots;
+namespace NoTiming.Ui.Contracts.Features.Snapshots;
 
 public interface ISnapshotService : IStatefulService
 {

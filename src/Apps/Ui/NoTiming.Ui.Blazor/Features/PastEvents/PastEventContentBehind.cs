@@ -1,8 +1,8 @@
 using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Aggregates;
-using static NTS.Witness.Blazor.Routes;
+using static NoTiming.Ui.Blazor.Routes;
 
-namespace NTS.Witness.Blazor.Features.PastEvents;
+namespace NoTiming.Ui.Blazor.Features.PastEvents;
 
 public class PastEventContentBehind : NComponent
 {

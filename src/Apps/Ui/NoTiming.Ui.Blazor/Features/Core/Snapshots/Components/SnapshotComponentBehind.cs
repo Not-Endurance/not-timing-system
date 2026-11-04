@@ -5,10 +5,10 @@ using Not.Blazor.Helpers;
 using Not.Exceptions;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
-using NTS.Witness.Blazor.Features.Core.Snapshots.SnapshotUpdate;
-using NTS.Witness.Contracts.Features.Snapshots;
+using NoTiming.Ui.Blazor.Features.Core.Snapshots.SnapshotUpdate;
+using NoTiming.Ui.Contracts.Features.Snapshots;
 
-namespace NTS.Witness.Blazor.Features.Core.Snapshots.Components;
+namespace NoTiming.Ui.Blazor.Features.Core.Snapshots.Components;
 
 public class SnapshotComponentBehind : NComponent
 {

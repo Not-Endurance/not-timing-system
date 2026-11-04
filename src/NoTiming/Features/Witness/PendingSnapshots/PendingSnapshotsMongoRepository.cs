@@ -4,7 +4,7 @@ using Not.Storage.Mongo;
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
 
-namespace NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
+namespace NoTiming.Features.Witness.PendingSnapshots;
 
 public interface IPendingSnapshotsRepository
 {

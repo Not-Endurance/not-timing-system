@@ -10,7 +10,7 @@ using NTS.Domain.Objects;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
-using WitnessSnapshotService = NTS.Witness.Contracts.Features.Snapshots.ISnapshotService;
+using WitnessSnapshotService = NoTiming.Ui.Contracts.Features.Snapshots.ISnapshotService;
 
 namespace NTS.Tests.Integration.EndToEndEventTests.Features;
 

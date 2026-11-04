@@ -4,7 +4,7 @@ using NTS.Application.Contracts.Watcher.Models;
 using NTS.Application.UserSession;
 using NTS.Domain.Watcher;
 
-namespace NTS.Witness.Features.Sessions;
+namespace NoTiming.Ui.Application.Features.Sessions;
 
 public class WitnessUserSessionService : IWitnessUserSession, IScoped
 {

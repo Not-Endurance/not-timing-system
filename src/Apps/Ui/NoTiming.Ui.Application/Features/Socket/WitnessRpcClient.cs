@@ -13,11 +13,11 @@ using NTS.Domain.Core.Objects.Presentlists;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
-using NTS.Nexus.Warp.Contracts;
-using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
-using NTS.Witness.Features.Core.Dashboard;
+using NoTiming.EventBus.Contracts;
+using NoTiming.EventBus.Contracts.Features.Witness.Procedures;
+using NoTiming.Ui.Application.Features.Core.Dashboard;
 
-namespace NTS.Witness.Features.Socket;
+namespace NoTiming.Ui.Application.Features.Socket;
 
 public class WitnessRpcClient
     : RpcClient,

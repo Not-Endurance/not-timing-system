@@ -3,7 +3,7 @@ using Not.Injection;
 using Not.Storage.Mongo;
 using NTS.Application.Contracts.Watcher.Models;
 
-namespace NTS.Nexus.Warp.Api.Mongo.Repositories;
+namespace NoTiming.Api.Mongo.Repositories;
 
 public class PendingSnapshotsEventResetMongoRepository : IEventResetRepository, ITransient
 {

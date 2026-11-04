@@ -7,7 +7,7 @@ using NTS.Application.Contracts.Core.Models;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Tests.Integration.Infrastructure;
-using NTS.Witness.Contracts.API;
+using NoTiming.Ui.Contracts.API;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupAthleteModel = NTS.Application.Contracts.Setup.Models.AthleteModel;
 using SetupClub = NTS.Domain.Setup.Aggregates.Club;

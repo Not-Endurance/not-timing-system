@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using Microsoft.AspNetCore.SignalR;
 using Not.Injection;
 
-namespace NTS.Nexus.Warp.Features;
+namespace NoTiming.Features;
 
 public class JudgeConnectionsContext : IJudgeConnectionsContext
 {

@@ -1,7 +1,7 @@
 using Not.Blazor.Components.Abstractions;
-using NTS.Witness.Blazor.Features.Socket;
+using NoTiming.Ui.Blazor.Features.Socket;
 
-namespace NTS.Witness.Blazor.Features.Core.Startlist;
+namespace NoTiming.Ui.Blazor.Features.Core.Startlist;
 
 public class StartlistContentBehind : NComponent
 {

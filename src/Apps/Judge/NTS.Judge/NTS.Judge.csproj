@@ -10,7 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NTS.Judge.Contracts\NTS.Judge.Contracts.csproj" />
     <ProjectReference Include="..\..\..\Shared\NTS.Application\NTS.Application.csproj" />
-    <ProjectReference Include="..\..\NoTiming.EventBus.Contracts\NTS.Nexus.Warp.Contracts.csproj" />
+    <ProjectReference Include="..\..\NoTiming.EventBus.Contracts\NoTiming.EventBus.Contracts.csproj" />
   </ItemGroup>
   
 </Project>

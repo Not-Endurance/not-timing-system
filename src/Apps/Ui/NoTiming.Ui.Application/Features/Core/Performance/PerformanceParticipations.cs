@@ -8,9 +8,9 @@ using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Witness.Contracts.Features.Performance;
+using NoTiming.Ui.Contracts.Features.Performance;
 
-namespace NTS.Witness.Features.Core.Performance;
+namespace NoTiming.Ui.Application.Features.Core.Performance;
 
 // TODO: Simplify the participation flow for snapshoting and probably remove this
 public class PerformanceParticipations

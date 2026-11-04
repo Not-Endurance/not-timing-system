@@ -3,7 +3,7 @@ using Not.Domain.Exceptions;
 using Not.Injection;
 using NTS.Application.Contracts.Core.Models;
 
-namespace NTS.Nexus.Warp.Api.Controllers;
+namespace NoTiming.Api.Controllers;
 
 public interface IConfigureEventMutationGuard
 {

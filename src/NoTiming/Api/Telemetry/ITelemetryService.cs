@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace NTS.Nexus.Warp.Api.Telemetry;
+namespace NoTiming.Api.Telemetry;
 
 public interface ITelemetryService
 {

@@ -5,9 +5,9 @@ using Not.Notify;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Enums;
 using NTS.Domain.Watcher;
-using NTS.Witness.Contracts.Features.Snapshots;
+using NoTiming.Ui.Contracts.Features.Snapshots;
 
-namespace NTS.Witness.Blazor.Features.Core.Snapshots.Components;
+namespace NoTiming.Ui.Blazor.Features.Core.Snapshots.Components;
 
 public class SnapshotHistoryBehind : NStatefulComponent
 {

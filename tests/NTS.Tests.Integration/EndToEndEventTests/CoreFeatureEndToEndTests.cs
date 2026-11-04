@@ -9,7 +9,7 @@ using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Features;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
 using NTS.Tests.Integration.Infrastructure;
-using NTS.Witness.Contracts.Features.Access;
+using NoTiming.Ui.Contracts.Features.Access;
 using CoreAthlete = NTS.Domain.Core.Aggregates.Participations.Entities.Athlete;
 using CoreCombination = NTS.Domain.Core.Aggregates.Participations.Entities.Combination;
 using CoreHorse = NTS.Domain.Core.Aggregates.Participations.Entities.Horse;

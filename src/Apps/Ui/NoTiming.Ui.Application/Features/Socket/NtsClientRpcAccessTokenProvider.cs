@@ -8,7 +8,7 @@ using Not.Blazor.Client.Authentication;
 using Not.Injection;
 using Not.Notify;
 
-namespace NTS.Witness.Features.Socket;
+namespace NoTiming.Ui.Application.Features.Socket;
 
 public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
 {

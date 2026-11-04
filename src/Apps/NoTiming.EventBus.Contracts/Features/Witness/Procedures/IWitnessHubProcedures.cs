@@ -2,7 +2,7 @@ using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Objects.Payloads;
 
-namespace NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
+namespace NoTiming.EventBus.Contracts.Features.Witness.Procedures;
 
 public interface IWitnessHubProcedures
 {

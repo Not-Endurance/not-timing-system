@@ -2,7 +2,7 @@ using MudBlazor;
 using Not.Injection;
 using NTS.Blazor.Components.SelectEvents;
 
-namespace NTS.Witness.Blazor.Features.Socket;
+namespace NoTiming.Ui.Blazor.Features.Socket;
 
 public class EventConnectionDialogLauncher : IEventConnectionDialogLauncher, IScoped
 {

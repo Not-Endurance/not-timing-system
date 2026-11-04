@@ -3,10 +3,10 @@ using Not.Application.Authentication.User;
 using Not.Application.HTTP;
 using Not.Notify;
 using Not.Structures;
-using NTS.Witness.Contracts.API;
-using NTS.Witness.Features.Profile;
+using NoTiming.Ui.Contracts.API;
+using NoTiming.Ui.Application.Features.Profile;
 
-namespace NTS.Witness.Storage.Repositories;
+namespace NoTiming.Ui.Application.Storage.Repositories;
 
 public class UserApiRepository : IUserRegister, IWitnessUserProfileRepository
 {

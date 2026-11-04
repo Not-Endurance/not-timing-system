@@ -11,8 +11,8 @@ using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
-using NTS.Nexus.Warp.Contracts;
-using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
+using NoTiming.EventBus.Contracts;
+using NoTiming.EventBus.Contracts.Features.Judge.Procedures;
 
 namespace NTS.Judge.Features.Socket;
 

@@ -10,7 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\NTS.Blazor\NTS.Blazor.csproj" />
     <ProjectReference Include="..\..\..\Domain\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
-    <ProjectReference Include="..\NoTiming.Ui.Contracts\NTS.Witness.Contracts.csproj" />
+    <ProjectReference Include="..\NoTiming.Ui.Contracts\NoTiming.Ui.Contracts.csproj" />
     <ProjectReference Include="..\..\..\..\nugets\Not.Blazor.Client\Not.Blazor.Client.csproj" />
   </ItemGroup>
 

@@ -2,7 +2,7 @@ using Not.Application.Authentication.User;
 using Not.Application.Behinds.Adapters;
 using NTS.Domain.Aggregates;
 
-namespace NTS.Witness.Contracts.Features.Profile;
+namespace NoTiming.Ui.Contracts.Features.Profile;
 
 public interface IWitnessProfileContext : IStatefulService
 {

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.SignalR;
 using Not.Notify;
-using NTS.Nexus.Warp.ConnectionDiagnostics;
+using NoTiming.ConnectionDiagnostics;
 
-namespace NTS.Nexus.Warp.Middlewares;
+namespace NoTiming.Middlewares;
 
 internal class ExceptionHandlingHubFilter : IHubFilter
 {

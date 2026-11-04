@@ -1,6 +1,6 @@
 using Not.Application.Behinds.Adapters;
 
-namespace NTS.Witness.Contracts.Features.Access;
+namespace NoTiming.Ui.Contracts.Features.Access;
 
 public interface IWitnessAccessContext : IStatefulService
 {

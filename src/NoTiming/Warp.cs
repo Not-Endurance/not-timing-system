@@ -5,13 +5,13 @@ using Not.Application.Environments;
 using Not.Localization;
 using Not.Startup;
 using NTS.Application.Contracts;
-using NTS.Nexus.Warp.ConnectionDiagnostics;
-using NTS.Nexus.Warp.Features.Judge;
-using NTS.Nexus.Warp.Features.Witness;
-using NTS.Nexus.Warp.Host;
-using NTS.Nexus.Warp.Host.Cors;
+using NoTiming.ConnectionDiagnostics;
+using NoTiming.Features.Judge;
+using NoTiming.Features.Witness;
+using NoTiming.Host;
+using NoTiming.Host.Cors;
 
-namespace NTS.Nexus.Warp;
+namespace NoTiming;
 
 public static class Warp
 {
@@ -32,7 +32,7 @@ public static class Warp
 
     public static void Start(WebApplication app, string port)
     {
-        var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("NTS.Nexus.Warp.Startup");
+        var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("NoTiming.Startup");
         var environment =
             Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? app.Environment.EnvironmentName;
 

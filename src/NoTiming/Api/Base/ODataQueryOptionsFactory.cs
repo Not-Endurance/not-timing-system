@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace NTS.Nexus.Warp.Api.Base;
+namespace NoTiming.Api.Base;
 
 internal static class ODataQueryOptionsFactory
 {

@@ -1,4 +1,4 @@
-namespace NTS.Witness.Contracts.API;
+namespace NoTiming.Ui.Contracts.API;
 
 public record UpdateUserProfilePayload
 {

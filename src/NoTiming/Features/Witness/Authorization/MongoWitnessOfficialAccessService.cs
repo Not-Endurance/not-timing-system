@@ -5,7 +5,7 @@ using NTS.Application.Contracts.Core.Models;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 
-namespace NTS.Nexus.Warp.Features.Witness.Authorization;
+namespace NoTiming.Features.Witness.Authorization;
 
 // TODO: Implement Search in IRepository abstraction and decouple the policy implementation from MongoDB
 internal sealed class MongoWitnessWriteAccessPolicy : IReceiveSnapshotAccessPolicy

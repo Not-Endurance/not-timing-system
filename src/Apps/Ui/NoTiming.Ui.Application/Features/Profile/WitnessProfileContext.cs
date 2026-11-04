@@ -5,9 +5,9 @@ using Not.Application.CRUD.Ports;
 using Not.Injection;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Aggregates;
-using NTS.Witness.Contracts.Features.Profile;
+using NoTiming.Ui.Contracts.Features.Profile;
 
-namespace NTS.Witness.Features.Profile;
+namespace NoTiming.Ui.Application.Features.Profile;
 
 public class WitnessProfileContext : NStatefulService, IWitnessProfileContext, IScoped
 {

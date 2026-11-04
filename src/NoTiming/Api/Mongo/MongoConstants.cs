@@ -1,4 +1,4 @@
-﻿namespace NTS.Nexus.Warp.Api.Mongo;
+﻿namespace NoTiming.Api.Mongo;
 
 public static class MongoConstants
 {

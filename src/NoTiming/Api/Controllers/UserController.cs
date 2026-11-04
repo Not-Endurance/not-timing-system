@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Not.Application.Authentication.User;
-using NTS.Nexus.Warp.Api.Base;
-using NTS.Nexus.Warp.Api.Logging;
-using NTS.Nexus.Warp.Api.Mongo.Repositories;
-using NTS.Nexus.Warp.Api.Telemetry;
-using NTS.Witness.Contracts.API;
+using NoTiming.Api.Base;
+using NoTiming.Api.Logging;
+using NoTiming.Api.Mongo.Repositories;
+using NoTiming.Api.Telemetry;
+using NoTiming.Ui.Contracts.API;
 
-namespace NTS.Nexus.Warp.Api.Controllers;
+namespace NoTiming.Api.Controllers;
 
 public class UserController : ApiControllerBase
 {

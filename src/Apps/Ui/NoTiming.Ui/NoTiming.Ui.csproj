@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NoTiming.Ui.Blazor\NTS.Witness.Blazor.csproj" />
-    <ProjectReference Include="..\NoTiming.Ui.Application\NTS.Witness.csproj" />
+    <ProjectReference Include="..\NoTiming.Ui.Blazor\NoTiming.Ui.Blazor.csproj" />
+    <ProjectReference Include="..\NoTiming.Ui.Application\NoTiming.Ui.Application.csproj" />
     <ProjectReference Include="..\..\..\Shared\NTS.Storage\NTS.Storage.csproj" />
   </ItemGroup>
 

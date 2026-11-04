@@ -2,15 +2,15 @@ using Microsoft.AspNetCore.SignalR;
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Nexus.Warp.Abstractions;
-using NTS.Nexus.Warp.Contracts;
-using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
-using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
-using NTS.Nexus.Warp.Features.Judge;
-using NTS.Nexus.Warp.Features.Witness.Authorization;
-using NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
+using NoTiming.Abstractions;
+using NoTiming.EventBus.Contracts;
+using NoTiming.EventBus.Contracts.Features.Judge.Procedures;
+using NoTiming.EventBus.Contracts.Features.Witness.Procedures;
+using NoTiming.Features.Judge;
+using NoTiming.Features.Witness.Authorization;
+using NoTiming.Features.Witness.PendingSnapshots;
 
-namespace NTS.Nexus.Warp.Features.Witness;
+namespace NoTiming.Features.Witness;
 
 internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProcedures
 {

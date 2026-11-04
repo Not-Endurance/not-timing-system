@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Not.Exceptions;
 using Not.Structures;
-using NTS.Nexus.Warp.Api.Telemetry;
+using NoTiming.Api.Telemetry;
 
-namespace NTS.Nexus.Warp.Api.Errors;
+namespace NoTiming.Api.Errors;
 
 public sealed class ApiExceptionFilter : IExceptionFilter
 {

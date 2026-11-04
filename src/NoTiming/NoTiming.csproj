@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>NoTiming.Shell</AssemblyName>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -12,8 +13,8 @@
     <ProjectReference Include="..\..\nugets\Not.Server\Not.Server.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Storage\Not.Storage.csproj" />
     <ProjectReference Include="..\Shared\NTS.Application\NTS.Application.csproj" />
-    <ProjectReference Include="..\Apps\NoTiming.EventBus.Contracts\NTS.Nexus.Warp.Contracts.csproj" />
-    <ProjectReference Include="..\Apps\Ui\NoTiming.Ui.Contracts\NTS.Witness.Contracts.csproj" />
+    <ProjectReference Include="..\Apps\NoTiming.EventBus.Contracts\NoTiming.EventBus.Contracts.csproj" />
+    <ProjectReference Include="..\Apps\Ui\NoTiming.Ui.Contracts\NoTiming.Ui.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,7 +35,7 @@
 
   <Target Name="PublishWitnessUiForLocalRun" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
     <MSBuild
-      Projects="$(MSBuildProjectDirectory)/../Apps/Ui/NoTiming.Ui/NTS.Witness.Web.csproj"
+      Projects="$(MSBuildProjectDirectory)/../Apps/Ui/NoTiming.Ui/NoTiming.Ui.csproj"
       Targets="Publish"
       Properties="Configuration=Debug;PublishDir=$(MSBuildProjectDirectory)/$(WitnessUiPublishDir);BlazorEnableCompression=false"
     />

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace NTS.Nexus.Warp.ConnectionDiagnostics;
+namespace NoTiming.ConnectionDiagnostics;
 
 internal sealed class ConnectionDiagnosticsMiddleware
 {

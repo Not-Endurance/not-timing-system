@@ -3,11 +3,11 @@ using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Components.Abstractions;
 using NTS.Application.Contracts.Socket;
 using NTS.Blazor.Components.SelectEvents;
-using NTS.Witness.Blazor.Features;
-using NTS.Witness.Contracts.Features.Access;
-using NTS.Witness.Contracts.Features.Profile;
+using NoTiming.Ui.Blazor.Features;
+using NoTiming.Ui.Contracts.Features.Access;
+using NoTiming.Ui.Contracts.Features.Profile;
 
-namespace NTS.Witness.Blazor.Layout.Drawer;
+namespace NoTiming.Ui.Blazor.Layout.Drawer;
 
 public class NavMenuBehind : NStatefulComponent
 {

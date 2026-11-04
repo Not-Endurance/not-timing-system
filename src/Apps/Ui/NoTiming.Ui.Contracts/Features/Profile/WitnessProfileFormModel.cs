@@ -1,8 +1,8 @@
 using Not.Application.Authentication.User;
 using NTS.Domain.Aggregates;
-using NTS.Witness.Contracts.API;
+using NoTiming.Ui.Contracts.API;
 
-namespace NTS.Witness.Contracts.Features.Profile;
+namespace NoTiming.Ui.Contracts.Features.Profile;
 
 public class WitnessProfileFormModel
 {

@@ -1,6 +1,6 @@
 using NTS.Domain.Core.Objects.Payloads;
 
-namespace NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
+namespace NoTiming.EventBus.Contracts.Features.Witness.Procedures;
 
 public interface IWitnessClientProcedures
 {

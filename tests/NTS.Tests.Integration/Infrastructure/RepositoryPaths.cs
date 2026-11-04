@@ -10,7 +10,7 @@ internal sealed class RepositoryPaths
     RepositoryPaths(string root)
     {
         Root = root;
-        WarpProject = Path.Combine(root, "src", "NoTiming", "NTS.Nexus.Warp.csproj");
+        WarpProject = Path.Combine(root, "src", "NoTiming", "NoTiming.csproj");
         DotnetHome = Path.Combine(root, ".tmp", "integration-dotnet-home");
         NuGetPackages = Path.Combine(root, ".tmp", "integration-nuget-packages");
     }

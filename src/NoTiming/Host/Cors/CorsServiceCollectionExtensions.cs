@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NTS.Nexus.Warp.Host.Cors;
+namespace NoTiming.Host.Cors;
 
 public static class CorsServiceCollectionExtensions
 {

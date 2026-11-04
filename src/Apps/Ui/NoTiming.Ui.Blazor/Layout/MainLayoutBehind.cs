@@ -1,7 +1,7 @@
 using Not.Application.Environments;
 using NTS.Application.Contracts;
 
-namespace NTS.Witness.Blazor.Layout;
+namespace NoTiming.Ui.Blazor.Layout;
 
 public class MainLayoutBehind : LayoutComponentBase
 {

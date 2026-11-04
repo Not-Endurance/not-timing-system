@@ -1,4 +1,4 @@
-namespace NTS.Witness.Contracts.Features.Access;
+namespace NoTiming.Ui.Contracts.Features.Access;
 
 public enum WitnessAccessLevel
 {

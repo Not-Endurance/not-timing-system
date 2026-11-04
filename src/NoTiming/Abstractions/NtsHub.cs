@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
 using Not.Application.RPC;
-using NTS.Nexus.Warp.ConnectionDiagnostics;
+using NoTiming.ConnectionDiagnostics;
 
-namespace NTS.Nexus.Warp.Abstractions;
+namespace NoTiming.Abstractions;
 
 public abstract class NtsHub<T> : Hub<T>
     where T : class

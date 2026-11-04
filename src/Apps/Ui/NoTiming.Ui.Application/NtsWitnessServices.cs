@@ -6,12 +6,13 @@ using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Blazor.Client;
 using Not.Krud.ServiceRegistration;
+using NTS;
 using NTS.Application;
-using NTS.Witness.Features.Profile;
-using NTS.Witness.Features.Socket;
-using NTS.Witness.Storage.Repositories;
+using NoTiming.Ui.Application.Features.Profile;
+using NoTiming.Ui.Application.Features.Socket;
+using NoTiming.Ui.Application.Storage.Repositories;
 
-namespace NTS.Witness;
+namespace NoTiming.Ui.Application;
 
 public static class NtsWitnessServices
 {

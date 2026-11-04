@@ -18,9 +18,9 @@ using NTS.Judge.Contracts.Features.Core.Handouts;
 using NTS.Localization;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
-using NTS.Witness.Contracts.API;
-using NTS.Witness.Contracts.Features.Access;
-using NTS.Witness.Contracts.Features.Performance;
+using NoTiming.Ui.Contracts.API;
+using NoTiming.Ui.Contracts.Features.Access;
+using NoTiming.Ui.Contracts.Features.Performance;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
 using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
@@ -33,7 +33,7 @@ using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participa
 using SetupPhase = NTS.Domain.Setup.Aggregates.ConfigureEvents.Phase;
 using SetupUser = NTS.Domain.Setup.Aggregates.User;
 using WitnessSnapshot = NTS.Domain.Watcher.Snapshot;
-using WitnessSnapshotService = NTS.Witness.Contracts.Features.Snapshots.ISnapshotService;
+using WitnessSnapshotService = NoTiming.Ui.Contracts.Features.Snapshots.ISnapshotService;
 
 namespace NTS.Tests.Integration;
 
