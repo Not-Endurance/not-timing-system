@@ -5,6 +5,14 @@ This project employs a Domain Driven Design architecture with strict layer and b
 
 You can see a clear corelation between Not and NTS projects and they are layered identically. 
 
+## Applications
+Deployable hosts and the capabilities they are built from.
+- **NoTiming** - the single AspNetCore shell, deployed as one Azure Web App. It composes **Api**, **EventBus** and **Ui**. Replaces the former **Nexus Warp** server.
+- **Api** - the REST capability: host configuration and endpoints.
+- **EventBus** - the SignalR capability: host configuration and hubs only. It holds no business logic.
+- **Ui** - the Blazor WebAssembly client served by NoTiming. Replaces the former **Witness** web app.
+- **Judge** - the MAUI app. Talks to Api over REST and to EventBus over SignalR. Not changed by the rebrand.
+
 ## Not* projects
 They are separated by function - Blazor, Storage, Application. etcs. *Not* is shared amongs them. These are intended to packaged up and used in other projects to bootsrap functionality, ensure consistent behavior and allow for easier maintenance. Elements of Not should be completely stripped of business logic and should provide a streamlined, generic API striving for a ballance between strict, conssitent behavior and enough configurability to be multi-purposed.
 Notes:
