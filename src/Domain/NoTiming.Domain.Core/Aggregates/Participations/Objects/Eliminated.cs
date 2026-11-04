@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Exceptions;
+using NC.Domain.Exceptions;
 
-namespace NTS.Domain.Core.Aggregates.Participations.Objects;
+namespace NoTiming.Domain.Core.Aggregates.Participations.Objects;
 
 public record Withdrawn : Eliminated
 {

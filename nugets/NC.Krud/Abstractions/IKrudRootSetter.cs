@@ -1,7 +1,7 @@
-﻿using Not.Domain;
-using Not.Krud.Graph;
+﻿using NC.Domain;
+using NC.Krud.Graph;
 
-namespace Not.Krud.Abstractions;
+namespace NC.Krud.Abstractions;
 
 public interface IKrudRootSetter<T>
     where T : Aggregate

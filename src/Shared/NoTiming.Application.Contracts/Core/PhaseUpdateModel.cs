@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
-using Not.Krud.Models;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NC.Krud.Models;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
-namespace NTS.Application.Contracts.Core;
+namespace NoTiming.Application.Contracts.Core;
 
 public record PhaseUpdateModel : KrudFormModel<Phase>, IPhaseState
 {

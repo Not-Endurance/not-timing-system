@@ -1,4 +1,4 @@
-using NTS.Domain.Objects;
+using NoTiming.Domain.Objects;
 
 namespace NoTiming.IntegrationTests.EndToEndEventTests.Helpers;
 

@@ -1,11 +1,11 @@
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Objects.Payloads;
-using static NTS.Domain.Core.Aggregates.SnapshotResultType;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Domain.Core.Objects.Payloads;
+using static NoTiming.Domain.Core.Aggregates.SnapshotResultType;
 
-namespace NTS.Domain.Core.Aggregates;
+namespace NoTiming.Domain.Core.Aggregates;
 
 public class Participation : Aggregate, IEventScoped
 {

@@ -1,4 +1,4 @@
-namespace Not.Files.Abstractions;
+namespace NC.Files.Abstractions;
 
 public interface IFileService
 {

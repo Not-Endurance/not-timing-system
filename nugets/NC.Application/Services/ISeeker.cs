@@ -1,6 +1,6 @@
-﻿using Not.Injection;
+﻿using NC.Injection;
 
-namespace Not.Application.Services;
+namespace NC.Application.Services;
 
 public interface ISeeker<T> : ITransient
 {

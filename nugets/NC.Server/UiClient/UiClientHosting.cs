@@ -6,7 +6,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Not.Server.UiClient;
+namespace NC.Server.UiClient;
 
 internal static class UiClientHosting
 {
@@ -68,7 +68,7 @@ internal static class UiClientHosting
         // In Development the client opens in the default browser once the server is listening.
         if (app.Environment.IsDevelopment())
         {
-            var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Not.Server.UiClient");
+            var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("NC.Server.UiClient");
             app.Lifetime.ApplicationStarted.Register(() => BrowserLauncher.Open(app, logger, prefix + "/"));
         }
     }

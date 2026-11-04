@@ -1,6 +1,6 @@
-using Not.Domain.Abstractions;
+using NC.Domain.Abstractions;
 
-namespace NTS.Domain.Setup.Events;
+namespace NoTiming.Domain.Setup.Events;
 
 public record ConfigureEventUpdated : IDomainEvent
 {

@@ -1,6 +1,6 @@
-﻿using Not.Extensions;
+﻿using NC.Extensions;
 
-namespace Not.Domain;
+namespace NC.Domain;
 
 public abstract record ValueObject
 {

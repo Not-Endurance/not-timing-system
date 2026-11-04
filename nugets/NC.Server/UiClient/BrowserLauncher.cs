@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Not.Server.UiClient;
+namespace NC.Server.UiClient;
 
 // Opens the UI in the default browser. Failures are logged, not thrown, so a headless machine keeps running.
 internal static class BrowserLauncher

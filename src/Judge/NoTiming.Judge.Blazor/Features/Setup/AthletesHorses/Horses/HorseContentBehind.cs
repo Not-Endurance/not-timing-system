@@ -1,5 +1,5 @@
-using NTS.Judge.Contracts.Features.Setup.Horses;
+using NoTiming.Judge.Contracts.Features.Setup.Horses;
 
-namespace NTS.Judge.Blazor.Features.Setup.AthletesHorses.Horses;
+namespace NoTiming.Judge.Blazor.Features.Setup.AthletesHorses.Horses;
 
 public class HorseContentBehind : SetupFormContent<HorseFormModel> { }

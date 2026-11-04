@@ -1,6 +1,6 @@
-﻿using NTS.Domain.Core.Aggregates.Participations.Entities;
+﻿using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
-namespace NTS.Judge.Contracts.Features.Core.Handouts;
+namespace NoTiming.Judge.Contracts.Features.Core.Handouts;
 
 public interface ICreateHandout
 {

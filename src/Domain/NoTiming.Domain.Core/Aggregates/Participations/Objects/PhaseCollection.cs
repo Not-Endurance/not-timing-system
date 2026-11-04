@@ -1,9 +1,9 @@
 ﻿using System.Collections.ObjectModel;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Extensions;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Extensions;
 
-namespace NTS.Domain.Core.Aggregates.Participations.Objects;
+namespace NoTiming.Domain.Core.Aggregates.Participations.Objects;
 
 public class PhaseCollection : ReadOnlyCollection<Phase>
 {

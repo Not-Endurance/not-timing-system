@@ -1,10 +1,10 @@
 using MudBlazor;
-using Not.Krud.Blazor.Components.Abstractions;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Contracts.Features.Setup.Athletes;
+using NC.Krud.Blazor.Components.Abstractions;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Judge.Contracts.Features.Setup.Athletes;
 
-namespace NTS.Judge.Blazor.Features.Setup.AthletesHorses.Athletes;
+namespace NoTiming.Judge.Blazor.Features.Setup.AthletesHorses.Athletes;
 
 public class AthleteShellBehind : KrudShell<AthleteFormModel>
 {

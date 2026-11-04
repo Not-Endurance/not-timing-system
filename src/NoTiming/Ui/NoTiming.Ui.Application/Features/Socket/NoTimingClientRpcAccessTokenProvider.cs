@@ -2,30 +2,30 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Not.Application.Authentication.Provider;
-using Not.Application.RPC.SignalR;
-using Not.Blazor.Client.Authentication;
-using Not.Injection;
-using Not.Notify;
+using NC.Application.Authentication.Provider;
+using NC.Application.RPC.SignalR;
+using NC.Blazor.Client.Authentication;
+using NC.Injection;
+using NC.Notify;
 
 namespace NoTiming.Ui.Application.Features.Socket;
 
-public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
+public class NoTimingClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
 {
     readonly IAccessTokenProvider _accessTokenProvider;
     readonly NClientAuthenticationSettings _clientAuthenticationSettings;
     readonly NavigationManager _navigationManager;
     readonly IUiAuthenticationRedirector _authenticationRedirector;
     readonly INotifier _notifier;
-    readonly ILogger<NtsClientRpcAccessTokenProvider> _logger;
+    readonly ILogger<NoTimingClientRpcAccessTokenProvider> _logger;
 
-    public NtsClientRpcAccessTokenProvider(
+    public NoTimingClientRpcAccessTokenProvider(
         IAccessTokenProvider accessTokenProvider,
         IOptions<NClientAuthenticationSettings> clientAuthenticationOptions,
         NavigationManager navigationManager,
         IUiAuthenticationRedirector authenticationRedirector,
         INotifier notifier,
-        ILogger<NtsClientRpcAccessTokenProvider> logger
+        ILogger<NoTimingClientRpcAccessTokenProvider> logger
     )
     {
         _accessTokenProvider = accessTokenProvider;

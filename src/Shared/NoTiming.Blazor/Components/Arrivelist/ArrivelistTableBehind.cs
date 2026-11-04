@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Components;
-using Not.Blazor.Components.Abstractions;
-using Not.Formatting;
-using NTS.Application.Contracts.Arrivelists;
-using NTS.Domain.Objects;
+using NC.Blazor.Components.Abstractions;
+using NC.Formatting;
+using NoTiming.Application.Contracts.Arrivelists;
+using NoTiming.Domain.Objects;
 
-namespace NTS.Blazor.Components.Arrivelist;
+namespace NoTiming.Blazor.Components.Arrivelist;
 
 public class ArrivelistTableBehind : NStatefulComponent
 {

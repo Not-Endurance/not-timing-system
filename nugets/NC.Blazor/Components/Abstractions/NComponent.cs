@@ -1,10 +1,10 @@
 using MudBlazor;
 using MudBlazor.Services;
-using Not.Async;
-using Not.Notify;
-using Not.Safe;
+using NC.Async;
+using NC.Notify;
+using NC.Safe;
 
-namespace Not.Blazor.Components.Abstractions;
+namespace NC.Blazor.Components.Abstractions;
 
 public class NComponent : NComponentBase, IDisposable
 {

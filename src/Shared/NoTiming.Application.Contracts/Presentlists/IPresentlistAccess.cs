@@ -1,6 +1,6 @@
-using Not.Application.Behinds.Adapters;
+using NC.Application.Behinds.Adapters;
 
-namespace NTS.Application.Contracts.Presentlists;
+namespace NoTiming.Application.Contracts.Presentlists;
 
 public interface IPresentlistAccess : IStatefulService
 {

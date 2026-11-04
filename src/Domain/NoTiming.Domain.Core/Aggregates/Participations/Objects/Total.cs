@@ -1,6 +1,6 @@
-﻿using NTS.Domain.Core.Aggregates.Participations.Entities;
+﻿using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
-namespace NTS.Domain.Core.Aggregates.Participations.Objects;
+namespace NoTiming.Domain.Core.Aggregates.Participations.Objects;
 
 public record Total
 {

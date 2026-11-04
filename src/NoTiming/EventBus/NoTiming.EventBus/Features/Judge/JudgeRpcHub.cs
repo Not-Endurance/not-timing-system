@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
-using NTS.Domain.Core.Objects.Payloads;
+using NoTiming.Domain.Core.Objects.Payloads;
 using NoTiming.EventBus.Abstractions;
 using NoTiming.EventBus.ConnectionDiagnostics;
 using NoTiming.EventBus.Contracts;
@@ -11,7 +11,7 @@ using NoTiming.Api.Application.Features.Ui.PendingSnapshots;
 
 namespace NoTiming.EventBus.Features.Judge;
 
-internal class JudgeRpcHub : NtsHubBase<IJudgeClientProcedures>, IJudgeHubProcedures
+internal class JudgeRpcHub : NoTimingHubBase<IJudgeClientProcedures>, IJudgeHubProcedures
 {
     readonly ILogger<JudgeRpcHub> _logger;
     readonly IHubContext<WitnessRpcHub, IUiClientProcedures> _witnessRelay;

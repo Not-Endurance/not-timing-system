@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
-using Not.Application.HTTP;
-using Not.Application.RPC;
-using NTS.Application.Contracts;
+using NC.Application.HTTP;
+using NC.Application.RPC;
+using NoTiming.Application.Contracts;
 
 namespace NoTiming.IntegrationTests.Infrastructure;
 

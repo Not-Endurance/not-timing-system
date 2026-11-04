@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace NTS.Domain.Core.Aggregates.Participations;
+namespace NoTiming.Domain.Core.Aggregates.Participations;
 
 public enum DisqualifyCode
 {

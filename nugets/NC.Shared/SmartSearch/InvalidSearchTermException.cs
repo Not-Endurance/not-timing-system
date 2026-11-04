@@ -1,6 +1,6 @@
-﻿using Not.Exceptions;
+﻿using NC.Exceptions;
 
-namespace Not.SmartSearch;
+namespace NC.SmartSearch;
 
 public class InvalidSearchTermException : NotException
 {

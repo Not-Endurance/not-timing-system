@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Core.Objects.Payloads;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Domain.Core.Objects.Payloads;
 using NoTiming.EventBus.Abstractions;
 using NoTiming.EventBus.Contracts;
 using NoTiming.EventBus.Contracts.Features.Judge.Procedures;
@@ -12,7 +12,7 @@ using NoTiming.Api.Application.Features.Ui.PendingSnapshots;
 
 namespace NoTiming.EventBus.Features.Witness;
 
-internal class WitnessRpcHub : NtsHubBase<IUiClientProcedures>, IUiHubProcedures
+internal class WitnessRpcHub : NoTimingHubBase<IUiClientProcedures>, IUiHubProcedures
 {
     readonly IJudgeConnectionsContext _primaryConnections;
     readonly IHubContext<JudgeRpcHub, IJudgeClientProcedures> _judgeRelay;

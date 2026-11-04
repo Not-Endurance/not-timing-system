@@ -1,12 +1,12 @@
-using NTS.Application.Factories;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
-using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
-using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participation;
+using NoTiming.Application.Factories;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
+using SetupCompetition = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Competition;
+using SetupParticipation = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Participation;
 
-namespace NTS.Application.Tests.Factories;
+namespace NoTiming.Application.Tests.Factories;
 
 public sealed class ParticipationAndRankingFactoryTests
 {

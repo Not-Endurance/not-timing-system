@@ -1,7 +1,7 @@
-using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Core.Objects.Presentlists;
+using NoTiming.Domain.Core.Objects.Payloads;
+using NoTiming.Domain.Core.Objects.Presentlists;
 
-namespace NTS.Application.Contracts.Presentlists;
+namespace NoTiming.Application.Contracts.Presentlists;
 
 public interface IPresentlistActionPublisher
 {

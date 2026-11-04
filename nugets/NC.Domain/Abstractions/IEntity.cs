@@ -1,5 +1,5 @@
-﻿using Not.Structures;
+﻿using NC.Structures;
 
-namespace Not.Domain.Abstractions;
+namespace NC.Domain.Abstractions;
 
 public interface IEntity : IIdentifiable { }

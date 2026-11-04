@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Core.Objects.Startlists;
+﻿namespace NoTiming.Domain.Core.Objects.Startlists;
 
 public enum StartlistEntryState
 {

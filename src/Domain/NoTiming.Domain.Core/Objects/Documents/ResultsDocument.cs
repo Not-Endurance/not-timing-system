@@ -1,9 +1,9 @@
-using Not.Structures;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Results;
-using NTS.Domain.Core.Objects.Documents.Base;
+using NC.Structures;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Results;
+using NoTiming.Domain.Core.Objects.Documents.Base;
 
-namespace NTS.Domain.Core.Objects.Documents;
+namespace NoTiming.Domain.Core.Objects.Documents;
 
 public sealed record ResultsDocument : Document, IIdentifiable
 {

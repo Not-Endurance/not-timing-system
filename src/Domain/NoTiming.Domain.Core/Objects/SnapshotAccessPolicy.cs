@@ -1,4 +1,4 @@
-namespace NTS.Domain.Core.Objects;
+namespace NoTiming.Domain.Core.Objects;
 
 public static class SnapshotAccessPolicy
 {

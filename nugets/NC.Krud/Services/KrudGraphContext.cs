@@ -1,17 +1,17 @@
 using System.Collections;
 using System.Runtime.CompilerServices;
-using Not.Application.CRUD.Ports;
-using Not.Async;
-using Not.Domain;
-using Not.Domain.Krud;
-using Not.Exceptions;
-using Not.Krud.Abstractions;
-using Not.Krud.Graph;
-using Not.Krud.Models;
-using Not.Krud.ServiceRegistration;
-using Not.Observables;
+using NC.Application.CRUD.Ports;
+using NC.Async;
+using NC.Domain;
+using NC.Domain.Krud;
+using NC.Exceptions;
+using NC.Krud.Abstractions;
+using NC.Krud.Graph;
+using NC.Krud.Models;
+using NC.Krud.ServiceRegistration;
+using NC.Observables;
 
-namespace Not.Krud.Services;
+namespace NC.Krud.Services;
 
 public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider, IKrudDependencyResolver
     where T : Aggregate

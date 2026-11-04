@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Authentication.WebAssembly.Msal.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Authentication.Provider;
-using Not.Application.Authentication.User;
-using Not.Application.Configurations;
-using Not.Blazor.Client.Authentication.Services;
-using Not.BLazor.Client.Browser;
+using NC.Application.Authentication.Provider;
+using NC.Application.Authentication.User;
+using NC.Application.Configurations;
+using NC.Blazor.Client.Authentication.Services;
+using NC.BLazor.Client.Browser;
 
-namespace Not.Blazor.Client.Authentication;
+namespace NC.Blazor.Client.Authentication;
 
 public static class AuthenticationExtensions
 {

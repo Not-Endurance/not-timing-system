@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace Not.Server.UiClient;
+namespace NC.Server.UiClient;
 
 public static class UiClientExtensions
 {

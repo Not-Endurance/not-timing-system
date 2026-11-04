@@ -1,6 +1,6 @@
-﻿using NTS.Judge.MAUI.Platforms.Services;
+﻿using NoTiming.Judge.MAUI.Platforms.Services;
 
-namespace NTS.Judge.MAUI.Platforms.Windows.Services;
+namespace NoTiming.Judge.MAUI.Platforms.Windows.Services;
 
 public class WindowsProcessService : IMauiProcessService
 {

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Not.Krud.ServiceRegistration;
+namespace NC.Krud.ServiceRegistration;
 
 internal sealed class ReferenceEqualityComparer<T> : IEqualityComparer<T>
     where T : class

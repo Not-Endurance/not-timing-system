@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace NTS.Application.Contracts.Pdf;
+namespace NoTiming.Application.Contracts.Pdf;
 
 public static class PdfFileNameHelper
 {

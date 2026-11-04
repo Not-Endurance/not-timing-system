@@ -1,1 +1,1 @@
-﻿global using Not.Domain;
+﻿global using NC.Domain;

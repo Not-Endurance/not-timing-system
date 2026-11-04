@@ -1,6 +1,6 @@
-using NTS.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Judge.Features.Core.Rankings.FeiExport;
+namespace NoTiming.Judge.Features.Core.Rankings.FeiExport;
 
 public class FeiExportService : IFeiExportService
 {

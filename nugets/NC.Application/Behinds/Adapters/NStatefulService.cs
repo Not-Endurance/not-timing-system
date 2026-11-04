@@ -1,9 +1,9 @@
-﻿using Not.Async;
-using Not.Events;
-using Not.Observables;
-using Not.Safe;
+﻿using NC.Async;
+using NC.Events;
+using NC.Observables;
+using NC.Safe;
 
-namespace Not.Application.Behinds.Adapters;
+namespace NC.Application.Behinds.Adapters;
 
 public abstract class NStatefulService : Observer, IStatefulService
 {

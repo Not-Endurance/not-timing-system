@@ -1,18 +1,18 @@
 using MongoDB.Driver;
-using Not.Application.Authentication.Abstractions;
-using Not.Injection;
-using Not.Storage.Mongo;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Application.UserSession;
+using NC.Application.Authentication.Abstractions;
+using NC.Injection;
+using NC.Storage.Mongo;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Application.UserSession;
 using NoTiming.Api.Application.Telemetry;
 
 namespace NoTiming.Api.Application.Mongo.Repositories;
 
 public class UserSessionMongoRepository
-    : MongoRepository<NtsUserSessionModel>,
-        INtsUserSessionRepository,
-        INUserSessionRepository<NtsUserSessionStateModel>,
+    : MongoRepository<NoTimingUserSessionModel>,
+        INoTimingUserSessionRepository,
+        INUserSessionRepository<NoTimingUserSessionStateModel>,
         IEventResetRepository,
         ITransient
 {
@@ -24,24 +24,24 @@ public class UserSessionMongoRepository
         _telemetry = telemetry;
     }
 
-    protected override UpdateDefinition<NtsUserSessionModel> GetUpdateDefinition(NtsUserSessionModel document)
+    protected override UpdateDefinition<NoTimingUserSessionModel> GetUpdateDefinition(NoTimingUserSessionModel document)
     {
         using var activity = _telemetry.StartActivity(nameof(UserSessionMongoRepository), nameof(GetUpdateDefinition));
 
-        return Builders<NtsUserSessionModel>
+        return Builders<NoTimingUserSessionModel>
             .Update.Set(x => x.UserIdentifier, document.UserIdentifier)
             .Set(x => x.EventId, document.EventId)
             .Set(x => x.State, document.State);
     }
 
-    protected override System.Linq.Expressions.Expression<Func<NtsUserSessionModel, bool>> GetItemFilter(
-        NtsUserSessionModel item
+    protected override System.Linq.Expressions.Expression<Func<NoTimingUserSessionModel, bool>> GetItemFilter(
+        NoTimingUserSessionModel item
     )
     {
         return x => x.Id == item.Id && x.EventId == item.EventId;
     }
 
-    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier)
+    public async Task<NoTimingUserSessionModel?> ReadByUserIdentifier(string userIdentifier)
     {
         using var activity = _telemetry.StartActivity(nameof(UserSessionMongoRepository), nameof(ReadByUserIdentifier));
 
@@ -53,7 +53,7 @@ public class UserSessionMongoRepository
         return await GetCollection().Find(x => x.UserIdentifier == userIdentifier).FirstOrDefaultAsync();
     }
 
-    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId)
+    public async Task<NoTimingUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId)
     {
         using var activity = _telemetry.StartActivity(nameof(UserSessionMongoRepository), nameof(ReadByUserIdentifier));
 
@@ -72,7 +72,7 @@ public class UserSessionMongoRepository
         return DeleteMany(x => x.EventId == eventId);
     }
 
-    async Task<NtsUserSessionStateModel?> INUserSessionRepository<NtsUserSessionStateModel>.ReadByUserIdentifier(
+    async Task<NoTimingUserSessionStateModel?> INUserSessionRepository<NoTimingUserSessionStateModel>.ReadByUserIdentifier(
         string userIdentifier
     )
     {

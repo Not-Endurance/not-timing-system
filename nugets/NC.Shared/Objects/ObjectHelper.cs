@@ -1,4 +1,4 @@
-﻿namespace Not.Objects;
+﻿namespace NC.Objects;
 
 public static class ObjectHelper
 {

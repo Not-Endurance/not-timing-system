@@ -1,4 +1,4 @@
-﻿namespace Not.Krud.Abstractions;
+﻿namespace NC.Krud.Abstractions;
 
 public interface IKrudNodeSetter
 {

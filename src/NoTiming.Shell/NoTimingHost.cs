@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using Microsoft.Extensions.Localization;
-using Not.Application.Configurations;
-using Not.Application.Environments;
-using Not.Localization;
-using Not.Startup;
-using NTS.Application.Contracts;
+using NC.Application.Configurations;
+using NC.Application.Environments;
+using NC.Localization;
+using NC.Startup;
+using NoTiming.Application.Contracts;
 using NoTiming.ConnectionDiagnostics;
 using NoTiming.EventBus;
 using NoTiming.EventBus.ConnectionDiagnostics;

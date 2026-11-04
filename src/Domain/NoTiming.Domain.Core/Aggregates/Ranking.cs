@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace NTS.Domain.Core.Aggregates;
+namespace NoTiming.Domain.Core.Aggregates;
 
 public class Ranking : Aggregate, IEventScoped
 {

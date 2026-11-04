@@ -1,10 +1,10 @@
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Navigation.Abstractions;
-using NTS.Application.Contracts.Socket;
-using NTS.Judge.Contracts.Features.Settings;
-using static NTS.Judge.Blazor.JudgeRoutes;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Navigation.Abstractions;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Judge.Contracts.Features.Settings;
+using static NoTiming.Judge.Blazor.JudgeRoutes;
 
-namespace NTS.Judge.Blazor.Layout.Drawer;
+namespace NoTiming.Judge.Blazor.Layout.Drawer;
 
 public class JudgeNavMenuBehind : NStatefulComponent
 {
@@ -15,7 +15,7 @@ public class JudgeNavMenuBehind : NStatefulComponent
     protected ISettingService SettingService { get; set; } = default!;
 
     [Inject]
-    protected INtsSocketService SocketService { get; set; } = default!;
+    protected INoTimingSocketService SocketService { get; set; } = default!;
 
     protected bool HasActiveEvent => SocketService.Event != null;
 

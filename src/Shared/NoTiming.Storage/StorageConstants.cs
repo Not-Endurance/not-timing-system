@@ -1,4 +1,4 @@
-﻿namespace NTS.Storage;
+﻿namespace NoTiming.Storage;
 
 internal static class StorageConstants
 {

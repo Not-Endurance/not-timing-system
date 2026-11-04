@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Core.Aggregates;
+﻿namespace NoTiming.Domain.Core.Aggregates;
 
 public class RankingEntry : Aggregate // TODO: refacator in a proper aggregate
 {

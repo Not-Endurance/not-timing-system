@@ -1,8 +1,8 @@
-﻿using Not.Application.CRUD.Ports;
-using Not.Application.HTTP;
-using NTS.Domain.Aggregates;
+﻿using NC.Application.CRUD.Ports;
+using NC.Application.HTTP;
+using NoTiming.Domain.Aggregates;
 
-namespace NTS.Judge.Features.Setup;
+namespace NoTiming.Judge.Features.Setup;
 
 public class CountryCache : HttpCache<Country>
 {

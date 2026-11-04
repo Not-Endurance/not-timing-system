@@ -1,6 +1,6 @@
-﻿using Not.Application.CRUD.Ports;
+﻿using NC.Application.CRUD.Ports;
 
-namespace Not.Krud.Abstractions;
+namespace NC.Krud.Abstractions;
 
 public interface IKrudFormService<TModel> : ICreate<TModel>, IUpdate<TModel>
     where TModel : IKrudFormModel, new() { }

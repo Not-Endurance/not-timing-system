@@ -1,10 +1,10 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Components.Buttons;
-using Not.Notify;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Enums;
-using NTS.Domain.Watcher;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Buttons;
+using NC.Notify;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Watcher;
 using NoTiming.Ui.Contracts.Features.Snapshots;
 
 namespace NoTiming.Ui.Blazor.Features.Core.Snapshots.Components;
@@ -19,7 +19,7 @@ public class SnapshotHistoryBehind : NStatefulComponent
     protected INotifier Notifier { get; set; } = default!;
 
     [Inject]
-    protected INtsSocketContext SocketContext { get; set; } = default!;
+    protected INoTimingSocketContext SocketContext { get; set; } = default!;
 
     [Inject]
     protected ISnapshotService SnapshotService { get; set; } = default!;

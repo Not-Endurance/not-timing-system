@@ -1,15 +1,15 @@
 using System.Xml.Linq;
-using Not.Domain.Exceptions;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Objects;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
-using NTS.Judge.Contracts.Features.Core.Rankings.FeiExport;
+using NC.Domain.Exceptions;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Domain.Core.Objects;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
+using NoTiming.Judge.Contracts.Features.Core.Rankings.FeiExport;
 using NoTiming.IntegrationTests.Drivers;
-using CoreCompetition = NTS.Domain.Core.Aggregates.Participations.Objects.Competition;
+using CoreCompetition = NoTiming.Domain.Core.Aggregates.Participations.Objects.Competition;
 
 namespace NoTiming.IntegrationTests;
 

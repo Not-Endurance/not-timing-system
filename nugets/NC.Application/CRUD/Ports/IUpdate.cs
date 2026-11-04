@@ -1,4 +1,4 @@
-﻿namespace Not.Application.CRUD.Ports;
+﻿namespace NC.Application.CRUD.Ports;
 
 public interface IUpdate<in T>
 {

@@ -1,6 +1,6 @@
-﻿using Not.Application.Behinds.Adapters;
+﻿using NC.Application.Behinds.Adapters;
 
-namespace NTS.Judge.Contracts.Features.Core.Dashboard;
+namespace NoTiming.Judge.Contracts.Features.Core.Dashboard;
 
 public interface IInspectionService : IStatefulService
 {

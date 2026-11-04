@@ -1,8 +1,8 @@
-using Not.Structures;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Services.StartValidation.Rules;
+using NC.Structures;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Services.StartValidation.Rules;
 
-namespace NTS.Domain.Setup.Services.StartValidation;
+namespace NoTiming.Domain.Setup.Services.StartValidation;
 
 public static class StartValidator
 {

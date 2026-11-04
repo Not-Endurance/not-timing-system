@@ -1,7 +1,7 @@
 using System.Net;
-using Not.Print;
+using NC.Print;
 
-namespace Not.Blazor.Client.Browser;
+namespace NC.Blazor.Client.Browser;
 
 internal static class NBrowserPrintHtmlRenderer
 {

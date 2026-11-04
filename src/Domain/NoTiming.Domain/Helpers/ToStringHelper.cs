@@ -1,4 +1,4 @@
-namespace NTS.Domain.Helpers;
+namespace NoTiming.Domain.Helpers;
 
 public static class ToStringHelper
 {

@@ -1,9 +1,9 @@
 using System.Globalization;
-using Not.Krud.Blazor.Components.Abstractions;
-using NTS.Domain.Aggregates;
-using NTS.Judge.Contracts.Features.Settings;
+using NC.Krud.Blazor.Components.Abstractions;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Judge.Contracts.Features.Settings;
 
-namespace NTS.Judge.Blazor.Features.Settings;
+namespace NoTiming.Judge.Blazor.Features.Settings;
 
 public class SettingShellBehind : KrudShell<SettingFormModel>
 {

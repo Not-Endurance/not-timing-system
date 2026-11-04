@@ -1,18 +1,18 @@
 using Microsoft.AspNetCore.SignalR.Client;
-using Not.Application.DomainEvents;
-using Not.Application.RPC;
-using Not.Application.RPC.Clients;
-using Not.Exceptions;
-using Not.Injection;
-using NTS.Application.Contracts.Presentlists;
-using NTS.Application.Contracts.Socket;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Core.Objects.Presentlists;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
+using NC.Application.DomainEvents;
+using NC.Application.RPC;
+using NC.Application.RPC.Clients;
+using NC.Exceptions;
+using NC.Injection;
+using NoTiming.Application.Contracts.Presentlists;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Domain.Core.Objects.Payloads;
+using NoTiming.Domain.Core.Objects.Presentlists;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
+using NoTiming.Domain.Watcher;
 using NoTiming.EventBus.Contracts;
 using NoTiming.EventBus.Contracts.Features.Ui.Procedures;
 using NoTiming.Ui.Application.Features.Core.Dashboard;
@@ -27,12 +27,12 @@ public class UiRpcClient
         IScoped
 {
     readonly IRpcSocket _socket;
-    readonly INtsSocketContext _socketContext;
+    readonly INoTimingSocketContext _socketContext;
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
     public UiRpcClient(
         IRpcSocket socket,
-        INtsSocketContext socketContext,
+        INoTimingSocketContext socketContext,
         IDomainEventDispatcher domainEventDispatcher
     )
         : base(socket)

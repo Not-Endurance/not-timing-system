@@ -1,10 +1,10 @@
-﻿using Not.Domain.Exceptions;
-using Not.Domain.Krud;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Extensions;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+﻿using NC.Domain.Exceptions;
+using NC.Domain.Krud;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Extensions;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Domain.Setup.Aggregates;
+namespace NoTiming.Domain.Setup.Aggregates;
 
 public class ConfigureEvent
     : Aggregate,

@@ -2,7 +2,7 @@ using Testcontainers.MongoDb;
 
 namespace NoTiming.IntegrationTests.Infrastructure;
 
-public sealed class NtsIntegrationFixture : IAsyncLifetime
+public sealed class NoTimingIntegrationFixture : IAsyncLifetime
 {
     MongoDbContainer? _mongo;
     NoTimingProcess? _noTiming;

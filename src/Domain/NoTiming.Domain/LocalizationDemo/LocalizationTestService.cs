@@ -1,7 +1,7 @@
-using Not.Injection;
-using Not.Notify;
+using NC.Injection;
+using NC.Notify;
 
-namespace NTS.Domain.LocalizationDemo;
+namespace NoTiming.Domain.LocalizationDemo;
 
 public class LocalizationTestService : ILocalizationTestService
 {

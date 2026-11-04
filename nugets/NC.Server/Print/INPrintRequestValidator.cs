@@ -1,7 +1,7 @@
-using Not.Injection;
-using Not.Print;
+using NC.Injection;
+using NC.Print;
 
-namespace Not.Server.Print;
+namespace NC.Server.Print;
 
 public interface INPrintRequestValidator : ITransient
 {

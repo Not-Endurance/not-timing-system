@@ -1,6 +1,6 @@
-using Not.Domain.Abstractions;
+using NC.Domain.Abstractions;
 
-namespace NTS.Domain.Core.Events;
+namespace NoTiming.Domain.Core.Events;
 
 public record EventConnected : IDomainEvent
 {

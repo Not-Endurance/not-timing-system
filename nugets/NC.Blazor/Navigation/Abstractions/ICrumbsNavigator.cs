@@ -1,6 +1,6 @@
-﻿using Not.Injection;
+﻿using NC.Injection;
 
-namespace Not.Blazor.Navigation.Abstractions;
+namespace NC.Blazor.Navigation.Abstractions;
 
 public interface ICrumbsNavigator
 {

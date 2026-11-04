@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using MongoDB.Driver;
-using Not.Application.CRUD.Ports;
-using Not.Storage.Mongo;
-using NTS.Application.Contracts.Setup;
-using NTS.Application.Contracts.Setup.Models;
+using NC.Application.CRUD.Ports;
+using NC.Storage.Mongo;
+using NoTiming.Application.Contracts.Setup;
+using NoTiming.Application.Contracts.Setup.Models;
 using NoTiming.Api.Application.Telemetry;
 
 namespace NoTiming.Api.Application.Mongo.Repositories;

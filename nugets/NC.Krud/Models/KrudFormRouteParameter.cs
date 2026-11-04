@@ -1,6 +1,6 @@
-using Not.Krud.Abstractions;
+using NC.Krud.Abstractions;
 
-namespace Not.Krud.Models;
+namespace NC.Krud.Models;
 
 public sealed class KrudFormRouteParameter<TModel>
     where TModel : IKrudFormModel, new()

@@ -1,10 +1,10 @@
-using Not.Application.Authentication.Abstractions;
-using Not.Application.Authentication.User;
-using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
-using Not.Injection;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Aggregates;
+using NC.Application.Authentication.Abstractions;
+using NC.Application.Authentication.User;
+using NC.Application.Behinds.Adapters;
+using NC.Application.CRUD.Ports;
+using NC.Injection;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Domain.Aggregates;
 using NoTiming.Ui.Contracts.Features.Profile;
 
 namespace NoTiming.Ui.Application.Features.Profile;
@@ -33,7 +33,7 @@ public class UiProfileContext : NStatefulService, IUiProfileContext, IScoped
 
     protected override async Task<bool> InitializeState()
     {
-        var session = await _userSession.GetCurrent<NtsUserSessionStateModel>();
+        var session = await _userSession.GetCurrent<NoTimingUserSessionStateModel>();
         User = session?.User;
         if (User == null)
         {

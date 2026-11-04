@@ -1,11 +1,11 @@
-﻿using Not.Application.HTTP;
-using Not.Storage.REST;
-using NTS.Application.Contracts.Shared;
-using NTS.Application.Contracts.Shared.Models;
-using NTS.Application.Settings;
-using NTS.Domain.Aggregates;
+﻿using NC.Application.HTTP;
+using NC.Storage.REST;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Application.Contracts.Shared.Models;
+using NoTiming.Application.Settings;
+using NoTiming.Domain.Aggregates;
 
-namespace NTS.Storage.REST;
+namespace NoTiming.Storage.REST;
 
 public class SettingApiRepository : ApiRepository<Setting, SettingModel>, ISettingRepository
 {

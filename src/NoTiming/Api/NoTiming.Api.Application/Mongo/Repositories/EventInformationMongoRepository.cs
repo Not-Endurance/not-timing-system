@@ -1,7 +1,7 @@
 using MongoDB.Driver;
-using Not.Exceptions;
-using Not.Storage.Mongo;
-using NTS.Application.Contracts.Core.Models;
+using NC.Exceptions;
+using NC.Storage.Mongo;
+using NoTiming.Application.Contracts.Core.Models;
 
 namespace NoTiming.Api.Application.Mongo.Repositories;
 

@@ -1,9 +1,9 @@
-using Not.Blazor.Components.Abstractions;
-using Not.Notify;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Judge.Contracts.Features.Core.Handouts;
+using NC.Blazor.Components.Abstractions;
+using NC.Notify;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Judge.Contracts.Features.Core.Handouts;
 
-namespace NTS.Judge.Blazor.Features.Core.Handouts.Form;
+namespace NoTiming.Judge.Blazor.Features.Core.Handouts.Form;
 
 public class HandoutFormBehind : NComponent
 {

@@ -1,16 +1,16 @@
-using Not.Application.Behinds.Adapters;
-using Not.Application.DomainEvents;
-using Not.Application.RPC;
-using Not.Application.RPC.SignalR;
-using Not.Injection;
-using Not.Notify;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Events;
+using NC.Application.Behinds.Adapters;
+using NC.Application.DomainEvents;
+using NC.Application.RPC;
+using NC.Application.RPC.SignalR;
+using NC.Injection;
+using NC.Notify;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Events;
 
-namespace NTS.Judge.Features.Socket;
+namespace NoTiming.Judge.Features.Socket;
 
-public class JudgeSocketService : NStatefulService, INtsSocketService, IScoped
+public class JudgeSocketService : NStatefulService, INoTimingSocketService, IScoped
 {
     readonly IRpcSocket _socket;
     readonly INotifier _notifier;

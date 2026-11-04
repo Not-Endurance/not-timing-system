@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
-namespace Not.Blazor.Client.Authentication.Components;
+namespace NC.Blazor.Client.Authentication.Components;
 
 public class AuthenticateRedirectContentBehind : NComponent
 {

@@ -6,10 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using Not.Notify;
-using Not.Serialization.JSON;
+using NC.Notify;
+using NC.Serialization.JSON;
 
-namespace Not.Application.RPC.SignalR;
+namespace NC.Application.RPC.SignalR;
 
 public class SignalRSocket : ThreadSafePersistentConnection<SignalRSocket.ConnectionAttemptContext>, IRpcSocket
 {

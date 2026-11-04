@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
-using Not.Application.CRUD.Ports;
-using Not.Domain;
-using Not.Krud.Abstractions;
-using Not.Krud.Models;
+using NC.Application.CRUD.Ports;
+using NC.Domain;
+using NC.Krud.Abstractions;
+using NC.Krud.Models;
 
-namespace Not.Krud.Services;
+namespace NC.Krud.Services;
 
 public class KrudInMemoryNodeRepository<T> : IRepository<T>, IKrudCascadeRepository<T>
     where T : Entity

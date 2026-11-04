@@ -1,6 +1,6 @@
-using Not.Structures;
+using NC.Structures;
 
-namespace NTS.Application.Contracts.Shared;
+namespace NoTiming.Application.Contracts.Shared;
 
 // TODO: remove
 public interface ISoftDeletableDocument : IIdentifiable

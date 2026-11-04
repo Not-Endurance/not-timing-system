@@ -1,10 +1,10 @@
 using System.Timers;
 using MudBlazor;
-using Not.Application.RPC;
-using Not.Blazor.Components.Abstractions;
-using NTS.Application.Contracts.Socket;
+using NC.Application.RPC;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Application.Contracts.Socket;
 
-namespace NTS.Judge.Blazor.Features.Socket;
+namespace NoTiming.Judge.Blazor.Features.Socket;
 
 public class SocketStatusBehind : NComponent, IDisposable
 {
@@ -17,7 +17,7 @@ public class SocketStatusBehind : NComponent, IDisposable
     }
 
     [Inject]
-    INtsSocketService SocketContext { get; set; } = default!;
+    INoTimingSocketService SocketContext { get; set; } = default!;
 
     protected bool IsConnected => SocketContext.IsConnected;
 

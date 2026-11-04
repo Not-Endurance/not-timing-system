@@ -2,7 +2,7 @@
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 // ReSharper disable once CheckNamespace
-namespace NTS.Judge.MAUI.WinUI;
+namespace NoTiming.Judge.MAUI.WinUI;
 
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class.

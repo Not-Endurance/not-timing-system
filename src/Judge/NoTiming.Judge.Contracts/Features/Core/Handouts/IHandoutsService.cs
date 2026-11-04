@@ -1,8 +1,8 @@
-using Not.Application.Behinds.Adapters;
-using Not.Injection;
-using NTS.Domain.Core.Objects.Documents;
+using NC.Application.Behinds.Adapters;
+using NC.Injection;
+using NoTiming.Domain.Core.Objects.Documents;
 
-namespace NTS.Judge.Contracts.Features.Core.Handouts;
+namespace NoTiming.Judge.Contracts.Features.Core.Handouts;
 
 public interface IHandoutsService : IStatefulService, IScoped
 {

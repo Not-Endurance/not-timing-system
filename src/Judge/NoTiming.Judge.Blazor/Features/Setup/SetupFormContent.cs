@@ -1,9 +1,9 @@
-using Not.Blazor.Components;
-using Not.Exceptions;
-using Not.Krud.Abstractions;
-using Not.Krud.Models;
+using NC.Blazor.Components;
+using NC.Exceptions;
+using NC.Krud.Abstractions;
+using NC.Krud.Models;
 
-namespace NTS.Judge.Blazor.Features.Setup;
+namespace NoTiming.Judge.Blazor.Features.Setup;
 
 public class SetupFormContent<T> : NContentBehind
     where T : IKrudFormModel, new()

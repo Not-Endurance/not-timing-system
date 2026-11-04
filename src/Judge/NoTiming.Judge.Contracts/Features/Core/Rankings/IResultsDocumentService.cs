@@ -1,8 +1,8 @@
-using Not.Injection;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Documents;
+using NC.Injection;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects.Documents;
 
-namespace NTS.Judge.Contracts.Features.Core.Rankings;
+namespace NoTiming.Judge.Contracts.Features.Core.Rankings;
 
 public interface IResultsDocumentService : ITransient
 {

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using Not.Application.Authentication.Abstractions;
+using NC.Application.Authentication.Abstractions;
 
-namespace Not.Blazor.Client.Authentication.Services;
+namespace NC.Blazor.Client.Authentication.Services;
 
 internal class NBlazorClientAuthenticationService : INAuthentication
 {

@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Objects;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Domain.Objects;
 
-namespace NTS.Blazor.Components.Results;
+namespace NoTiming.Blazor.Components.Results;
 
 public class ParticipationSummaryComponentBehind : NComponent
 {

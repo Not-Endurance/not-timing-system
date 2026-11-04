@@ -1,8 +1,8 @@
-using Not.Application.Services;
-using Not.Domain;
-using Not.Krud.Models;
+using NC.Application.Services;
+using NC.Domain;
+using NC.Krud.Models;
 
-namespace Not.Krud.Abstractions;
+namespace NC.Krud.Abstractions;
 
 public interface IKrudListBehind<T> : ISettService<T>
     where T : Entity

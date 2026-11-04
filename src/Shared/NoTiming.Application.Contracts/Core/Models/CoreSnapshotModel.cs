@@ -1,8 +1,8 @@
-﻿using NTS.Domain.Aggregates;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
+﻿using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
 
-namespace NTS.Application.Contracts.Core.Models;
+namespace NoTiming.Application.Contracts.Core.Models;
 
 public class CoreSnapshotModel
 {

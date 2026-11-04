@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Enums;
+﻿namespace NoTiming.Domain.Enums;
 
 public enum ParticipationCategory
 {

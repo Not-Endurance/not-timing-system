@@ -1,7 +1,7 @@
-﻿using Not.Application.Authentication.User;
-using Not.Structures;
+﻿using NC.Application.Authentication.User;
+using NC.Structures;
 
-namespace Not.Application.Authentication.Abstractions;
+namespace NC.Application.Authentication.Abstractions;
 
 public interface IUserRegister
 {

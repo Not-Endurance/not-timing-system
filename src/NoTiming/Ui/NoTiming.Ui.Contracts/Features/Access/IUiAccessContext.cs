@@ -1,4 +1,4 @@
-using Not.Application.Behinds.Adapters;
+using NC.Application.Behinds.Adapters;
 
 namespace NoTiming.Ui.Contracts.Features.Access;
 

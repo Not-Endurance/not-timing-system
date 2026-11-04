@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Core.Aggregates.Participations.Entities;
+﻿namespace NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
 public class Club : Entity
 {

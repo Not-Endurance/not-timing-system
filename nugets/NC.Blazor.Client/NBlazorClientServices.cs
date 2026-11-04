@@ -1,16 +1,16 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Not.Application.Authentication.Abstractions;
-using Not.Application.Configurations;
-using Not.Application.Print;
-using Not.Blazor.Client.Authentication;
-using Not.Blazor.Client.Authentication.Services;
-using Not.Blazor.Client.Browser;
-using Not.Files.Abstractions;
-using Not.Print;
+using NC.Application.Authentication.Abstractions;
+using NC.Application.Configurations;
+using NC.Application.Print;
+using NC.Blazor.Client.Authentication;
+using NC.Blazor.Client.Authentication.Services;
+using NC.Blazor.Client.Browser;
+using NC.Files.Abstractions;
+using NC.Print;
 
-namespace Not.Blazor.Client;
+namespace NC.Blazor.Client;
 
 public static class NBlazorClientServices
 {

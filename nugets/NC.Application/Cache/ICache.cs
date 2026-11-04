@@ -1,7 +1,7 @@
-﻿using Not.Domain.Abstractions;
-using Not.Injection;
+﻿using NC.Domain.Abstractions;
+using NC.Injection;
 
-namespace Not.Application.Cache;
+namespace NC.Application.Cache;
 
 public interface ICache<T> : ISingleton
     where T : IAggregate

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components;
-using Not.Application.Authentication.Abstractions;
-using Not.Blazor.Client.Authentication.Services;
-using Not.Blazor.Components.Abstractions;
+using NC.Application.Authentication.Abstractions;
+using NC.Blazor.Client.Authentication.Services;
+using NC.Blazor.Components.Abstractions;
 
-namespace Not.Blazor.Client.Authentication.Components;
+namespace NC.Blazor.Client.Authentication.Components;
 
 public abstract class AuthenticateContentBehind : NComponent
 {

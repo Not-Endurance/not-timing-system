@@ -1,6 +1,6 @@
 using MudBlazor;
 
-namespace Not.Blazor.Components.Text;
+namespace NC.Blazor.Components.Text;
 
 public class NHeadline2 : NHeadline
 {

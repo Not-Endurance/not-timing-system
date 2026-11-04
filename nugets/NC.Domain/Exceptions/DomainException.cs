@@ -1,7 +1,7 @@
-﻿using Not.Exceptions;
-using Not.Strings;
+﻿using NC.Exceptions;
+using NC.Strings;
 
-namespace Not.Domain.Exceptions;
+namespace NC.Domain.Exceptions;
 
 //TODO: Create AggregateDomainException and modify domains to batch their validation exceptions before throwing
 public class DomainException : ValidationException

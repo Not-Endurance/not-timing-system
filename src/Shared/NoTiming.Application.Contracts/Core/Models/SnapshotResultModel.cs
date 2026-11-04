@@ -1,8 +1,8 @@
-﻿using Not.Krud.Abstractions;
-using NTS.Application.Contracts.Shared;
-using NTS.Domain.Core.Aggregates;
+﻿using NC.Krud.Abstractions;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Application.Contracts.Core.Models;
+namespace NoTiming.Application.Contracts.Core.Models;
 
 public class SnapshotResultModel : IEventScoped, ISoftDeletableDocument, IKrudModel<SnapshotResult>
 {

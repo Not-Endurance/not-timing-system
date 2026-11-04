@@ -1,7 +1,7 @@
-﻿using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Objects;
+﻿using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Objects;
 
-namespace NTS.Domain.Core.Aggregates;
+namespace NoTiming.Domain.Core.Aggregates;
 
 public class EventInformation : Aggregate
 {

@@ -1,10 +1,10 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Dialogs;
-using Not.Blazor.Helpers;
-using Not.Exceptions;
-using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Dialogs;
+using NC.Blazor.Helpers;
+using NC.Exceptions;
+using NoTiming.Domain.Objects;
+using NoTiming.Domain.Watcher;
 using NoTiming.Ui.Blazor.Features.Core.Snapshots.SnapshotUpdate;
 using NoTiming.Ui.Contracts.Features.Snapshots;
 

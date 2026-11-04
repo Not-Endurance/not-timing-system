@@ -1,28 +1,28 @@
 using Newtonsoft.Json;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.PastEvents;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects;
-using NTS.Judge.Contracts.Features.Core;
-using NTS.Judge.Contracts.Features.Core.Rankings.FeiExport;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Application.Contracts.PastEvents;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects;
+using NoTiming.Judge.Contracts.Features.Core;
+using NoTiming.Judge.Contracts.Features.Core.Rankings.FeiExport;
 using NoTiming.IntegrationTests.Drivers;
 using NoTiming.IntegrationTests.EndToEndEventTests.Features;
 using NoTiming.IntegrationTests.EndToEndEventTests.Helpers;
 using NoTiming.IntegrationTests.Infrastructure;
 using NoTiming.Ui.Contracts.Features.Access;
-using CoreAthlete = NTS.Domain.Core.Aggregates.Participations.Entities.Athlete;
-using CoreCombination = NTS.Domain.Core.Aggregates.Participations.Entities.Combination;
-using CoreHorse = NTS.Domain.Core.Aggregates.Participations.Entities.Horse;
-using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
+using CoreAthlete = NoTiming.Domain.Core.Aggregates.Participations.Entities.Athlete;
+using CoreCombination = NoTiming.Domain.Core.Aggregates.Participations.Entities.Combination;
+using CoreHorse = NoTiming.Domain.Core.Aggregates.Participations.Entities.Horse;
+using SetupConfigureEvent = NoTiming.Domain.Setup.Aggregates.ConfigureEvent;
 
 namespace NoTiming.IntegrationTests.EndToEndEventTests;
 
 [Collection(EndToEndEventCollection.Name)]
 public sealed class CoreFeatureEndToEndTests
 {
-    readonly NtsIntegrationFixture _fixture;
+    readonly NoTimingIntegrationFixture _fixture;
 
-    public CoreFeatureEndToEndTests(NtsIntegrationFixture fixture)
+    public CoreFeatureEndToEndTests(NoTimingIntegrationFixture fixture)
     {
         _fixture = fixture;
     }

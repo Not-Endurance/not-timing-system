@@ -1,7 +1,7 @@
-using Not.Domain;
-using Not.Krud.Graph;
+using NC.Domain;
+using NC.Krud.Graph;
 
-namespace Not.Krud.ServiceRegistration;
+namespace NC.Krud.ServiceRegistration;
 
 internal static class KrudGraphHelper
 {

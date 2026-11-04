@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Not.Krud.Graph;
+namespace NC.Krud.Graph;
 
 internal sealed record KrudGraph
 {

@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Not.Application.Authentication.User;
+namespace NC.Application.Authentication.User;
 
 public static class NScopeClaimsHelper
 {

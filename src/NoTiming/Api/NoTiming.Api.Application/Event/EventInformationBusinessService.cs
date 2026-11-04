@@ -1,20 +1,20 @@
 using System.Text;
-using Not.Application.CRUD.Ports;
-using Not.Domain.Exceptions;
-using Not.Exceptions;
-using Not.Injection;
-using NTS.Application.Factories;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Enums;
-using NTS.Domain.Setup.Services.StartValidation;
-using static Not.Localization.NStrings;
-using static NTS.Localization.NtsStrings;
-using CoreEventInformationModel = NTS.Application.Contracts.Core.Models.EventInformationModel;
-using CoreOfficialModel = NTS.Application.Contracts.Core.Models.OfficialModel;
-using CoreOperatorModel = NTS.Application.Contracts.Core.Models.OperatorModel;
-using CoreParticipationModel = NTS.Application.Contracts.Core.Models.ParticipationModel;
-using CoreRankingModel = NTS.Application.Contracts.Core.Models.RankingModel;
-using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
+using NC.Application.CRUD.Ports;
+using NC.Domain.Exceptions;
+using NC.Exceptions;
+using NC.Injection;
+using NoTiming.Application.Factories;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Setup.Services.StartValidation;
+using static NC.Localization.NStrings;
+using static NoTiming.Shared.Localization.NoTimingStrings;
+using CoreEventInformationModel = NoTiming.Application.Contracts.Core.Models.EventInformationModel;
+using CoreOfficialModel = NoTiming.Application.Contracts.Core.Models.OfficialModel;
+using CoreOperatorModel = NoTiming.Application.Contracts.Core.Models.OperatorModel;
+using CoreParticipationModel = NoTiming.Application.Contracts.Core.Models.ParticipationModel;
+using CoreRankingModel = NoTiming.Application.Contracts.Core.Models.RankingModel;
+using SetupConfigureEventModel = NoTiming.Application.Contracts.Setup.Models.ConfigureEventModel;
 
 namespace NoTiming.Api.Application.Event;
 
@@ -156,7 +156,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         return validationBuilder.ToString().TrimEnd();
     }
 
-    async Task<NTS.Domain.Setup.Aggregates.ConfigureEvent> GetSetupEvent(int configureEventId)
+    async Task<NoTiming.Domain.Setup.Aggregates.ConfigureEvent> GetSetupEvent(int configureEventId)
     {
         var configureEvent = await _configureEvents.Read(configureEventId);
         return configureEvent?.MapToEntity()
@@ -175,7 +175,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
     }
 
     (IEnumerable<Participation> Participations, IEnumerable<Ranking> Rankings) CreateParticipationsAndRankings(
-        NTS.Domain.Setup.Aggregates.ConfigureEvent setupEvent
+        NoTiming.Domain.Setup.Aggregates.ConfigureEvent setupEvent
     )
     {
         var participations = new List<Participation>();
@@ -199,7 +199,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
     }
 
     static Ranking CreateRanking(
-        NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
+        NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
         KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory,
         int eventId
     )
@@ -218,7 +218,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         );
     }
 
-    static void ValidateFeiConfiguration(NTS.Domain.Setup.Aggregates.ConfigureEvent setupEvent)
+    static void ValidateFeiConfiguration(NoTiming.Domain.Setup.Aggregates.ConfigureEvent setupEvent)
     {
         if (!HasAnyFeiConfiguration(setupEvent))
         {
@@ -275,13 +275,13 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         }
     }
 
-    static bool HasAnyFeiConfiguration(NTS.Domain.Setup.Aggregates.ConfigureEvent setupEvent)
+    static bool HasAnyFeiConfiguration(NoTiming.Domain.Setup.Aggregates.ConfigureEvent setupEvent)
     {
         return !string.IsNullOrWhiteSpace(setupEvent.FeiShowId)
             || setupEvent.Competitions.Any(HasAnyCompetitionFeiConfiguration);
     }
 
-    static bool HasAnyCompetitionFeiConfiguration(NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition competition)
+    static bool HasAnyCompetitionFeiConfiguration(NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Competition competition)
     {
         return !string.IsNullOrWhiteSpace(competition.FeiEventId)
             || !string.IsNullOrWhiteSpace(competition.FeiEventCode)

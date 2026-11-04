@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using Not.Blazor.Navigation.Abstractions;
+using NC.Blazor.Navigation.Abstractions;
 
-namespace Not.Blazor.Navigation;
+namespace NC.Blazor.Navigation;
 
 // Cannot be singleton as long as it uses NavigationManager: https://github.com/dotnet/maui/issues/8583
 public class BlazorCrumbsNavigator : ICrumbsNavigator, ILandNavigator

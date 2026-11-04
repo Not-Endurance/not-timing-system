@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Localization;
 
-namespace Not.Localization.Localizers;
+namespace NC.Localization.Localizers;
 
 public class ResxLocalizer<T> : IStringLocalizer
 {

@@ -5,7 +5,7 @@ namespace NoTiming.Host.Cors;
 
 public static class CorsServiceCollectionExtensions
 {
-    public static ICorsOriginValidator AddNtsCorsOriginValidation(
+    public static ICorsOriginValidator AddNoTimingCorsOriginValidation(
         this IServiceCollection services,
         IConfiguration configuration
     )

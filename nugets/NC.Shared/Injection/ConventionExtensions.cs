@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Not.Injection;
+namespace NC.Injection;
 
 public static class InjectionServiceCollectionExtensions
 {
-    const string NOT_PREFIX = "Not.";
+    const string NC_PREFIX = "NC.";
     static readonly Type TRANSIENT_TYPE = typeof(ITransient);
     static readonly Type SCOPED_TYPE = typeof(IScoped);
     static readonly Type SINGLETON_TYPE = typeof(ISingleton);
@@ -109,8 +109,8 @@ public static class InjectionServiceCollectionExtensions
             .GetReferencedAssemblies()
             .Where(x =>
                 x.FullName!.StartsWith(ntsPrefix, StringComparison.InvariantCulture)
-                || x.FullName!.StartsWith(NOT_PREFIX, StringComparison.InvariantCulture)
-                || x.FullName!.StartsWith("NTS.", StringComparison.InvariantCulture)
+                || x.FullName!.StartsWith(NC_PREFIX, StringComparison.InvariantCulture)
+                || x.FullName!.StartsWith("NoTiming.", StringComparison.InvariantCulture)
             ) // TODO: remove
             .ToList();
         foreach (var reference in references)

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Not.Logging.Builder;
+using NC.Logging.Builder;
 using Serilog;
 
-namespace Not.Logging;
+namespace NC.Logging;
 
 public static class LoggingServiceCollectionExtensions
 {

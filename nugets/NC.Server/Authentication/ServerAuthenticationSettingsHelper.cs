@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
-namespace Not.Server.Authentication;
+namespace NC.Server.Authentication;
 
 internal static class ServerAuthenticationSettingsHelper
 {

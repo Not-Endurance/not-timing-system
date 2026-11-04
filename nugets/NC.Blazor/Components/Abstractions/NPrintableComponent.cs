@@ -1,6 +1,6 @@
-using Not.Events;
+using NC.Events;
 
-namespace Not.Blazor.Components.Abstractions;
+namespace NC.Blazor.Components.Abstractions;
 
 public abstract class PrintableComponent : NStatefulComponent, IDisposable
 {

@@ -1,10 +1,10 @@
-using Not.Blazor.Dialogs.Abstractions;
-using Not.Structures;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Domain.Core.Aggregates;
+using NC.Blazor.Dialogs.Abstractions;
+using NC.Structures;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
+namespace NoTiming.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 
 public class CustomRankingDialogBehind : NDialog<CustomRankingModel>
 {

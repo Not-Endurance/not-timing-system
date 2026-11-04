@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Not.Startup;
+namespace NC.Startup;
 
 public static class ServiceProviderExtensions
 {

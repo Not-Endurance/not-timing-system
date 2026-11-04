@@ -1,22 +1,22 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Authentication.Abstractions;
-using Not.Application.RPC;
-using Not.Application.RPC.SignalR;
-using Not.Blazor.Client;
-using Not.Krud.ServiceRegistration;
-using NTS;
-using NTS.Application;
+using NC.Application.Authentication.Abstractions;
+using NC.Application.RPC;
+using NC.Application.RPC.SignalR;
+using NC.Blazor.Client;
+using NC.Krud.ServiceRegistration;
+using NoTiming.Shared;
+using NoTiming.Application;
 using NoTiming.Ui.Application.Features.Profile;
 using NoTiming.Ui.Application.Features.Socket;
 using NoTiming.Ui.Application.Storage.Repositories;
 
 namespace NoTiming.Ui.Application;
 
-public static class NtsUiApplicationServices
+public static class NoTimingUiApplicationServices
 {
-    public static IServiceCollection AddNtsUiApplication(
+    public static IServiceCollection AddNoTimingUiApplication(
         this IServiceCollection services,
         IConfiguration configuration,
         string baseUrl,
@@ -24,12 +24,12 @@ public static class NtsUiApplicationServices
     )
     {
         services.ConfigureKrud();
-        services.AddScoped<IRpcAccessTokenProvider, NtsClientRpcAccessTokenProvider>();
+        services.AddScoped<IRpcAccessTokenProvider, NoTimingClientRpcAccessTokenProvider>();
         services.AddScoped<IUiAuthenticationRedirector, UiAuthenticationRedirector>();
         services.AddTransient<IUserRegister, UiUserApiRepository>();
         services.AddTransient<IUiUserProfileRepository, UiUserApiRepository>();
         services
-            .ConfigureNtsApplication(configuration, rootAssembly)
+            .ConfigureNoTimingApplication(configuration, rootAssembly)
             .AddSharedCoreDomainServices()
             .ConfigureN()
             .AddRpcClient()
@@ -46,6 +46,6 @@ public static class NtsUiApplicationServices
             }
         });
 
-        return services.AddNts(configuration).NClientSideBlazor(configuration);
+        return services.AddNoTiming(configuration).NClientSideBlazor(configuration);
     }
 }

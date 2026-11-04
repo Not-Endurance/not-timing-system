@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using NTS.Application.Contracts.PastEvents;
-using NTS.Blazor.Components.PastEvents;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Documents;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Application.Contracts.PastEvents;
+using NoTiming.Blazor.Components.PastEvents;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects.Documents;
 
 namespace NoTiming.Ui.Blazor.Features.PastEvents;
 

@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
-using Not.Application.Authentication.User;
-using Not.Server.Authentication;
+using NC.Application.Authentication.User;
+using NC.Server.Authentication;
 
 namespace NoTiming.Api.Application.Features.Ui.Authorization;
 

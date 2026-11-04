@@ -1,9 +1,9 @@
-using Not.Krud.Models;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.StaticOptions;
-using NTS.Domain.Setup.Aggregates;
+using NC.Krud.Models;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.StaticOptions;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Contracts.Features.Setup.Athletes;
+namespace NoTiming.Judge.Contracts.Features.Setup.Athletes;
 
 public record AthleteFormModel : KrudFormModel<Athlete>
 {

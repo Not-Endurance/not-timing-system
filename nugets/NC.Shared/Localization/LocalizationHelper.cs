@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Localization;
-using Not.Injection;
-using Not.Reflection;
+using NC.Injection;
+using NC.Reflection;
 
-namespace Not.Localization;
+namespace NC.Localization;
 
 public static class LocalizationHelper
 {
@@ -24,8 +24,8 @@ public static class LocalizationHelper
 # if DEBUG
         catch (InvalidOperationException ex) when (ex.Message.Contains("localization"))
         {
-            Not.Notify.NotificationHelper.Current?.Error(ex);
-            Not.Logging.LoggingHelper.Error(ex.ToString());
+            NC.Notify.NotificationHelper.Current?.Error(ex);
+            NC.Logging.LoggingHelper.Error(ex.ToString());
             return value.ToString();
         }
 # else

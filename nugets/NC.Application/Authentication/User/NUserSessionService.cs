@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Authentication.Abstractions;
+using NC.Application.Authentication.Abstractions;
 
-namespace Not.Application.Authentication.User;
+namespace NC.Application.Authentication.User;
 
 public class NUserSessionService : INUserSession
 {

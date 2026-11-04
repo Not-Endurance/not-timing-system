@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using Not.Injection;
+using NC.Injection;
 
-namespace Not.Blazor.Components.Print;
+namespace NC.Blazor.Components.Print;
 
 public interface INHtmlComponentRenderer : ITransient
 {

@@ -1,10 +1,10 @@
 using MudBlazor;
-using Not.Krud.Blazor.Components.Abstractions;
-using Not.Structures;
-using NTS.Blazor.Constants;
-using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions;
+using NC.Krud.Blazor.Components.Abstractions;
+using NC.Structures;
+using NoTiming.Blazor.Constants;
+using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions;
 
-namespace NTS.Judge.Blazor.Features.Setup.ConfigureEvents.Competitions;
+namespace NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents.Competitions;
 
 public class CompetitionShellBehind : KrudShell<CompetitionFormModel>
 {

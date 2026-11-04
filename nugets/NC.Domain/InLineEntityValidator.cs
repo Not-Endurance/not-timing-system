@@ -1,10 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using Not.Domain.Exceptions;
-using Not.Structures;
-using static Not.Localization.NStrings;
+using NC.Domain.Exceptions;
+using NC.Structures;
+using static NC.Localization.NStrings;
 
-namespace Not.Domain;
+namespace NC.Domain;
 
 public abstract class InLineEntityValidator
 {

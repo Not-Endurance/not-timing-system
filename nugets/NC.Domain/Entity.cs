@@ -1,8 +1,8 @@
-﻿using Not.Domain.Abstractions;
-using Not.Extensions;
-using Not.Objects;
+﻿using NC.Domain.Abstractions;
+using NC.Extensions;
+using NC.Objects;
 
-namespace Not.Domain;
+namespace NC.Domain;
 
 public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity>
 {

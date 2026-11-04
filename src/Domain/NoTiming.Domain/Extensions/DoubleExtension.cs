@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Extensions;
+﻿namespace NoTiming.Domain.Extensions;
 
 public static class DoubleExtension
 {

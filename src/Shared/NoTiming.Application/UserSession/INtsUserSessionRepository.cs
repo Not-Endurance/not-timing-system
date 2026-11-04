@@ -1,14 +1,14 @@
-using Not.Application.Authentication.Abstractions;
-using Not.Application.CRUD.Ports;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
+using NC.Application.Authentication.Abstractions;
+using NC.Application.CRUD.Ports;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
 
-namespace NTS.Application.UserSession;
+namespace NoTiming.Application.UserSession;
 
-public interface INtsUserSessionRepository
-    : IRepository<NtsUserSessionModel>,
-        INUserSessionRepository<NtsUserSessionModel>
+public interface INoTimingUserSessionRepository
+    : IRepository<NoTimingUserSessionModel>,
+        INUserSessionRepository<NoTimingUserSessionModel>
 {
-    Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId);
-    new Task Delete(NtsUserSessionModel item);
+    Task<NoTimingUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId);
+    new Task Delete(NoTimingUserSessionModel item);
 }

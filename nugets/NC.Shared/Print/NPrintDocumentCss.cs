@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Not.Print;
+namespace NC.Print;
 
 public static class NPrintDocumentCss
 {

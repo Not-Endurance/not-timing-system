@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.SignalR;
-using Not.Injection;
+using NC.Injection;
 
 namespace NoTiming.EventBus.Features;
 

@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using Not.Blazor.Dialogs.Abstractions;
+using NC.Blazor.Dialogs.Abstractions;
 
-namespace Not.Blazor.Dialogs;
+namespace NC.Blazor.Dialogs;
 
 public class UnhandledExceptionDialogBehind : NDialog
 {

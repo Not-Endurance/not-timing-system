@@ -1,7 +1,7 @@
 using System;
-using Not.Safe;
+using NC.Safe;
 
-namespace Not.Events;
+namespace NC.Events;
 
 public abstract class EventBase<T>
 {

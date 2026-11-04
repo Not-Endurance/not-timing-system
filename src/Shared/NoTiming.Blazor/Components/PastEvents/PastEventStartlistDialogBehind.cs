@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
-using Not.Blazor.Dialogs.Abstractions;
-using NTS.Domain.Core.Objects.Startlists;
+using NC.Blazor.Dialogs.Abstractions;
+using NoTiming.Domain.Core.Objects.Startlists;
 
-namespace NTS.Blazor.Components.PastEvents;
+namespace NoTiming.Blazor.Components.PastEvents;
 
 public class PastEventStartlistDialogBehind : NDialog
 {

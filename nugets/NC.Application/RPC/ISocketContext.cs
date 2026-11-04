@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Not.Application.RPC.SignalR;
+using NC.Application.RPC.SignalR;
 
-namespace Not.Application.RPC;
+namespace NC.Application.RPC;
 
 public interface ISocketContext
 {

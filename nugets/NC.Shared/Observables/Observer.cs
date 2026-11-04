@@ -1,4 +1,4 @@
-﻿namespace Not.Observables;
+﻿namespace NC.Observables;
 
 public abstract class Observer : IDisposable
 {

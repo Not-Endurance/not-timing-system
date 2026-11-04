@@ -1,4 +1,4 @@
-﻿namespace Not.Formatting;
+﻿namespace NC.Formatting;
 
 public static class FormattingHelper
 {

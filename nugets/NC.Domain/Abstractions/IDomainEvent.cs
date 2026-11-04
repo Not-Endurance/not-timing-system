@@ -1,5 +1,5 @@
 using MediatR;
 
-namespace Not.Domain.Abstractions;
+namespace NC.Domain.Abstractions;
 
 public interface IDomainEvent : INotification { }

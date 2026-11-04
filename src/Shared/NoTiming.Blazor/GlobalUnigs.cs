@@ -1,2 +1,2 @@
-﻿global using static Not.Localization.NStrings;
-global using static NTS.Localization.NtsStrings;
+﻿global using static NC.Localization.NStrings;
+global using static NoTiming.Shared.Localization.NoTimingStrings;

@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Core.StaticOptions;
+﻿namespace NoTiming.Domain.Core.StaticOptions;
 
 public interface IRegionOption
 {

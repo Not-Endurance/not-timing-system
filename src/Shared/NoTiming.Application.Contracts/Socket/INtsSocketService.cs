@@ -1,9 +1,9 @@
-using Not.Application.Behinds.Adapters;
-using NTS.Domain.Core.Aggregates;
+using NC.Application.Behinds.Adapters;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Application.Contracts.Socket;
+namespace NoTiming.Application.Contracts.Socket;
 
-public interface INtsSocketService : INtsSocketContext, IStatefulService
+public interface INoTimingSocketService : INoTimingSocketContext, IStatefulService
 {
     Task Connect(EventInformation eventInformation);
     Task Disconnect();

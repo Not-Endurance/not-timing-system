@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Localization;
-using Not.Localization;
+using NC.Localization;
 
-namespace NTS.Judge.Blazor.Layout;
+namespace NoTiming.Judge.Blazor.Layout;
 
 public class PrintLayoutBehind : LayoutComponentBase, IDisposable
 {

@@ -1,7 +1,7 @@
-using Not.Domain.Abstractions;
-using NTS.Domain.Core.Objects.Presentlists;
+using NC.Domain.Abstractions;
+using NoTiming.Domain.Core.Objects.Presentlists;
 
-namespace NTS.Domain.Core.Objects.Payloads;
+namespace NoTiming.Domain.Core.Objects.Payloads;
 
 public record VetInAcknoledged : IDomainEvent
 {

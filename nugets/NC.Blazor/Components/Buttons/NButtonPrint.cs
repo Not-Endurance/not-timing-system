@@ -1,6 +1,6 @@
 using MudBlazor;
 
-namespace Not.Blazor.Components.Buttons;
+namespace NC.Blazor.Components.Buttons;
 
 public class NotButtonPrint : NButtonSecondary
 {

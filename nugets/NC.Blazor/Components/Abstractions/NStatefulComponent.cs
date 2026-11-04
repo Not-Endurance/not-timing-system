@@ -1,7 +1,7 @@
-﻿using Not.Application.Behinds.Adapters;
-using Not.Observables;
+﻿using NC.Application.Behinds.Adapters;
+using NC.Observables;
 
-namespace Not.Blazor.Components.Abstractions;
+namespace NC.Blazor.Components.Abstractions;
 
 public class NStatefulComponent : NComponent, IDisposable
 {

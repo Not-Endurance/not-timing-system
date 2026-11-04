@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
-using Not.Localization.Localizers;
+using NC.Localization.Localizers;
 
-namespace Not.Localization;
+namespace NC.Localization;
 
 public static class LocalizationServiceCollectionExtensions
 {

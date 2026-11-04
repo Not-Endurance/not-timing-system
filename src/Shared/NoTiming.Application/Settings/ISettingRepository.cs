@@ -1,7 +1,7 @@
-using Not.Application.CRUD.Ports;
-using NTS.Domain.Aggregates;
+using NC.Application.CRUD.Ports;
+using NoTiming.Domain.Aggregates;
 
-namespace NTS.Application.Settings;
+namespace NoTiming.Application.Settings;
 
 public interface ISettingRepository : IRepository<Setting>
 {

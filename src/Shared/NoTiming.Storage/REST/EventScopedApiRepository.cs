@@ -1,15 +1,15 @@
 using System.Linq.Expressions;
-using Not.Application.CRUD.Ports;
-using Not.Application.HTTP;
-using Not.Domain.Abstractions;
-using Not.Exceptions;
-using Not.Krud.Abstractions;
-using Not.Storage.REST;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Core.Aggregates;
+using NC.Application.CRUD.Ports;
+using NC.Application.HTTP;
+using NC.Domain.Abstractions;
+using NC.Exceptions;
+using NC.Krud.Abstractions;
+using NC.Storage.REST;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Storage.REST;
+namespace NoTiming.Storage.REST;
 
 public abstract class EventScopedApiRepository<T, TModel> : ApiRepository<T, TModel>, IEventScopedRepository<T>
     where T : class, IEntity, IEventScoped
@@ -22,9 +22,9 @@ public abstract class EventScopedApiRepository<T, TModel> : ApiRepository<T, TMo
 public class EventScopeFactory<T> : IRepositoryScopeFactory<T>
     where T : IEventScoped
 {
-    readonly INtsSocketContext _socketContext;
+    readonly INoTimingSocketContext _socketContext;
 
-    public EventScopeFactory(INtsSocketContext socketContext)
+    public EventScopeFactory(INoTimingSocketContext socketContext)
     {
         _socketContext = socketContext;
     }

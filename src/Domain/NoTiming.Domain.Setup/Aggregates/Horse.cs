@@ -1,9 +1,9 @@
 using System.Globalization;
-using NTS.Domain.Helpers;
+using NoTiming.Domain.Helpers;
 
-namespace NTS.Domain.Setup.Aggregates;
+namespace NoTiming.Domain.Setup.Aggregates;
 
-public class Horse : Aggregate, INamed, INtsDisplayable
+public class Horse : Aggregate, INamed, INoTimingDisplayable
 {
     public Horse(string? name, string? nameEnglish, string? feiId, int? id = null)
         : base(id)

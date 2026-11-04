@@ -1,16 +1,16 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
-using Not.Application.RPC;
+using NC.Application.RPC;
 using NoTiming.EventBus.ConnectionDiagnostics;
 
 namespace NoTiming.EventBus.Abstractions;
 
-public abstract class NtsHubBase<T> : Hub<T>
+public abstract class NoTimingHubBase<T> : Hub<T>
     where T : class
 {
-    readonly ILogger<NtsHubBase<T>> _logger;
+    readonly ILogger<NoTimingHubBase<T>> _logger;
 
-    public NtsHubBase(ILogger<NtsHubBase<T>> logger)
+    public NoTimingHubBase(ILogger<NoTimingHubBase<T>> logger)
     {
         _logger = logger;
     }

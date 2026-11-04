@@ -1,9 +1,9 @@
-using Not.Krud.Abstractions;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects;
+using NC.Krud.Abstractions;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects;
 
-namespace NTS.Blazor.Components.PastEvents;
+namespace NoTiming.Blazor.Components.PastEvents;
 
 public class PastEventModel : IKrudModel<EventInformation>, IKrudFormModel
 {

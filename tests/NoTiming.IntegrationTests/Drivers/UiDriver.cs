@@ -3,18 +3,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Not.Application.HTTP;
-using Not.Application.RPC;
-using Not.Application.RPC.Clients;
-using Not.Application.RPC.SignalR;
-using Not.Startup;
-using NTS.Application.Contracts;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Watcher;
-using NTS.Storage;
+using NC.Application.HTTP;
+using NC.Application.RPC;
+using NC.Application.RPC.Clients;
+using NC.Application.RPC.SignalR;
+using NC.Startup;
+using NoTiming.Application.Contracts;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Watcher;
+using NoTiming.Storage;
 using NoTiming.IntegrationTests.Infrastructure;
 using NoTiming.Ui.Application;
 using NoTiming.Ui.Contracts.Features.Access;
@@ -25,7 +25,7 @@ namespace NoTiming.IntegrationTests.Drivers;
 internal sealed class UiDriver : IAsyncDisposable
 {
     readonly ServiceProvider _provider;
-    readonly INtsSocketService _socketService;
+    readonly INoTimingSocketService _socketService;
     readonly IParticipationContext _participationContext;
     readonly IUiAccessContext _accessContext;
     readonly string _clientName;
@@ -46,13 +46,13 @@ internal sealed class UiDriver : IAsyncDisposable
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
-        services.ConfigureNtsStorage(configuration).AddRestApiStorage();
-        services.AddNtsUiApplication(configuration, noTimingBaseUrl.ToString().TrimEnd('/'), typeof(NtsUiApplicationServices).Assembly);
+        services.ConfigureNoTimingStorage(configuration).AddRestApiStorage();
+        services.AddNoTimingUiApplication(configuration, noTimingBaseUrl.ToString().TrimEnd('/'), typeof(NoTimingUiApplicationServices).Assembly);
         services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, IntegrationRpcAccessTokenProvider>());
         services.AddScoped<AuthenticationStateProvider>(_ => new IntegrationAuthenticationStateProvider(user));
 
         _provider = services.BuildServiceProvider();
-        _socketService = _provider.GetRequiredService<INtsSocketService>();
+        _socketService = _provider.GetRequiredService<INoTimingSocketService>();
         _participationContext = _provider.GetRequiredService<IParticipationContext>();
         _accessContext = _provider.GetRequiredService<IUiAccessContext>();
     }

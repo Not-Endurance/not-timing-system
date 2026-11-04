@@ -1,9 +1,9 @@
-using Not.Application.Behinds.Adapters;
-using Not.Observables.Structures;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
+using NC.Application.Behinds.Adapters;
+using NC.Observables.Structures;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
+using NoTiming.Domain.Watcher;
 
 namespace NoTiming.Ui.Contracts.Features.Snapshots;
 

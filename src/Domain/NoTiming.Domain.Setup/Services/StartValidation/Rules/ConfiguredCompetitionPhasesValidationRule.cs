@@ -1,6 +1,6 @@
-using NTS.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Domain.Setup.Services.StartValidation.Rules;
+namespace NoTiming.Domain.Setup.Services.StartValidation.Rules;
 
 internal class ConfiguredCompetitionPhasesValidationRule : IStartValidationRule
 {

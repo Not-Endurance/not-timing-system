@@ -1,7 +1,7 @@
 #pragma warning disable CA1416 // Validate platform compatibility
-using NTS.Judge.MAUI.Platforms.Services;
+using NoTiming.Judge.MAUI.Platforms.Services;
 
-namespace NTS.Judge.MAUI;
+namespace NoTiming.Judge.MAUI;
 
 public partial class App : Microsoft.Maui.Controls.Application
 {

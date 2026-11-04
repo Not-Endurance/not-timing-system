@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Not.Blazor.Components.Print;
+namespace NC.Blazor.Components.Print;
 
 public sealed class NHtmlComponentRenderer : INHtmlComponentRenderer
 {

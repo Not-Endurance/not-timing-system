@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Not.Exceptions;
-using Not.Notify;
+using NC.Exceptions;
+using NC.Notify;
 
-namespace Not.Krud.Blazor.Components.Form;
+namespace NC.Krud.Blazor.Components.Form;
 
 public class ExceptionFormValidator : ComponentBase
 {

@@ -1,4 +1,4 @@
-namespace Not.Application.RPC.SignalR;
+namespace NC.Application.RPC.SignalR;
 
 public interface IRpcAccessTokenProvider
 {

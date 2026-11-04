@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Components;
-using Not.Blazor.Components.Abstractions;
-using Not.Krud.Blazor;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Blazor.Components.ParticipationTable.Phases;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
+using NC.Blazor.Components.Abstractions;
+using NC.Krud.Blazor;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Blazor.Components.ParticipationTable.Phases;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
 
-namespace NTS.Blazor.Components.ParticipationTable;
+namespace NoTiming.Blazor.Components.ParticipationTable;
 
 public class ParticipationTableBehind : NComponent
 {

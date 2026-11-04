@@ -1,7 +1,7 @@
-using Not.Application.Behinds.Adapters;
-using NTS.Domain.Core.Objects.Presentlists;
+using NC.Application.Behinds.Adapters;
+using NoTiming.Domain.Core.Objects.Presentlists;
 
-namespace NTS.Application.Contracts.Presentlists;
+namespace NoTiming.Application.Contracts.Presentlists;
 
 public interface IPresentlistService : IStatefulService
 {

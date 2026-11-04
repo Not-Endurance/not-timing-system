@@ -1,4 +1,4 @@
-namespace Not.Application.Authentication.Provider;
+namespace NC.Application.Authentication.Provider;
 
 public static class NClientAuthenticationSessionPolicy
 {

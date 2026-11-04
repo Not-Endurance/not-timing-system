@@ -1,9 +1,9 @@
-using Not.Domain.Exceptions;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects;
-using NTS.Domain.Objects;
+using NC.Domain.Exceptions;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects;
+using NoTiming.Domain.Objects;
 
-namespace NTS.Application.Factories;
+namespace NoTiming.Application.Factories;
 
 public static class EventInformationFactory
 {

@@ -1,4 +1,4 @@
-namespace NTS.Judge.Blazor.Layout;
+namespace NoTiming.Judge.Blazor.Layout;
 
 public class JudgeMainLayoutBehind : LayoutComponentBase
 {
@@ -6,5 +6,5 @@ public class JudgeMainLayoutBehind : LayoutComponentBase
     NEnvironment Environment { get; set; } = default!;
 
     protected string LayoutWatermark =>
-        NtsClientDisplayFormatter.FormatTitle(ApplicationConstants.Apps.JUDGE, Environment);
+        NoTimingClientDisplayFormatter.FormatTitle(ApplicationConstants.Apps.JUDGE, Environment);
 }

@@ -1,15 +1,15 @@
-using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
-using Not.Exceptions;
-using Not.Krud.Abstractions;
-using Not.Krud.Models;
-using NTS.Application.Contracts.PastEvents;
-using NTS.Application.Core;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Documents;
-using NTS.Domain.Core.Objects.Startlists;
+using NC.Application.Behinds.Adapters;
+using NC.Application.CRUD.Ports;
+using NC.Exceptions;
+using NC.Krud.Abstractions;
+using NC.Krud.Models;
+using NoTiming.Application.Contracts.PastEvents;
+using NoTiming.Application.Core;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects.Documents;
+using NoTiming.Domain.Core.Objects.Startlists;
 
-namespace NTS.Application.PastEvents;
+namespace NoTiming.Application.PastEvents;
 
 public class PastEventService : NStatefulService, IPastEventService, IKrudListBehind<EventInformation>
 {

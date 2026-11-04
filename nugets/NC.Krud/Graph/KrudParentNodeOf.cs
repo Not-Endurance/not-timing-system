@@ -1,9 +1,9 @@
-﻿using Not.Domain;
-using Not.Domain.Krud;
-using Not.Exceptions;
-using Not.Krud.Abstractions;
+﻿using NC.Domain;
+using NC.Domain.Krud;
+using NC.Exceptions;
+using NC.Krud.Abstractions;
 
-namespace Not.Krud.Graph;
+namespace NC.Krud.Graph;
 
 public class KrudParentNodeOf<T> : KrudNode, IKrudParentNodeOf<T>
     where T : Entity

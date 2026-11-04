@@ -1,6 +1,6 @@
 using System;
 
-namespace Not.SmartSearch.Property;
+namespace NC.SmartSearch.Property;
 
 internal class StringPropertySearch<T> : PropertySearch<T, string>
 {

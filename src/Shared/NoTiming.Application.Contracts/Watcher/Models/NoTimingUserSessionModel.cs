@@ -1,19 +1,19 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Not.Application.Authentication.User;
-using Not.Krud.Abstractions;
-using NTS.Application.Contracts.Shared;
-using NTS.Application.Contracts.Shared.Models;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
+using NC.Application.Authentication.User;
+using NC.Krud.Abstractions;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Application.Contracts.Shared.Models;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
+using NoTiming.Domain.Watcher;
 
-namespace NTS.Application.Contracts.Watcher.Models;
+namespace NoTiming.Application.Contracts.Watcher.Models;
 
-public class NtsUserSessionModel
-    : NUserSessionModel<NtsUserSessionStateModel>,
+public class NoTimingUserSessionModel
+    : NUserSessionModel<NoTimingUserSessionStateModel>,
         IDocument,
-        IKrudModel<NtsUserSessionModel>
+        IKrudModel<NoTimingUserSessionModel>
 {
     [BsonId]
     [Newtonsoft.Json.JsonIgnore]
@@ -24,7 +24,7 @@ public class NtsUserSessionModel
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public int EventId { get; set; }
 
-    public void MapFrom(NtsUserSessionModel session)
+    public void MapFrom(NoTimingUserSessionModel session)
     {
         MongoId = session.MongoId;
         Id = session.Id;
@@ -34,14 +34,14 @@ public class NtsUserSessionModel
         ReplaceState(session.State);
     }
 
-    public NtsUserSessionModel MapToEntity()
+    public NoTimingUserSessionModel MapToEntity()
     {
-        var model = new NtsUserSessionModel();
+        var model = new NoTimingUserSessionModel();
         model.MapFrom(this);
         return model;
     }
 
-    public void ReplaceState(NtsUserSessionStateModel? state)
+    public void ReplaceState(NoTimingUserSessionStateModel? state)
     {
         State = state?.Copy();
     }

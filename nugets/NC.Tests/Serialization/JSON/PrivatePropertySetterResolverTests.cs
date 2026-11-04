@@ -1,8 +1,8 @@
 using Newtonsoft.Json;
-using Not.Serialization.JSON;
+using NC.Serialization.JSON;
 using Xunit;
 
-namespace Not.Tests.Serialization.JSON;
+namespace NC.Tests.Serialization.JSON;
 
 public sealed class PrivatePropertySetterResolverTests
 {

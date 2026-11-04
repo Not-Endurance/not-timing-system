@@ -1,11 +1,11 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Authentication.User;
-using Not.Storage;
+using NC.Application.Authentication.User;
+using NC.Storage;
 using NoTiming.Api.Application.Features.Ui.Authorization;
 using NoTiming.Api.Application.Mongo.Repositories;
-using NTS.Application.Mongo;
+using NoTiming.Application.Mongo;
 
 namespace NoTiming.Api.Application;
 
@@ -35,7 +35,7 @@ public static class NoTimingApiApplicationServices
         }
 
         var builder = new NStorageBuilder(services, configuration);
-        NtsMongoSerialization.Configure();
+        NoTimingMongoSerialization.Configure();
         builder.AddMongoStorage(connectionString, Assembly.GetExecutingAssembly());
     }
 }

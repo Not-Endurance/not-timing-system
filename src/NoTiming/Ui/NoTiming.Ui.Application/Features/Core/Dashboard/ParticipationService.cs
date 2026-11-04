@@ -1,14 +1,14 @@
 using MediatR;
-using Not.Application.Behinds.Adapters;
-using Not.Collections;
-using Not.Injection;
-using Not.Observables.Structures;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
+using NC.Application.Behinds.Adapters;
+using NC.Collections;
+using NC.Injection;
+using NC.Observables.Structures;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Events;
+using NoTiming.Domain.Core.Objects.Payloads;
 
 namespace NoTiming.Ui.Application.Features.Core.Dashboard;
 
@@ -25,7 +25,7 @@ public class ParticipationService
         IScoped
 {
     readonly IEventScopedRepository<Participation> _participationReader;
-    readonly INtsSocketContext? _socketContext;
+    readonly INoTimingSocketContext? _socketContext;
     Participation? _selected;
 
     public ParticipationService(IEventScopedRepository<Participation> participationReader)
@@ -33,7 +33,7 @@ public class ParticipationService
 
     public ParticipationService(
         IEventScopedRepository<Participation> participationReader,
-        INtsSocketContext? socketContext
+        INoTimingSocketContext? socketContext
     )
     {
         _participationReader = participationReader;

@@ -1,5 +1,5 @@
-using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
+using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
 
-namespace NTS.Judge.Blazor.Features.Setup.Loops;
+namespace NoTiming.Judge.Blazor.Features.Setup.Loops;
 
 public class LoopContentBehind : SetupFormContent<LoopFormModel> { }

@@ -1,10 +1,10 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Domain.Core.Aggregates;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components;
+namespace NoTiming.Judge.Blazor.Features.Core.Dashboards.Components;
 
 public class DashboardBehind : NStatefulComponent
 {

@@ -1,6 +1,6 @@
 using MongoDB.Driver;
-using Not.Application.Authentication.User;
-using Not.Storage.Mongo;
+using NC.Application.Authentication.User;
+using NC.Storage.Mongo;
 using NoTiming.Api.Application.Mongo.Models;
 using NoTiming.Api.Application.Telemetry;
 using NoTiming.Ui.Contracts.API;

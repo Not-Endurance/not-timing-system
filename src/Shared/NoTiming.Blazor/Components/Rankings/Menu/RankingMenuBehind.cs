@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
-using Not.Blazor.Components.Abstractions;
-using NTS.Domain.Core.Aggregates;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Blazor.Components.Rankings.Menu;
+namespace NoTiming.Blazor.Components.Rankings.Menu;
 
 public class RankingMenuBehind : NComponent
 {

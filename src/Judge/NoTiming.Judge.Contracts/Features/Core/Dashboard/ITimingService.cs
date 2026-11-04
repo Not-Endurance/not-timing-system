@@ -1,6 +1,6 @@
-﻿using NTS.Domain.Aggregates;
+﻿using NoTiming.Domain.Aggregates;
 
-namespace NTS.Judge.Contracts.Features.Core.Dashboard;
+namespace NoTiming.Judge.Contracts.Features.Core.Dashboard;
 
 public interface IJudgeSnapshotService
 {

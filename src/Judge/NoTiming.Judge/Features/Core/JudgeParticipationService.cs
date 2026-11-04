@@ -1,18 +1,18 @@
-using Not.Application.Behinds.Adapters;
-using Not.Application.DomainEvents;
-using Not.Async.Extensions;
-using Not.Exceptions;
-using Not.Injection;
-using Not.Krud.Abstractions;
-using Not.Startup;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
-using NTS.Judge.Features.Core.State;
+using NC.Application.Behinds.Adapters;
+using NC.Application.DomainEvents;
+using NC.Async.Extensions;
+using NC.Exceptions;
+using NC.Injection;
+using NC.Krud.Abstractions;
+using NC.Startup;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations;
+using NoTiming.Judge.Features.Core.State;
 
-namespace NTS.Judge.Features.Core;
+namespace NoTiming.Judge.Features.Core;
 
 public class JudgeParticipationService
     : NStatefulService,
@@ -26,14 +26,14 @@ public class JudgeParticipationService
         IScoped
 {
     readonly List<int> _recentlyProcessed = [];
-    readonly INtsSocketContext _socketContext;
+    readonly INoTimingSocketContext _socketContext;
     readonly IEventScopedRepository<Participation> _participationRepository;
     readonly IEventScopedRepository<SnapshotResult> _snapshotResultRepository;
     readonly IDomainEventDispatcher _domainEventDispatcher;
     Participation? _selectedParticipation;
 
     public JudgeParticipationService(
-        INtsSocketContext socketContext,
+        INoTimingSocketContext socketContext,
         IEventScopedRepository<Participation> participationRepository,
         IEventScopedRepository<SnapshotResult> snapshotResultRepository,
         IDomainEventDispatcher domainEventDispatcher

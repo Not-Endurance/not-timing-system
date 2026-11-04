@@ -1,6 +1,6 @@
 using Microsoft.Extensions.FileProviders;
 
-namespace Not.Server.UiClient;
+namespace NC.Server.UiClient;
 
 public class UiClientSettings
 {

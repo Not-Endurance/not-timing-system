@@ -1,18 +1,18 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Components.Print;
-using Not.Files;
-using Not.Files.Abstractions;
-using Not.Print;
-using NTS.Application.Contracts.PastEvents;
-using NTS.Application.Contracts.Pdf;
-using NTS.Blazor.Components.PastEvents;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Documents;
-using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
-using NTS.Judge.Blazor.Features.Print;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Print;
+using NC.Files;
+using NC.Files.Abstractions;
+using NC.Print;
+using NoTiming.Application.Contracts.PastEvents;
+using NoTiming.Application.Contracts.Pdf;
+using NoTiming.Blazor.Components.PastEvents;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects.Documents;
+using NoTiming.Judge.Blazor.Features.Core.Rankings.Protocols;
+using NoTiming.Judge.Blazor.Features.Print;
 
-namespace NTS.Judge.Blazor.Features.PastEvents;
+namespace NoTiming.Judge.Blazor.Features.PastEvents;
 
 public class JudgePastEventDetailsContentBehind : NStatefulComponent
 {
@@ -31,7 +31,7 @@ public class JudgePastEventDetailsContentBehind : NStatefulComponent
     IFileService FileService { get; set; } = default!;
 
     [Inject]
-    INtsPrintRequestFactory PrintRequests { get; set; } = default!;
+    INoTimingPrintRequestFactory PrintRequests { get; set; } = default!;
 
     [Inject]
     IProtocolLogoState HeaderLogo { get; set; } = default!;

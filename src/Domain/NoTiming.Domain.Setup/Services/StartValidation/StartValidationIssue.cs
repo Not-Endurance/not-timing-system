@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Setup.Services.StartValidation;
+﻿namespace NoTiming.Domain.Setup.Services.StartValidation;
 
 public class StartValidationIssue
 {

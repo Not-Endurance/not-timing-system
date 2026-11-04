@@ -1,7 +1,7 @@
-﻿using Not.Krud.Models;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+﻿using NC.Krud.Models;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
+namespace NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
 
 public record PhaseFormModel : KrudFormModel<Phase>
 {

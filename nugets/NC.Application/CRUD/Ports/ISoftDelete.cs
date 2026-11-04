@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace Not.Application.CRUD.Ports;
+namespace NC.Application.CRUD.Ports;
 
 public interface ISoftDelete<T> : IDelete<T>, IDeleteMany<T>
 {

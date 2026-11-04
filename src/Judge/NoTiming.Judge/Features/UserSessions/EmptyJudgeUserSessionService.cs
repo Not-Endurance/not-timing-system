@@ -1,10 +1,10 @@
-using Not.Injection;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Application.UserSession;
-using NTS.Domain.Watcher;
+using NC.Injection;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Application.UserSession;
+using NoTiming.Domain.Watcher;
 
-namespace NTS.Judge.Features.UserSessions;
+namespace NoTiming.Judge.Features.UserSessions;
 
 internal class EmptyJudgeUserSessionService : IUiUserSession, IScoped
 {
@@ -23,9 +23,9 @@ internal class EmptyJudgeUserSessionService : IUiUserSession, IScoped
         return Task.CompletedTask;
     }
 
-    public Task<NtsUserSessionStateModel?> GetCurrent()
+    public Task<NoTimingUserSessionStateModel?> GetCurrent()
     {
-        return Task.FromResult<NtsUserSessionStateModel?>(null);
+        return Task.FromResult<NoTimingUserSessionStateModel?>(null);
     }
 
     public Task SetEventId(int? eventId)

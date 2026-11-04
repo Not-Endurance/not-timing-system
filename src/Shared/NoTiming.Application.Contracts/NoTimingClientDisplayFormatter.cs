@@ -1,8 +1,8 @@
-using Not.Application.Environments;
+using NC.Application.Environments;
 
-namespace NTS.Application.Contracts;
+namespace NoTiming.Application.Contracts;
 
-public static class NtsClientDisplayFormatter
+public static class NoTimingClientDisplayFormatter
 {
     public static string FormatTitle(string appName, NEnvironment environment)
     {

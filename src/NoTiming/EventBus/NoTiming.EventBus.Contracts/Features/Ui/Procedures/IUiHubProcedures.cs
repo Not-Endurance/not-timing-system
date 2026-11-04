@@ -1,6 +1,6 @@
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Core.Objects.Payloads;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Domain.Core.Objects.Payloads;
 
 namespace NoTiming.EventBus.Contracts.Features.Ui.Procedures;
 

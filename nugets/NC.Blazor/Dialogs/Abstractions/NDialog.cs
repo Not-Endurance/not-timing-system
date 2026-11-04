@@ -1,7 +1,7 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
-namespace Not.Blazor.Dialogs.Abstractions;
+namespace NC.Blazor.Dialogs.Abstractions;
 
 public abstract class NDialog : NStatefulComponent
 {

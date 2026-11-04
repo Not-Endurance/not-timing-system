@@ -1,10 +1,10 @@
 using MudBlazor;
-using Not.Blazor.Dialogs.Abstractions;
-using Not.Blazor.Helpers;
-using NTS.Application.Contracts.Socket;
-using NTS.Judge.Contracts.Features.Core;
+using NC.Blazor.Dialogs.Abstractions;
+using NC.Blazor.Helpers;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Judge.Contracts.Features.Core;
 
-namespace NTS.Judge.Blazor.Layout.Drawer.Reset;
+namespace NoTiming.Judge.Blazor.Layout.Drawer.Reset;
 
 public class DisconnectEventDialogBehind : NDialog
 {
@@ -12,7 +12,7 @@ public class DisconnectEventDialogBehind : NDialog
     IDashService TimingStateService { get; set; } = default!;
 
     [Inject]
-    INtsSocketService SocketService { get; set; } = default!;
+    INoTimingSocketService SocketService { get; set; } = default!;
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;

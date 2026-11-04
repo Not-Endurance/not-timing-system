@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
-using Not.Application.RPC.SignalR;
+using NC.Application.RPC.SignalR;
 
 namespace NoTiming.IntegrationTests.Infrastructure;
 

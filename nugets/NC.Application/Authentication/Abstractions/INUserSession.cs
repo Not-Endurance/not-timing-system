@@ -1,6 +1,6 @@
-using Not.Application.Authentication.User;
+using NC.Application.Authentication.User;
 
-namespace Not.Application.Authentication.Abstractions;
+namespace NC.Application.Authentication.Abstractions;
 
 public interface INUserSessionModel
 {

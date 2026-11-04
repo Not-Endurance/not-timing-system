@@ -1,18 +1,18 @@
 using MediatR;
-using Not.Application.Behinds.Adapters;
-using Not.Collections;
-using Not.Exceptions;
-using Not.Injection;
-using Not.Observables.Structures;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
-using NTS.Application.UserSession;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
+using NC.Application.Behinds.Adapters;
+using NC.Collections;
+using NC.Exceptions;
+using NC.Injection;
+using NC.Observables.Structures;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Application.UserSession;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Events;
+using NoTiming.Domain.Core.Objects.Payloads;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
+using NoTiming.Domain.Watcher;
 using NoTiming.Ui.Contracts.Features.Snapshots;
 
 namespace NoTiming.Ui.Application.Features.Core.Dashboard;
@@ -31,7 +31,7 @@ public class SnapshotService
 {
     readonly Dictionary<int, Participation> _allParticipations = [];
     readonly List<SnapshotGroup> _history = [];
-    readonly INtsSocketContext _socketContext;
+    readonly INoTimingSocketContext _socketContext;
     readonly IEventScopedRepository<Participation> _participationReader;
     readonly List<Participation> _participationsToSnapshot = [];
     readonly ISnapshotPublisher _snapshotPublisher;
@@ -41,7 +41,7 @@ public class SnapshotService
     Task _snapshotSelectionPersistence = Task.CompletedTask;
 
     public SnapshotService(
-        INtsSocketContext socketContext,
+        INoTimingSocketContext socketContext,
         IEventScopedRepository<Participation> participationReader,
         IUiUserSession userSessionService,
         ISnapshotPublisher snapshotPublisher

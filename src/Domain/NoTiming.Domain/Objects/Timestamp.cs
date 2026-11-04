@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace NTS.Domain.Objects;
+namespace NoTiming.Domain.Objects;
 
 public sealed record Timestamp : IComparable<Timestamp>
 {

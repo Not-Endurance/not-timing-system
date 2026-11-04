@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Not.Serialization.JSON;
+namespace NC.Serialization.JSON;
 
 public class NJsonSettings : JsonSerializerSettings
 {

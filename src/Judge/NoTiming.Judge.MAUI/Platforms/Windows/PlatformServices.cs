@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace NTS.Judge.MAUI.Platforms.Windows;
+namespace NoTiming.Judge.MAUI.Platforms.Windows;
 
 public static class PlatformServices
 {

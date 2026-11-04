@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
-using Not.Blazor.Components.Abstractions;
-using NTS.Domain.Core.Objects.Documents;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Domain.Core.Objects.Documents;
 
-namespace NTS.Blazor.Components.Results;
+namespace NoTiming.Blazor.Components.Results;
 
 public class ResultComponentBehind : NComponent
 {

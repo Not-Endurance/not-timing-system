@@ -1,4 +1,4 @@
-﻿namespace NTS.Judge.MAUI.Platforms.Services;
+﻿namespace NoTiming.Judge.MAUI.Platforms.Services;
 
 public interface IMauiProcessService
 {

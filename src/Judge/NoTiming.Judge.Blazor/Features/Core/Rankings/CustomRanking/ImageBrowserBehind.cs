@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Notify;
+using NC.Blazor.Components.Abstractions;
+using NC.Notify;
 
-namespace NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
+namespace NoTiming.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 
 public class ImageBrowserBehind : NComponent
 {

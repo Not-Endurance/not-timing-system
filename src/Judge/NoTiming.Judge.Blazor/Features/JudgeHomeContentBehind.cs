@@ -1,16 +1,16 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Helpers;
-using Not.Domain.Exceptions;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Blazor.Features.Setup.StartValidation;
-using NTS.Judge.Blazor.Layout.Drawer.Reset;
-using NTS.Judge.Contracts.Features.Core;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Helpers;
+using NC.Domain.Exceptions;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Judge.Blazor.Features.Setup.StartValidation;
+using NoTiming.Judge.Blazor.Layout.Drawer.Reset;
+using NoTiming.Judge.Contracts.Features.Core;
 
-namespace NTS.Judge.Blazor.Features;
+namespace NoTiming.Judge.Blazor.Features;
 
 public class JudgeHomeContentBehind : NStatefulComponent
 {
@@ -21,7 +21,7 @@ public class JudgeHomeContentBehind : NStatefulComponent
     protected IDashService DashService { get; set; } = default!;
 
     [Inject]
-    protected INtsSocketService SocketService { get; set; } = default!;
+    protected INoTimingSocketService SocketService { get; set; } = default!;
 
     [Inject]
     protected IActiveEventsContext ActiveEventContext { get; set; } = default!;

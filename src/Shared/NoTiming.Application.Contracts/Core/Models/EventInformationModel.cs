@@ -1,12 +1,12 @@
 using MongoDB.Bson.Serialization.Attributes;
-using Not.Krud.Abstractions;
-using Not.Structures;
-using NTS.Application.Contracts.Shared;
-using NTS.Application.Contracts.Shared.Models;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects;
+using NC.Krud.Abstractions;
+using NC.Structures;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Application.Contracts.Shared.Models;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects;
 
-namespace NTS.Application.Contracts.Core.Models;
+namespace NoTiming.Application.Contracts.Core.Models;
 
 public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKrudModel<EventInformation>
 {

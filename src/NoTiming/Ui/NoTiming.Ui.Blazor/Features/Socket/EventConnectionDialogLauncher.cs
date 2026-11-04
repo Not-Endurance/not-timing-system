@@ -1,6 +1,6 @@
 using MudBlazor;
-using Not.Injection;
-using NTS.Blazor.Components.SelectEvents;
+using NC.Injection;
+using NoTiming.Blazor.Components.SelectEvents;
 
 namespace NoTiming.Ui.Blazor.Features.Socket;
 

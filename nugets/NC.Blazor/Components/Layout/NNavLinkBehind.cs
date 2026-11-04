@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components.Routing;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Navigation.Abstractions;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Navigation.Abstractions;
 
-namespace Not.Blazor.Components.Layout;
+namespace NC.Blazor.Components.Layout;
 
 public class NNavLinkBehind : NComponent
 {

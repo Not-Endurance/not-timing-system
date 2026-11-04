@@ -10,5 +10,5 @@ using System.Diagnostics.CodeAnalysis;
     "IDE0130:Namespace does not match folder structure",
     Justification = "Compress the number of usings in razor files, since these components are widely used",
     Scope = "namespace",
-    Target = "~N:Not.Blazor.Components"
+    Target = "~N:NC.Blazor.Components"
 )]

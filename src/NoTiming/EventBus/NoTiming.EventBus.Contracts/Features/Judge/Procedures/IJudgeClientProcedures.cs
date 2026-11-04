@@ -1,5 +1,5 @@
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
 
 namespace NoTiming.EventBus.Contracts.Features.Judge.Procedures;
 

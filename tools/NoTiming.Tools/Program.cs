@@ -1,5 +1,5 @@
-using NTS.Tools.NameMigration;
-using NTS.Tools.Watcher;
+using NoTiming.Tools.NameMigration;
+using NoTiming.Tools.Watcher;
 
 return args.FirstOrDefault() switch
 {
@@ -17,7 +17,7 @@ static int ShowHelp()
     Console.WriteLine(
         """
         Usage:
-          dotnet run --project tools/NTS.Tools -- <command> [options]
+          dotnet run --project tools/NoTiming.Tools -- <command> [options]
 
         Commands:
           watcher              Placeholder watcher command

@@ -1,3 +1,3 @@
-global using static Not.Localization.NStrings;
-global using NTS.Application.Contracts.Pdf;
-global using static NTS.Localization.NtsStrings;
+global using static NC.Localization.NStrings;
+global using NoTiming.Application.Contracts.Pdf;
+global using static NoTiming.Shared.Localization.NoTimingStrings;

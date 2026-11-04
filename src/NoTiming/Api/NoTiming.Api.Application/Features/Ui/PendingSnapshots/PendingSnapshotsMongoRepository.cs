@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using MongoDB.Driver;
-using Not.Storage.Mongo;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
+using NC.Storage.Mongo;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
 
 namespace NoTiming.Api.Application.Features.Ui.PendingSnapshots;
 

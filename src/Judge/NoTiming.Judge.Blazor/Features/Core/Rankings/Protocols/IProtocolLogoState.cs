@@ -1,6 +1,6 @@
-﻿using Not.Injection;
+﻿using NC.Injection;
 
-namespace NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
+namespace NoTiming.Judge.Blazor.Features.Core.Rankings.Protocols;
 
 public interface IProtocolLogoState : ISingleton
 {

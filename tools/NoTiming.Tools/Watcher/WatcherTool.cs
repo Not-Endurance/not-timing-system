@@ -1,4 +1,4 @@
-namespace NTS.Tools.Watcher;
+namespace NoTiming.Tools.Watcher;
 
 public static class WatcherTool
 {

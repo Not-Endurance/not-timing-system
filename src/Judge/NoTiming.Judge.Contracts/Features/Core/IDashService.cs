@@ -1,7 +1,7 @@
-using Not.Structures;
-using NTS.Domain.Setup.Services.StartValidation;
+using NC.Structures;
+using NoTiming.Domain.Setup.Services.StartValidation;
 
-namespace NTS.Judge.Contracts.Features.Core;
+namespace NoTiming.Judge.Contracts.Features.Core;
 
 public interface IDashService
 {

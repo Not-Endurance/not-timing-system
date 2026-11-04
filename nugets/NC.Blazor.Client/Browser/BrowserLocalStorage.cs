@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
-namespace Not.BLazor.Client.Browser;
+namespace NC.BLazor.Client.Browser;
 
 internal class BrowserLocalStorage : IBrowserLocalStorage
 {

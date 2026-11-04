@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
 using Microsoft.Extensions.Logging;
-using Not.Application.Authentication.User;
+using NC.Application.Authentication.User;
 
-namespace Not.Blazor.Client.Authentication.Services;
+namespace NC.Blazor.Client.Authentication.Services;
 
 internal class ClientSideAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactory<RemoteUserAccount>
 {

@@ -1,10 +1,10 @@
 using MudBlazor;
-using Not.Krud.Blazor.Components.Abstractions;
-using NTS.Blazor.Constants;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
-using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
+using NC.Krud.Blazor.Components.Abstractions;
+using NoTiming.Blazor.Constants;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
+using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
 
-namespace NTS.Judge.Blazor.Features.Setup.ConfigureEvents.Participations;
+namespace NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents.Participations;
 
 public class ParticipationShellBehind : KrudShell<ParticipationFormModel>
 {

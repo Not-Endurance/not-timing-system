@@ -1,4 +1,4 @@
-﻿namespace Not.Events;
+﻿namespace NC.Events;
 
 public interface IEventSubscriber
 {

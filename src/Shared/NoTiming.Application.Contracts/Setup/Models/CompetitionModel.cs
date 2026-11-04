@@ -1,11 +1,11 @@
-﻿using Not.Krud.Abstractions;
-using NTS.Application.Contracts.Shared;
-using NTS.Application.Contracts.Shared.Models;
-using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+﻿using NC.Krud.Abstractions;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Application.Contracts.Shared.Models;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Application.Contracts.Setup.Models;
+namespace NoTiming.Application.Contracts.Setup.Models;
 
 public class CompetitionModel
 {

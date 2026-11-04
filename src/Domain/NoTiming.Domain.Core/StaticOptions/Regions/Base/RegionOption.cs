@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Core.StaticOptions.Regions.Base;
+﻿namespace NoTiming.Domain.Core.StaticOptions.Regions.Base;
 
 public abstract class RegionOption : IRegionOption
 {

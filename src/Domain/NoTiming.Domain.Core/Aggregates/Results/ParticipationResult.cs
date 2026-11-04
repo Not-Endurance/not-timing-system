@@ -1,4 +1,4 @@
-namespace NTS.Domain.Core.Aggregates.Results;
+namespace NoTiming.Domain.Core.Aggregates.Results;
 
 public class ParticipationResult : Entity
 {

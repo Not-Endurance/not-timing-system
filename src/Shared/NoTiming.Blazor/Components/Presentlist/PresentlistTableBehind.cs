@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Formatting;
-using NTS.Application.Contracts.Presentlists;
-using NTS.Domain.Core.Objects.Presentlists;
-using NTS.Domain.Helpers;
+using NC.Blazor.Components.Abstractions;
+using NC.Formatting;
+using NoTiming.Application.Contracts.Presentlists;
+using NoTiming.Domain.Core.Objects.Presentlists;
+using NoTiming.Domain.Helpers;
 
-namespace NTS.Blazor.Components.Presentlist;
+namespace NoTiming.Blazor.Components.Presentlist;
 
 public class PresentlistTableBehind : NStatefulComponent
 {

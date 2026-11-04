@@ -1,7 +1,7 @@
-using Not.Application.Authentication.User;
-using Not.Random;
-using NTS.Application.Contracts.Shared;
-using NTS.Application.Contracts.Shared.Models;
+using NC.Application.Authentication.User;
+using NC.Random;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Application.Contracts.Shared.Models;
 
 namespace NoTiming.Api.Application.Mongo.Models;
 

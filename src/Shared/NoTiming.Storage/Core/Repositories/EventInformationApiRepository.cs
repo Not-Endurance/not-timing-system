@@ -1,23 +1,23 @@
-using Not.Application.HTTP;
-using Not.Domain.Exceptions;
-using Not.Exceptions;
-using Not.Storage.REST;
-using Not.Structures;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.Socket;
-using NTS.Application.Core;
-using NTS.Domain.Core.Aggregates;
+using NC.Application.HTTP;
+using NC.Domain.Exceptions;
+using NC.Exceptions;
+using NC.Storage.REST;
+using NC.Structures;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Application.Core;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Storage.Core.Repositories;
+namespace NoTiming.Storage.Core.Repositories;
 
 public class EventInformationApiRepository
     : ApiRepository<EventInformation, EventInformationModel>,
         IEventInformationRepository
 {
-    readonly INtsSocketContext _socketContext;
+    readonly INoTimingSocketContext _socketContext;
 
-    public EventInformationApiRepository(NHttpClient client, INtsSocketContext socketContext)
+    public EventInformationApiRepository(NHttpClient client, INoTimingSocketContext socketContext)
         : base("event", client)
     {
         _socketContext = socketContext;
@@ -58,7 +58,7 @@ public class EventInformationApiRepository
             return;
         }
 
-        await Client.Post<Not.Structures.Result.Empty>(
+        await Client.Post<NC.Structures.Result.Empty>(
             $"{Endpoint}/{eventId.Value}/deactivate",
             new DeactivateEventInformationRequest()
         );

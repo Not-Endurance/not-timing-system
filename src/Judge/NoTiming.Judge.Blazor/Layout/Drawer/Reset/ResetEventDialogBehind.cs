@@ -1,6 +1,6 @@
-using Not.Blazor.Dialogs.Abstractions;
+using NC.Blazor.Dialogs.Abstractions;
 
-namespace NTS.Judge.Blazor.Layout.Drawer.Reset;
+namespace NoTiming.Judge.Blazor.Layout.Drawer.Reset;
 
 public class ResetEventDialogBehind : NDialog
 {

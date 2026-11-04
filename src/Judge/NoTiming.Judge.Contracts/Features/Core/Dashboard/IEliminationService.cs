@@ -1,6 +1,6 @@
-using NTS.Domain.Core.Aggregates.Participations;
+using NoTiming.Domain.Core.Aggregates.Participations;
 
-namespace NTS.Judge.Contracts.Features.Core.Dashboard;
+namespace NoTiming.Judge.Contracts.Features.Core.Dashboard;
 
 public interface IEliminationService
 {

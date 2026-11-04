@@ -1,6 +1,6 @@
-﻿using NTS.Domain.Core.Aggregates.Participations.Objects;
+﻿using NoTiming.Domain.Core.Aggregates.Participations.Objects;
 
-namespace NTS.Application.Contracts.Core.Models;
+namespace NoTiming.Application.Contracts.Core.Models;
 
 public class TotalModel
 {

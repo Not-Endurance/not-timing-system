@@ -1,9 +1,9 @@
-﻿using Not.Domain.Exceptions;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.StaticOptions;
-using static NTS.Domain.Core.Aggregates.SnapshotResultType;
+﻿using NC.Domain.Exceptions;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.StaticOptions;
+using static NoTiming.Domain.Core.Aggregates.SnapshotResultType;
 
-namespace NTS.Domain.Core.Aggregates.Participations.Entities;
+namespace NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
 public class Phase : Entity
 {

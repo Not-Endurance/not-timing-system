@@ -1,4 +1,4 @@
-﻿namespace Not.Injection.Config;
+﻿namespace NC.Injection.Config;
 
 public static class NConfigHelper
 {

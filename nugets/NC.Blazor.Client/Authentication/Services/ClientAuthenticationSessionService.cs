@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options;
-using Not.Application.Authentication.Abstractions;
-using Not.Application.Authentication.Provider;
-using Not.Injection;
+using NC.Application.Authentication.Abstractions;
+using NC.Application.Authentication.Provider;
+using NC.Injection;
 
-namespace Not.Blazor.Client.Authentication.Services;
+namespace NC.Blazor.Client.Authentication.Services;
 
 internal class ClientAuthenticationSessionService : INAuthenticationSession, ITransient
 {

@@ -1,9 +1,9 @@
-﻿using static Not.Localization.LocalizationHelper;
+﻿using static NC.Localization.LocalizationHelper;
 // ReSharper disable InconsistentNaming
 
 #pragma warning disable IDE1006 // Naming Styles
 #pragma warning disable NA0004 // Member spacing rule violation
-namespace Not.Localization;
+namespace NC.Localization;
 
 public static class NStrings
 {

@@ -1,9 +1,9 @@
 using MudBlazor;
-using Not.Krud.Blazor.Components.Abstractions;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
+using NC.Krud.Blazor.Components.Abstractions;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
 
-namespace NTS.Judge.Blazor.Features.Setup.Combinations;
+namespace NoTiming.Judge.Blazor.Features.Setup.Combinations;
 
 public class CombinationShellBehind : KrudShell<CombinationFormModel>
 {

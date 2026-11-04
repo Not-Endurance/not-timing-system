@@ -1,23 +1,23 @@
 using MudBlazor;
-using Not.Async.Extensions;
-using Not.Injection;
-using Not.Startup;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.Socket;
-using NTS.Blazor.Components.SelectEvents;
+using NC.Async.Extensions;
+using NC.Injection;
+using NC.Startup;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Blazor.Components.SelectEvents;
 
-namespace NTS.Judge.Blazor.Features.Socket;
+namespace NoTiming.Judge.Blazor.Features.Socket;
 
 public class JudgeStartupEventInformationCoordinator : IStartupInitializerAsync, IScoped
 {
     readonly IEventInformationService _eventInformationService;
-    readonly INtsSocketService _socketService;
+    readonly INoTimingSocketService _socketService;
     readonly IJudgeSelectEventDialogLauncher _dialogLauncher;
 
     public JudgeStartupEventInformationCoordinator(
         IEventInformationService eventInformationService,
-        INtsSocketService socketService,
+        INoTimingSocketService socketService,
         IJudgeSelectEventDialogLauncher dialogLauncher
     )
     {

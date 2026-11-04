@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Not.Application.Environments;
+namespace NC.Application.Environments;
 
 public static class EnvironmentHelper
 {
@@ -9,7 +9,7 @@ public static class EnvironmentHelper
     public const string DEVELOPMENT = NEnvionmentNames.DEVELOPMENT;
     public const string STAGING = NEnvionmentNames.STAGING;
     public const string PRODUCTION = NEnvionmentNames.PRODUCTION;
-    public const string TARGET_ENVIRONMENT_METADATA = "NtsTargetEnvironment";
+    public const string TARGET_ENVIRONMENT_METADATA = "NoTimingTargetEnvironment";
 
     public static bool Is(string env)
     {

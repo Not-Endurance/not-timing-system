@@ -1,14 +1,14 @@
-using Not.Application.CRUD.Ports;
-using Not.Events;
-using Not.Exceptions;
-using Not.Injection;
-using Not.Krud.Services;
-using Not.Notify;
-using Not.Structures;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Services.StartValidation;
+using NC.Application.CRUD.Ports;
+using NC.Events;
+using NC.Exceptions;
+using NC.Injection;
+using NC.Krud.Services;
+using NC.Notify;
+using NC.Structures;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Services.StartValidation;
 
-namespace NTS.Judge.Features.Setup.ConfigureEvents;
+namespace NoTiming.Judge.Features.Setup.ConfigureEvents;
 
 public class ConfigureEventService
     : KrudServiceBase<ConfigureEvent, ConfigureEventFormModel>,

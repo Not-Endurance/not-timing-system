@@ -1,7 +1,7 @@
-using Not.Files;
-using Not.Injection;
+using NC.Files;
+using NC.Injection;
 
-namespace Not.Print;
+namespace NC.Print;
 
 public interface INPrintService : ITransient
 {

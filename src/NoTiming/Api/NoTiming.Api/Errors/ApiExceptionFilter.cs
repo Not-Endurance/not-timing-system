@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Not.Exceptions;
-using Not.Structures;
+using NC.Exceptions;
+using NC.Structures;
 using NoTiming.Api.Application.Telemetry;
 
 namespace NoTiming.Api.Errors;

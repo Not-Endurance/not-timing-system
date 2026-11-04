@@ -1,20 +1,20 @@
 using MediatR;
-using Not.Application.RPC;
-using Not.Application.RPC.Clients;
-using Not.Application.RPC.SignalR;
-using Not.Injection;
-using NTS.Application.Contracts.Socket;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
-using NTS.Judge.Contracts.Features.Core.Dashboard;
+using NC.Application.RPC;
+using NC.Application.RPC.Clients;
+using NC.Application.RPC.SignalR;
+using NC.Injection;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Objects.Payloads;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
+using NoTiming.Judge.Contracts.Features.Core.Dashboard;
 using NoTiming.EventBus.Contracts;
 using NoTiming.EventBus.Contracts.Features.Judge.Procedures;
 
-namespace NTS.Judge.Features.Socket;
+namespace NoTiming.Judge.Features.Socket;
 
 public class JudgeRpcClient
     : RpcClient,
@@ -27,11 +27,11 @@ public class JudgeRpcClient
         INotificationHandler<ParticipationRestored>,
         IScoped
 {
-    readonly INtsSocketService _eventContext;
+    readonly INoTimingSocketService _eventContext;
     readonly IJudgeSnapshotService _snapshotService;
     readonly HubProcedures _hubProcedures;
 
-    public JudgeRpcClient(INtsSocketService eventContext, IRpcSocket socket, IJudgeSnapshotService snapshotService)
+    public JudgeRpcClient(INoTimingSocketService eventContext, IRpcSocket socket, IJudgeSnapshotService snapshotService)
         : base(socket)
     {
         _eventContext = eventContext;

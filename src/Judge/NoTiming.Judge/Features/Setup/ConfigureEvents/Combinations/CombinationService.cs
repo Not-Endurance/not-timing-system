@@ -1,10 +1,10 @@
-using Not.Application.CRUD.Ports;
-using Not.Injection;
-using Not.Krud.Abstractions;
-using Not.Krud.Services;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+using NC.Application.CRUD.Ports;
+using NC.Injection;
+using NC.Krud.Abstractions;
+using NC.Krud.Services;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Judge.Features.Setup.ConfigureEvents.Combinations;
+namespace NoTiming.Judge.Features.Setup.ConfigureEvents.Combinations;
 
 public class CombinationService : KrudServiceBase<Combination, CombinationFormModel>, ITransient
 {

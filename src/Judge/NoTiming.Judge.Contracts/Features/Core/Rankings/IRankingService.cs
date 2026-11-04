@@ -1,5 +1,5 @@
-﻿using Not.Injection;
+﻿using NC.Injection;
 
-namespace NTS.Judge.Contracts.Features.Core.Rankings;
+namespace NoTiming.Judge.Contracts.Features.Core.Rankings;
 
 public interface IRankingService : IRankingContext, ITransient { }

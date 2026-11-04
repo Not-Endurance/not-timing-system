@@ -1,6 +1,6 @@
-﻿using NTS.Domain.Core.StaticOptions.Regions.Base;
+﻿using NoTiming.Domain.Core.StaticOptions.Regions.Base;
 
-namespace NTS.Domain.Core.StaticOptions.Regions;
+namespace NoTiming.Domain.Core.StaticOptions.Regions;
 
 public class BulgariaOption : RegionOption
 {

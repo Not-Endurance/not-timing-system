@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using MongoDB.Driver;
-using Not.Storage.Mongo;
-using NTS.Application.Contracts.Shared;
-using NTS.Application.Contracts.Shared.Models;
+using NC.Storage.Mongo;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Application.Contracts.Shared.Models;
 using NoTiming.Api.Application.Telemetry;
 
 namespace NoTiming.Api.Application.Mongo.Repositories;

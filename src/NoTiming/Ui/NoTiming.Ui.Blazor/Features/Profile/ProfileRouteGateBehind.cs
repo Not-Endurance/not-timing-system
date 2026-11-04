@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Components.Routing;
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 using NoTiming.Ui.Contracts.Features.Profile;
 
 namespace NoTiming.Ui.Blazor.Features.Profile;

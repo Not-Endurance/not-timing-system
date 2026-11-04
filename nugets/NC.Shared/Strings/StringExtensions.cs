@@ -1,7 +1,7 @@
 using System.Text;
-using Not.Notify;
+using NC.Notify;
 
-namespace Not.Strings;
+namespace NC.Strings;
 
 public static class StringExtensions
 {

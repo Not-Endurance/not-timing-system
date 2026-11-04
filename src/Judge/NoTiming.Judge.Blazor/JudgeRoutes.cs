@@ -1,4 +1,4 @@
-﻿namespace NTS.Judge.Blazor;
+﻿namespace NoTiming.Judge.Blazor;
 
 public static class JudgeRoutes
 {

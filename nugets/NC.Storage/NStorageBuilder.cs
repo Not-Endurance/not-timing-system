@@ -5,11 +5,11 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Serializers;
-using Not.Application;
-using Not.Injection;
-using Not.Storage.Mongo;
+using NC.Application;
+using NC.Injection;
+using NC.Storage.Mongo;
 
-namespace Not.Storage;
+namespace NC.Storage;
 
 public class NStorageBuilder
 {

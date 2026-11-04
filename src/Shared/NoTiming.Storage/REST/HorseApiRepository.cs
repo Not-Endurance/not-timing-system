@@ -1,10 +1,10 @@
-﻿using Not.Application.HTTP;
-using Not.Storage.REST;
-using NTS.Application.Contracts.Setup;
-using NTS.Application.Contracts.Setup.Models;
-using NTS.Domain.Setup.Aggregates;
+﻿using NC.Application.HTTP;
+using NC.Storage.REST;
+using NoTiming.Application.Contracts.Setup;
+using NoTiming.Application.Contracts.Setup.Models;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Storage.REST;
+namespace NoTiming.Storage.REST;
 
 public class HorseApiRepository : ApiRepository<Horse, HorseModel>
 {

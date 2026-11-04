@@ -1,6 +1,6 @@
-using NTS.Domain.Enums;
+using NoTiming.Domain.Enums;
 
-namespace NTS.Domain.Helpers;
+namespace NoTiming.Domain.Helpers;
 
 public static class NameRenderingHelper
 {

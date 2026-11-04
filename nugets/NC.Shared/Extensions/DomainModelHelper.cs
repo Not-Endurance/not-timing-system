@@ -1,6 +1,6 @@
-﻿using Not.Random;
+﻿using NC.Random;
 
-namespace Not.Extensions;
+namespace NC.Extensions;
 
 public static class DomainModelHelper
 {

@@ -1,6 +1,6 @@
-using NTS.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
+namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Operator : Entity
 {

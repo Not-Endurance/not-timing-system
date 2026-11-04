@@ -1,8 +1,8 @@
-﻿using NTS.Domain.Aggregates;
-using NTS.Domain.Core.StaticOptions.Regions;
-using NTS.Domain.Settings;
+﻿using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.StaticOptions.Regions;
+using NoTiming.Domain.Settings;
 
-namespace NTS.Domain.Core.StaticOptions;
+namespace NoTiming.Domain.Core.StaticOptions;
 
 public class StaticOption
 {

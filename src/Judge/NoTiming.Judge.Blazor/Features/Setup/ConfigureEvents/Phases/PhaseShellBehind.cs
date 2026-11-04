@@ -1,9 +1,9 @@
-using Not.Krud.Blazor.Components.Abstractions;
-using Not.Structures;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
-using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
+using NC.Krud.Blazor.Components.Abstractions;
+using NC.Structures;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
+using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
 
-namespace NTS.Judge.Blazor.Features.Setup.ConfigureEvents.Phases;
+namespace NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents.Phases;
 
 public class PhaseShellBehind : KrudShell<PhaseFormModel>
 {

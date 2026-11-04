@@ -1,7 +1,7 @@
 using MudBlazor;
-using Not.Krud.Blazor.Components.Abstractions;
-using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
+using NC.Krud.Blazor.Components.Abstractions;
+using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
 
-namespace NTS.Judge.Blazor.Features.Setup.Loops;
+namespace NoTiming.Judge.Blazor.Features.Setup.Loops;
 
 public class LoopShellBehind : KrudShell<LoopFormModel> { }

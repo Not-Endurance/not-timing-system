@@ -1,7 +1,7 @@
-﻿using Not.Krud.Models;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+﻿using NC.Krud.Models;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
+namespace NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
 
 public record LoopFormModel : KrudFormModel<Loop>
 {

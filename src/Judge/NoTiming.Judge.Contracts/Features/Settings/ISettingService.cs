@@ -1,7 +1,7 @@
-using Not.Application.Behinds.Adapters;
-using NTS.Domain.Aggregates;
+using NC.Application.Behinds.Adapters;
+using NoTiming.Domain.Aggregates;
 
-namespace NTS.Judge.Contracts.Features.Settings;
+namespace NoTiming.Judge.Contracts.Features.Settings;
 
 public interface ISettingService : IStatefulService
 {

@@ -1,8 +1,8 @@
-﻿using Not.Objects;
-using Not.Random;
-using Not.Structures;
+﻿using NC.Objects;
+using NC.Random;
+using NC.Structures;
 
-namespace Not.Application.Authentication.User;
+namespace NC.Application.Authentication.User;
 
 public class NUserModel : IIdentifiable, IEquatable<NUserModel>
 {

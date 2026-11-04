@@ -1,23 +1,23 @@
 using System.Text;
-using Not.Blazor.Components.Print;
-using Not.Injection;
-using Not.Print;
-using NTS.Application.Contracts;
-using NTS.Application.Contracts.Pdf;
-using NTS.Blazor.Components.Results;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Documents;
+using NC.Blazor.Components.Print;
+using NC.Injection;
+using NC.Print;
+using NoTiming.Application.Contracts;
+using NoTiming.Application.Contracts.Pdf;
+using NoTiming.Blazor.Components.Results;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects.Documents;
 
-namespace NTS.Judge.Blazor.Features.Print;
+namespace NoTiming.Judge.Blazor.Features.Print;
 
-public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
+public sealed class NoTimingPrintRequestFactory : INoTimingPrintRequestFactory, ITransient
 {
     const string HANDOUT_PAGE_MARGIN = "6mm 6mm 10mm 6mm";
     const string RANKLIST_PAGE_MARGIN = "10mm 10mm 12mm 10mm";
 
     readonly INHtmlComponentRenderer _renderer;
 
-    public NtsPrintRequestFactory(INHtmlComponentRenderer renderer)
+    public NoTimingPrintRequestFactory(INHtmlComponentRenderer renderer)
     {
         _renderer = renderer;
     }
@@ -38,7 +38,7 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
             FileName = EnsureExtension(fileName, ".pdf"),
             Html = html,
             FooterText = GeneratedByText,
-            BackdropImage = LogoConstants.Nts,
+            BackdropImage = LogoConstants.NoTiming,
             Page = new NPrintPageOptions
             {
                 PaperFormat = context.PaperFormat,
@@ -97,7 +97,7 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
             FileName = EnsureExtension(fileName, ".pdf"),
             Html = html,
             FooterText = GeneratedByText,
-            BackdropImage = LogoConstants.Nts,
+            BackdropImage = LogoConstants.NoTiming,
             Page = new NPrintPageOptions
             {
                 PaperFormat = NPrintPaperFormat.A4,
@@ -114,7 +114,7 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
     }
 }
 
-public interface INtsPrintRequestFactory
+public interface INoTimingPrintRequestFactory
 {
     Task<NPrintDocumentRequest> CreateHandouts(
         IReadOnlyList<ResultsDocument> documents,

@@ -1,4 +1,4 @@
-﻿namespace Not.Domain.Krud;
+﻿namespace NC.Domain.Krud;
 
 /// <summary>
 /// Implementations of this interface are expected to reflect changes ot <typeparamref name="T"/> that occur separately

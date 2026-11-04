@@ -1,9 +1,9 @@
-using Not.Application.CRUD.Ports;
-using Not.Injection;
-using Not.Krud.Services;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+using NC.Application.CRUD.Ports;
+using NC.Injection;
+using NC.Krud.Services;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Judge.Features.Setup.ConfigureEvents.Competitions;
+namespace NoTiming.Judge.Features.Setup.ConfigureEvents.Competitions;
 
 public class CompetitionService : KrudServiceBase<Competition, CompetitionFormModel>, ITransient
 {

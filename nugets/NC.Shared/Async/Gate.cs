@@ -1,4 +1,4 @@
-﻿namespace Not.Async;
+﻿namespace NC.Async;
 
 public class Gate : IDisposable
 {

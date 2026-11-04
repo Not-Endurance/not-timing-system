@@ -1,7 +1,7 @@
 using MudBlazor;
-using Not.Safe;
+using NC.Safe;
 
-namespace Not.Blazor.Components.Input;
+namespace NC.Blazor.Components.Input;
 
 public class NAutocomplete<T> : MudAutocomplete<T?>
 {

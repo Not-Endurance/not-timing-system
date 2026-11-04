@@ -1,6 +1,6 @@
-﻿using Not.SmartSearch.Property;
+﻿using NC.SmartSearch.Property;
 
-namespace Not.SmartSearch.Builder;
+namespace NC.SmartSearch.Builder;
 
 public class SmartSearchBuilder<T>
 {

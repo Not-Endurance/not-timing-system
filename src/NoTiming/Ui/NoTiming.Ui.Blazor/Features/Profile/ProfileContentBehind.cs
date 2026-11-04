@@ -1,5 +1,5 @@
-using Not.Blazor.Components.Abstractions;
-using NTS.Domain.Aggregates;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Domain.Aggregates;
 using NoTiming.Ui.Contracts.Features.Profile;
 
 namespace NoTiming.Ui.Blazor.Features.Profile;

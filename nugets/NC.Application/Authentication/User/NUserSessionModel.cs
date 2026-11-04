@@ -1,6 +1,6 @@
-using Not.Application.Authentication.Abstractions;
+using NC.Application.Authentication.Abstractions;
 
-namespace Not.Application.Authentication.User;
+namespace NC.Application.Authentication.User;
 
 public abstract class NUserSessionModel
 {

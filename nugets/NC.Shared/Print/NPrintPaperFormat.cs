@@ -1,4 +1,4 @@
-namespace Not.Print;
+namespace NC.Print;
 
 public enum NPrintPaperFormat
 {

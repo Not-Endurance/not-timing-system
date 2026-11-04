@@ -1,6 +1,6 @@
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
-namespace Not.Blazor.Components.Tables;
+namespace NC.Blazor.Components.Tables;
 
 public class NTdBehind<T> : NComponent
 {

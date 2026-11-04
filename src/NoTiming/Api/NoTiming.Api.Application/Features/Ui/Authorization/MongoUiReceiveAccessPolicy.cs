@@ -1,9 +1,9 @@
 using MongoDB.Driver;
-using Not.Storage.Mongo;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Domain.Core.Objects;
-using NTS.Domain.Enums;
+using NC.Storage.Mongo;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Domain.Core.Objects;
+using NoTiming.Domain.Enums;
 
 namespace NoTiming.Api.Application.Features.Ui.Authorization;
 

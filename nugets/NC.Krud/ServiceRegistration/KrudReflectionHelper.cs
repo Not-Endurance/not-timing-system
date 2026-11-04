@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Reflection;
-using Not.Domain;
-using Not.Domain.Krud;
-using Not.Krud.Abstractions;
-using Not.Krud.Graph;
+using NC.Domain;
+using NC.Domain.Krud;
+using NC.Krud.Abstractions;
+using NC.Krud.Graph;
 
-namespace Not.Krud.ServiceRegistration;
+namespace NC.Krud.ServiceRegistration;
 
 internal static class KrudReflectionHelper
 {

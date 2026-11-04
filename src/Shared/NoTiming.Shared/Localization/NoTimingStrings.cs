@@ -1,13 +1,13 @@
-﻿using static Not.Localization.LocalizationHelper;
+﻿using static NC.Localization.LocalizationHelper;
 // ReSharper disable InconsistentNaming
 
 #pragma warning disable IDE1006 // Naming Styles
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 #pragma warning disable NA0004 // Member spacing rule violation
 
-namespace NTS.Localization
+namespace NoTiming.Shared.Localization
 {
-    public static class NtsStrings
+    public static class NoTimingStrings
     {
         public static string km_string => LocalizeString(nameof(km_string));
         public static string hrs_string => LocalizeString(nameof(hrs_string));

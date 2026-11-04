@@ -1,15 +1,15 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using MongoDB.Driver;
-using Not.Application.CRUD.Ports;
-using Not.Application.HTTP;
-using Not.Domain.Abstractions;
-using Not.Exceptions;
-using Not.Krud.Abstractions;
-using Not.Notify;
-using Not.Structures;
+using NC.Application.CRUD.Ports;
+using NC.Application.HTTP;
+using NC.Domain.Abstractions;
+using NC.Exceptions;
+using NC.Krud.Abstractions;
+using NC.Notify;
+using NC.Structures;
 
-namespace Not.Storage.REST;
+namespace NC.Storage.REST;
 
 public abstract class ApiRepository<T, TModel> : IRepository<T>
     where T : class, IEntity
@@ -109,7 +109,7 @@ public abstract class ApiRepository<T, TModel> : IRepository<T>
 #if DEBUG
                 Notifier?.Error(ex);
 #else
-                Notifier?.Warn(Not.Localization.NStrings.Cannot_connect_to_server_string);
+                Notifier?.Warn(NC.Localization.NStrings.Cannot_connect_to_server_string);
 #endif
             }
             else

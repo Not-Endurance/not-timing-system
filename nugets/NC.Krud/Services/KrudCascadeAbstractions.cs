@@ -1,7 +1,7 @@
-using Not.Domain;
-using Not.Krud.Models;
+using NC.Domain;
+using NC.Krud.Models;
 
-namespace Not.Krud.Services;
+namespace NC.Krud.Services;
 
 public interface IKrudCascadeRepository<T>
     where T : Entity

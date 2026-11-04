@@ -1,7 +1,7 @@
 using Microsoft.JSInterop;
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
-namespace NTS.Judge.MAUI.Print;
+namespace NoTiming.Judge.MAUI.Print;
 
 public class PrintInterop : IPrintInterop
 {

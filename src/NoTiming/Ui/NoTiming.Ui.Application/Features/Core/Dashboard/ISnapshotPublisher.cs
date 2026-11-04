@@ -1,4 +1,4 @@
-using NTS.Domain.Watcher;
+using NoTiming.Domain.Watcher;
 
 namespace NoTiming.Ui.Application.Features.Core.Dashboard;
 

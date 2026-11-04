@@ -1,8 +1,8 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Components.Web;
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
-namespace NTS.Judge.Blazor;
+namespace NoTiming.Judge.Blazor;
 
 public class JudgeBlazorRootBehind : NComponent
 {

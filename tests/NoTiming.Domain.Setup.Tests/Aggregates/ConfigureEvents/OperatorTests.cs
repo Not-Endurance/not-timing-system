@@ -1,9 +1,9 @@
-using Not.Domain.Exceptions;
-using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates;
-using SetupOperator = NTS.Domain.Setup.Aggregates.ConfigureEvents.Operator;
+using NC.Domain.Exceptions;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Setup.Aggregates;
+using SetupOperator = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Operator;
 
-namespace NTS.Domain.Setup.Tests.Aggregates.ConfigureEvents;
+namespace NoTiming.Domain.Setup.Tests.Aggregates.ConfigureEvents;
 
 public sealed class OperatorTests
 {

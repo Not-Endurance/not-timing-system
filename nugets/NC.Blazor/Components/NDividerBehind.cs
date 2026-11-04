@@ -1,6 +1,6 @@
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
-namespace Not.Blazor.Components;
+namespace NC.Blazor.Components;
 
 public class NDividerBehind : NComponent
 {

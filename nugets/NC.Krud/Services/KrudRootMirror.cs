@@ -1,9 +1,9 @@
-using Not.Application.CRUD.Ports;
-using Not.Domain;
-using Not.Domain.Krud;
-using Not.Krud.Abstractions;
+using NC.Application.CRUD.Ports;
+using NC.Domain;
+using NC.Domain.Krud;
+using NC.Krud.Abstractions;
 
-namespace Not.Krud.Services;
+namespace NC.Krud.Services;
 
 internal sealed class KrudRootMirror<TRoot, TPrincipal> : IKrudMirrorService<TPrincipal>
     where TRoot : Aggregate, IKurdMirror<TPrincipal>

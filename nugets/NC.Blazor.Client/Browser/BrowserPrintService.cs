@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
-using Not.Application.Print;
-using Not.Files;
-using Not.Files.Abstractions;
-using Not.Print;
+using NC.Application.Print;
+using NC.Files;
+using NC.Files.Abstractions;
+using NC.Print;
 
-namespace Not.Blazor.Client.Browser;
+namespace NC.Blazor.Client.Browser;
 
 public class BrowserPrintService : INPrintService, IFileService
 {
@@ -75,6 +75,6 @@ public class BrowserPrintService : INPrintService, IFileService
 
     ValueTask<IJSObjectReference> Import()
     {
-        return _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Not.Blazor.Client/print-scripts.js");
+        return _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/NC.Blazor.Client/print-scripts.js");
     }
 }

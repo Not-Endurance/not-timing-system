@@ -1,7 +1,7 @@
-﻿using Not.Events;
-using Not.Observables;
+﻿using NC.Events;
+using NC.Observables;
 
-namespace Not.Krud.Graph;
+namespace NC.Krud.Graph;
 
 public class KrudNode : Observer, IObservable
 {

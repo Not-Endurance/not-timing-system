@@ -1,8 +1,8 @@
-using Not.Krud.Blazor.Components.Abstractions;
-using NTS.Domain.Aggregates;
-using NTS.Judge.Contracts.Features.Setup.ConfigureEvents;
+using NC.Krud.Blazor.Components.Abstractions;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents;
 
-namespace NTS.Judge.Blazor.Features.Setup.ConfigureEvents;
+namespace NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents;
 
 public class ConfigureEventShellBehind : KrudShell<ConfigureEventFormModel>
 {

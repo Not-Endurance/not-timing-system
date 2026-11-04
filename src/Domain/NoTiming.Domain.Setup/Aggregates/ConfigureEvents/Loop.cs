@@ -1,6 +1,6 @@
-﻿using Not.Domain.Exceptions;
+﻿using NC.Domain.Exceptions;
 
-namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
+namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Loop : Entity
 {

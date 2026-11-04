@@ -1,20 +1,20 @@
-using Not.Async.Extensions;
-using Not.Injection;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Core.Aggregates;
+using NC.Async.Extensions;
+using NC.Injection;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Core.Aggregates;
 
 namespace NoTiming.Ui.Blazor.Features.Socket;
 
 public class EventConnectionCoordinator : IEventConnectionCoordinator, IScoped
 {
     readonly IEventInformationService _eventInformationService;
-    readonly INtsSocketService _socketService;
+    readonly INoTimingSocketService _socketService;
     readonly IEventConnectionDialogLauncher _dialogLauncher;
 
     public EventConnectionCoordinator(
         IEventInformationService eventInformationService,
-        INtsSocketService socketService,
+        INoTimingSocketService socketService,
         IEventConnectionDialogLauncher dialogLauncher
     )
     {

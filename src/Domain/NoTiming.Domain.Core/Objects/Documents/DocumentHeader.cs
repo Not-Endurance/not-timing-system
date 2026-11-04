@@ -1,7 +1,7 @@
-﻿using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
+﻿using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Domain.Core.Objects.Documents;
+namespace NoTiming.Domain.Core.Objects.Documents;
 
 public record DocumentHeader
 {

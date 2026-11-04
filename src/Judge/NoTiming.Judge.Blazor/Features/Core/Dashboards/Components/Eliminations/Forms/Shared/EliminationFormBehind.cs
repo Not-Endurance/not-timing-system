@@ -1,7 +1,7 @@
-using Not.Blazor.Components.Abstractions;
-using NTS.Judge.Contracts.Features.Core.Dashboard;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Judge.Contracts.Features.Core.Dashboard;
 
-namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms.Shared;
+namespace NoTiming.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms.Shared;
 
 public abstract class EliminationFormBehind : NComponent
 {

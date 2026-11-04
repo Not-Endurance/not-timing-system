@@ -1,10 +1,10 @@
-using Not.Blazor.Components.Abstractions;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Domain.Core.Aggregates.Participations;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Domain.Core.Aggregates.Participations;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
 
-namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations;
+namespace NoTiming.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations;
 
 public class EliminationsPanelBehind : NStatefulComponent
 {

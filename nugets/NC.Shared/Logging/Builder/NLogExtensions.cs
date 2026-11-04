@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Not.Files;
-using Not.Injection.Config;
-using Not.Logging.Filesystem;
-using Not.Logging.HTTP;
-using Not.Startup;
+using NC.Files;
+using NC.Injection.Config;
+using NC.Logging.Filesystem;
+using NC.Logging.HTTP;
+using NC.Startup;
 
-namespace Not.Logging.Builder;
+namespace NC.Logging.Builder;
 
 public static class NLogExtensions
 {

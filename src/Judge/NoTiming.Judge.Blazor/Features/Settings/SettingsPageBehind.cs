@@ -1,8 +1,8 @@
-using Not.Blazor.Components.Abstractions;
-using Not.Krud.Blazor;
-using NTS.Judge.Contracts.Features.Settings;
+using NC.Blazor.Components.Abstractions;
+using NC.Krud.Blazor;
+using NoTiming.Judge.Contracts.Features.Settings;
 
-namespace NTS.Judge.Blazor.Features.Settings;
+namespace NoTiming.Judge.Blazor.Features.Settings;
 
 public class SettingsPageBehind : NStatefulComponent
 {

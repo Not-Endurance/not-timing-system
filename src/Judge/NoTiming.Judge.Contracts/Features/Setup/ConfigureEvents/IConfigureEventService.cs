@@ -1,8 +1,8 @@
-using Not.Injection;
-using Not.Structures;
-using NTS.Domain.Setup.Services.StartValidation;
+using NC.Injection;
+using NC.Structures;
+using NoTiming.Domain.Setup.Services.StartValidation;
 
-namespace NTS.Judge.Contracts.Features.Setup.ConfigureEvents;
+namespace NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents;
 
 public interface IConfigureEventService : ITransient
 {

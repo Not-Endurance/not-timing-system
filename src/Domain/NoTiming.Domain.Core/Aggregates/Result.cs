@@ -1,8 +1,8 @@
-using NTS.Domain.Core.Aggregates.Results;
-using NTS.Domain.Core.Objects.Rankers;
-using NTS.Domain.Core.StaticOptions;
+using NoTiming.Domain.Core.Aggregates.Results;
+using NoTiming.Domain.Core.Objects.Rankers;
+using NoTiming.Domain.Core.StaticOptions;
 
-namespace NTS.Domain.Core.Aggregates;
+namespace NoTiming.Domain.Core.Aggregates;
 
 public class Result : Aggregate, IEventScoped
 {

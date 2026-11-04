@@ -1,4 +1,4 @@
-namespace Not.Server.Print;
+namespace NC.Server.Print;
 
 public sealed class NPrintSettings
 {

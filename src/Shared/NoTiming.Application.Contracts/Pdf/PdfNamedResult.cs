@@ -1,4 +1,4 @@
-namespace NTS.Application.Contracts.Pdf;
+namespace NoTiming.Application.Contracts.Pdf;
 
 public sealed class PdfNamedResult
 {

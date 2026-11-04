@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
-namespace Not.Blazor.Components.Input;
+namespace NC.Blazor.Components.Input;
 
 public abstract class NSwitchBehind : NComponentBase
 {

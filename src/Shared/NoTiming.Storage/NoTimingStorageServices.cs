@@ -1,26 +1,26 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Authentication.Abstractions;
-using Not.Application.CRUD.Ports;
-using Not.Storage;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Application.Core;
-using NTS.Application.Settings;
-using NTS.Application.Setup;
-using NTS.Application.UserSession;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Storage.Core.Repositories;
-using NTS.Storage.REST;
+using NC.Application.Authentication.Abstractions;
+using NC.Application.CRUD.Ports;
+using NC.Storage;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Application.Core;
+using NoTiming.Application.Settings;
+using NoTiming.Application.Setup;
+using NoTiming.Application.UserSession;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Storage.Core.Repositories;
+using NoTiming.Storage.REST;
 
-namespace NTS.Storage;
+namespace NoTiming.Storage;
 
-public static class NtsStorageServices
+public static class NoTimingStorageServices
 {
-    public static Builder ConfigureNtsStorage(this IServiceCollection services, IConfiguration configuration)
+    public static Builder ConfigureNoTimingStorage(this IServiceCollection services, IConfiguration configuration)
     {
         return new(services, configuration);
     }
@@ -43,8 +43,8 @@ public static class NtsStorageServices
 
             _services.AddTransient<IEventInformationRepository, EventInformationApiRepository>();
             _services.AddTransient<ISettingRepository, SettingApiRepository>();
-            _services.AddTransient<INtsUserSessionRepository, UserSessionApiRepository>();
-            _services.AddTransient<INUserSessionRepository<NtsUserSessionStateModel>, UserSessionApiRepository>();
+            _services.AddTransient<INoTimingUserSessionRepository, UserSessionApiRepository>();
+            _services.AddTransient<INUserSessionRepository<NoTimingUserSessionStateModel>, UserSessionApiRepository>();
             _services.AddTransient<IRepository<Participation>, ParticipationApiRepository>();
             _services.AddTransient<IRepository<Ranking>, RankingApiRepository>();
             _services.AddTransient<IRepository<Official>, OfficialApiRepository>();

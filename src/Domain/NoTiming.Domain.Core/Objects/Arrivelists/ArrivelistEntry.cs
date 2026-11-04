@@ -1,4 +1,4 @@
-namespace NTS.Domain.Core.Objects.Arrivelists;
+namespace NoTiming.Domain.Core.Objects.Arrivelists;
 
 public record ArrivelistEntry : ValueObject
 {

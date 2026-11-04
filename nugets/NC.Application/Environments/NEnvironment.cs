@@ -1,4 +1,4 @@
-namespace Not.Application.Environments;
+namespace NC.Application.Environments;
 
 public sealed class NEnvironment
 {

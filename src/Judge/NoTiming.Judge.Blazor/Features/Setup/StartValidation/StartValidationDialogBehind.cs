@@ -1,9 +1,9 @@
-using Not.Blazor.Dialogs.Abstractions;
-using Not.Structures;
-using NTS.Domain.Setup.Services.StartValidation;
-using NTS.Judge.Contracts.Features.Setup.ConfigureEvents;
+using NC.Blazor.Dialogs.Abstractions;
+using NC.Structures;
+using NoTiming.Domain.Setup.Services.StartValidation;
+using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents;
 
-namespace NTS.Judge.Blazor.Features.Setup.StartValidation;
+namespace NoTiming.Judge.Blazor.Features.Setup.StartValidation;
 
 public class StartValidationDialogBehind : NDialog<bool>
 {

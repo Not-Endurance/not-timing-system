@@ -1,14 +1,14 @@
 using MediatR;
-using Not.Application.Authentication.Abstractions;
-using Not.Application.Behinds.Adapters;
-using Not.Injection;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Presentlists;
-using NTS.Application.Contracts.Socket;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects;
+using NC.Application.Authentication.Abstractions;
+using NC.Application.Behinds.Adapters;
+using NC.Injection;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Presentlists;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Events;
+using NoTiming.Domain.Core.Objects;
 
 namespace NoTiming.Ui.Application.Features.Access;
 
@@ -20,13 +20,13 @@ public class UiAccessContext
         INotificationHandler<EventDisconnected>,
         IScoped
 {
-    readonly INtsSocketContext _socketContext;
+    readonly INoTimingSocketContext _socketContext;
     readonly INUserSession _userSessionService;
     readonly IEventScopedRepository<Official> _officialReader;
     readonly IEventScopedRepository<Operator> _operatorReader;
 
     public UiAccessContext(
-        INtsSocketContext socketContext,
+        INoTimingSocketContext socketContext,
         INUserSession userSessionService,
         IEventScopedRepository<Official> officialRepository,
         IEventScopedRepository<Operator> operatorRepository
@@ -49,7 +49,7 @@ public class UiAccessContext
             return true;
         }
 
-        var session = await _userSessionService.GetCurrent<NtsUserSessionStateModel>();
+        var session = await _userSessionService.GetCurrent<NoTimingUserSessionStateModel>();
         var userId = session?.User.Id;
         if (userId == null)
         {

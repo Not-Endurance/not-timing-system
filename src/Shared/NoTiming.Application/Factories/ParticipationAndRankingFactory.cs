@@ -1,10 +1,10 @@
-using Not.Domain.Exceptions;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
+using NC.Domain.Exceptions;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
 
-namespace NTS.Application.Factories;
+namespace NoTiming.Application.Factories;
 
 // TODO: Move Judge/Features/Core/State when consolidating Judge & Ui projects
 public static class ParticipationAndRankingFactory

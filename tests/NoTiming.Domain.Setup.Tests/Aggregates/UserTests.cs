@@ -1,6 +1,6 @@
-using NTS.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Domain.Setup.Tests.Aggregates;
+namespace NoTiming.Domain.Setup.Tests.Aggregates;
 
 public sealed class UserTests
 {

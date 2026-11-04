@@ -1,10 +1,10 @@
-﻿using Not.DateAndTime;
-using Not.Domain.Exceptions;
-using Not.Krud.Models;
-using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+﻿using NC.DateAndTime;
+using NC.Domain.Exceptions;
+using NC.Krud.Models;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
+namespace NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
 
 public record ParticipationFormModel : KrudFormModel<Participation>
 {

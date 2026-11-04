@@ -1,7 +1,7 @@
-using Not.Domain.Abstractions;
-using NTS.Domain.Core.Aggregates;
+using NC.Domain.Abstractions;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Domain.Core.Objects.Payloads;
+namespace NoTiming.Domain.Core.Objects.Payloads;
 
 public abstract record ParticipationPayload : IDomainEvent
 {

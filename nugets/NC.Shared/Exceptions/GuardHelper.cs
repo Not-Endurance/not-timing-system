@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace Not.Exceptions;
+namespace NC.Exceptions;
 
 /// <summary>
 /// GuardHelper deals with exceptions that should never be seen by the end-user

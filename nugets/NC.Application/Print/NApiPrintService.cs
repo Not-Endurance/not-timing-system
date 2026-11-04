@@ -1,9 +1,9 @@
-using Not.Application.HTTP;
-using Not.Files;
-using Not.Injection;
-using Not.Print;
+using NC.Application.HTTP;
+using NC.Files;
+using NC.Injection;
+using NC.Print;
 
-namespace Not.Application.Print;
+namespace NC.Application.Print;
 
 public interface INPrintApiService : ITransient
 {

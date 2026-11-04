@@ -1,4 +1,4 @@
-namespace Not.Blazor.Client.Browser;
+namespace NC.Blazor.Client.Browser;
 
 public sealed class NPrintClientSettings
 {

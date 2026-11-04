@@ -1,8 +1,8 @@
-using Not.Application.Authentication.Abstractions;
-using Not.Application.Authentication.User;
-using Not.Application.HTTP;
-using Not.Notify;
-using Not.Structures;
+using NC.Application.Authentication.Abstractions;
+using NC.Application.Authentication.User;
+using NC.Application.HTTP;
+using NC.Notify;
+using NC.Structures;
 using NoTiming.Ui.Contracts.API;
 using NoTiming.Ui.Application.Features.Profile;
 

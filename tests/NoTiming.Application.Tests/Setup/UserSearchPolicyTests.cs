@@ -1,7 +1,7 @@
-using NTS.Application.Setup;
-using NTS.Domain.Setup.Aggregates;
+using NoTiming.Application.Setup;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Application.Tests.Setup;
+namespace NoTiming.Application.Tests.Setup;
 
 public sealed class UserSearchPolicyTests
 {

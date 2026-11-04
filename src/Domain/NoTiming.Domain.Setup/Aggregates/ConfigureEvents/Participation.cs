@@ -1,6 +1,6 @@
-﻿using Not.Domain.Krud;
+﻿using NC.Domain.Krud;
 
-namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
+namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Participation : Entity, IKurdMirror<Combination>
 {

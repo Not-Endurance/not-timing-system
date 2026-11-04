@@ -1,4 +1,4 @@
-namespace Not.Blazor.Client.Authentication;
+namespace NC.Blazor.Client.Authentication;
 
 public static class AuthenticationContents
 {

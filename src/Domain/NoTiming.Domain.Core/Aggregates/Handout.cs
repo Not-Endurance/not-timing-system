@@ -1,6 +1,6 @@
-using NTS.Domain.Core.Aggregates.Results;
+using NoTiming.Domain.Core.Aggregates.Results;
 
-namespace NTS.Domain.Core.Aggregates;
+namespace NoTiming.Domain.Core.Aggregates;
 
 public sealed class Handout : Result
 {

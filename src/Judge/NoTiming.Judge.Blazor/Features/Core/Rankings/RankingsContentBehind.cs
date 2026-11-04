@@ -1,21 +1,21 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Components.Buttons;
-using Not.Blazor.Components.Print;
-using Not.Blazor.Dialogs;
-using Not.Blazor.Helpers;
-using Not.Print;
-using NTS.Application.Contracts.Pdf;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Documents;
-using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
-using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
-using NTS.Judge.Blazor.Features.Print;
-using NTS.Judge.Blazor.Layout.Drawer.Deactivate;
-using static NTS.Judge.Blazor.JudgeRoutes;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Buttons;
+using NC.Blazor.Components.Print;
+using NC.Blazor.Dialogs;
+using NC.Blazor.Helpers;
+using NC.Print;
+using NoTiming.Application.Contracts.Pdf;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects.Documents;
+using NoTiming.Judge.Blazor.Features.Core.Rankings.CustomRanking;
+using NoTiming.Judge.Blazor.Features.Core.Rankings.Protocols;
+using NoTiming.Judge.Blazor.Features.Print;
+using NoTiming.Judge.Blazor.Layout.Drawer.Deactivate;
+using static NoTiming.Judge.Blazor.JudgeRoutes;
 
-namespace NTS.Judge.Blazor.Features.Core.Rankings;
+namespace NoTiming.Judge.Blazor.Features.Core.Rankings;
 
 public class RankingsContentBehind : NStatefulComponent
 {
@@ -30,7 +30,7 @@ public class RankingsContentBehind : NStatefulComponent
     IDashService DashService { get; set; } = default!;
 
     [Inject]
-    INtsSocketService SocketService { get; set; } = default!;
+    INoTimingSocketService SocketService { get; set; } = default!;
 
     [Inject]
     IResultsDocumentService DocumentService { get; set; } = default!;
@@ -39,7 +39,7 @@ public class RankingsContentBehind : NStatefulComponent
     NavigationManager NavigationManager { get; set; } = default!;
 
     [Inject]
-    INtsPrintRequestFactory PrintRequests { get; set; } = default!;
+    INoTimingPrintRequestFactory PrintRequests { get; set; } = default!;
 
     [Inject]
     IProtocolLogoState HeaderLogo { get; set; } = default!;

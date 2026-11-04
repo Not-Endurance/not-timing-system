@@ -1,4 +1,4 @@
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 using NoTiming.Ui.Blazor.Features.Socket;
 
 namespace NoTiming.Ui.Blazor.Features.Core.Presentlist;

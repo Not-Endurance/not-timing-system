@@ -1,4 +1,4 @@
-﻿namespace Not.Exceptions;
+﻿namespace NC.Exceptions;
 
 public class NotException : ApplicationException
 {

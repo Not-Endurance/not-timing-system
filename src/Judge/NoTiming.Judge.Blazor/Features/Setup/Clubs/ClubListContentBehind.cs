@@ -1,5 +1,5 @@
-using Not.Blazor.Components;
+using NC.Blazor.Components;
 
-namespace NTS.Judge.Blazor.Features.Setup.Clubs;
+namespace NoTiming.Judge.Blazor.Features.Setup.Clubs;
 
 public class ClubListContentBehind : NContentBehind { }

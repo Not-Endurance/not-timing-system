@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Playwright;
 
-namespace Not.Server.Print;
+namespace NC.Server.Print;
 
 public sealed class NPlaywrightPrintRenderer : INPrintRenderer, IAsyncDisposable
 {

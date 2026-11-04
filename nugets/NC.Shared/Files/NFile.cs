@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Not.Files;
+namespace NC.Files;
 
 public sealed class NFile
 {

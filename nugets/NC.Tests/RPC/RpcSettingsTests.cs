@@ -1,7 +1,7 @@
-using Not.Application.RPC;
+using NC.Application.RPC;
 using Xunit;
 
-namespace Not.Tests.RPC;
+namespace NC.Tests.RPC;
 
 public sealed class RpcSettingsTests
 {

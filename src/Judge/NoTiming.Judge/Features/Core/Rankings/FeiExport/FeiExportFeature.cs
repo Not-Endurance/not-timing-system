@@ -2,14 +2,14 @@
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using Not.Domain.Exceptions;
-using Not.Formatting;
-using Not.Injection;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Enums;
+using NC.Domain.Exceptions;
+using NC.Formatting;
+using NC.Injection;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Domain.Enums;
 
-namespace NTS.Judge.Features.Core.Rankings.FeiExport;
+namespace NoTiming.Judge.Features.Core.Rankings.FeiExport;
 
 internal class FeiExportFeature : IFeiExportFeature
 {

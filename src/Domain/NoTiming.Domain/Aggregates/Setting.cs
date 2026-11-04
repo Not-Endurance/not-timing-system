@@ -1,8 +1,8 @@
-﻿using Not.Domain;
-using NTS.Domain.Enums;
-using NTS.Domain.Settings;
+﻿using NC.Domain;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Settings;
 
-namespace NTS.Domain.Aggregates;
+namespace NoTiming.Domain.Aggregates;
 
 public class Setting : Aggregate
 {

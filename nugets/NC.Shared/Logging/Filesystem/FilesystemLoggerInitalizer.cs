@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Not.Files;
-using Not.Logging.Builder;
-using Not.Startup;
+using NC.Files;
+using NC.Logging.Builder;
+using NC.Startup;
 using Serilog;
 
-namespace Not.Logging.Filesystem;
+namespace NC.Logging.Filesystem;
 
 public class FilesystemLoggerInitalizer : IStartupInitializer
 {

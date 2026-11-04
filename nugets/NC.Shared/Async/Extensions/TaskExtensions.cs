@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Not.Async.Extensions;
+using NC.Async.Extensions;
 
-namespace Not.Async.Extensions;
+namespace NC.Async.Extensions;
 
-// TODO: This should be in its own namespace. Something like Not.Async or Not.Tasks
+// TODO: This should be in its own namespace. Something like NC.Async or NC.Tasks
 public static class TaskExtensions
 {
     public static void ToVoid(this Task task)

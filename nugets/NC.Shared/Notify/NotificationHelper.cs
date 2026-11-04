@@ -1,4 +1,4 @@
-namespace Not.Notify;
+namespace NC.Notify;
 
 public static class NotificationHelper
 {

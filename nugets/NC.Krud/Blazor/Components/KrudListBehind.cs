@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Components;
-using Not.Async.Extensions;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Navigation.Abstractions;
-using Not.Collections;
-using Not.Domain;
-using Not.Exceptions;
-using Not.Krud.Abstractions;
-using Not.Krud.Blazor.Components.Abstractions;
-using Not.Krud.Models;
+using NC.Async.Extensions;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Navigation.Abstractions;
+using NC.Collections;
+using NC.Domain;
+using NC.Exceptions;
+using NC.Krud.Abstractions;
+using NC.Krud.Blazor.Components.Abstractions;
+using NC.Krud.Models;
 
-namespace Not.Krud.Blazor.Components;
+namespace NC.Krud.Blazor.Components;
 
 public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     where T : Entity

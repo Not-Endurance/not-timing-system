@@ -1,16 +1,16 @@
-using Not.Application.Behinds.Adapters;
-using Not.Application.DomainEvents;
-using Not.Application.RPC;
-using Not.Application.RPC.SignalR;
-using Not.Injection;
-using NTS.Application.Contracts.Socket;
-using NTS.Application.UserSession;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Events;
+using NC.Application.Behinds.Adapters;
+using NC.Application.DomainEvents;
+using NC.Application.RPC;
+using NC.Application.RPC.SignalR;
+using NC.Injection;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Application.UserSession;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Events;
 
 namespace NoTiming.Ui.Application.Features.Socket;
 
-public class UiSocketService : NStatefulService, INtsSocketService, IScoped, IDisposable
+public class UiSocketService : NStatefulService, INoTimingSocketService, IScoped, IDisposable
 {
     readonly IUiUserSession _userSessionService;
     readonly IRpcSocket _socket;

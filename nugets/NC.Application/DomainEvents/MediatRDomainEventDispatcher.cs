@@ -1,10 +1,10 @@
 using MediatR;
-using Not.Domain;
-using Not.Domain.Abstractions;
-using Not.Exceptions;
-using Not.Logging;
+using NC.Domain;
+using NC.Domain.Abstractions;
+using NC.Exceptions;
+using NC.Logging;
 
-namespace Not.Application.DomainEvents;
+namespace NC.Application.DomainEvents;
 
 public class MediatRDomainEventDispatcher : IDomainEventDispatcher
 {
@@ -37,13 +37,13 @@ public class MediatRDomainEventDispatcher : IDomainEventDispatcher
         {
             await _publisher.Publish(@event, ct);
         }
-        catch (Not.Exceptions.ValidationException validation)
+        catch (NC.Exceptions.ValidationException validation)
         {
             var message = $"""
                 Validation was suppressed while dispatching '{@event.GetType().Name}' in RELEASE.
                 Message: {validation.Message}
                 """;
-            Not.Logging.LoggingHelper.Debug(message);
+            NC.Logging.LoggingHelper.Debug(message);
         }
 #endif
     }

@@ -1,4 +1,4 @@
-﻿namespace Not.Application.Tenants;
+﻿namespace NC.Application.Tenants;
 
 public interface ITenantAware
 {

@@ -1,10 +1,10 @@
-using NTS.Domain.Aggregates;
-using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
-using SetupOperator = NTS.Domain.Setup.Aggregates.ConfigureEvents.Operator;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
+using SetupOperator = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Operator;
 
-namespace NTS.Domain.Setup.Tests.Aggregates;
+namespace NoTiming.Domain.Setup.Tests.Aggregates;
 
 public sealed class ConfigureEventTests
 {

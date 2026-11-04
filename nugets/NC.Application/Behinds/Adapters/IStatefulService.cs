@@ -1,6 +1,6 @@
-﻿using Not.Observables;
+﻿using NC.Observables;
 
-namespace Not.Application.Behinds.Adapters;
+namespace NC.Application.Behinds.Adapters;
 
 public interface IStatefulService : IObservable
 {

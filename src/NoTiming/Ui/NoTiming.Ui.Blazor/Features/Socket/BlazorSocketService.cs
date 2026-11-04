@@ -1,5 +1,5 @@
-using Not.Injection;
-using Not.Safe;
+using NC.Injection;
+using NC.Safe;
 
 namespace NoTiming.Ui.Blazor.Features.Socket;
 

@@ -1,8 +1,8 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Not.Application.Configurations;
-using Not.Application.Environments;
+using NC.Application.Configurations;
+using NC.Application.Environments;
 using NoTiming.Ui.Application;
 using NoTiming.Ui;
 
@@ -14,8 +14,8 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton(new NEnvironment(builder.HostEnvironment.Environment));
-builder.Services.AddNtsUi(builder.Configuration);
-builder.Services.AddNtsUiApplication(
+builder.Services.AddNoTimingUi(builder.Configuration);
+builder.Services.AddNoTimingUiApplication(
     builder.Configuration,
     builder.HostEnvironment.BaseAddress,
     Assembly.GetExecutingAssembly()

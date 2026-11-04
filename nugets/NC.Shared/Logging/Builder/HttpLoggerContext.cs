@@ -1,6 +1,6 @@
-﻿using Not.Injection.Config;
+﻿using NC.Injection.Config;
 
-namespace Not.Logging.Builder;
+namespace NC.Logging.Builder;
 
 public class HttpLoggerContext : INConfig
 {

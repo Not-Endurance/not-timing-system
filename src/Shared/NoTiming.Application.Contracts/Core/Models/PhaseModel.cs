@@ -1,7 +1,7 @@
-﻿using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Enums;
+﻿using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Enums;
 
-namespace NTS.Application.Contracts.Core.Models;
+namespace NoTiming.Application.Contracts.Core.Models;
 
 public class PhaseModel
 {

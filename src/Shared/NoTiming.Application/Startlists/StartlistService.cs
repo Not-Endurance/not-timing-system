@@ -1,15 +1,15 @@
 using MediatR;
-using Not.Application.Behinds.Adapters;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
-using NTS.Application.Contracts.Startlists;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Core.Objects.Startlists;
+using NC.Application.Behinds.Adapters;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Application.Contracts.Startlists;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Domain.Core.Events;
+using NoTiming.Domain.Core.Objects.Payloads;
+using NoTiming.Domain.Core.Objects.Startlists;
 
-namespace NTS.Application.Startlists;
+namespace NoTiming.Application.Startlists;
 
 public class StartlistService
     : NStatefulService,
@@ -22,13 +22,13 @@ public class StartlistService
         INotificationHandler<EventDisconnected>
 {
     readonly IEventScopedRepository<Participation> _participations;
-    readonly INtsSocketContext? _socketContext;
+    readonly INoTimingSocketContext? _socketContext;
     UniqueParticipations _state = new();
 
     public StartlistService(IEventScopedRepository<Participation> participations)
         : this(participations, null) { }
 
-    public StartlistService(IEventScopedRepository<Participation> participations, INtsSocketContext? socketContext)
+    public StartlistService(IEventScopedRepository<Participation> participations, INoTimingSocketContext? socketContext)
     {
         _participations = participations;
         _socketContext = socketContext;

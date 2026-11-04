@@ -1,9 +1,9 @@
-using Not.Injection;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+using NC.Injection;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Judge.Contracts.Features.Setup;
+namespace NoTiming.Judge.Contracts.Features.Setup;
 
 public interface IJudgeSetupLookupService : ITransient
 {

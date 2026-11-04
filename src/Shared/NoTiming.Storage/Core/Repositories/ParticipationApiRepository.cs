@@ -1,9 +1,9 @@
-using Not.Application.HTTP;
-using Not.Storage.REST;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Domain.Core.Aggregates;
+using NC.Application.HTTP;
+using NC.Storage.REST;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Storage.Core.Repositories;
+namespace NoTiming.Storage.Core.Repositories;
 
 public class ParticipationApiRepository : ApiRepository<Participation, ParticipationModel>
 {

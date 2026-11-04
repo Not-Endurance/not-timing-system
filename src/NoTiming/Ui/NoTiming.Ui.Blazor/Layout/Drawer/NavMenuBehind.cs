@@ -1,8 +1,8 @@
 using MudBlazor;
-using Not.Application.Authentication.Abstractions;
-using Not.Blazor.Components.Abstractions;
-using NTS.Application.Contracts.Socket;
-using NTS.Blazor.Components.SelectEvents;
+using NC.Application.Authentication.Abstractions;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Blazor.Components.SelectEvents;
 using NoTiming.Ui.Blazor.Features;
 using NoTiming.Ui.Contracts.Features.Access;
 using NoTiming.Ui.Contracts.Features.Profile;
@@ -24,7 +24,7 @@ public class NavMenuBehind : NStatefulComponent
     IUiProfileContext ProfileContext { get; set; } = default!;
 
     [Inject]
-    INtsSocketService SocketService { get; set; } = default!;
+    INoTimingSocketService SocketService { get; set; } = default!;
 
     [CascadingParameter(Name = "CloseResponsiveDrawer")]
     Func<Task>? CloseResponsiveDrawer { get; set; }

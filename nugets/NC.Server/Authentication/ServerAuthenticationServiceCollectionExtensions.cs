@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Not.Application.Authentication.User;
-using Not.Application.Configurations;
+using NC.Application.Authentication.User;
+using NC.Application.Configurations;
 
-namespace Not.Server.Authentication;
+namespace NC.Server.Authentication;
 
 public static class ServerAuthenticationServiceCollectionExtensions
 {

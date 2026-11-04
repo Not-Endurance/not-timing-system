@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Components.Web;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Components.Buttons;
-using Not.Blazor.Helpers;
-using Not.Files;
-using Not.Print;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Buttons;
+using NC.Blazor.Helpers;
+using NC.Files;
+using NC.Print;
 
-namespace Not.Blazor.Components.Print;
+namespace NC.Blazor.Components.Print;
 
 public class NPrintPanelBehind : NComponent
 {

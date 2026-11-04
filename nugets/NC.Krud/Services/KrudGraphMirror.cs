@@ -1,7 +1,7 @@
-using Not.Domain;
-using Not.Krud.Abstractions;
+using NC.Domain;
+using NC.Krud.Abstractions;
 
-namespace Not.Krud.Services;
+namespace NC.Krud.Services;
 
 internal sealed class KrudGraphMirror<TRoot, TPrincipal> : IKrudMirrorService<TPrincipal>
     where TRoot : Aggregate

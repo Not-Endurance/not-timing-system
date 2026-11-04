@@ -1,4 +1,4 @@
-﻿namespace Not.Blazor.Helpers;
+﻿namespace NC.Blazor.Helpers;
 
 public static class ComponentHelper
 {

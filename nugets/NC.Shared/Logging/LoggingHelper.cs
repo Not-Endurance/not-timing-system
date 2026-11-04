@@ -1,6 +1,6 @@
 ﻿using Serilog;
 
-namespace Not.Logging;
+namespace NC.Logging;
 
 public static class LoggingHelper
 {

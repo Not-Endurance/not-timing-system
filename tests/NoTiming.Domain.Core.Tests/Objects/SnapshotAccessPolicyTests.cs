@@ -1,7 +1,7 @@
-using NTS.Domain.Core.Objects;
-using NTS.Domain.Enums;
+using NoTiming.Domain.Core.Objects;
+using NoTiming.Domain.Enums;
 
-namespace NTS.Domain.Core.Tests.Objects;
+namespace NoTiming.Domain.Core.Tests.Objects;
 
 public sealed class SnapshotAccessPolicyTests
 {

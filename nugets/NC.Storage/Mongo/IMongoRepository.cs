@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.OData.Query;
-using Not.Application.CRUD.Ports;
+using NC.Application.CRUD.Ports;
 
-namespace Not.Storage.Mongo;
+namespace NC.Storage.Mongo;
 
 public interface IMongoRepository<T> : IRepository<T>
 {

@@ -1,6 +1,6 @@
-﻿using NTS.Domain.Core.Aggregates;
+﻿using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Domain.Core.Objects.Payloads;
+namespace NoTiming.Domain.Core.Objects.Payloads;
 
 public record ParticipationRestored : ParticipationPayload
 {

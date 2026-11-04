@@ -2,14 +2,14 @@ using NoTiming.IntegrationTests.Infrastructure;
 
 namespace NoTiming.IntegrationTests;
 
-public sealed class NoTimingCorsTests : IClassFixture<NtsIntegrationFixture>
+public sealed class NoTimingCorsTests : IClassFixture<NoTimingIntegrationFixture>
 {
     // Any localhost origin passes NoTiming's CORS rule. No client has to be running for this preflight.
     const string LOCAL_CLIENT_ORIGIN = "http://localhost:7077";
 
-    readonly NtsIntegrationFixture _fixture;
+    readonly NoTimingIntegrationFixture _fixture;
 
-    public NoTimingCorsTests(NtsIntegrationFixture fixture)
+    public NoTimingCorsTests(NoTimingIntegrationFixture fixture)
     {
         _fixture = fixture;
     }

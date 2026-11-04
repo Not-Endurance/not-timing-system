@@ -1,4 +1,4 @@
-﻿namespace Not.Async.Extensions;
+﻿namespace NC.Async.Extensions;
 
 public static class SemaphoreExtensions
 {

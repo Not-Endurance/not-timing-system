@@ -1,6 +1,6 @@
-﻿using Not.Injection;
+﻿using NC.Injection;
 
-namespace Not.Blazor.Navigation.Abstractions;
+namespace NC.Blazor.Navigation.Abstractions;
 
 /// <summary>
 /// Landing servers as a start for Crumbs navigation. I.e. we need to Land and set a landing page

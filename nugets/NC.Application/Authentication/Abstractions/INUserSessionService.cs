@@ -1,6 +1,6 @@
-using Not.Injection;
+using NC.Injection;
 
-namespace Not.Application.Authentication.Abstractions;
+namespace NC.Application.Authentication.Abstractions;
 
 public interface INUserSession
 {

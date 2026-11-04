@@ -1,5 +1,5 @@
-using Not.Krud.Blazor.Components.Abstractions;
+using NC.Krud.Blazor.Components.Abstractions;
 
-namespace NTS.Blazor.Components.PastEvents;
+namespace NoTiming.Blazor.Components.PastEvents;
 
 public class PastEventShell : KrudShell<PastEventModel> { }

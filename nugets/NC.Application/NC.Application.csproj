@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Not.Tests" />
+    <InternalsVisibleTo Include="NC.Tests" />
   </ItemGroup>
 
   <ItemGroup>

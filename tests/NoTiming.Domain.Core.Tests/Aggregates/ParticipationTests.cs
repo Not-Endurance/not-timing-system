@@ -1,12 +1,12 @@
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Domain.Core.Objects.Payloads;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
 
-namespace NTS.Domain.Core.Tests.Aggregates;
+namespace NoTiming.Domain.Core.Tests.Aggregates;
 
 public sealed class ParticipationTests
 {

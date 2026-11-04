@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Serialization.JSON;
+using NC.Serialization.JSON;
 using NoTiming.EventBus.Features.Judge;
 using NoTiming.EventBus.Features.Witness;
 using NoTiming.EventBus.Middlewares;
-using NTS.Application.Contracts;
+using NoTiming.Application.Contracts;
 
 namespace NoTiming.EventBus;
 

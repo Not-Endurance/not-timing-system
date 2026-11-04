@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
 namespace NoTiming.Ui.Blazor.Features.Core.Snapshots.SnapshotUpdate;
 

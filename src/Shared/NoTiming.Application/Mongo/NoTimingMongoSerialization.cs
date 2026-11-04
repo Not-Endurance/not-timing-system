@@ -1,9 +1,9 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 
-namespace NTS.Application.Mongo;
+namespace NoTiming.Application.Mongo;
 
-public static class NtsMongoSerialization
+public static class NoTimingMongoSerialization
 {
     public static void Configure()
     {
@@ -15,9 +15,9 @@ public static class NtsMongoSerialization
         var pack = new ConventionPack { new IgnoreNullOrDefaultConvention() };
 
         ConventionRegistry.Register(
-            "NTS ignore null and default values",
+            "NoTiming ignore null and default values",
             pack,
-            type => type.FullName?.StartsWith("NTS.", StringComparison.Ordinal) == true
+            type => type.FullName?.StartsWith("NoTiming.", StringComparison.Ordinal) == true
         );
     }
 

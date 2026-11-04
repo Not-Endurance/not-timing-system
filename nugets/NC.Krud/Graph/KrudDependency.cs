@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Not.Krud.Graph;
+namespace NC.Krud.Graph;
 
 internal sealed class KrudDependency
 {

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Not.Application.Authentication.User;
+using NC.Application.Authentication.User;
 using NoTiming.Api.Base;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Mongo.Repositories;

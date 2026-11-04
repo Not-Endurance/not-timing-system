@@ -1,4 +1,4 @@
-﻿namespace Not.Application.Services;
+﻿namespace NC.Application.Services;
 
 public interface ISettService<T>
 {

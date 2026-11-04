@@ -1,11 +1,11 @@
 using System.Globalization;
-using NTS.Domain.Helpers;
-using NTS.Domain.Setup.Aggregates;
-using static NTS.Domain.Enums.OfficialRole;
+using NoTiming.Domain.Helpers;
+using NoTiming.Domain.Setup.Aggregates;
+using static NoTiming.Domain.Enums.OfficialRole;
 
-namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
+namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-public class Official : Entity, INamed, INtsDisplayable
+public class Official : Entity, INamed, INoTimingDisplayable
 {
     public Official(string? name, string? nameEnglish, OfficialRole? role, int? id = null, User? user = null)
         : base(id)

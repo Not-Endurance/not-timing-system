@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Not.Server.UiClient;
+namespace NC.Server.UiClient;
 
 internal sealed class PrecompressedVariant
 {

@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Components;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Navigation.Abstractions;
-using Not.Krud.Abstractions;
-using Not.Notify;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Navigation.Abstractions;
+using NC.Krud.Abstractions;
+using NC.Notify;
 
-namespace Not.Krud.Blazor.Components.Abstractions;
+namespace NC.Krud.Blazor.Components.Abstractions;
 
 public abstract class KrudShell<TModel> : NComponent
     where TModel : IKrudFormModel, new()

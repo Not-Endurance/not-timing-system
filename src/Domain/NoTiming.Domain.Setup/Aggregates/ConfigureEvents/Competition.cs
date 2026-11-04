@@ -1,7 +1,7 @@
-using Not.Domain.Krud;
-using NTS.Domain.Extensions;
+using NC.Domain.Krud;
+using NoTiming.Domain.Extensions;
 
-namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
+namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase>
 {

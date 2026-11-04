@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Core.Objects.Documents.Base;
+﻿namespace NoTiming.Domain.Core.Objects.Documents.Base;
 
 public abstract record Document
 {

@@ -1,6 +1,6 @@
 using System.Globalization;
-using NTS.Domain.Enums;
-using NTS.Domain.Helpers;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Helpers;
 
 namespace NoTiming.IntegrationTests;
 

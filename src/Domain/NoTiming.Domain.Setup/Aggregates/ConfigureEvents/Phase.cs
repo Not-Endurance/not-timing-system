@@ -1,8 +1,8 @@
-﻿using Not.Domain.Exceptions;
-using Not.Domain.Krud;
-using Not.Structures;
+﻿using NC.Domain.Exceptions;
+using NC.Domain.Krud;
+using NC.Structures;
 
-namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
+namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Phase : Entity, IKurdMirror<Loop>, IIdentifiable
 {

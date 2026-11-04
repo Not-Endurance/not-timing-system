@@ -1,16 +1,16 @@
 using MediatR;
-using Not.Application.Behinds.Adapters;
-using Not.Collections;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Presentlists;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Core.Objects.Presentlists;
+using NC.Application.Behinds.Adapters;
+using NC.Collections;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Presentlists;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Domain.Core.Events;
+using NoTiming.Domain.Core.Objects.Payloads;
+using NoTiming.Domain.Core.Objects.Presentlists;
 
-namespace NTS.Application.Presentlists;
+namespace NoTiming.Application.Presentlists;
 
 public class PresentlistService
     : NStatefulService,
@@ -26,7 +26,7 @@ public class PresentlistService
         INotificationHandler<EventDisconnected>
 {
     readonly IEventScopedRepository<Participation> _participations;
-    readonly INtsSocketContext? _socketContext;
+    readonly INoTimingSocketContext? _socketContext;
     readonly IPresentlistActionPublisher? _actionPublisher;
     readonly IPresentlistAccess? _access;
     UniqueParticipations _state = new();
@@ -36,7 +36,7 @@ public class PresentlistService
 
     public PresentlistService(
         IEventScopedRepository<Participation> participations,
-        INtsSocketContext? socketContext,
+        INoTimingSocketContext? socketContext,
         IEnumerable<IPresentlistActionPublisher> actionPublishers,
         IEnumerable<IPresentlistAccess> accessPolicies
     )

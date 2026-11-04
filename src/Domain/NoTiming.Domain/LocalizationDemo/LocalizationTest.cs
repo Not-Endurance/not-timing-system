@@ -1,7 +1,7 @@
-﻿using Not.Domain;
-using Not.Domain.Exceptions;
+﻿using NC.Domain;
+using NC.Domain.Exceptions;
 
-namespace NTS.Domain.LocalizationDemo;
+namespace NoTiming.Domain.LocalizationDemo;
 
 public class LocalizationTest : Aggregate
 {

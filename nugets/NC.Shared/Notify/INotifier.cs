@@ -1,6 +1,6 @@
-using Not.Events;
+using NC.Events;
 
-namespace Not.Notify;
+namespace NC.Notify;
 
 public interface INotifier
 {

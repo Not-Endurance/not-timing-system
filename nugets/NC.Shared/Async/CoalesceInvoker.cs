@@ -1,6 +1,6 @@
-﻿using Not.Exceptions;
+﻿using NC.Exceptions;
 
-namespace Not.Async;
+namespace NC.Async;
 
 public class CoalesceInvoker
 {

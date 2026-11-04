@@ -1,4 +1,4 @@
-namespace Not.Krud.Models;
+namespace NC.Krud.Models;
 
 public sealed record KrudDeleteImpact
 {

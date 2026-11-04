@@ -1,4 +1,4 @@
-namespace Not.Events;
+namespace NC.Events;
 
 public class Event : EventBase<EventDelegate>, IEventSubscriber
 {

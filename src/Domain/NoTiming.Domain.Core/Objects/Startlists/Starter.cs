@@ -1,7 +1,7 @@
-using Not.Formatting;
-using NTS.Domain.Helpers;
+using NC.Formatting;
+using NoTiming.Domain.Helpers;
 
-namespace NTS.Domain.Core.Objects.Startlists;
+namespace NoTiming.Domain.Core.Objects.Startlists;
 
 public record Starter : ValueObject
 {

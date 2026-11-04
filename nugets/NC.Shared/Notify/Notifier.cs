@@ -1,9 +1,9 @@
 using System.Text;
-using Not.Events;
-using Not.Injection;
-using Not.Localization;
+using NC.Events;
+using NC.Injection;
+using NC.Localization;
 
-namespace Not.Notify;
+namespace NC.Notify;
 
 public class Notifier : INotifier, INotificationStream, IScoped
 {

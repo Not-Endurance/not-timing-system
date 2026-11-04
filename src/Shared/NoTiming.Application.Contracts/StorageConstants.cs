@@ -1,4 +1,4 @@
-﻿namespace NTS.Application.Contracts;
+﻿namespace NoTiming.Application.Contracts;
 
 internal static class StorageConstants
 {

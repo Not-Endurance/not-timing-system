@@ -1,5 +1,5 @@
-using Not.Application.Authentication.User;
-using NTS.Domain.Aggregates;
+using NC.Application.Authentication.User;
+using NoTiming.Domain.Aggregates;
 using NoTiming.Ui.Contracts.API;
 
 namespace NoTiming.Ui.Contracts.Features.Profile;

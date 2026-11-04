@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using NTS.Domain.Core.Aggregates;
-using NTS.Judge.Contracts.Features.Core;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Judge.Contracts.Features.Core;
 using NoTiming.IntegrationTests.Drivers;
 
 namespace NoTiming.IntegrationTests.EndToEndEventTests.Features;

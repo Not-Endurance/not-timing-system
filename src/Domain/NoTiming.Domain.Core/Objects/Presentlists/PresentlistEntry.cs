@@ -1,4 +1,4 @@
-namespace NTS.Domain.Core.Objects.Presentlists;
+namespace NoTiming.Domain.Core.Objects.Presentlists;
 
 public record PresentlistEntry : ValueObject
 {

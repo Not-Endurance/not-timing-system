@@ -1,6 +1,6 @@
-﻿using Not.Extensions;
+﻿using NC.Extensions;
 
-namespace Not.Structures;
+namespace NC.Structures;
 
 // TODO combine with NotListModel
 public class SelectListModel

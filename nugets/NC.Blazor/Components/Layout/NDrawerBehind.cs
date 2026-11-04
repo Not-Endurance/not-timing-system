@@ -1,7 +1,7 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
-namespace Not.Blazor.Components.Layout;
+namespace NC.Blazor.Components.Layout;
 
 public class NDrawerBehind : NComponent
 {

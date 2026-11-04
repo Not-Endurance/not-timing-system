@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Not.Blazor.Dialogs.Abstractions;
-using Not.Krud.Abstractions;
-using Not.Krud.Blazor.Components.Abstractions;
+using NC.Blazor.Dialogs.Abstractions;
+using NC.Krud.Abstractions;
+using NC.Krud.Blazor.Components.Abstractions;
 
-namespace Not.Krud.Blazor.Components.Form;
+namespace NC.Krud.Blazor.Components.Form;
 
 public class KrudFormDialogBehind<TModel, TForm> : NDialog<TModel>
     where TForm : KrudShell<TModel>

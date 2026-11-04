@@ -1,4 +1,4 @@
-namespace Not.Application.Authentication.Abstractions;
+namespace NC.Application.Authentication.Abstractions;
 
 public interface INAuthenticationSessionStorage
 {

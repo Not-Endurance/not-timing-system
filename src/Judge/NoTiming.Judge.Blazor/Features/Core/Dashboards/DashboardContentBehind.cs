@@ -1,14 +1,14 @@
-using Not.Blazor.Components.Abstractions;
-using NTS.Application.Contracts.Socket;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Application.Contracts.Socket;
 
-namespace NTS.Judge.Blazor.Features.Core.Dashboards;
+namespace NoTiming.Judge.Blazor.Features.Core.Dashboards;
 
 public class DashboardContentBehind : NStatefulComponent
 {
     protected bool HasActiveEvent => SocketService.Event != null;
 
     [Inject]
-    protected INtsSocketService SocketService { get; set; } = default!;
+    protected INoTimingSocketService SocketService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {

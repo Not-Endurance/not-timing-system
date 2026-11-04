@@ -1,4 +1,4 @@
-namespace Not.Startup;
+namespace NC.Startup;
 
 public interface IStartupInitializerAsync
 {

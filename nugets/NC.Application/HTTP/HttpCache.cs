@@ -1,9 +1,9 @@
-﻿using Not.Application.Cache;
-using Not.Application.CRUD.Ports;
-using Not.Async.Extensions;
-using Not.Domain.Abstractions;
+﻿using NC.Application.Cache;
+using NC.Application.CRUD.Ports;
+using NC.Async.Extensions;
+using NC.Domain.Abstractions;
 
-namespace Not.Application.HTTP;
+namespace NC.Application.HTTP;
 
 public abstract class HttpCache<T> : ICache<T>
     where T : IAggregate

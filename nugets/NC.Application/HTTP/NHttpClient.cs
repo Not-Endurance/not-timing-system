@@ -2,10 +2,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Not.Serialization.JSON;
-using Not.Structures;
+using NC.Serialization.JSON;
+using NC.Structures;
 
-namespace Not.Application.HTTP;
+namespace NC.Application.HTTP;
 
 public class NHttpClient
 {

@@ -1,7 +1,7 @@
-using Not.Application.CRUD.Ports;
-using NTS.Domain.Core.Aggregates;
+using NC.Application.CRUD.Ports;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Application.Core;
+namespace NoTiming.Application.Core;
 
 public interface IEventInformationRepository : IRepository<EventInformation>
 {

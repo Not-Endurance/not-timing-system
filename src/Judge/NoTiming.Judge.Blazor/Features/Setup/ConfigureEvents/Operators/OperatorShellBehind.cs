@@ -1,8 +1,8 @@
-using Not.Krud.Blazor.Components.Abstractions;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Operators;
+using NC.Krud.Blazor.Components.Abstractions;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Operators;
 
-namespace NTS.Judge.Blazor.Features.Setup.ConfigureEvents.Operators;
+namespace NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents.Operators;
 
 public class OperatorShellBehind : KrudShell<OperatorFormModel>
 {

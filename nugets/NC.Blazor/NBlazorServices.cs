@@ -3,12 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MudBlazor;
 using MudBlazor.Services;
-using Not.Blazor.Helpers;
-using Not.Blazor.Navigation;
-using Not.Blazor.Navigation.Abstractions;
-using Not.Notify;
+using NC.Blazor.Helpers;
+using NC.Blazor.Navigation;
+using NC.Blazor.Navigation.Abstractions;
+using NC.Notify;
 
-namespace Not.Blazor;
+namespace NC.Blazor;
 
 public static class NBlazorServices
 {

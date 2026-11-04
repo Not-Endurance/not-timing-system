@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
-using NTS.Domain.Helpers;
+using NoTiming.Domain.Helpers;
 
-namespace NTS.Domain.Core.Aggregates.Participations.Entities;
+namespace NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
-public class Combination : Entity, INtsDisplayable
+public class Combination : Entity, INoTimingDisplayable
 {
     public static string FormatDistance(decimal distance)
     {

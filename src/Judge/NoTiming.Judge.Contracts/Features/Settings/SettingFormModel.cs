@@ -1,8 +1,8 @@
-﻿using Not.Krud.Models;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Enums;
+﻿using NC.Krud.Models;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Enums;
 
-namespace NTS.Judge.Contracts.Features.Settings;
+namespace NoTiming.Judge.Contracts.Features.Settings;
 
 public record SettingFormModel : KrudFormModel<Setting>
 {

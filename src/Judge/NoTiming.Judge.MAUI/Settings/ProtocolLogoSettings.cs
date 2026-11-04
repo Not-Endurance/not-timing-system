@@ -1,6 +1,6 @@
-﻿using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
+﻿using NoTiming.Judge.Blazor.Features.Core.Rankings.Protocols;
 
-namespace NTS.Judge.MAUI.Settings;
+namespace NoTiming.Judge.MAUI.Settings;
 
 public sealed class ProtocolLogoSettings : IProtocolLogoState
 {

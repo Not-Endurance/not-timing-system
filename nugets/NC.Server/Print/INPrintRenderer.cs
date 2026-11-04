@@ -1,6 +1,6 @@
-using Not.Injection;
+using NC.Injection;
 
-namespace Not.Server.Print;
+namespace NC.Server.Print;
 
 public interface INPrintRenderer : ISingleton
 {

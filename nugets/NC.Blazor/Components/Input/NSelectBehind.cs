@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
-using Not.Blazor.Components.Abstractions;
-using Not.Structures;
+using NC.Blazor.Components.Abstractions;
+using NC.Structures;
 
-namespace Not.Blazor.Components.Input;
+namespace NC.Blazor.Components.Input;
 
 public class NSelectBehind<T> : NComponentBase
 {

@@ -1,7 +1,7 @@
-﻿using Not.Application.Behinds.Adapters;
-using NTS.Domain.Core.Objects.Arrivelists;
+﻿using NC.Application.Behinds.Adapters;
+using NoTiming.Domain.Core.Objects.Arrivelists;
 
-namespace NTS.Application.Contracts.Arrivelists;
+namespace NoTiming.Application.Contracts.Arrivelists;
 
 public interface IArrivelistService : IStatefulService
 {

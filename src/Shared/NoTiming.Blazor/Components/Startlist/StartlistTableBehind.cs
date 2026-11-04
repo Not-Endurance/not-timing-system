@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Components;
-using Not.Blazor.Components.Abstractions;
-using NTS.Application.Contracts.Startlists;
-using NTS.Domain.Core.Objects.Startlists;
-using NTS.Domain.Helpers;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Application.Contracts.Startlists;
+using NoTiming.Domain.Core.Objects.Startlists;
+using NoTiming.Domain.Helpers;
 
-namespace NTS.Blazor.Components.Startlist;
+namespace NoTiming.Blazor.Components.Startlist;
 
 public class StartlistTableBehind : NStatefulComponent
 {

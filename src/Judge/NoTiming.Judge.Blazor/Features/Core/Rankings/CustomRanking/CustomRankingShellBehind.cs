@@ -1,5 +1,5 @@
-using Not.Krud.Blazor.Components.Abstractions;
+using NC.Krud.Blazor.Components.Abstractions;
 
-namespace NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
+namespace NoTiming.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 
 public class CustomRankingShellBehind : KrudShell<CustomRankingModel> { }

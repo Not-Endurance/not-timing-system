@@ -1,4 +1,4 @@
-namespace Not.Server.UiClient;
+namespace NC.Server.UiClient;
 
 // The path a client is served under, as a leading-slash path without a trailing slash, for example "/ui".
 internal static class UiPath

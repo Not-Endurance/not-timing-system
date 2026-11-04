@@ -1,4 +1,4 @@
-namespace Not.Server.UiClient;
+namespace NC.Server.UiClient;
 
 // Turns the addresses a server is listening on into a URL a browser can open. Wildcard hosts become localhost.
 internal static class BrowserAddress

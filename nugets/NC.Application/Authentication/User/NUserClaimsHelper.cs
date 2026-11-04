@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace Not.Application.Authentication.User;
+namespace NC.Application.Authentication.User;
 
 public static class NUserClaimsHelper
 {

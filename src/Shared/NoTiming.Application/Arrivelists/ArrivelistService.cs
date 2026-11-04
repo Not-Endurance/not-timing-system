@@ -1,16 +1,16 @@
 using MediatR;
-using Not.Application.Behinds.Adapters;
-using Not.Collections;
-using NTS.Application.Contracts.Arrivelists;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Arrivelists;
-using NTS.Domain.Core.Objects.Payloads;
+using NC.Application.Behinds.Adapters;
+using NC.Collections;
+using NoTiming.Application.Contracts.Arrivelists;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Domain.Core.Events;
+using NoTiming.Domain.Core.Objects.Arrivelists;
+using NoTiming.Domain.Core.Objects.Payloads;
 
-namespace NTS.Application.Arrivelists;
+namespace NoTiming.Application.Arrivelists;
 
 public class ArrivelistService
     : NStatefulService,
@@ -23,13 +23,13 @@ public class ArrivelistService
         INotificationHandler<EventDisconnected>
 {
     readonly IEventScopedRepository<Participation> _participations;
-    readonly INtsSocketContext? _socketContext;
+    readonly INoTimingSocketContext? _socketContext;
     UniqueParticipations _state = new();
 
     public ArrivelistService(IEventScopedRepository<Participation> participations)
         : this(participations, null) { }
 
-    public ArrivelistService(IEventScopedRepository<Participation> participations, INtsSocketContext? socketContext)
+    public ArrivelistService(IEventScopedRepository<Participation> participations, INoTimingSocketContext? socketContext)
     {
         _participations = participations;
         _socketContext = socketContext;

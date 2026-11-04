@@ -1,4 +1,4 @@
-namespace NTS.Domain;
+namespace NoTiming.Domain;
 
 public interface INamed
 {

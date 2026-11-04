@@ -11,7 +11,7 @@ platform="x64"
 runtime_identifier="win-x64"
 icon_path="appicon.ico"
 rcedit_path="rcedit.exe"
-app_exe="NTS.Judge.MAUI.exe"
+app_exe="NoTiming.Judge.MAUI.exe"
 shortcut_name="NTS Judge.lnk"
 target_environment="${1:-${NTS_TARGET_ENVIRONMENT:-Production}}"
 
@@ -47,7 +47,7 @@ dotnet publish \
  -c "$build" \
  -p:Platform="$platform" \
  -property:SolutionDir="$solution_dir/" \
- -p:NtsTargetEnvironment="$target_environment" \
+ -p:NoTimingTargetEnvironment="$target_environment" \
  -o "$publish_dir"
 
 if [ $? -ne 0 ]; then

@@ -1,9 +1,9 @@
-using Not.Krud.Abstractions;
-using NTS.Application.Contracts.Shared;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Enums;
+using NC.Krud.Abstractions;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Enums;
 
-namespace NTS.Application.Contracts.Core.Models;
+namespace NoTiming.Application.Contracts.Core.Models;
 
 public class OfficialModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Official>
 {

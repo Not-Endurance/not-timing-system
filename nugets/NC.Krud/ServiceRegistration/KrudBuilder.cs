@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Not.Domain;
+using NC.Domain;
 
-namespace Not.Krud.ServiceRegistration;
+namespace NC.Krud.ServiceRegistration;
 
 public class KrudBuilder
 {

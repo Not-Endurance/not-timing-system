@@ -1,6 +1,6 @@
-﻿using Not.Injection;
+﻿using NC.Injection;
 
-namespace Not.Blazor.Components.Abstractions;
+namespace NC.Blazor.Components.Abstractions;
 
 public interface IPrintInterop : ITransient
 {

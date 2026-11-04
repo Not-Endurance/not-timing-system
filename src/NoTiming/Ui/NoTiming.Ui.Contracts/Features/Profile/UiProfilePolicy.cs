@@ -1,4 +1,4 @@
-using Not.Application.Authentication.User;
+using NC.Application.Authentication.User;
 
 namespace NoTiming.Ui.Contracts.Features.Profile;
 

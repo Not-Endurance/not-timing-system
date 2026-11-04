@@ -1,27 +1,27 @@
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
-using NTS.Judge.Contracts.Features.Core;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
+using NoTiming.Judge.Contracts.Features.Core;
 using NoTiming.IntegrationTests.Drivers;
 using NoTiming.IntegrationTests.Infrastructure;
-using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
-using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
-using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
-using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
-using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
-using SetupLoop = NTS.Domain.Setup.Aggregates.ConfigureEvents.Loop;
-using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participation;
-using SetupPhase = NTS.Domain.Setup.Aggregates.ConfigureEvents.Phase;
+using SetupAthlete = NoTiming.Domain.Setup.Aggregates.Athlete;
+using SetupCombination = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Combination;
+using SetupCompetition = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Competition;
+using SetupConfigureEvent = NoTiming.Domain.Setup.Aggregates.ConfigureEvent;
+using SetupHorse = NoTiming.Domain.Setup.Aggregates.Horse;
+using SetupLoop = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Loop;
+using SetupParticipation = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Participation;
+using SetupPhase = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Phase;
 
 namespace NoTiming.IntegrationTests.EndToEndEventTests;
 
 [Collection(EndToEndEventCollection.Name)]
 public sealed class CompulsoryInspectionSetupTests
 {
-    readonly NtsIntegrationFixture _fixture;
+    readonly NoTimingIntegrationFixture _fixture;
 
-    public CompulsoryInspectionSetupTests(NtsIntegrationFixture fixture)
+    public CompulsoryInspectionSetupTests(NoTimingIntegrationFixture fixture)
     {
         _fixture = fixture;
     }

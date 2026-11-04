@@ -1,8 +1,8 @@
-﻿using Not.Logging;
-using Not.Logging.Builder;
+﻿using NC.Logging;
+using NC.Logging.Builder;
 using Serilog;
 
-namespace Not.MAUI;
+namespace NC.MAUI;
 
 public static class MauiServiceCollectionExtensions
 {

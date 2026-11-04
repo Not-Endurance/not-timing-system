@@ -1,7 +1,7 @@
-﻿using Not.Krud.Models;
-using NTS.Domain.Setup.Aggregates;
+﻿using NC.Krud.Models;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Contracts.Features.Setup.Clubs;
+namespace NoTiming.Judge.Contracts.Features.Setup.Clubs;
 
 public record ClubFormModel : KrudFormModel<Club>
 {

@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace NTS.Domain.Core.Objects;
+namespace NoTiming.Domain.Core.Objects;
 
 public record EventSpan
 {

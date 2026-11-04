@@ -1,6 +1,6 @@
-using Not.Application.Authentication.User;
-using Not.Application.Behinds.Adapters;
-using NTS.Domain.Aggregates;
+using NC.Application.Authentication.User;
+using NC.Application.Behinds.Adapters;
+using NoTiming.Domain.Aggregates;
 
 namespace NoTiming.Ui.Contracts.Features.Profile;
 

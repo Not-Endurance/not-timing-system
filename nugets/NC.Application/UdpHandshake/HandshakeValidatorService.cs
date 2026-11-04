@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using Not.Injection;
+using NC.Injection;
 
-namespace Not.Application.UdpHandshake;
+namespace NC.Application.UdpHandshake;
 
 public class HandshakeValidatorService : IHandshakeValidatorService
 {

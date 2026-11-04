@@ -1,7 +1,7 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Not.Injection;
+namespace NC.Injection;
 
 public static class ServiceCollectionExtensions
 {

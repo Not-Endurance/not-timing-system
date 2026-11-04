@@ -1,9 +1,9 @@
-using Not.Blazor.Components.Abstractions;
-using Not.Notify;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Judge.Contracts.Features.Core.Dashboard;
+using NC.Blazor.Components.Abstractions;
+using NC.Notify;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Judge.Contracts.Features.Core.Dashboard;
 
-namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms;
+namespace NoTiming.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms;
 
 public abstract class FinishNotRankedFormBehind : NComponent
 {

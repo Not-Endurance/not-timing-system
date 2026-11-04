@@ -1,4 +1,4 @@
-using NTS.Domain.Core.Objects.Payloads;
+using NoTiming.Domain.Core.Objects.Payloads;
 
 namespace NoTiming.EventBus.Contracts.Features.Ui.Procedures;
 

@@ -1,7 +1,7 @@
-﻿using Not.Async.Extensions;
-using Not.Logging;
+﻿using NC.Async.Extensions;
+using NC.Logging;
 
-namespace Not.Async;
+namespace NC.Async;
 
 public class TimeoutLockSemaphore
 {

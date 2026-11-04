@@ -1,7 +1,7 @@
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace Not.Blazor.Helpers;
+namespace NC.Blazor.Helpers;
 
 internal static class NHtmlHelper
 {

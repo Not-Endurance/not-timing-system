@@ -1,7 +1,7 @@
 ﻿using System.Security.Authentication;
 using MongoDB.Driver;
 
-namespace Not.Storage.Mongo;
+namespace NC.Storage.Mongo;
 
 public class MongoContext : IMongoContext
 {

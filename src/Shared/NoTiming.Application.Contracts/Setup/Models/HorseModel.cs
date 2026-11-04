@@ -1,8 +1,8 @@
-using Not.Krud.Abstractions;
-using NTS.Application.Contracts.Shared;
-using NTS.Domain.Setup.Aggregates;
+using NC.Krud.Abstractions;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Application.Contracts.Setup.Models;
+namespace NoTiming.Application.Contracts.Setup.Models;
 
 public class HorseModel : IDocument, IKrudModel<Horse>
 {

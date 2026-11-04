@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace NTS.Tools.NameMigration;
+namespace NoTiming.Tools.NameMigration;
 
 public static class NameMigrationTool
 {
@@ -245,7 +245,7 @@ public static class NameMigrationTool
         Console.WriteLine(
             """
             Usage:
-              dotnet run --project tools/NTS.Tools -- migrate-names --connection-string <mongo> [--database nts] [--apply]
+              dotnet run --project tools/NoTiming.Tools -- migrate-names --connection-string <mongo> [--database nts] [--apply]
 
             Options:
               --connection-string <mongo>   MongoDB connection string.

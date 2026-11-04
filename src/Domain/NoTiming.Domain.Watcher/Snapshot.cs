@@ -1,12 +1,12 @@
 using System.Globalization;
-using Not.Structures;
-using NTS.Domain.Enums;
-using NTS.Domain.Helpers;
-using NTS.Domain.Objects;
+using NC.Structures;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Helpers;
+using NoTiming.Domain.Objects;
 
-namespace NTS.Domain.Watcher;
+namespace NoTiming.Domain.Watcher;
 
-public record Snapshot : IIdentifiable, INamed, INtsDisplayable
+public record Snapshot : IIdentifiable, INamed, INoTimingDisplayable
 {
     public Snapshot(
         int number,

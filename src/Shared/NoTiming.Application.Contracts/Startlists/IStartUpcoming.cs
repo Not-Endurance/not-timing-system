@@ -1,7 +1,7 @@
-﻿using Not.Application.Behinds.Adapters;
-using NTS.Domain.Core.Objects.Startlists;
+﻿using NC.Application.Behinds.Adapters;
+using NoTiming.Domain.Core.Objects.Startlists;
 
-namespace NTS.Application.Contracts.Startlists;
+namespace NoTiming.Application.Contracts.Startlists;
 
 public interface IStartUpcoming : IStatefulService
 {

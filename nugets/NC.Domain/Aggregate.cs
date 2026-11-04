@@ -1,7 +1,7 @@
-using Not.Domain.Abstractions;
-using Not.Exceptions;
+using NC.Domain.Abstractions;
+using NC.Exceptions;
 
-namespace Not.Domain;
+namespace NC.Domain;
 
 public abstract class Aggregate : Entity, IAggregate
 {

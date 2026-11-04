@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using System.Text;
-using Not.Exceptions;
-using Not.Logging;
-using Not.Notify;
+using NC.Exceptions;
+using NC.Logging;
+using NC.Notify;
 
-namespace Not.Safe;
+namespace NC.Safe;
 
 // SafeHelper is essentially a centralized error-handler.
 // It's the main character in what I'm calling Safe Pattern:

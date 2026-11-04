@@ -1,7 +1,7 @@
-using Not.Files;
-using Not.Print;
+using NC.Files;
+using NC.Print;
 
-namespace Not.Server.Print;
+namespace NC.Server.Print;
 
 public sealed class NPrintRequestValidator : INPrintRequestValidator
 {

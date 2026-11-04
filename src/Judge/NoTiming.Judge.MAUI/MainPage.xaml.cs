@@ -1,6 +1,6 @@
 ﻿#pragma warning disable CA1416 // Validate platform compatibility
 
-namespace NTS.Judge.MAUI;
+namespace NoTiming.Judge.MAUI;
 
 public partial class MainPage : ContentPage
 {

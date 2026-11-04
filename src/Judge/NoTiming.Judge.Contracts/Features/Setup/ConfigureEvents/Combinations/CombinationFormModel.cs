@@ -1,8 +1,8 @@
-﻿using Not.Krud.Models;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+﻿using NC.Krud.Models;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
+namespace NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
 
 public record CombinationFormModel : KrudFormModel<Combination>
 {

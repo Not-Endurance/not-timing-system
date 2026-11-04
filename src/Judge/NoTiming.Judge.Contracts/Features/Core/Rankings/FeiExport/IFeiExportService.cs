@@ -1,7 +1,7 @@
-using Not.Injection;
-using NTS.Domain.Core.Aggregates;
+using NC.Injection;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Judge.Contracts.Features.Core.Rankings.FeiExport;
+namespace NoTiming.Judge.Contracts.Features.Core.Rankings.FeiExport;
 
 public interface IFeiExportService : ITransient
 {

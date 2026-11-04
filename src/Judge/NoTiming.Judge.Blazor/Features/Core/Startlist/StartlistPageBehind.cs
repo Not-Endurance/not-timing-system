@@ -1,5 +1,5 @@
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
-namespace NTS.Judge.Blazor.Features.Core.Startlist;
+namespace NoTiming.Judge.Blazor.Features.Core.Startlist;
 
 public class StartlistPageBehind : NComponent { }

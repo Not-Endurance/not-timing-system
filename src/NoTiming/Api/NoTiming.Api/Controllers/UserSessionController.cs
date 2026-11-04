@@ -1,23 +1,23 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Not.Storage.Mongo;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Application.UserSession;
+using NC.Storage.Mongo;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Application.UserSession;
 using NoTiming.Api.Base;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Telemetry;
 
 namespace NoTiming.Api.Controllers;
 
-public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
+public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel>
 {
-    readonly INtsUserSessionRepository _sessions;
+    readonly INoTimingUserSessionRepository _sessions;
 
     public UserSessionController(
         IFunctionLogger<UserSessionController> logger,
-        INtsUserSessionRepository sessions,
-        IMongoRepository<NtsUserSessionModel> mongoSessions,
+        INoTimingUserSessionRepository sessions,
+        IMongoRepository<NoTimingUserSessionModel> mongoSessions,
         ITelemetryService telemetry
     )
         : base(logger, mongoSessions, telemetry)
@@ -63,7 +63,7 @@ public class UserSessionController : CrudControllerBase<NtsUserSessionModel>
         TagRequest(request);
         LogInformation(request, nameof(DeleteForEvent));
 
-        await _sessions.Delete(new NtsUserSessionModel { Id = id, EventId = eventId });
+        await _sessions.Delete(new NoTimingUserSessionModel { Id = id, EventId = eventId });
         return Ok();
     }
 

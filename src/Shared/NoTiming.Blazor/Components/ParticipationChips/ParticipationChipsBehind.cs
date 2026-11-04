@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using NTS.Domain.Core.Aggregates;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Blazor.Components.ParticipationChips;
+namespace NoTiming.Blazor.Components.ParticipationChips;
 
 public abstract class ParticipationChipsBehind : NStatefulComponent
 {

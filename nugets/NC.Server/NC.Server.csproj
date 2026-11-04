@@ -23,13 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Not.Tests" />
+    <InternalsVisibleTo Include="NC.Tests" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Print\Templates\*.html" />
     <EmbeddedResource Include="$(PkgMudBlazor)\staticwebassets\MudBlazor.min.css"
-                      LogicalName="Not.Server.Print.Assets.MudBlazor.min.css" />
+                      LogicalName="NC.Server.Print.Assets.MudBlazor.min.css" />
   </ItemGroup>
 
 </Project>

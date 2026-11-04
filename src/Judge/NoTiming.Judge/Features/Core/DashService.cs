@@ -1,24 +1,24 @@
-using Not.Exceptions;
-using Not.Injection;
-using Not.Structures;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
-using NTS.Application.Core;
-using NTS.Domain.Setup.Services.StartValidation;
-using NTS.Judge.Features.Core.State;
+using NC.Exceptions;
+using NC.Injection;
+using NC.Structures;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Application.Core;
+using NoTiming.Domain.Setup.Services.StartValidation;
+using NoTiming.Judge.Features.Core.State;
 
-namespace NTS.Judge.Features.Core;
+namespace NoTiming.Judge.Features.Core;
 
 public class DashService : IDashService, IScoped
 {
-    readonly INtsSocketService _socketService;
+    readonly INoTimingSocketService _socketService;
     readonly IActiveEventsContext _activeEventService;
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
     readonly IEventInformationRepository _eventInformationRepository;
     readonly IConfigureEventService _configureEvents;
 
     public DashService(
-        INtsSocketService socketService,
+        INoTimingSocketService socketService,
         IActiveEventsContext activeEventService,
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
         IEventInformationRepository eventInformationRepository,

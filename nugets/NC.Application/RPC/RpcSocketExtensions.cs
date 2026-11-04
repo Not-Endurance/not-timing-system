@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.SignalR.Client;
-using Not.Application.RPC.Clients;
-using Not.Application.RPC.SignalR;
+using NC.Application.RPC.Clients;
+using NC.Application.RPC.SignalR;
 
-namespace Not.Application.RPC;
+namespace NC.Application.RPC;
 
 public static class RpcSocketExtensions
 {

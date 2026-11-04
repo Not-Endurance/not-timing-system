@@ -1,15 +1,15 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Authentication.Abstractions;
-using Not.Application.Authentication.User;
-using Not.Application.Configurations;
-using Not.Application.DomainEvents;
-using Not.Application.HTTP;
-using Not.Application.RPC;
-using Not.Application.RPC.SignalR;
+using NC.Application.Authentication.Abstractions;
+using NC.Application.Authentication.User;
+using NC.Application.Configurations;
+using NC.Application.DomainEvents;
+using NC.Application.HTTP;
+using NC.Application.RPC;
+using NC.Application.RPC.SignalR;
 
-namespace Not.Application;
+namespace NC.Application;
 
 public class NApplicationBuilder
 {

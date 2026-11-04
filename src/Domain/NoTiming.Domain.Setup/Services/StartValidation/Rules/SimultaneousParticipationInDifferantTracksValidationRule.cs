@@ -1,7 +1,7 @@
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Domain.Setup.Services.StartValidation.Rules;
+namespace NoTiming.Domain.Setup.Services.StartValidation.Rules;
 
 internal class SimultaneousParticipationInDifferantTracksValidationRule : IStartValidationRule
 {

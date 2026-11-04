@@ -1,22 +1,23 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Krud.ServiceRegistration;
-using NTS.Application;
-using NTS.Domain.Setup.Aggregates;
+using NC.Krud.ServiceRegistration;
+using NoTiming.Shared;
+using NoTiming.Application;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Judge;
+namespace NoTiming.Judge;
 
-public static class NtsJudgeServices
+public static class NoTimingJudgeServices
 {
-    public static IServiceCollection AddNtsJudge(
+    public static IServiceCollection AddNoTimingJudge(
         this IServiceCollection services,
         IConfiguration configuration,
         Assembly rootAssembly
     )
     {
         services
-            .ConfigureNtsApplication(configuration, rootAssembly)
+            .ConfigureNoTimingApplication(configuration, rootAssembly)
             .AddSharedCoreDomainServices()
             .ConfigureN()
             .AddRpcClient()
@@ -29,6 +30,6 @@ public static class NtsJudgeServices
             .RegisterAggregate<Horse>()
             .RegisterAggregate<Club>();
 
-        return services.AddNts(configuration);
+        return services.AddNoTiming(configuration);
     }
 }

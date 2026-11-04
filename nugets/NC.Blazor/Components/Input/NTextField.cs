@@ -1,6 +1,6 @@
 ﻿using MudBlazor;
 
-namespace Not.Blazor.Components.Input;
+namespace NC.Blazor.Components.Input;
 
 public class NTextField<T> : MudTextField<T>
 {

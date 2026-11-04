@@ -1,10 +1,10 @@
-using Not.Application.Behinds.Adapters;
-using Not.Injection;
-using Not.Krud.Abstractions;
-using NTS.Application.Settings;
-using NTS.Domain.Aggregates;
+using NC.Application.Behinds.Adapters;
+using NC.Injection;
+using NC.Krud.Abstractions;
+using NoTiming.Application.Settings;
+using NoTiming.Domain.Aggregates;
 
-namespace NTS.Judge.Features.Settings;
+namespace NoTiming.Judge.Features.Settings;
 
 public class SettingService : NStatefulService, ISettingService, IKrudFormService<SettingFormModel>, IScoped
 {

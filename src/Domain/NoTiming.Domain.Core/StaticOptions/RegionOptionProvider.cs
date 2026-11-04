@@ -1,8 +1,8 @@
-﻿using NTS.Domain.Aggregates;
-using NTS.Domain.Core.StaticOptions.Regions;
-using NTS.Domain.Core.StaticOptions.Regions.Base;
+﻿using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.StaticOptions.Regions;
+using NoTiming.Domain.Core.StaticOptions.Regions.Base;
 
-namespace NTS.Domain.Core.StaticOptions;
+namespace NoTiming.Domain.Core.StaticOptions;
 
 internal class RegionOptionProvider
 {

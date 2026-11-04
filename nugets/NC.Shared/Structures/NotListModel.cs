@@ -1,7 +1,7 @@
-﻿using Not.Exceptions;
-using Not.Extensions;
+﻿using NC.Exceptions;
+using NC.Extensions;
 
-namespace Not.Structures;
+namespace NC.Structures;
 
 public class NotListModel
 {

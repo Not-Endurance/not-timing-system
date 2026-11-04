@@ -1,12 +1,12 @@
 using System.Text;
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Dialogs;
-using Not.Blazor.Helpers;
-using Not.Events;
-using Not.Notify;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Dialogs;
+using NC.Blazor.Helpers;
+using NC.Events;
+using NC.Notify;
 
-namespace Not.Blazor.Components.Layout;
+namespace NC.Blazor.Components.Layout;
 
 public class NNotifier : NComponent, IDisposable
 {

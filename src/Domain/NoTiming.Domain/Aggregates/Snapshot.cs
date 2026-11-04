@@ -1,6 +1,6 @@
-﻿using NTS.Domain.Enums;
+﻿using NoTiming.Domain.Enums;
 
-namespace NTS.Domain.Aggregates;
+namespace NoTiming.Domain.Aggregates;
 
 public record Snapshot
 {

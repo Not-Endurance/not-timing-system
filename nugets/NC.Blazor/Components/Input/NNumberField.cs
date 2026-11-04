@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using MudBlazor;
 
-namespace Not.Blazor.Components.Input;
+namespace NC.Blazor.Components.Input;
 
 public class NNumberField<T> : MudNumericField<T>
 {

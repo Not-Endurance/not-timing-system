@@ -1,4 +1,4 @@
-namespace Not.Server.Authentication;
+namespace NC.Server.Authentication;
 
 public class NServerAuthenticationSettings
 {

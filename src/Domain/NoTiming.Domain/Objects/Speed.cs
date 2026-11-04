@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Objects;
+﻿namespace NoTiming.Domain.Objects;
 
 public record Speed
 {

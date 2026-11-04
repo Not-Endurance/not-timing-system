@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
-namespace Not.Blazor.Components.Buttons;
+namespace NC.Blazor.Components.Buttons;
 
 public class NDropdownButtonBehind : NComponent
 {

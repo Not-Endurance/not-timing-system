@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 
-namespace Not.Application.UdpHandshake;
+namespace NC.Application.UdpHandshake;
 
 public class NetworkBroadcastService : BackgroundService
 {

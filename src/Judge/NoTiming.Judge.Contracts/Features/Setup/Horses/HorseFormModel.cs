@@ -1,7 +1,7 @@
-using Not.Krud.Models;
-using NTS.Domain.Setup.Aggregates;
+using NC.Krud.Models;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Contracts.Features.Setup.Horses;
+namespace NoTiming.Judge.Contracts.Features.Setup.Horses;
 
 public record HorseFormModel : KrudFormModel<Horse>
 {

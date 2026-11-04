@@ -1,7 +1,7 @@
-using Not.Structures;
-using NTS.Domain.Enums;
+using NC.Structures;
+using NoTiming.Domain.Enums;
 
-namespace NTS.Domain.Watcher;
+namespace NoTiming.Domain.Watcher;
 
 public class SnapshotGroup : IIdentifiable
 {

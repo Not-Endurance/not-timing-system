@@ -1,8 +1,8 @@
-using Not.Blazor.Components.Abstractions;
-using NTS.Domain.Core.Aggregates;
-using static NTS.Judge.Blazor.JudgeRoutes;
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Domain.Core.Aggregates;
+using static NoTiming.Judge.Blazor.JudgeRoutes;
 
-namespace NTS.Judge.Blazor.Features.PastEvents;
+namespace NoTiming.Judge.Blazor.Features.PastEvents;
 
 public class JudgePastEventContentBehind : NComponent
 {

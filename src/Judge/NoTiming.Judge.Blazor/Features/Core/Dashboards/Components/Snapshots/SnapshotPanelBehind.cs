@@ -1,14 +1,14 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Notify;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Blazor.Constants;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Objects;
-using NTS.Judge.Contracts.Features.Core.Dashboard;
+using NC.Blazor.Components.Abstractions;
+using NC.Notify;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Blazor.Constants;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Objects;
+using NoTiming.Judge.Contracts.Features.Core.Dashboard;
 
-namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Snapshots;
+namespace NoTiming.Judge.Blazor.Features.Core.Dashboards.Components.Snapshots;
 
 public class SnapshotPanelBehind : NComponent
 {

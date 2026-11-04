@@ -1,43 +1,43 @@
 using System.Security.Claims;
 using Microsoft.Extensions.Localization;
-using Not.Application.Authentication.User;
-using Not.Application.Behinds.Adapters;
-using NTS.Application.Contracts.Arrivelists;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Presentlists;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Arrivelists;
-using NTS.Domain.Core.Objects.Presentlists;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
-using NTS.Judge.Contracts.Features.Core.Dashboard;
-using NTS.Judge.Contracts.Features.Core.Handouts;
-using NTS.Localization;
+using NC.Application.Authentication.User;
+using NC.Application.Behinds.Adapters;
+using NoTiming.Application.Contracts.Arrivelists;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Presentlists;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects.Arrivelists;
+using NoTiming.Domain.Core.Objects.Presentlists;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
+using NoTiming.Domain.Watcher;
+using NoTiming.Judge.Contracts.Features.Core.Dashboard;
+using NoTiming.Judge.Contracts.Features.Core.Handouts;
+using NoTiming.Shared.Localization;
 using NoTiming.IntegrationTests.Drivers;
 using NoTiming.IntegrationTests.Infrastructure;
 using NoTiming.Ui.Contracts.API;
 using NoTiming.Ui.Contracts.Features.Access;
 using NoTiming.Ui.Contracts.Features.Performance;
-using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
-using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
-using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
-using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
-using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
-using SetupLoop = NTS.Domain.Setup.Aggregates.ConfigureEvents.Loop;
-using SetupOfficial = NTS.Domain.Setup.Aggregates.ConfigureEvents.Official;
-using SetupOperator = NTS.Domain.Setup.Aggregates.ConfigureEvents.Operator;
-using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participation;
-using SetupPhase = NTS.Domain.Setup.Aggregates.ConfigureEvents.Phase;
-using SetupUser = NTS.Domain.Setup.Aggregates.User;
-using UiSnapshot = NTS.Domain.Watcher.Snapshot;
+using SetupAthlete = NoTiming.Domain.Setup.Aggregates.Athlete;
+using SetupCombination = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Combination;
+using SetupCompetition = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Competition;
+using SetupConfigureEvent = NoTiming.Domain.Setup.Aggregates.ConfigureEvent;
+using SetupHorse = NoTiming.Domain.Setup.Aggregates.Horse;
+using SetupLoop = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Loop;
+using SetupOfficial = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Official;
+using SetupOperator = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Operator;
+using SetupParticipation = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Participation;
+using SetupPhase = NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Phase;
+using SetupUser = NoTiming.Domain.Setup.Aggregates.User;
+using UiSnapshot = NoTiming.Domain.Watcher.Snapshot;
 using UiSnapshotService = NoTiming.Ui.Contracts.Features.Snapshots.ISnapshotService;
 
 namespace NoTiming.IntegrationTests;
 
-public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFixture>
+public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrationFixture>
 {
     static readonly IntegrationUser OFFICIAL_USER = new(
         "official.witness@integration.test",
@@ -50,9 +50,9 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         "Participant Witness"
     );
 
-    readonly NtsIntegrationFixture _fixture;
+    readonly NoTimingIntegrationFixture _fixture;
 
-    public IntegrationHarnessCheckTest(NtsIntegrationFixture fixture)
+    public IntegrationHarnessCheckTest(NoTimingIntegrationFixture fixture)
     {
         _fixture = fixture;
     }
@@ -486,7 +486,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             () => judge.GetRequiredService<IInspectionService>().RequestInspection(true)
         );
         Assert.Equal(
-            nameof(NtsStrings.Cannot_request_Required_Inspection_without_Representation_time_string),
+            nameof(NoTimingStrings.Cannot_request_Required_Inspection_without_Representation_time_string),
             pendingRepresentationInspectionException.Message
         );
         Assert.Equal(
@@ -974,16 +974,16 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             .ToArray();
     }
 
-    static async Task<NtsUserSessionModel> WaitForUserSession(
+    static async Task<NoTimingUserSessionModel> WaitForUserSession(
         NoTimingApiDriver api,
         string userIdentifier,
         int eventId,
-        Func<NtsUserSessionStateModel, bool> predicate,
+        Func<NoTimingUserSessionStateModel, bool> predicate,
         string expectedState
     )
     {
         var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
-        NtsUserSessionModel? last = null;
+        NoTimingUserSessionModel? last = null;
         while (DateTimeOffset.UtcNow < deadline)
         {
             last = await api.ReadUserSession(userIdentifier, eventId);
@@ -1000,7 +1000,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         );
     }
 
-    static string FormatUserSessionState(NtsUserSessionStateModel? state)
+    static string FormatUserSessionState(NoTimingUserSessionStateModel? state)
     {
         if (state == null)
         {

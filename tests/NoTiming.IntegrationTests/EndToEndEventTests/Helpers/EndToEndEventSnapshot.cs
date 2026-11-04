@@ -1,17 +1,17 @@
 using Newtonsoft.Json.Linq;
 using NoTiming.IntegrationTests.Infrastructure;
-using CoreEliminated = NTS.Domain.Core.Aggregates.Participations.Objects.Eliminated;
-using CoreParticipation = NTS.Domain.Core.Aggregates.Participation;
-using CoreParticipationModel = NTS.Application.Contracts.Core.Models.ParticipationModel;
-using CorePhase = NTS.Domain.Core.Aggregates.Participations.Entities.Phase;
-using CoreRanking = NTS.Domain.Core.Aggregates.Ranking;
-using CoreRankingModel = NTS.Application.Contracts.Core.Models.RankingModel;
-using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
-using SetupClub = NTS.Domain.Setup.Aggregates.Club;
-using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
-using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
-using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
-using SetupUser = NTS.Domain.Setup.Aggregates.User;
+using CoreEliminated = NoTiming.Domain.Core.Aggregates.Participations.Objects.Eliminated;
+using CoreParticipation = NoTiming.Domain.Core.Aggregates.Participation;
+using CoreParticipationModel = NoTiming.Application.Contracts.Core.Models.ParticipationModel;
+using CorePhase = NoTiming.Domain.Core.Aggregates.Participations.Entities.Phase;
+using CoreRanking = NoTiming.Domain.Core.Aggregates.Ranking;
+using CoreRankingModel = NoTiming.Application.Contracts.Core.Models.RankingModel;
+using SetupAthlete = NoTiming.Domain.Setup.Aggregates.Athlete;
+using SetupClub = NoTiming.Domain.Setup.Aggregates.Club;
+using SetupConfigureEvent = NoTiming.Domain.Setup.Aggregates.ConfigureEvent;
+using SetupConfigureEventModel = NoTiming.Application.Contracts.Setup.Models.ConfigureEventModel;
+using SetupHorse = NoTiming.Domain.Setup.Aggregates.Horse;
+using SetupUser = NoTiming.Domain.Setup.Aggregates.User;
 
 namespace NoTiming.IntegrationTests.EndToEndEventTests.Helpers;
 

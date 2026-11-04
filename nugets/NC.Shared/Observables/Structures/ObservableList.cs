@@ -1,10 +1,10 @@
 ﻿using System.Collections;
-using Not.Collections;
-using Not.Events;
-using Not.Exceptions;
-using Not.Structures;
+using NC.Collections;
+using NC.Events;
+using NC.Exceptions;
+using NC.Structures;
 
-namespace Not.Observables.Structures;
+namespace NC.Observables.Structures;
 
 public class ObservableList<T> : IReadOnlyList<T>, IObservable
     where T : IIdentifiable

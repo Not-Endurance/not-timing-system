@@ -1,7 +1,7 @@
-using Not.Server.UiClient;
+using NC.Server.UiClient;
 using Xunit;
 
-namespace Not.Tests.UiClient;
+namespace NC.Tests.UiClient;
 
 public sealed class UiPathTests
 {

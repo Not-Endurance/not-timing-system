@@ -1,4 +1,4 @@
-using Not.Injection;
+using NC.Injection;
 using NoTiming.Api.Application.Mongo.Repositories;
 
 namespace NoTiming.Api.Application.Event;

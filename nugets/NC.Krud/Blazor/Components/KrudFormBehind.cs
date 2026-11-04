@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Components;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Navigation.Abstractions;
-using Not.Exceptions;
-using Not.Krud.Abstractions;
-using Not.Krud.Blazor.Components.Abstractions;
-using Not.Krud.Blazor.Components.Form;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Navigation.Abstractions;
+using NC.Exceptions;
+using NC.Krud.Abstractions;
+using NC.Krud.Blazor.Components.Abstractions;
+using NC.Krud.Blazor.Components.Form;
 
-namespace Not.Krud.Blazor.Components;
+namespace NC.Krud.Blazor.Components;
 
 public abstract class KrudFormBehind<TModel> : NComponent
     where TModel : IKrudFormModel, new()

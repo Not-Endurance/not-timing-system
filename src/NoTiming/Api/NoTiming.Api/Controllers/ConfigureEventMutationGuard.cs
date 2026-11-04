@@ -1,7 +1,7 @@
-using Not.Application.CRUD.Ports;
-using Not.Domain.Exceptions;
-using Not.Injection;
-using NTS.Application.Contracts.Core.Models;
+using NC.Application.CRUD.Ports;
+using NC.Domain.Exceptions;
+using NC.Injection;
+using NoTiming.Application.Contracts.Core.Models;
 
 namespace NoTiming.Api.Controllers;
 

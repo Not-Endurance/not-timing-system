@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
-using Not.Notify;
+using NC.Notify;
 using NoTiming.EventBus.ConnectionDiagnostics;
 
 namespace NoTiming.EventBus.Middlewares;

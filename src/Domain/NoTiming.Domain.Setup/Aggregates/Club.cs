@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Setup.Aggregates;
+﻿namespace NoTiming.Domain.Setup.Aggregates;
 
 public class Club : Aggregate
 {

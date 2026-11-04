@@ -1,7 +1,7 @@
 using System.Collections;
-using NTS.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Domain.Core.Aggregates.Participations.Objects;
+namespace NoTiming.Domain.Core.Aggregates.Participations.Objects;
 
 public sealed class UniqueParticipations : IReadOnlyList<Participation>
 {

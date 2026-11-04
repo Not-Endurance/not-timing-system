@@ -1,8 +1,8 @@
-using Not.Application.Behinds.Adapters;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Setup.Aggregates;
+using NC.Application.Behinds.Adapters;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Application.Contracts.Core;
+namespace NoTiming.Application.Contracts.Core;
 
 public interface IActiveEventsContext : IStatefulService
 {

@@ -1,10 +1,10 @@
 using Microsoft.Extensions.FileProviders;
-using Not.Server.UiClient;
-using NTS.Application.Contracts;
+using NC.Server.UiClient;
+using NoTiming.Application.Contracts;
 
 namespace NoTiming.Host;
 
-// Hosts the Ui WebAssembly client from NoTiming. The serving itself lives in Not.Server (ServeUiClient); this
+// Hosts the Ui WebAssembly client from NoTiming. The serving itself lives in NC.Server (ServeUiClient); this
 // class only decides what NoTiming serves. To host the UI elsewhere, remove the UseUi() call in NoTimingHost.Start.
 internal static class UiHosting
 {

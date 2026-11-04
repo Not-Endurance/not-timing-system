@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
-using NTS.Domain.Helpers;
+using NoTiming.Domain.Helpers;
 
-namespace NTS.Domain.Core.Aggregates;
+namespace NoTiming.Domain.Core.Aggregates;
 
-public class Official : Aggregate, IEventScoped, INamed, INtsDisplayable
+public class Official : Aggregate, IEventScoped, INamed, INoTimingDisplayable
 {
     public Official(
         string? name,

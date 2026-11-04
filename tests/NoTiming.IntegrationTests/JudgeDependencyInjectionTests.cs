@@ -1,9 +1,9 @@
-using Not.Application.CRUD.Ports;
-using Not.Krud.Abstractions;
-using Not.Krud.Services;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Contracts.Features.Setup.Clubs;
-using NTS.Storage.REST;
+using NC.Application.CRUD.Ports;
+using NC.Krud.Abstractions;
+using NC.Krud.Services;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Judge.Contracts.Features.Setup.Clubs;
+using NoTiming.Storage.REST;
 using NoTiming.IntegrationTests.Drivers;
 
 namespace NoTiming.IntegrationTests;

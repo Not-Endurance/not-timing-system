@@ -1,7 +1,7 @@
-﻿using NTS.Domain.Aggregates;
-using NTS.Domain.Enums;
+﻿using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Enums;
 
-namespace NTS.Domain.Settings;
+namespace NoTiming.Domain.Settings;
 
 public static class StaticSettings
 {

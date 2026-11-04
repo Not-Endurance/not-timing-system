@@ -1,6 +1,6 @@
-using Not.Blazor.Navigation;
-using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
+using NC.Blazor.Navigation;
+using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
 
-namespace NTS.Judge.Blazor.Features.Setup.Combinations;
+namespace NoTiming.Judge.Blazor.Features.Setup.Combinations;
 
 public class CombinationContentBehind : SetupFormContent<CombinationFormModel> { }

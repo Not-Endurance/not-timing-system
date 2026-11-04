@@ -1,6 +1,6 @@
-﻿using Not.Domain;
+﻿using NC.Domain;
 
-namespace NTS.Domain.Aggregates;
+namespace NoTiming.Domain.Aggregates;
 
 public class Country : Aggregate
 {

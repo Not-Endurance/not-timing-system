@@ -1,12 +1,12 @@
 using System.Globalization;
-using Not.Domain.Exceptions;
-using Not.Domain.Krud;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Helpers;
+using NC.Domain.Exceptions;
+using NC.Domain.Krud;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Helpers;
 
-namespace NTS.Domain.Setup.Aggregates;
+namespace NoTiming.Domain.Setup.Aggregates;
 
-public class Athlete : Aggregate, IKurdMirror<Club>, INamed, INtsDisplayable
+public class Athlete : Aggregate, IKurdMirror<Club>, INamed, INoTimingDisplayable
 {
     public Athlete(
         string? name,

@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Blazor;
-using Not.Blazor.Client;
-using Not.Startup;
-using NTS.Judge.Blazor.Features.Socket;
+using NC.Blazor;
+using NC.Blazor.Client;
+using NC.Startup;
+using NoTiming.Judge.Blazor.Features.Socket;
 
-namespace NTS.Judge.Blazor;
+namespace NoTiming.Judge.Blazor;
 
 public static class JudgeBlazorServices
 {

@@ -1,4 +1,4 @@
-﻿namespace Not.Exceptions;
+﻿namespace NC.Exceptions;
 
 /// <summary>
 /// This exception is intended to be SEEN BY DEVS ONLY.

@@ -1,4 +1,4 @@
-﻿namespace Not.Logging.HTTP;
+﻿namespace NC.Logging.HTTP;
 
 public interface IHttpLoggerConfiguration
 {

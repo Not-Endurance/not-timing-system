@@ -1,4 +1,4 @@
-﻿namespace NTS.Application.Contracts;
+﻿namespace NoTiming.Application.Contracts;
 
 public static class ApplicationConstants
 {

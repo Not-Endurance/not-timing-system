@@ -1,7 +1,7 @@
-﻿using Not.Domain.Abstractions;
-using Not.Krud.Abstractions;
+﻿using NC.Domain.Abstractions;
+using NC.Krud.Abstractions;
 
-namespace Not.Krud.Models;
+namespace NC.Krud.Models;
 
 public abstract record KrudFormModel<T> : IKrudModel<T>, IKrudFormModel
     where T : IEntity

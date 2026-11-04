@@ -1,6 +1,6 @@
-﻿using NTS.Domain.Aggregates;
+﻿using NoTiming.Domain.Aggregates;
 
-namespace NTS.Domain.Core.Aggregates;
+namespace NoTiming.Domain.Core.Aggregates;
 
 public class SnapshotResult : Aggregate, IEventScoped
 {

@@ -1,13 +1,13 @@
-using Not.Application.Authentication.User;
-using Not.Application.HTTP;
-using Not.Storage.REST;
-using Not.Strings;
-using NTS.Application.Contracts.Setup;
-using NTS.Application.Contracts.Setup.Models;
-using NTS.Application.Setup;
-using NTS.Domain.Setup.Aggregates;
+using NC.Application.Authentication.User;
+using NC.Application.HTTP;
+using NC.Storage.REST;
+using NC.Strings;
+using NoTiming.Application.Contracts.Setup;
+using NoTiming.Application.Contracts.Setup.Models;
+using NoTiming.Application.Setup;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Storage.REST;
+namespace NoTiming.Storage.REST;
 
 public class UserApiRepository : ApiRepository<User, UserModel>, IUserLookup
 {

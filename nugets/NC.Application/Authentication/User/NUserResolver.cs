@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
-using Not.Application.Authentication.Abstractions;
+using NC.Application.Authentication.Abstractions;
 
-namespace Not.Application.Authentication.User;
+namespace NC.Application.Authentication.User;
 
 public class NUserResolver
 {

@@ -1,6 +1,6 @@
-using NTS.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Application.Setup;
+namespace NoTiming.Application.Setup;
 
 public static class UserSearchPolicy
 {

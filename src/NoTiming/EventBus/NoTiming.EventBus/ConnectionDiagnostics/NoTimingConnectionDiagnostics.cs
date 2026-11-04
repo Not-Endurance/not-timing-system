@@ -1,5 +1,5 @@
-using Not.Application.RPC;
-using NTS.Application.Contracts;
+using NC.Application.RPC;
+using NoTiming.Application.Contracts;
 
 namespace NoTiming.EventBus.ConnectionDiagnostics;
 

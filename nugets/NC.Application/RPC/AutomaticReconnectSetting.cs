@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 
-namespace Not.Application.RPC;
+namespace NC.Application.RPC;
 
 public class AutomaticReconnectSetting : IRetryPolicy
 {

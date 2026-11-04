@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Not.Serialization.JSON;
-using Not.Structures;
+using NC.Serialization.JSON;
+using NC.Structures;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Telemetry;
 

@@ -1,6 +1,6 @@
-﻿using Not.Domain;
+﻿using NC.Domain;
 
-namespace NTS.Domain.Extensions;
+namespace NoTiming.Domain.Extensions;
 
 public static class DomainExtensions
 {

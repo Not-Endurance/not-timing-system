@@ -1,9 +1,9 @@
-﻿using Not.Application.HTTP;
-using Not.Storage.REST;
-using NTS.Application.Contracts.Shared.Models;
-using NTS.Domain.Aggregates;
+﻿using NC.Application.HTTP;
+using NC.Storage.REST;
+using NoTiming.Application.Contracts.Shared.Models;
+using NoTiming.Domain.Aggregates;
 
-namespace NTS.Storage.REST;
+namespace NoTiming.Storage.REST;
 
 public class CountryApiRepository : ApiRepository<Country, CountryModel>
 {

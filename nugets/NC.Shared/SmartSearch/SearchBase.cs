@@ -1,4 +1,4 @@
-﻿namespace Not.SmartSearch;
+﻿namespace NC.SmartSearch;
 
 public abstract class SearchBase<T>
 {

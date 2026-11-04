@@ -1,4 +1,4 @@
-﻿namespace Not.Files;
+﻿namespace NC.Files;
 
 [Obsolete("Standardize logging and remove previous local file dependencies that require this context")]
 public class FilesystemContext : IFilesystemContext

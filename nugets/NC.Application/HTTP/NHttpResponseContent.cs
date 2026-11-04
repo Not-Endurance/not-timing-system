@@ -1,4 +1,4 @@
-namespace Not.Application.HTTP;
+namespace NC.Application.HTTP;
 
 public sealed class NHttpResponseContent
 {

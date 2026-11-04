@@ -1,15 +1,15 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Components.Print;
-using Not.Blazor.Helpers;
-using Not.Print;
-using NTS.Application.Contracts.Pdf;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Core.Objects.Documents;
-using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
-using NTS.Judge.Blazor.Features.Print;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Print;
+using NC.Blazor.Helpers;
+using NC.Print;
+using NoTiming.Application.Contracts.Pdf;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Core.Objects.Documents;
+using NoTiming.Judge.Blazor.Features.Core.Rankings.Protocols;
+using NoTiming.Judge.Blazor.Features.Print;
 
-namespace NTS.Judge.Blazor.Features.Core.Handouts;
+namespace NoTiming.Judge.Blazor.Features.Core.Handouts;
 
 public class HandoutsContentBehind : NStatefulComponent
 {
@@ -21,10 +21,10 @@ public class HandoutsContentBehind : NStatefulComponent
     IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    INtsSocketService SocketService { get; set; } = default!;
+    INoTimingSocketService SocketService { get; set; } = default!;
 
     [Inject]
-    INtsPrintRequestFactory PrintRequests { get; set; } = default!;
+    INoTimingPrintRequestFactory PrintRequests { get; set; } = default!;
 
     [Inject]
     IHandoutsService Service { get; set; } = default!;

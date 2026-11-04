@@ -1,8 +1,8 @@
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
 
-namespace NTS.Domain.Core.Objects.Presentlists;
+namespace NoTiming.Domain.Core.Objects.Presentlists;
 
 public record Presentlist : ValueObject
 {

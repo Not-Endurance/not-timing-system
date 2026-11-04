@@ -2,7 +2,7 @@ using System.Collections;
 using System.Globalization;
 using System.Linq.Expressions;
 
-namespace Not.Application.HTTP;
+namespace NC.Application.HTTP;
 
 public static class ODataApiFilterAdapter
 {

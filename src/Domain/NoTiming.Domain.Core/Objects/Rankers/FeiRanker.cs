@@ -1,6 +1,6 @@
-using NTS.Domain.Core.Aggregates.Results;
+using NoTiming.Domain.Core.Aggregates.Results;
 
-namespace NTS.Domain.Core.Objects.Rankers;
+namespace NoTiming.Domain.Core.Objects.Rankers;
 
 internal class FeiRanker : Ranker
 {

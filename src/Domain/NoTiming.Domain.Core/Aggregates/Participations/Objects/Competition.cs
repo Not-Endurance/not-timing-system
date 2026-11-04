@@ -1,4 +1,4 @@
-﻿namespace NTS.Domain.Core.Aggregates.Participations.Objects;
+﻿namespace NoTiming.Domain.Core.Aggregates.Participations.Objects;
 
 public record Competition
 {

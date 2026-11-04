@@ -1,9 +1,9 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
-using Not.Application.Environments;
-using Not.Exceptions;
+using NC.Application.Environments;
+using NC.Exceptions;
 
-namespace Not.Application.Configurations;
+namespace NC.Application.Configurations;
 
 public static class ConfigurationManagerExtensions
 {

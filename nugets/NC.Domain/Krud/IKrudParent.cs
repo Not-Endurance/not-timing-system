@@ -1,6 +1,6 @@
-﻿namespace Not.Domain.Krud;
+﻿namespace NC.Domain.Krud;
 
-// TODO: create Not.Krud.Abstractions project and put interfaces there
+// TODO: create NC.Krud.Abstractions project and put interfaces there
 public interface IKrudParent<T>
     where T : Entity
 {

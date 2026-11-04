@@ -1,6 +1,6 @@
-using Not.Print;
+using NC.Print;
 
-namespace Not.Blazor.Components.Print;
+namespace NC.Blazor.Components.Print;
 
 public sealed record NPrintPanelContext
 {

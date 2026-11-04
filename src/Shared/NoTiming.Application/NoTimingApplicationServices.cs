@@ -2,29 +2,29 @@ using System.Reflection;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application;
-using Not.Application.HTTP;
-using Not.Injection;
-using Not.Krud.Abstractions;
-using NTS.Application.Arrivelists;
-using NTS.Application.Contracts.Arrivelists;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.PastEvents;
-using NTS.Application.Contracts.Presentlists;
-using NTS.Application.Contracts.Startlists;
-using NTS.Application.Core;
-using NTS.Application.PastEvents;
-using NTS.Application.Presentlists;
-using NTS.Application.Startlists;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
+using NC.Application;
+using NC.Application.HTTP;
+using NC.Injection;
+using NC.Krud.Abstractions;
+using NoTiming.Application.Arrivelists;
+using NoTiming.Application.Contracts.Arrivelists;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.PastEvents;
+using NoTiming.Application.Contracts.Presentlists;
+using NoTiming.Application.Contracts.Startlists;
+using NoTiming.Application.Core;
+using NoTiming.Application.PastEvents;
+using NoTiming.Application.Presentlists;
+using NoTiming.Application.Startlists;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Events;
+using NoTiming.Domain.Core.Objects.Payloads;
 
-namespace NTS.Application;
+namespace NoTiming.Application;
 
-public static class NtsApplicationServices
+public static class NoTimingApplicationServices
 {
-    public static Builder ConfigureNtsApplication(
+    public static Builder ConfigureNoTimingApplication(
         this IServiceCollection services,
         IConfiguration configuration,
         Assembly rootAssembly

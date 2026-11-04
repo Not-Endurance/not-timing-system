@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
-using Not.Blazor.Dialogs.Abstractions;
-using Not.Krud.Models;
+using NC.Blazor.Dialogs.Abstractions;
+using NC.Krud.Models;
 
-namespace Not.Krud.Blazor.Dialogs;
+namespace NC.Krud.Blazor.Dialogs;
 
 public class KrudCascadingDeleteDialogBehind : NDialog
 {

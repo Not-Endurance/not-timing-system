@@ -1,21 +1,21 @@
 using System.Text;
-using Not.Application.Authentication.User;
-using Not.Application.HTTP;
-using Not.Serialization.JSON;
-using Not.Structures;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Core.Aggregates;
+using NC.Application.Authentication.User;
+using NC.Application.HTTP;
+using NC.Serialization.JSON;
+using NC.Structures;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Domain.Core.Aggregates;
 using NoTiming.IntegrationTests.Infrastructure;
 using NoTiming.Ui.Contracts.API;
-using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
-using SetupAthleteModel = NTS.Application.Contracts.Setup.Models.AthleteModel;
-using SetupClub = NTS.Domain.Setup.Aggregates.Club;
-using SetupClubModel = NTS.Application.Contracts.Setup.Models.ClubModel;
-using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
-using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
-using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
-using SetupHorseModel = NTS.Application.Contracts.Setup.Models.HorseModel;
+using SetupAthlete = NoTiming.Domain.Setup.Aggregates.Athlete;
+using SetupAthleteModel = NoTiming.Application.Contracts.Setup.Models.AthleteModel;
+using SetupClub = NoTiming.Domain.Setup.Aggregates.Club;
+using SetupClubModel = NoTiming.Application.Contracts.Setup.Models.ClubModel;
+using SetupConfigureEvent = NoTiming.Domain.Setup.Aggregates.ConfigureEvent;
+using SetupConfigureEventModel = NoTiming.Application.Contracts.Setup.Models.ConfigureEventModel;
+using SetupHorse = NoTiming.Domain.Setup.Aggregates.Horse;
+using SetupHorseModel = NoTiming.Application.Contracts.Setup.Models.HorseModel;
 
 namespace NoTiming.IntegrationTests.Drivers;
 
@@ -224,10 +224,10 @@ internal sealed class NoTimingApiDriver : IDisposable
         return models.ToArray();
     }
 
-    public Task<NtsUserSessionModel?> ReadUserSession(string userIdentifier, int eventId)
+    public Task<NoTimingUserSessionModel?> ReadUserSession(string userIdentifier, int eventId)
     {
         var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
-        return SendNullable<NtsUserSessionModel>(
+        return SendNullable<NoTimingUserSessionModel>(
             HttpMethod.Get,
             $"api/user-sessions/{eventId}/by-user-identifier/{encodedUserIdentifier}"
         );
@@ -271,7 +271,7 @@ internal sealed class NoTimingApiDriver : IDisposable
     async Task Send(HttpMethod method, string endpoint, object? payload = null)
     {
         var content = await SendCore(method, endpoint, payload);
-        var result = content.FromJson<Not.Structures.Result>();
+        var result = content.FromJson<NC.Structures.Result>();
         if (!result.IsSuccess)
         {
             throw new InvalidOperationException(string.Join(Environment.NewLine, result.Errors));

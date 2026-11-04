@@ -1,11 +1,11 @@
-using Not.Application.CRUD.Ports;
-using Not.Domain;
-using Not.Domain.Exceptions;
-using Not.Exceptions;
-using Not.Krud.Abstractions;
-using Not.Krud.Models;
+using NC.Application.CRUD.Ports;
+using NC.Domain;
+using NC.Domain.Exceptions;
+using NC.Exceptions;
+using NC.Krud.Abstractions;
+using NC.Krud.Models;
 
-namespace Not.Krud.Services;
+namespace NC.Krud.Services;
 
 public abstract class KrudServiceBase<T, TModel> : IKrudListBehind<T>, IKrudFormService<TModel>
     where T : Entity

@@ -1,14 +1,14 @@
-using Not.Application.Cache;
-using Not.Application.CRUD.Ports;
-using Not.Injection;
-using Not.Strings;
-using NTS.Application.Setup;
-using NTS.Domain;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+using NC.Application.Cache;
+using NC.Application.CRUD.Ports;
+using NC.Injection;
+using NC.Strings;
+using NoTiming.Application.Setup;
+using NoTiming.Domain;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Judge.Features.Setup;
+namespace NoTiming.Judge.Features.Setup;
 
 public class JudgeSetupLookupService : IJudgeSetupLookupService, ITransient
 {

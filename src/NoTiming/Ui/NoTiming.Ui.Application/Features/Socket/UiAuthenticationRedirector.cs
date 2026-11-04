@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using Not.Injection;
+using NC.Injection;
 
 namespace NoTiming.Ui.Application.Features.Socket;
 

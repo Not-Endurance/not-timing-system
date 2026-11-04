@@ -1,4 +1,4 @@
-﻿namespace Not.Random;
+﻿namespace NC.Random;
 
 public static class RandomHelper
 {

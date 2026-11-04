@@ -1,4 +1,4 @@
-namespace Not.Blazor.Components.Print;
+namespace NC.Blazor.Components.Print;
 
 public enum NPrintPanelActionKind
 {

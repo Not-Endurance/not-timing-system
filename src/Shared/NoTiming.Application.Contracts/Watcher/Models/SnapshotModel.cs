@@ -1,8 +1,8 @@
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
+using NoTiming.Domain.Watcher;
 
-namespace NTS.Application.Contracts.Watcher.Models;
+namespace NoTiming.Application.Contracts.Watcher.Models;
 
 public class SnapshotModel
 {

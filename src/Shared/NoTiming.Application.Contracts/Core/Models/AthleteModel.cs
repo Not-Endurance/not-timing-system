@@ -1,7 +1,7 @@
-using NTS.Application.Contracts.Shared.Models;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Application.Contracts.Shared.Models;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
-namespace NTS.Application.Contracts.Core.Models;
+namespace NoTiming.Application.Contracts.Core.Models;
 
 public class AthleteModel
 {

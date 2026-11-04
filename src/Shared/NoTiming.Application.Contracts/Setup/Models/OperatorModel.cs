@@ -1,8 +1,8 @@
-using NTS.Application.Contracts.Shared.Models;
-using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+using NoTiming.Application.Contracts.Shared.Models;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Application.Contracts.Setup.Models;
+namespace NoTiming.Application.Contracts.Setup.Models;
 
 public class OperatorModel
 {

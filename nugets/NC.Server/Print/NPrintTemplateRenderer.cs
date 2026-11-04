@@ -1,13 +1,13 @@
 using System.Net;
 using System.Reflection;
-using Not.Print;
+using NC.Print;
 
-namespace Not.Server.Print;
+namespace NC.Server.Print;
 
 public sealed class NPrintTemplateRenderer : INPrintTemplateRenderer
 {
-    const string TEMPLATE_RESOURCE = "Not.Server.Print.Templates.default-print.html";
-    const string MUD_BLAZOR_STYLES_RESOURCE = "Not.Server.Print.Assets.MudBlazor.min.css";
+    const string TEMPLATE_RESOURCE = "NC.Server.Print.Templates.default-print.html";
+    const string MUD_BLAZOR_STYLES_RESOURCE = "NC.Server.Print.Assets.MudBlazor.min.css";
     static readonly Lazy<string> TEMPLATE = new(() => LoadResource(TEMPLATE_RESOURCE));
     static readonly Lazy<string> MUD_BLAZOR_STYLES = new(() => LoadResource(MUD_BLAZOR_STYLES_RESOURCE));
 

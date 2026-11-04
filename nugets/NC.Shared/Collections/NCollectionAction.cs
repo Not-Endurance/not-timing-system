@@ -1,4 +1,4 @@
-namespace Not.Collections;
+namespace NC.Collections;
 
 public enum NCollectionAction
 {

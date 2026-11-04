@@ -1,8 +1,8 @@
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Documents;
-using NTS.Domain.Core.Objects.Startlists;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Objects.Documents;
+using NoTiming.Domain.Core.Objects.Startlists;
 
-namespace NTS.Application.Contracts.PastEvents;
+namespace NoTiming.Application.Contracts.PastEvents;
 
 public interface IPastEventService : IPastEventContext
 {

@@ -1,19 +1,19 @@
 using MediatR;
-using Not.Application.Behinds.Adapters;
-using Not.Async;
-using Not.Exceptions;
-using Not.Injection;
-using Not.Krud.Abstractions;
-using Not.Observables.Structures;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Documents;
-using NTS.Domain.Core.Objects.Payloads;
-using NTS.Judge.Features.Core.State;
+using NC.Application.Behinds.Adapters;
+using NC.Async;
+using NC.Exceptions;
+using NC.Injection;
+using NC.Krud.Abstractions;
+using NC.Observables.Structures;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Events;
+using NoTiming.Domain.Core.Objects.Documents;
+using NoTiming.Domain.Core.Objects.Payloads;
+using NoTiming.Judge.Features.Core.State;
 
-namespace NTS.Judge.Features.Core.Rankings;
+namespace NoTiming.Judge.Features.Core.Rankings;
 
 public class RankingService
     : NStatefulService<ObservableList<Ranking>>,
@@ -29,7 +29,7 @@ public class RankingService
         INotificationHandler<EventDisconnected>,
         IScoped
 {
-    readonly INtsSocketContext _socketContext;
+    readonly INoTimingSocketContext _socketContext;
     readonly IEventScopedRepository<Ranking> _rankings;
     readonly IEventScopedRepository<Official> _officials;
     readonly CoalesceInvoker _coalesced;
@@ -37,7 +37,7 @@ public class RankingService
     IReadOnlyList<Official> _loadedOfficials = [];
 
     public RankingService(
-        INtsSocketContext socketContext,
+        INoTimingSocketContext socketContext,
         IEventScopedRepository<Ranking> rankings,
         IEventScopedRepository<Official> officials
     )

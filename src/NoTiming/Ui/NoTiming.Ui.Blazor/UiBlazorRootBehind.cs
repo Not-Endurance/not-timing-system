@@ -1,7 +1,7 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Components.Web;
-using Not.Blazor.Client.Authentication;
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Client.Authentication;
+using NC.Blazor.Components.Abstractions;
 
 namespace NoTiming.Ui.Blazor;
 

@@ -1,3 +1,3 @@
-﻿namespace Not.Injection;
+﻿namespace NC.Injection;
 
 public interface ISingleton { }

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Not.DateAndTime;
+namespace NC.DateAndTime;
 
 public static class DateTimeExtensions
 {

@@ -1,5 +1,5 @@
-using Not.Application.Authentication.User;
-using Not.Blazor.Client.Authentication;
+using NC.Application.Authentication.User;
+using NC.Blazor.Client.Authentication;
 using NoTiming.Ui.Contracts.Features.Profile;
 
 namespace NoTiming.Ui.Blazor.Features.Profile;

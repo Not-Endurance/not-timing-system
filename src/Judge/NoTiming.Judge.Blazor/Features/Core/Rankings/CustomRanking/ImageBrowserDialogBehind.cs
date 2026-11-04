@@ -1,7 +1,7 @@
 ﻿using MudBlazor;
-using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
+using NoTiming.Judge.Blazor.Features.Core.Rankings.Protocols;
 
-namespace NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
+namespace NoTiming.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 
 public class ImageBrowserDialogBehind : ComponentBase
 {

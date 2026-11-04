@@ -1,6 +1,6 @@
 using System.Threading;
 
-namespace Not.Application.RPC;
+namespace NC.Application.RPC;
 
 public abstract class ThreadSafePersistentConnection<TConnectionContext> : IAsyncDisposable
     where TConnectionContext : class

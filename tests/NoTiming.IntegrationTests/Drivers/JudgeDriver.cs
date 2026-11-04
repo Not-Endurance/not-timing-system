@@ -3,20 +3,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Not.Application.HTTP;
-using Not.Application.RPC;
-using Not.Application.RPC.Clients;
-using Not.Krud.Abstractions;
-using Not.Notify;
-using Not.Startup;
-using NTS.Application.Contracts;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
-using NTS.Judge;
-using NTS.Judge.Contracts.Features.Core.Dashboard;
-using NTS.Storage;
+using NC.Application.HTTP;
+using NC.Application.RPC;
+using NC.Application.RPC.Clients;
+using NC.Krud.Abstractions;
+using NC.Notify;
+using NC.Startup;
+using NoTiming.Application.Contracts;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Judge;
+using NoTiming.Judge.Contracts.Features.Core.Dashboard;
+using NoTiming.Storage;
 using NoTiming.IntegrationTests.Infrastructure;
 
 namespace NoTiming.IntegrationTests.Drivers;
@@ -24,7 +24,7 @@ namespace NoTiming.IntegrationTests.Drivers;
 internal sealed class JudgeDriver : IAsyncDisposable
 {
     readonly ServiceProvider _provider;
-    readonly INtsSocketService _socketService;
+    readonly INoTimingSocketService _socketService;
     readonly IJudgeSnapshotService _snapshotService;
     readonly IParticipationContext _participationContext;
     readonly IEventScopedRepository<Participation> _participationRepository;
@@ -36,12 +36,12 @@ internal sealed class JudgeDriver : IAsyncDisposable
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
-        services.ConfigureNtsStorage(configuration).AddRestApiStorage();
-        services.AddNtsJudge(configuration, typeof(NtsJudgeServices).Assembly);
+        services.ConfigureNoTimingStorage(configuration).AddRestApiStorage();
+        services.AddNoTimingJudge(configuration, typeof(NoTimingJudgeServices).Assembly);
         services.AddNotifier();
 
         _provider = services.BuildServiceProvider();
-        _socketService = _provider.GetRequiredService<INtsSocketService>();
+        _socketService = _provider.GetRequiredService<INoTimingSocketService>();
         _snapshotService = _provider.GetRequiredService<IJudgeSnapshotService>();
         _participationContext = _provider.GetRequiredService<IParticipationContext>();
         _participationRepository = _provider.GetRequiredService<IEventScopedRepository<Participation>>();

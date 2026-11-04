@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Not.Blazor.Dialogs;
-using Not.Blazor.Helpers;
-using Not.Exceptions;
-using Not.Krud.Abstractions;
-using Not.Krud.Blazor.Components.Abstractions;
-using Not.Krud.Blazor.Components.Form;
-using Not.Krud.Blazor.Dialogs;
-using Not.Krud.Models;
+using NC.Blazor.Dialogs;
+using NC.Blazor.Helpers;
+using NC.Exceptions;
+using NC.Krud.Abstractions;
+using NC.Krud.Blazor.Components.Abstractions;
+using NC.Krud.Blazor.Components.Form;
+using NC.Krud.Blazor.Dialogs;
+using NC.Krud.Models;
 
-namespace Not.Krud.Blazor;
+namespace NC.Krud.Blazor;
 
 public class KrudDialogService<TModel, TShell>
     where TModel : IKrudFormModel, new()

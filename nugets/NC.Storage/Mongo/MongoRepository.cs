@@ -3,14 +3,14 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Query;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using Not.Structures;
+using NC.Structures;
 
-namespace Not.Storage.Mongo;
+namespace NC.Storage.Mongo;
 
 public abstract class MongoRepository<T> : IMongoRepository<T>
     where T : IIdentifiable
 {
-    static readonly ActivitySource SOURCE = new("Not.Storage.Mongo");
+    static readonly ActivitySource SOURCE = new("NC.Storage.Mongo");
 
     readonly IMongoContext _context;
     readonly string _db;

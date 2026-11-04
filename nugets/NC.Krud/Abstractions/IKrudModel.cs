@@ -1,6 +1,6 @@
-﻿using Not.Domain.Abstractions;
+﻿using NC.Domain.Abstractions;
 
-namespace Not.Krud.Abstractions;
+namespace NC.Krud.Abstractions;
 
 public interface IKrudModel<T>
     where T : IEntity

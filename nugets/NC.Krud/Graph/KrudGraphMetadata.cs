@@ -1,6 +1,6 @@
-using Not.Krud.ServiceRegistration;
+using NC.Krud.ServiceRegistration;
 
-namespace Not.Krud.Graph;
+namespace NC.Krud.Graph;
 
 internal sealed record KrudGraphMetadata
 {

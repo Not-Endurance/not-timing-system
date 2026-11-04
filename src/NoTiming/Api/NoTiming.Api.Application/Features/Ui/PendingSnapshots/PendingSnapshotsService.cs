@@ -1,6 +1,6 @@
-using Not.Injection;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
+using NC.Injection;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
 
 namespace NoTiming.Api.Application.Features.Ui.PendingSnapshots;
 

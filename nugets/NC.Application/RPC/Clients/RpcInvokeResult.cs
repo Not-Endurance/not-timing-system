@@ -1,4 +1,4 @@
-﻿namespace Not.Application.RPC.Clients;
+﻿namespace NC.Application.RPC.Clients;
 
 public class RpcInvokeResult //TODO: RpcInvokeResult seems kind of pointless. Consider removing
 {

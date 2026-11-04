@@ -1,4 +1,4 @@
-namespace Not.SmartSearch.Property;
+namespace NC.SmartSearch.Property;
 
 internal class IntPropertySearch<T> : PropertySearch<T, int>
 {

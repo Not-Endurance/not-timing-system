@@ -1,7 +1,7 @@
 using MongoDB.Driver;
-using Not.Injection;
-using Not.Storage.Mongo;
-using NTS.Application.Contracts.Watcher.Models;
+using NC.Injection;
+using NC.Storage.Mongo;
+using NoTiming.Application.Contracts.Watcher.Models;
 
 namespace NoTiming.Api.Application.Mongo.Repositories;
 

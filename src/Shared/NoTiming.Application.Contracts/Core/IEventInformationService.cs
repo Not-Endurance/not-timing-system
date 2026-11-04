@@ -1,6 +1,6 @@
-using NTS.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Application.Contracts.Core;
+namespace NoTiming.Application.Contracts.Core;
 
 public interface IEventInformationService
 {

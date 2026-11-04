@@ -1,13 +1,13 @@
 #pragma warning disable CA1416 // We use only Windows
 
-using Not.Application.Configurations;
-using Not.Application.Environments;
-using Not.Logging.Builder;
-using Not.MAUI;
-using NTS.Judge.MAUI.Platforms.Services;
-using NTS.Judge.MAUI.Platforms.Windows.Services;
+using NC.Application.Configurations;
+using NC.Application.Environments;
+using NC.Logging.Builder;
+using NC.MAUI;
+using NoTiming.Judge.MAUI.Platforms.Services;
+using NoTiming.Judge.MAUI.Platforms.Windows.Services;
 
-namespace NTS.Judge.MAUI;
+namespace NoTiming.Judge.MAUI;
 
 public static class MauiProgram
 {
@@ -20,7 +20,7 @@ public static class MauiProgram
         var targetEnvironment = EnvironmentHelper.UseResolvedEnvironment(assembly);
         builder.Configuration.AddNAppsettings(assembly, "judge");
 
-        builder.UseNLog().AddFilesystemLogger("NTS.Judge");
+        builder.UseNLog().AddFilesystemLogger("NoTiming.Judge");
         builder.Services.AddSingleton(new NEnvironment(targetEnvironment));
         builder.Services.AddJudgeMaui(builder.Configuration);
 

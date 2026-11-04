@@ -1,12 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.CRUD.Ports;
-using Not.Domain;
-using Not.Krud.Abstractions;
-using Not.Krud.Blazor;
-using Not.Krud.Graph;
-using Not.Krud.Services;
+using NC.Application.CRUD.Ports;
+using NC.Domain;
+using NC.Krud.Abstractions;
+using NC.Krud.Blazor;
+using NC.Krud.Graph;
+using NC.Krud.Services;
 
-namespace Not.Krud.ServiceRegistration;
+namespace NC.Krud.ServiceRegistration;
 
 public static class KrudServiceCollectionExtensions
 {

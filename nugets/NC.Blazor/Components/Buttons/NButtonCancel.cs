@@ -1,8 +1,8 @@
 using MudBlazor;
-using Not.Blazor.Components.Buttons.Abstractions;
+using NC.Blazor.Components.Buttons.Abstractions;
 
 // ReSharper disable once CheckNamespace
-namespace Not.Blazor.Components.Buttons;
+namespace NC.Blazor.Components.Buttons;
 
 public class NButtonCancel : NButtonBase
 {

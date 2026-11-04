@@ -1,9 +1,9 @@
-using Not.Krud.Models;
-using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+using NC.Krud.Models;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-namespace NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Operators;
+namespace NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Operators;
 
 public record OperatorFormModel : KrudFormModel<Operator>
 {

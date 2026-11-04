@@ -1,9 +1,9 @@
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Components.Buttons;
-using Not.Notify;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Enums;
-using NTS.Domain.Watcher;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Buttons;
+using NC.Notify;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Watcher;
 using NoTiming.Ui.Blazor.Features.Socket;
 using NoTiming.Ui.Contracts.Features.Access;
 using NoTiming.Ui.Contracts.Features.Snapshots;

@@ -1,7 +1,7 @@
-using Not.Domain;
-using Not.Domain.Abstractions;
+using NC.Domain;
+using NC.Domain.Abstractions;
 
-namespace Not.Application.DomainEvents;
+namespace NC.Application.DomainEvents;
 
 public interface IDomainEventDispatcher
 {

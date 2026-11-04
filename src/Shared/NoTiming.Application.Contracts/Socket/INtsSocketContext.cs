@@ -1,10 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
-using Not.Application.RPC;
-using NTS.Domain.Core.Aggregates;
+using NC.Application.RPC;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Application.Contracts.Socket;
+namespace NoTiming.Application.Contracts.Socket;
 
-public interface INtsSocketContext : ISocketContext
+public interface INoTimingSocketContext : ISocketContext
 {
     [MemberNotNullWhen(true, nameof(Event))]
     new bool IsConnected { get; }

@@ -1,6 +1,6 @@
-﻿using Not.Events;
+﻿using NC.Events;
 
-namespace Not.Observables;
+namespace NC.Observables;
 
 public interface IObservable
 {

@@ -1,10 +1,10 @@
 using System.Globalization;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Helpers;
+using NoTiming.Domain.Aggregates;
+using NoTiming.Domain.Helpers;
 
-namespace NTS.Domain.Core.Aggregates.Participations.Entities;
+namespace NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
-public class Athlete : Entity, INamed, INtsDisplayable
+public class Athlete : Entity, INamed, INoTimingDisplayable
 {
     public Athlete(string? name, string? nameEnglish, Country country, Club? club, string? feiId, int id)
         : base(id)

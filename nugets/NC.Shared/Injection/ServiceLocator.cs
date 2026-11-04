@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Not.Exceptions;
-using Not.Startup;
+using NC.Exceptions;
+using NC.Startup;
 
-namespace Not.Injection;
+namespace NC.Injection;
 
 public class ServiceLocator : IStartupInitializer, ITransient
 {

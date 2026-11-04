@@ -1,8 +1,8 @@
-using Not.Blazor.Dialogs.Abstractions;
-using NTS.Domain.Core.Objects.Documents;
-using NTS.Judge.Contracts.Features.Core.Handouts;
+using NC.Blazor.Dialogs.Abstractions;
+using NoTiming.Domain.Core.Objects.Documents;
+using NoTiming.Judge.Contracts.Features.Core.Handouts;
 
-namespace NTS.Judge.Blazor.Features.Core.Handouts;
+namespace NoTiming.Judge.Blazor.Features.Core.Handouts;
 
 public class HandoutsPrintConfirmationDialogBehind : NDialog
 {

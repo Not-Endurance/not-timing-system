@@ -1,4 +1,4 @@
-namespace Not.Blazor.Components.Abstractions;
+namespace NC.Blazor.Components.Abstractions;
 
 public abstract class NComponentBase : ComponentBase
 {

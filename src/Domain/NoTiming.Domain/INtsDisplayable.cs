@@ -1,8 +1,8 @@
-using NTS.Domain.Enums;
+using NoTiming.Domain.Enums;
 
-namespace NTS.Domain;
+namespace NoTiming.Domain;
 
-public interface INtsDisplayable
+public interface INoTimingDisplayable
 {
     string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null);
 }

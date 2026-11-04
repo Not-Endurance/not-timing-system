@@ -1,5 +1,5 @@
-using Not.Application.CRUD.Ports;
+using NC.Application.CRUD.Ports;
 
-namespace NTS.Application.Contracts.Core;
+namespace NoTiming.Application.Contracts.Core;
 
 public interface IEventScopedRepository<T> : IRepository<T> { }

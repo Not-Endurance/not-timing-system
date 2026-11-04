@@ -1,7 +1,7 @@
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Navigation.Abstractions;
+using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Navigation.Abstractions;
 
-namespace Not.Blazor.Components;
+namespace NC.Blazor.Components;
 
 public class NContentBehind : NComponent
 {

@@ -1,7 +1,7 @@
-using Not.Application.Behinds.Adapters;
-using NTS.Domain.Core.Aggregates;
+using NC.Application.Behinds.Adapters;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Application.Contracts.Core;
+namespace NoTiming.Application.Contracts.Core;
 
 public interface IParticipationContext : IStatefulService
 {

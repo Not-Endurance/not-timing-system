@@ -1,6 +1,6 @@
-using NTS.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Judge.Contracts.Features.Core.Rankings.CustomRankings;
+namespace NoTiming.Judge.Contracts.Features.Core.Rankings.CustomRankings;
 
 public class CustomRankingEntryModel
 {

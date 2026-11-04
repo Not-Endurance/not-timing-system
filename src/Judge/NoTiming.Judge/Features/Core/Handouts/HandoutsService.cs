@@ -1,18 +1,18 @@
 using MediatR;
-using Not.Application.Behinds.Adapters;
-using Not.Async.Extensions;
-using Not.Exceptions;
-using Not.Observables.Structures;
-using Not.Safe;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Core.Objects.Documents;
-using NTS.Domain.Core.Objects.Payloads;
-using NTS.Judge.Features.Core.State;
+using NC.Application.Behinds.Adapters;
+using NC.Async.Extensions;
+using NC.Exceptions;
+using NC.Observables.Structures;
+using NC.Safe;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Core.Objects.Documents;
+using NoTiming.Domain.Core.Objects.Payloads;
+using NoTiming.Judge.Features.Core.State;
 
-namespace NTS.Judge.Features.Core.Handouts;
+namespace NoTiming.Judge.Features.Core.Handouts;
 
 public class HandoutsService
     : NStatefulService<ObservableList<ResultsDocument>>,
@@ -22,13 +22,13 @@ public class HandoutsService
         INotificationHandler<PhaseCompleted>
 {
     readonly SemaphoreSlim _semaphore = new(1);
-    readonly INtsSocketContext _socketContext;
+    readonly INoTimingSocketContext _socketContext;
     readonly IEventScopedRepository<Handout> _handoutRepository;
     readonly IEventScopedRepository<Participation> _participations;
     readonly IEventScopedRepository<Official> _officials;
 
     public HandoutsService(
-        INtsSocketContext socketContext,
+        INoTimingSocketContext socketContext,
         IEventScopedRepository<Handout> handouts,
         IEventScopedRepository<Participation> participations,
         IEventScopedRepository<Official> officials

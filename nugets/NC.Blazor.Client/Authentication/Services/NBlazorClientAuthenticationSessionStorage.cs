@@ -1,10 +1,10 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
-using Not.Application.Authentication.Abstractions;
-using Not.BLazor.Client.Browser;
-using Not.Injection;
+using NC.Application.Authentication.Abstractions;
+using NC.BLazor.Client.Browser;
+using NC.Injection;
 
-namespace Not.Blazor.Client.Authentication.Services;
+namespace NC.Blazor.Client.Authentication.Services;
 
 internal class NBlazorClientAuthenticationSessionStorage : INAuthenticationSessionStorage, ITransient
 {

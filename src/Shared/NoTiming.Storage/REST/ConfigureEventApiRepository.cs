@@ -1,13 +1,13 @@
-using Not.Application.DomainEvents;
-using Not.Application.HTTP;
-using Not.Storage.REST;
-using Not.Structures;
-using NTS.Application.Contracts.Setup;
-using NTS.Application.Contracts.Setup.Models;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Events;
+using NC.Application.DomainEvents;
+using NC.Application.HTTP;
+using NC.Storage.REST;
+using NC.Structures;
+using NoTiming.Application.Contracts.Setup;
+using NoTiming.Application.Contracts.Setup.Models;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Events;
 
-namespace NTS.Storage.REST;
+namespace NoTiming.Storage.REST;
 
 public class ConfigureEventApiRepository : ApiRepository<ConfigureEvent, ConfigureEventModel>
 {

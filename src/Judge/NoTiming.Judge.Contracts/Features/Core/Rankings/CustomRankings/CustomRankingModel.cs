@@ -1,8 +1,8 @@
-using Not.Krud.Models;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Enums;
+using NC.Krud.Models;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Enums;
 
-namespace NTS.Judge.Contracts.Features.Core.Rankings.CustomRankings;
+namespace NoTiming.Judge.Contracts.Features.Core.Rankings.CustomRankings;
 
 public record CustomRankingModel : KrudFormModel<Ranking>
 {

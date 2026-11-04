@@ -1,7 +1,7 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
+using NC.Blazor.Components.Abstractions;
 
-namespace Not.Blazor.Components.Text.Abstractions;
+namespace NC.Blazor.Components.Text.Abstractions;
 
 public class NTextBaseBehind : NComponentBase
 {

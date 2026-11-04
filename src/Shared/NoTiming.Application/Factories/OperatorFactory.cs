@@ -1,6 +1,6 @@
-using NTS.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
 
-namespace NTS.Application.Factories;
+namespace NoTiming.Application.Factories;
 
 public static class OperatorFactory
 {

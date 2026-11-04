@@ -1,12 +1,12 @@
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Watcher;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Domain.Watcher;
 
-namespace NTS.Application.UserSession;
+namespace NoTiming.Application.UserSession;
 
 public interface IUiUserSession
 {
-    Task<NtsUserSessionStateModel?> GetCurrent();
+    Task<NoTimingUserSessionStateModel?> GetCurrent();
     Task SetEventId(int? eventId);
     Task AppendSnapshot(SnapshotGroup snapshot);
     Task ReplaceSnapshotSelections(IReadOnlyCollection<Snapshot> snapshots);

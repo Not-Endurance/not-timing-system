@@ -1,7 +1,7 @@
-using Not.Domain.Exceptions;
-using CoreOperator = NTS.Domain.Core.Aggregates.Operator;
+using NC.Domain.Exceptions;
+using CoreOperator = NoTiming.Domain.Core.Aggregates.Operator;
 
-namespace NTS.Domain.Core.Tests.Aggregates;
+namespace NoTiming.Domain.Core.Tests.Aggregates;
 
 public sealed class OperatorTests
 {

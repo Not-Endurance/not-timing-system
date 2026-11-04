@@ -1,8 +1,8 @@
-﻿using Not.Krud.Abstractions;
-using NTS.Application.Contracts.Shared;
-using NTS.Domain.Aggregates;
+﻿using NC.Krud.Abstractions;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Domain.Aggregates;
 
-namespace NTS.Application.Contracts.Shared.Models;
+namespace NoTiming.Application.Contracts.Shared.Models;
 
 public class CountryModel : IDocument, IKrudModel<Country>
 {

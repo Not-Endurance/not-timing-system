@@ -1,6 +1,6 @@
-using Not.Blazor.Dialogs.Abstractions;
+using NC.Blazor.Dialogs.Abstractions;
 
-namespace NTS.Judge.Blazor.Layout.Drawer.Deactivate;
+namespace NoTiming.Judge.Blazor.Layout.Drawer.Deactivate;
 
 public class DeactivateEventDialogBehind : NDialog
 {

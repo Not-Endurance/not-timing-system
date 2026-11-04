@@ -1,4 +1,4 @@
-namespace Not.Files;
+namespace NC.Files;
 
 public static class NFileContentTypes
 {

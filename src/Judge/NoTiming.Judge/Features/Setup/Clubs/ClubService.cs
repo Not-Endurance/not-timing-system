@@ -1,10 +1,10 @@
-using Not.Application.CRUD.Ports;
-using Not.Injection;
-using Not.Krud.Abstractions;
-using Not.Krud.Services;
-using NTS.Domain.Setup.Aggregates;
+using NC.Application.CRUD.Ports;
+using NC.Injection;
+using NC.Krud.Abstractions;
+using NC.Krud.Services;
+using NoTiming.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Features.Setup.Clubs;
+namespace NoTiming.Judge.Features.Setup.Clubs;
 
 internal class ClubService : KrudServiceBase<Club, ClubFormModel>, ITransient
 {

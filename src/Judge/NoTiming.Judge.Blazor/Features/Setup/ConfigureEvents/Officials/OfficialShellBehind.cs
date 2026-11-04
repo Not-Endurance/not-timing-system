@@ -1,8 +1,8 @@
-using Not.Krud.Blazor.Components.Abstractions;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Officials;
+using NC.Krud.Blazor.Components.Abstractions;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Officials;
 
-namespace NTS.Judge.Blazor.Features.Setup.ConfigureEvents.Officials;
+namespace NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents.Officials;
 
 public class OfficialShellBehind : KrudShell<OfficialFormModel>
 {

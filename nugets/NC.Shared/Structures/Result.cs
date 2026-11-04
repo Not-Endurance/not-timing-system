@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 
-namespace Not.Structures;
+namespace NC.Structures;
 
 public class Result : Result<Result.Empty>
 {

@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Formatting;
-using NTS.Application.Contracts.Startlists;
-using NTS.Domain.Core.Objects.Startlists;
+using NC.Blazor.Components.Abstractions;
+using NC.Formatting;
+using NoTiming.Application.Contracts.Startlists;
+using NoTiming.Domain.Core.Objects.Startlists;
 
-namespace NTS.Blazor.Components.Startlist.Upcoming;
+namespace NoTiming.Blazor.Components.Startlist.Upcoming;
 
 public class StartlistEntryTimerBehind : NStatefulComponent
 {

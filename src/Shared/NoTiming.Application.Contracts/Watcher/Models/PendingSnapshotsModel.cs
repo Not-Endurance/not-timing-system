@@ -1,8 +1,8 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Not.Structures;
+using NC.Structures;
 
-namespace NTS.Application.Contracts.Watcher.Models;
+namespace NoTiming.Application.Contracts.Watcher.Models;
 
 public class PendingSnapshotsModel : IIdentifiable
 {

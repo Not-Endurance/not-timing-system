@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Localization;
-using Not.Blazor.Components.Abstractions;
-using Not.Localization;
-using Not.Notify;
-using Not.Safe;
-using Not.Startup;
+using NC.Blazor.Components.Abstractions;
+using NC.Localization;
+using NC.Notify;
+using NC.Safe;
+using NC.Startup;
 
-namespace Not.Blazor.Components.Layout;
+namespace NC.Blazor.Components.Layout;
 
 public class NLayoutBehind : LayoutComponentBase, IDisposable
 {

@@ -1,26 +1,26 @@
-using Not.Application.Authentication.Abstractions;
-using Not.Application.HTTP;
-using Not.Storage.REST;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
-using NTS.Application.UserSession;
+using NC.Application.Authentication.Abstractions;
+using NC.Application.HTTP;
+using NC.Storage.REST;
+using NoTiming.Application.Contracts.Watcher;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Application.UserSession;
 
-namespace NTS.Storage.REST;
+namespace NoTiming.Storage.REST;
 
 public class UserSessionApiRepository
-    : ApiRepository<NtsUserSessionModel, NtsUserSessionModel>,
-        INtsUserSessionRepository,
-        INUserSessionRepository<NtsUserSessionStateModel>
+    : ApiRepository<NoTimingUserSessionModel, NoTimingUserSessionModel>,
+        INoTimingUserSessionRepository,
+        INUserSessionRepository<NoTimingUserSessionStateModel>
 {
     public UserSessionApiRepository(NHttpClient client)
         : base("user-sessions", client) { }
 
-    public new async Task Delete(NtsUserSessionModel item)
+    public new async Task Delete(NoTimingUserSessionModel item)
     {
         await HandleRequest(Client.Delete($"{Endpoint}/{item.EventId}/{item.Id}"));
     }
 
-    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier)
+    public async Task<NoTimingUserSessionModel?> ReadByUserIdentifier(string userIdentifier)
     {
         if (string.IsNullOrWhiteSpace(userIdentifier))
         {
@@ -29,11 +29,11 @@ public class UserSessionApiRepository
 
         var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
         return await HandleRequest(
-            Client.Get<NtsUserSessionModel>($"{Endpoint}/by-user-identifier/{encodedUserIdentifier}")
+            Client.Get<NoTimingUserSessionModel>($"{Endpoint}/by-user-identifier/{encodedUserIdentifier}")
         );
     }
 
-    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId)
+    public async Task<NoTimingUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId)
     {
         if (string.IsNullOrWhiteSpace(userIdentifier))
         {
@@ -42,11 +42,11 @@ public class UserSessionApiRepository
 
         var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
         return await HandleRequest(
-            Client.Get<NtsUserSessionModel>($"{Endpoint}/{eventId}/by-user-identifier/{encodedUserIdentifier}")
+            Client.Get<NoTimingUserSessionModel>($"{Endpoint}/{eventId}/by-user-identifier/{encodedUserIdentifier}")
         );
     }
 
-    async Task<NtsUserSessionStateModel?> INUserSessionRepository<NtsUserSessionStateModel>.ReadByUserIdentifier(
+    async Task<NoTimingUserSessionStateModel?> INUserSessionRepository<NoTimingUserSessionStateModel>.ReadByUserIdentifier(
         string userIdentifier
     )
     {
