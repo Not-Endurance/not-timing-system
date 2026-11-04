@@ -14,7 +14,7 @@ public static class WitnessProfileRoutePolicy
     public static bool IsProfileGateBypassRoute(string relativePath)
     {
         var path = Normalize(relativePath);
-        return string.Equals(path, Routes.PROFILE_PAGE, StringComparison.OrdinalIgnoreCase)
+        return string.Equals(path, Normalize(Routes.PROFILE_PAGE), StringComparison.OrdinalIgnoreCase)
             || path.StartsWith($"/{AuthenticationContents.AUTHENTICATION}", StringComparison.OrdinalIgnoreCase);
     }
 

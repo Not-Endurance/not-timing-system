@@ -6,8 +6,8 @@ namespace NTS.Nexus.Warp.ConnectionDiagnostics;
 internal static class WarpConnectionDiagnostics
 {
     const string UNKNOWN_INSTANCE = "local";
-    static readonly PathString JUDGE_HUB_PATH = new($"/{ApplicationConstants.JUDGE_HUB}");
-    static readonly PathString WITNESS_HUB_PATH = new($"/{ApplicationConstants.WITNESS_HUB}");
+    static readonly PathString JUDGE_HUB_PATH = new($"/{ApplicationConstants.EventBusHub(ApplicationConstants.JUDGE_HUB)}");
+    static readonly PathString WITNESS_HUB_PATH = new($"/{ApplicationConstants.EventBusHub(ApplicationConstants.WITNESS_HUB)}");
 
     public static bool TryDescribeTransportRequest(HttpContext context, out string requestKind, out string hubPath)
     {

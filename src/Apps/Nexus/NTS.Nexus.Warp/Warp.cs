@@ -28,8 +28,8 @@ public static class Warp
         var environment =
             Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? app.Environment.EnvironmentName;
 
-        var judgeHubPath = new PathString($"/{ApplicationConstants.JUDGE_HUB}");
-        var witnessHubPath = new PathString($"/{ApplicationConstants.WITNESS_HUB}");
+        var judgeHubPath = new PathString($"/{ApplicationConstants.EventBusHub(ApplicationConstants.JUDGE_HUB)}");
+        var witnessHubPath = new PathString($"/{ApplicationConstants.EventBusHub(ApplicationConstants.WITNESS_HUB)}");
         var originValidator = app.Services.GetRequiredService<ICorsOriginValidator>();
 
         app.Urls.Add($"http://*:{port}");
@@ -119,8 +119,8 @@ public static class Warp
                     }
                 )
         );
-        app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
-        app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
+        app.MapHub<JudgeRpcHub>(ApplicationConstants.EventBusHub(ApplicationConstants.JUDGE_HUB)).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
+        app.MapHub<WitnessRpcHub>(ApplicationConstants.EventBusHub(ApplicationConstants.WITNESS_HUB)).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
         app.MapControllers();
 
         LocalizationHelper.Configure(app.Services.GetRequiredService<IStringLocalizer>());

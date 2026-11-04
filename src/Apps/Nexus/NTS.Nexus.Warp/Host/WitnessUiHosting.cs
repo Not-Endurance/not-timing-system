@@ -15,13 +15,7 @@ internal static class WitnessUiHosting
         app.ServeUiClient(settings =>
         {
             settings.FileProvider = localUi;
-            settings.ReservedPathPrefixes =
-            [
-                "/api",
-                "/healthz",
-                $"/{ApplicationConstants.JUDGE_HUB}",
-                $"/{ApplicationConstants.WITNESS_HUB}",
-            ];
+            settings.PathPrefix = ApplicationConstants.UI;
             settings.ResponseHeaders["Blazor-Environment"] = app.Environment.EnvironmentName;
         });
 
