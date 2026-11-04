@@ -1,9 +1,9 @@
 ## Overview
 This project employs a Domain Driven Design architecture with strict layer and boundary separations. The codebase consists of two parts:
 - NC* "nugets", located in /nugets
-- NTS* - stands for No Timing System - the name of the product. 
+- NoTiming* - the product, formerly NTS (No Timing System).
 
-You can see a clear corelation between Not and NTS projects and they are layered identically. 
+You can see a clear corelation between NC and NoTiming projects and they are layered identically. 
 
 ## Applications
 Deployable hosts and the capabilities they are built from.
@@ -20,13 +20,13 @@ Notes:
 - Service registration - services in NC* should be registered manually, using the `N*Builder` pattern (see `NApplicationBuilder`) for example
 - Components defined in `NC.Blazor` should begin with `N` - `NTable`, `NNotifier`, `NTextField` etc
 
-# NTS* projects
-NTS stands for *No Timing System*, the Brand of the current product - a cheap alternative to full-fledged Endurance timing systems.
+# NoTiming* projects
+NoTiming (formerly NTS) stands for *No Timing System*, the brand of the current product - a cheap alternative to full-fledged Endurance timing systems.
 - Domain Model - hardcode business logic and validation is contained within the `NoTiming.Domain.*` namespace, which holds the domain model. It has to be as pure as reasonably possible. Some "pollution" is acceptable - like coupling with `MediatR.INotification` or `NC.Krud` framework, however there are no references to repositories or other infrastructure.
 - Secondary business logic - contained in `NoTiming.Application`, `NoTiming.Judge`, the **Ui** application or the so-called applicaiton level. It handles interactions between domain boundaries and infrastructure. The key component here and entry point should be the Service. Services should be suffixed with `*Service` and usually implement multiple segregated interfaces (conforms to Interface segregation principle)
 - Storage - contains operations related to storing something. All of the storage should be conform to the `IRepository<T>` abstraction.
 - Blazor - the layout is composed of a Header, Drawer and Main content. Components that are navigated to via Router should be suffixed with `*Content.razor`.
-- Service registration - services in NTS projects should be registed to the container via the `ITransient`, `IScoped` and `ISingleton` marker interfaces. Those interfaces shouldn't be inherited by other interfaces, but implemented by the classes implementing those interfaces. Services should not be registered manually
+- Service registration - services in NoTiming projects should be registed to the container via the `ITransient`, `IScoped` and `ISingleton` marker interfaces. Those interfaces shouldn't be inherited by other interfaces, but implemented by the classes implementing those interfaces. Services should not be registered manually
 - *Exceptions*: `NoTiming.Application` - we need to keep service registraiton manual for NoTiming.Application as it's also being used by the **NoTiming** shell in order to share RPC contracts. 
 
 ## Blazor
