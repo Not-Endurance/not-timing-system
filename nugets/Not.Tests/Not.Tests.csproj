@@ -15,6 +15,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Not.Application\Not.Application.csproj" />
+    <ProjectReference Include="..\Not.Server\Not.Server.csproj" />
   </ItemGroup>
 
 </Project>
