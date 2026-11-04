@@ -38,7 +38,9 @@ internal static class WitnessUiHosting
 
         if (app.Environment.IsDevelopment())
         {
-            var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("NTS.Nexus.Warp.Host.WitnessUi");
+            var logger = app
+                .Services.GetRequiredService<ILoggerFactory>()
+                .CreateLogger("NTS.Nexus.Warp.Host.WitnessUi");
             app.Lifetime.ApplicationStarted.Register(() => OpenLocalUi(logger));
         }
 
@@ -64,7 +66,10 @@ internal static class WitnessUiHosting
             using var process = Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
             if (process is null)
             {
-                logger.LogInformation("The system reported no new browser process for {Url}; a tab may already be open.", url);
+                logger.LogInformation(
+                    "The system reported no new browser process for {Url}; a tab may already be open.",
+                    url
+                );
             }
         }
         catch (Exception exception)
