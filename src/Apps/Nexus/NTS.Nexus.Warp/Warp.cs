@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using Microsoft.Extensions.Localization;
-using Not.Localization;
-using Not.Startup;
 using Not.Application.Configurations;
 using Not.Application.Environments;
+using Not.Localization;
+using Not.Startup;
 using NTS.Application.Contracts;
 using NTS.Nexus.Warp.ConnectionDiagnostics;
 using NTS.Nexus.Warp.Features.Judge;
@@ -127,8 +127,10 @@ public static class Warp
                     }
                 )
         );
-        app.MapHub<JudgeRpcHub>(ApplicationConstants.EventBusHub(ApplicationConstants.JUDGE_HUB)).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
-        app.MapHub<WitnessRpcHub>(ApplicationConstants.EventBusHub(ApplicationConstants.WITNESS_HUB)).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
+        app.MapHub<JudgeRpcHub>(ApplicationConstants.EventBusHub(ApplicationConstants.JUDGE_HUB))
+            .RequireCors(NtsWarpServices.CORS_POLICY_NAME);
+        app.MapHub<WitnessRpcHub>(ApplicationConstants.EventBusHub(ApplicationConstants.WITNESS_HUB))
+            .RequireCors(NtsWarpServices.CORS_POLICY_NAME);
         app.MapControllers();
 
         LocalizationHelper.Configure(app.Services.GetRequiredService<IStringLocalizer>());

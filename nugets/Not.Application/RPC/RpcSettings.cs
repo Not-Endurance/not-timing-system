@@ -19,7 +19,9 @@ public class RpcSettings
         {
             var host = Host.TrimEnd('/');
             var authority = Port == null ? host : $"{host}:{Port}";
-            var segments = new[] { EndpointPrefix.Trim('/'), HubPattern.Trim('/') }.Where(segment => segment.Length > 0);
+            var segments = new[] { EndpointPrefix.Trim('/'), HubPattern.Trim('/') }.Where(segment =>
+                segment.Length > 0
+            );
             return $"{authority}/{string.Join('/', segments)}";
         }
     }
