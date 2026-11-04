@@ -23,7 +23,6 @@ internal static class WitnessUiHosting
                 $"/{ApplicationConstants.WITNESS_HUB}",
             ];
             settings.ResponseHeaders["Blazor-Environment"] = app.Environment.EnvironmentName;
-            settings.OpenInBrowser = app.Environment.IsDevelopment();
         });
 
         return app;

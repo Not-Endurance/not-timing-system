@@ -12,8 +12,4 @@ public class UiClientSettings
     public string[] ReservedPathPrefixes { get; set; } = [];
 
     // Headers added to every response for the client, excluding reserved paths.
-    public Dictionary<string, string> ResponseHeaders { get; set; } = new();
-
-    // Open the client in the default browser once the server is listening, at the address it is bound to.
-    public bool OpenInBrowser { get; set; }
-}
+    public Dictionary<string, string> ResponseHeaders { get; set; } = new();}

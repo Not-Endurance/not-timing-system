@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
@@ -45,7 +46,8 @@ internal static class UiClientHosting
         app.UseStaticFiles(new StaticFileOptions { FileProvider = files, ServeUnknownFileTypes = true });
         app.MapFallback(context => ServeIndexAsync(context, files, reserved));
 
-        if (settings.OpenInBrowser)
+        // In Development the client opens in the default browser once the server is listening.
+        if (app.Environment.IsDevelopment())
         {
             var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Not.Server.UiClient");
             app.Lifetime.ApplicationStarted.Register(() => BrowserLauncher.Open(app, logger));
