@@ -1,0 +1,10 @@
+﻿@namespace NC.Blazor.Components
+
+@inherits NSkeletonBehind
+
+<MudStack>
+    @for (var i = 0; i < Lines; i++)
+    {
+        <MudSkeleton />
+    }
+</MudStack>

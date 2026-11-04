@@ -1,0 +1,36 @@
+{
+  "profiles": {
+    "Development": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "IS_LOCALHOST": "true",
+        "PORT": "11337",
+        "MONGO_CONNECTION_STRING": "mongodb://localhost:27017/nts",
+        "WITNESS_UI_PATH": "obj/ui/wwwroot"
+      },
+      "applicationUrl": "http://localhost:11337"
+    },
+    "Staging": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Staging",
+        "IS_LOCALHOST": "true",
+        "PORT": "11338"
+      },
+      "applicationUrl": "http://localhost:11338"
+    },
+    "Production": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "IS_LOCALHOST": "true",
+        "PORT": "11339"
+      },
+      "applicationUrl": "http://localhost:11339"
+    }
+  }
+}

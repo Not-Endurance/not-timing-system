@@ -1,0 +1,31 @@
+﻿@using NoTiming.Domain.Core.Aggregates.Participations
+@using NoTiming.Domain.Objects
+@using NoTiming.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms.Shared
+@using NC.Blazor.Components.Input
+@using NC.Localization
+@using NC.Structures
+
+@inherits FailedToQualifyFormBehind
+
+<EliminationForm SubmitSafe="FailToQualifySafe">
+
+    <MudSelect @bind-SelectedValues="@Codes" MultiSelection="true" Delimiter="+" Class="mt-4"
+        Label="@Failed_to_Qualify_Reason_string" Placeholder="@Select_a_reason_string">
+    
+        @foreach (var ftqCode in SelectListModel.FromEnum<FailToQualifyCode>())
+        {
+             <MudTooltip Text="@ftqCode.Description" Inline="false" RootStyle="width:inherit;">
+
+                <MudSelectItem Value="@ftqCode.Value">
+                    <MudText Typo="Typo.body1">@ftqCode.Value</MudText>
+                </MudSelectItem>
+
+            </MudTooltip>
+        }
+    </MudSelect>
+
+    <MudCollapse Expanded="Codes.Contains(FailToQualifyCode.FTC)">
+        <NTextField @bind-Value="Reason" Label="@Reason_string" Class="mt-4" />
+    </MudCollapse>
+
+</EliminationForm>

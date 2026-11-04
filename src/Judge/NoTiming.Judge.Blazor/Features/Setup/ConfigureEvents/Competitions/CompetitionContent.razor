@@ -1,0 +1,34 @@
+﻿@using NoTiming.Domain.Setup.Aggregates.ConfigureEvents
+@using NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents.Participations
+@using NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents.Phases
+@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Participations
+@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Phases
+@using NC.Blazor.Components.Layout
+@using NC.Krud.Blazor.Components
+
+@attribute [Route(COMPETITION_UPDATE)]
+@inherits CompetitionContentBehind
+
+<NContent Title="@Configure_Competition_string" IsEmpty="Model == null">
+
+    <Main>
+        <CompetitionShell Model="Model" ReadOnly="@ReadOnly">
+            
+            <AdditionalContent>
+                
+                <NGrid Spacing="8">
+                    <MudItem xs="6">
+                        <KrudList T="Phase" TModel="PhaseFormModel" TShell="PhaseShell" Name="@Phases_string" ReadOnly="@ReadOnly" />
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <KrudList T="Participation" TModel="ParticipationFormModel" TShell="ParticipationShell" Name="@Participations_string" ReadOnly="@ReadOnly" />
+                    </MudItem>
+                </NGrid>
+
+            </AdditionalContent>
+
+        </CompetitionShell>
+    </Main>
+
+</NContent>

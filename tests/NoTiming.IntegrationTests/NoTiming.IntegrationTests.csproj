@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\nugets\NC\NC.csproj" />
+    <ProjectReference Include="..\..\nugets\NC.Blazor\NC.Blazor.csproj" />
+    <ProjectReference Include="..\..\nugets\NC.Krud\NC.Krud.csproj" />
+    <ProjectReference Include="..\..\src\Judge\NoTiming.Judge\NoTiming.Judge.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming.Shell\NoTiming.Shell.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming\EventBus\NoTiming.EventBus.Contracts\NoTiming.EventBus.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming\Ui\NoTiming.Ui.Application\NoTiming.Ui.Application.csproj" />
+    <ProjectReference Include="..\..\src\Shared\NoTiming.Blazor\NoTiming.Blazor.csproj" />
+    <ProjectReference Include="..\..\src\Shared\NoTiming.Storage\NoTiming.Storage.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Testcontainers.MongoDb" Version="4.11.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

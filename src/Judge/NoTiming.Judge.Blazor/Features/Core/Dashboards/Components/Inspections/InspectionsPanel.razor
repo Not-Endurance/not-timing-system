@@ -1,0 +1,11 @@
+﻿@using NoTiming.Domain.Core.Aggregates
+@using NoTiming.Domain.Core.Aggregates.Participations
+@using NC.Blazor.Components.Input
+
+@inherits InspectionsPanelBehind
+
+<MudStack Class="@Class">
+    <NSwitch Label="@Representation_string" Value="@IsRepresentRequested" ValueChanged="HandleRepresentChanged" />
+
+    <NSwitch Label="@Required_Inspection_string" Value="@IsInspectionRequested" ValueChanged="HandleInspectionChanged" />
+</MudStack>

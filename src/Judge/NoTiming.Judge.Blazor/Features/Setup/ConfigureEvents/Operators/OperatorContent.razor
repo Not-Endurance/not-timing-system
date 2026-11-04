@@ -1,0 +1,14 @@
+﻿@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Operators
+@using NC.Blazor.Components.Layout
+@using NC.Blazor.Navigation
+
+@attribute [Route(OPERATOR_UPDATE)]
+@inherits OperatorContentBehind
+
+<NContent Title="@Configure_Operator_string" IsEmpty="Model == null">
+
+    <Main>
+        <OperatorShell Model="Model" ReadOnly="@ReadOnly" />
+    </Main>
+
+</NContent>

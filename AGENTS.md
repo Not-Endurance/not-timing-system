@@ -1,6 +1,6 @@
 ## Context
 - Primary sln file is src/not-timing-system.sln (production code only)
-- Test solution is tests/NoTiming.Tests.sln (unit test projects, Integration tests, Not.Tests)
+- Test solution is tests/NoTiming.Tests.sln (unit test projects, Integration tests, NC.Tests)
 
 ## Rules
 1. Don't execute commands that would create, delete or modify files outside of this working directory. Exceptions of this rule are commands which could cause side effects scoped to the utility that owns the command:
@@ -8,18 +8,18 @@
 - docker commands which would modify containers, volumes, images or similar
 2. Always dotnet `build`, `restore` with silent output `-v:q` unless instructed otherwise. Don't modify worklfows to use queit mode. This applies only for localhost verification
 3. Run dotnet `test` with minimal output `-v:m`.
-4. Domain logic is unit tested in the test project that mirrors its source project (for example NTS.Domain.Core.Tests and NTS.Domain.Setup.Tests). See Testing below.
+4. Domain logic is unit tested in the test project that mirrors its source project (for example NoTiming.Domain.Core.Tests and NoTiming.Domain.Setup.Tests). See Testing below.
 5. Don't concern yourself with code formatting. CSharpier formats code via CI, so don't run or check formatting locally.
 
 ## Verification
-- After individual atomic changes build and run the unit test project that mirrors the changed source project, for example `dotnet build tests/NoTiming.Tests.sln -v:q` followed by `dotnet test tests/NTS.Domain.Core.Tests/NTS.Domain.Core.Tests.csproj -v:m`.
-- Verify each complete feature with a successful run of `dotnet test tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -v:m`. This needs Docker.
+- After individual atomic changes build and run the unit test project that mirrors the changed source project, for example `dotnet build tests/NoTiming.Tests.sln -v:q` followed by `dotnet test tests/NoTiming.Domain.Core.Tests/NoTiming.Domain.Core.Tests.csproj -v:m`.
+- Verify each complete feature with a successful run of `dotnet test tests/NoTiming.IntegrationTests/NoTiming.IntegrationTests.csproj -v:m`. This needs Docker.
 
 ## Testing
 Conventions for unit tests (Integration tests are not subject to these rules):
-- Test projects: one per source project, named `<SourceProject>.Tests` and placed in `tests/` and referenced by the tests/ solution. Example: `src/NTS.Application` is tested by `tests/NTS.Application.Tests`.
+- Test projects: one per source project, named `<SourceProject>.Tests` and placed in `tests/` and referenced by the tests/ solution. Example: `src/Shared/NoTiming.Application` is tested by `tests/NoTiming.Application.Tests`.
 - Test class: named `<TestedClass>Tests`, where `<TestedClass>` is the class under test.
-- Test location: mirror the source directory. A class at `src/Domain/NTS.Domain.Core/Objects/Startlists/Startlist.cs` is tested by `tests/NTS.Domain.Core.Tests/Objects/Startlists/StartlistTests.cs`. Namespaces follow the folder.
+- Test location: mirror the source directory. A class at `src/Domain/NoTiming.Domain.Core/Objects/Startlists/Startlist.cs` is tested by `tests/NoTiming.Domain.Core.Tests/Objects/Startlists/StartlistTests.cs`. Namespaces follow the folder.
 - Test method: `<Method>_When<Condition>_<Result>`, for example `Create_WhenInvalid_ShouldReturnError`. The result starts with `Should`. For constructors, `<Method>` is `Constructor`.
 - One behaviour per test. Several `Assert` calls are fine when they check one atomic behaviour. If a test checks two separate behaviours, split it into two tests.
 - Helpers and fakes used by one test class are private and nested in that class. Helpers or fakes shared by several test classes go in a `Harness/` directory at the lowest directory level that contains all the classes using them.

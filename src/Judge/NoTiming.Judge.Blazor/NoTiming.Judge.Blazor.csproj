@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <ProjectReference Include="..\..\..\nugets\NC.Blazor.Client\NC.Blazor.Client.csproj" />
+	  <ProjectReference Include="..\..\Shared\NoTiming.Blazor\NoTiming.Blazor.csproj" />
+	  <ProjectReference Include="..\NoTiming.Judge.Contracts\NoTiming.Judge.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

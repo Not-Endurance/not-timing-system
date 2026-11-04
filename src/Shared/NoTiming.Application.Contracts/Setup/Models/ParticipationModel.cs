@@ -1,0 +1,47 @@
+﻿using NC.Krud.Abstractions;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Application.Contracts.Shared.Models;
+using NoTiming.Domain.Enums;
+using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
+
+namespace NoTiming.Application.Contracts.Setup.Models;
+
+public class ParticipationModel
+{
+    public static ParticipationModel MapFrom(Participation participation)
+    {
+        return new ParticipationModel
+        {
+            Id = participation.Id,
+            IsNotRanked = participation.IsNotRanked,
+            Category = participation.Category,
+            Combination = CombinationModel.MapFrom(participation.Combination),
+            StartTimeOverride = participation.StartTimeOverride,
+            MaxSpeedOverride = participation.MaxSpeedOverride,
+            MinSpeedOverride = participation.MinSpeedOverride,
+        };
+    }
+
+    public int Id { get; init; }
+    public ParticipationCategory Category { get; init; } = default!;
+    public CombinationModel Combination { get; init; } = default!;
+    public bool IsNotRanked { get; init; }
+    public DateTimeOffset? StartTimeOverride { get; init; }
+    public double? MaxSpeedOverride { get; init; }
+    public double? MinSpeedOverride { get; init; }
+
+    public Participation MapToEntity()
+    {
+        var combination = Combination.MapToEntity();
+        return new Participation(
+            IsNotRanked,
+            combination,
+            Category,
+            StartTimeOverride,
+            MaxSpeedOverride,
+            MinSpeedOverride,
+            Id
+        );
+    }
+}

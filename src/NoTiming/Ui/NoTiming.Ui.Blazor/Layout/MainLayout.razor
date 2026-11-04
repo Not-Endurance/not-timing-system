@@ -1,0 +1,18 @@
+@using NoTiming.Application
+@using NoTiming.Application.Contracts
+@using NoTiming.Ui.Blazor.Layout.Drawer
+@using NC.Blazor.Components.Layout
+
+@inherits MainLayoutBehind
+
+<NLayout Watermark="@LayoutWatermark" MenuTitle="@Main_menu_string">
+
+    <Drawer>
+        <NavMenu />
+    </Drawer>
+
+    <Content>
+        @Body
+    </Content>
+
+</NLayout>

@@ -1,0 +1,28 @@
+@using NoTiming.Domain.Core.Aggregates
+@using NC.Blazor.Components.Layout
+@using NC.Blazor.Dialogs.Abstractions
+
+@inherits SelectEventDialogBehind
+
+<MudDialog DefaultFocus="DefaultFocus.None">
+
+    <DialogContent>
+        <NTable Items="@Events" EmptyMessage="@Empty_event_list_message" Headings="@EventsTableHeaders">
+            <TrailingCell Context="item">
+                @{
+                    var context = (EventInformation)item;
+                }
+
+                @if (IsConnected && SelectedEvent?.Id == context.Id)
+                {
+                    <NButtonPrimary Color="Color.Error" Style="width:120px" OnClick="Disconnect">@Disconnect_string</NButtonPrimary>
+                }
+                else
+                {
+                    <NButtonPrimary Color="Color.Success" Style="width:120px" OnClick="() => ConnectTo(context)">@Connect_string</NButtonPrimary>
+                }
+            </TrailingCell>
+        </NTable>
+    </DialogContent>
+
+</MudDialog>

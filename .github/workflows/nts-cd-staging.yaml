@@ -9,10 +9,10 @@ on:
 env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 10.0.x
-  WITNESS_APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
-  WITNESS_PUBLISH_PATH: NTS.Witness.Web/publish
-  SOURCE_PATH: src/Apps/Nexus/NTS.Nexus.Warp
-  ARTIFACT_PATH: NTS.Nexus.Warp/publish
+  UI_APP_LOCATION: src/NoTiming/Ui/NoTiming.Ui
+  UI_PUBLISH_PATH: NoTiming.Ui/publish
+  SOURCE_PATH: src/NoTiming.Shell
+  ARTIFACT_PATH: NoTiming/publish
   AZURE_RESOURCE: nts-nexus-warp-dev
 
 jobs:
@@ -48,16 +48,16 @@ jobs:
         --no-build \
         --output ${{ env.ARTIFACT_PATH }}
 
-    - name: Publish Witness UI
+    - name: Publish Ui
       run: |
-        dotnet publish ${{ env.WITNESS_APP_LOCATION }} \
+        dotnet publish ${{ env.UI_APP_LOCATION }} \
         --configuration ${{ env.CONFIGURATION }} \
-        --output ${{ env.WITNESS_PUBLISH_PATH }}
+        --output ${{ env.UI_PUBLISH_PATH }}
 
-    - name: Add Witness UI to Warp package
+    - name: Add Ui to NoTiming package
       run: |
         mkdir -p "${{ env.ARTIFACT_PATH }}/wwwroot"
-        cp -r "${{ env.WITNESS_PUBLISH_PATH }}/wwwroot/." "${{ env.ARTIFACT_PATH }}/wwwroot/"
+        cp -r "${{ env.UI_PUBLISH_PATH }}/wwwroot/." "${{ env.ARTIFACT_PATH }}/wwwroot/"
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3

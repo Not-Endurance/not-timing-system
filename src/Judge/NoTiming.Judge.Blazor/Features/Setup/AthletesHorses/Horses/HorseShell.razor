@@ -1,0 +1,18 @@
+@using NoTiming.Judge.Contracts.Features.Setup.Horses
+@using NC.Blazor.Components.Input
+@using NC.Krud.Blazor.Components
+@using NC.Krud.Blazor.Components.Abstractions
+
+@inherits KrudShell<HorseFormModel>
+
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    <FormFields>
+        <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+
+        <NTextField @bind-Value="Model.NameEnglish" For="() => Model.NameEnglish" Label="@Name_in_English_string" />
+
+        <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@FEI_ID_string" />
+    </FormFields>
+</KrudForm>
+
+

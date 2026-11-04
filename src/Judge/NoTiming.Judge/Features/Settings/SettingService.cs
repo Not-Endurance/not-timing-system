@@ -1,0 +1,53 @@
+using NC.Application.Behinds.Adapters;
+using NC.Injection;
+using NC.Krud.Abstractions;
+using NoTiming.Application.Settings;
+using NoTiming.Domain.Aggregates;
+
+namespace NoTiming.Judge.Features.Settings;
+
+public class SettingService : NStatefulService, ISettingService, IKrudFormService<SettingFormModel>, IScoped
+{
+    readonly ISettingRepository _repository;
+    readonly IEnumerable<IKrudMirrorService<Setting>> _reflections;
+
+    public SettingService(ISettingRepository repository, IEnumerable<IKrudMirrorService<Setting>> reflections)
+    {
+        _repository = repository;
+        _reflections = reflections;
+    }
+
+    public Setting? Setting { get; private set; }
+
+    protected override async Task<bool> InitializeState()
+    {
+        Setting = await _repository.Get(Guid.Parse("ec6d8f0d-ecad-4fb6-a10f-fdb190dc0cd4"));
+        return Setting != null;
+    }
+
+    public async Task Create(SettingFormModel model)
+    {
+        var setting = model.MapToEntity();
+        await _repository.Create(setting);
+        Setting = setting;
+        await UpdateReflections();
+    }
+
+    public async Task Update(SettingFormModel model)
+    {
+        var setting = model.MapToEntity();
+        await _repository.Update(setting);
+        await UpdateReflections();
+    }
+
+    async Task UpdateReflections()
+    {
+        if (Setting != null)
+        {
+            foreach (var reflection in _reflections)
+            {
+                await reflection.Reflect(Setting);
+            }
+        }
+    }
+}

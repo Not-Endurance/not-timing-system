@@ -1,0 +1,53 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using NC.Krud.Abstractions
+@using NC.Krud.Blazor.Components.Form
+@using NC.Structures
+
+@typeparam TModel where TModel : IKrudFormModel, new()
+@inherits KrudFormBehind<TModel>
+
+<MudContainer Class="n-content-mid-width">
+  
+    <EditForm Model="Shell.Model" OnSubmit="OnSubmit">
+        <ExceptionFormValidator @ref="ValidatorRef"/>
+
+        <fieldset disabled="@ReadOnly" style="border:0;padding:0;margin:0;">
+            @FormFields
+        </fieldset>
+
+        @AdditionalContent
+
+        @if (ReadOnly)
+        {
+            <MudStack Row="true" Class="mt-4" Justify="Justify.FlexEnd">
+                @if (CanNavigateBack())
+                {
+                    <NButtonBack OnClick="NavigateBack" />
+                }
+            </MudStack>
+        }
+        else if (FormButtons != null)
+        {
+            @FormButtons
+        }
+        else 
+        {
+            <MudStack Row="true" Class="mt-4" Justify="Justify.FlexEnd">
+                @if (CanNavigateBack())
+                {
+                    <NButtonBack OnClick="NavigateBack" />
+                }
+
+                @if (IsCreateForm)
+                {
+                    <NButtonCreate ButtonType="ButtonType.Submit" />
+                }
+                else
+                {
+                    <NButtonUpdate ButtonType="ButtonType.Submit" />
+                }    
+            </MudStack>
+        }
+    </EditForm>
+
+</MudContainer>

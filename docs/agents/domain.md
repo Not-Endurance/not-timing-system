@@ -4,7 +4,7 @@ How the engineering skills should consume this repo's domain documentation when 
 
 ## Before exploring, read these
 
-- **`CONTEXT.md`** at the repo root: architecture and layering conventions for the NTS and Not* projects.
+- **`CONTEXT.md`** at the repo root: architecture and layering conventions for the NTS and NC* projects.
 - **`GLOSSARY.md`** at the repo root, if it exists. (Single-context layout.)
 - **`docs/adr/`**: read ADRs that touch the area you're about to work in.
 

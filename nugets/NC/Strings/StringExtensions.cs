@@ -1,0 +1,58 @@
+using System.Text;
+using NC.Notify;
+
+namespace NC.Strings;
+
+public static class StringExtensions
+{
+    /// <summary>
+    /// Contains with <see cref="StringComparison.InvariantCultureIgnoreCase"/> option
+    /// </summary>
+    /// <param name="str">Orginal string</param>
+    /// <param name="term">Search term</param>
+    /// <returns</returns>
+    public static bool NContains(this string? str, string? term)
+    {
+        if (term == null)
+        {
+            return false;
+        }
+        return str?.Contains(term, StringComparison.InvariantCultureIgnoreCase) ?? false;
+    }
+
+    public static string NTrim(this string str, int maxLength)
+    {
+        if (str.Length <= maxLength)
+        {
+            return str;
+        }
+        var sb = new StringBuilder();
+        for (var i = 0; i < maxLength; i++)
+        {
+            sb.Append(str[i]);
+        }
+        sb.AppendLine("...");
+        return sb.ToString();
+    }
+
+    public static string Format(this string format, params object?[] args)
+    {
+        try
+        {
+            var normalized = args.Select(x => x?.ToString() ?? "");
+            return string.Format(format, [.. normalized]);
+        }
+#if DEBUG
+        catch (FormatException exception)
+        {
+            NotificationHelper.Current?.Error(exception);
+            throw;
+        }
+#else
+        catch (FormatException)
+        {
+            return format;
+        }
+#endif
+    }
+}

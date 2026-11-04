@@ -1,0 +1,20 @@
+﻿@using NoTiming.Application
+@using NoTiming.Application.Contracts
+@using NoTiming.Judge.Blazor.Layout.Drawer
+@using NC.Blazor.Components.Layout
+
+@inherits JudgeMainLayoutBehind
+
+<NLayout Watermark="@LayoutWatermark" MenuTitle="@Main_menu_string">
+
+    <Drawer>
+        <JudgeNavMenu />
+
+        <EventMenu />
+    </Drawer>
+    
+    <Content>
+        @Body
+    </Content>
+
+</NLayout>

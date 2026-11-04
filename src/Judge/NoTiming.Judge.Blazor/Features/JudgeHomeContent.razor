@@ -1,0 +1,48 @@
+@attribute [Route(HOME)]
+
+@using MudBlazor
+@using NoTiming.Domain.Setup.Aggregates
+@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents
+@using NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents
+@using NC.Blazor.Components.Layout
+@using NC.Krud.Blazor.Components
+
+@inherits JudgeHomeContentBehind
+
+<NContent Title="@Select_event_string">
+   
+    <Main>
+        <KrudList T="ConfigureEvent"
+                  TModel="ConfigureEventFormModel"
+                  TShell="ConfigureEventShell"
+                  Name="@Configure_events_string"
+                  CanView="ShowViewButton"
+                  CanUpdate="ShowEditButton"
+                  AllowCreate
+                  AllowView
+                  AllowUpdate
+                  NoScroll>
+            <CustomAction1 Context="configureEvent">
+                @if (ShowStartButton(configureEvent))
+                {
+                    <NButtonWarning
+                        OnClick="() => Start(configureEvent)"
+                        Text="@Start_string"
+                        StartIcon="@Icons.Material.Filled.NotStarted" />
+                }
+            </CustomAction1>
+
+            <CustomAction2 Context="configureEvent">
+                @if (ShowResetTimingButton(configureEvent))
+                {
+                    <NButtonDanger
+                        OnClick="() => OpenResetTimingDialog(configureEvent)"
+                        Text="@Reset_string" />
+                }
+            </CustomAction2>
+        </KrudList>
+    </Main>
+    
+</NContent>
+
+    

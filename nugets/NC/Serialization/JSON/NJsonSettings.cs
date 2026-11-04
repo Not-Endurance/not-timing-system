@@ -1,0 +1,25 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace NC.Serialization.JSON;
+
+public class NJsonSettings : JsonSerializerSettings
+{
+    public static NJsonSettings ConfigureServerSerialization()
+    {
+        var settings = new NJsonSettings();
+        //settings.ConfigureServer();
+        return settings;
+    }
+
+    public NJsonSettings()
+    {
+        ContractResolver = new PrivatePropertySetterResolver();
+        ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
+        Formatting = Newtonsoft.Json.Formatting.Indented;
+        TypeNameHandling = TypeNameHandling.Auto;
+        NullValueHandling = NullValueHandling.Ignore;
+        ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
+        Converters = [new StringEnumConverter()];
+    }
+}

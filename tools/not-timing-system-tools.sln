@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Tools", "NTS.Tools\NTS.Tools.csproj", "{CE076382-04EB-4292-AFF5-ED225FC9DA4E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Tools", "NoTiming.Tools\NoTiming.Tools.csproj", "{CE076382-04EB-4292-AFF5-ED225FC9DA4E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EMS", "EMS", "{C48F3BDB-AC29-4054-937C-47F46F9F2E82}"
 EndProject

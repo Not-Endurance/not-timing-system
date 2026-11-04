@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+    container_name: aspire-dashboard
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
+    ports:
+      - "18888:18888"
+      - "18889:18889"
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  notiming:
+    container_name: notiming
+    build:
+      context: ../
+      dockerfile: src/NoTiming.Shell/Dockerfile
+    environment:
+      PORT: "80"
+      MONGO_CONNECTION_STRING: mongodb://mongodb:27017
+      NServerAuthenticationSettings__AuthorityInstance: "https://ntsexternalsandbox.ciamlogin.com"
+      NServerAuthenticationSettings__AuthorityTenantId: "8838b442-b043-466b-8ed6-ccf82cb3641f"
+      NServerAuthenticationSettings__Scope: "nts-client-scope"
+      NServerAuthenticationSettings__ResourceClientId: "16abc36b-4eab-45a0-9230-d2791350f396"
+      NServerAuthenticationSettings__AccessTokenQueryPaths: '[ "event-bus/witness" ]'
+
+    ports:
+      - "11337:80"
+
+volumes:
+  mongodb_data:

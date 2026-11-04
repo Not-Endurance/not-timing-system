@@ -1,0 +1,142 @@
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using NC.Application.HTTP;
+using NC.Application.RPC;
+using NC.Application.RPC.Clients;
+using NC.Application.RPC.SignalR;
+using NC.Startup;
+using NoTiming.Application.Contracts;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Socket;
+using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Watcher;
+using NoTiming.IntegrationTests.Infrastructure;
+using NoTiming.Storage;
+using NoTiming.Ui.Application;
+using NoTiming.Ui.Application.Features.Core.Dashboard;
+using NoTiming.Ui.Contracts.Features.Access;
+
+namespace NoTiming.IntegrationTests.Drivers;
+
+internal sealed class UiDriver : IAsyncDisposable
+{
+    readonly ServiceProvider _provider;
+    readonly INoTimingSocketService _socketService;
+    readonly IParticipationContext _participationContext;
+    readonly IUiAccessContext _accessContext;
+    readonly string _clientName;
+
+    public UiDriver(Uri noTimingBaseUrl, IntegrationUser user, string clientName)
+    {
+        _clientName = clientName;
+        var configuration = DriverConfiguration.Create(
+            noTimingBaseUrl,
+            ApplicationConstants.WITNESS_HUB,
+            clientName,
+            [
+                new("NClientAuthenticationSettings:ClientId", "integration-client"),
+                new("NClientAuthenticationSettings:Instance", "https://login.microsoftonline.com"),
+                new("NClientAuthenticationSettings:TenantId", "integration-tenant"),
+            ]
+        );
+        var services = new ServiceCollection();
+
+        services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
+        services.ConfigureNoTimingStorage(configuration).AddRestApiStorage();
+        services.AddNoTimingUiApplication(
+            configuration,
+            noTimingBaseUrl.ToString().TrimEnd('/'),
+            typeof(NoTimingUiApplicationServices).Assembly
+        );
+        services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, IntegrationRpcAccessTokenProvider>());
+        services.AddScoped<AuthenticationStateProvider>(_ => new IntegrationAuthenticationStateProvider(user));
+
+        _provider = services.BuildServiceProvider();
+        _socketService = _provider.GetRequiredService<INoTimingSocketService>();
+        _participationContext = _provider.GetRequiredService<IParticipationContext>();
+        _accessContext = _provider.GetRequiredService<IUiAccessContext>();
+    }
+
+    public UiAccessLevel AccessLevel => _accessContext.AccessLevel;
+
+    public T GetRequiredService<T>()
+        where T : notnull
+    {
+        return _provider.GetRequiredService<T>();
+    }
+
+    public Task Start()
+    {
+        EnsureRpcClientsInitialized();
+        return _provider.Startup();
+    }
+
+    public Task Publish(SnapshotGroup snapshotGroup)
+    {
+        return _provider.GetRequiredService<ISnapshotPublisher>().PublishSnapshotsAsync(snapshotGroup);
+    }
+
+    public async Task Connect(EventInformation eventInformation)
+    {
+        await _socketService.Connect(eventInformation);
+        if (!_socketService.IsConnected)
+        {
+            throw new InvalidOperationException($"Ui '{_clientName}' did not connect to event {eventInformation.Id}.");
+        }
+    }
+
+    public Task Disconnect()
+    {
+        return _socketService.IsConnected ? _socketService.Disconnect() : Task.CompletedTask;
+    }
+
+    public async Task<Participation> WaitForParticipation(
+        int participationNumber,
+        Func<Participation, bool> predicate,
+        TimeSpan timeout
+    )
+    {
+        var deadline = DateTimeOffset.UtcNow.Add(timeout);
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            var participation = _participationContext.Participations.FirstOrDefault(x =>
+                x.Combination.Number == participationNumber
+            );
+            if (participation != null && predicate(participation))
+            {
+                return participation;
+            }
+
+            await Task.Delay(100);
+        }
+
+        throw new TimeoutException($"Ui did not observe participation #{participationNumber} before timeout.");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_socketService.IsConnected)
+        {
+            await _socketService.Disconnect();
+        }
+
+        await _provider.DisposeAsync();
+    }
+
+    void EnsureRpcClientsInitialized()
+    {
+        foreach (var rpcClient in _provider.GetServices<IRpcClient>())
+        {
+            rpcClient.RunAtStartup();
+        }
+
+        if (_provider.GetService<ISnapshotPublisher>() is IRpcClient uiRpcClient)
+        {
+            uiRpcClient.RunAtStartup();
+        }
+    }
+}

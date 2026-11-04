@@ -1,0 +1,17 @@
+@using NoTiming.Judge.Contracts.Features.Setup.Clubs
+@using NC.Blazor.Components.Input
+@using NC.Krud.Blazor.Components
+
+@inherits ClubShellBehind
+
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    
+    <FormFields>
+        <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+    </FormFields>
+    
+</KrudForm>
+
+ 
+
+

@@ -1,0 +1,16 @@
+@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Loops
+@using NC.Blazor.Components.Input
+@using NC.Krud.Blazor.Components
+
+@inherits LoopShellBehind
+
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    <FormFields>
+
+        <NNumberField @bind-Value="Model.Distance" For="() => Model.Distance" Label="@Loop_distance_string" />
+
+    </FormFields>
+</KrudForm>
+
+
+

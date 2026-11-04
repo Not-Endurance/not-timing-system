@@ -1,0 +1,13 @@
+﻿@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Participations
+@using NC.Blazor.Components.Layout
+
+@attribute [Route(PARTICIPATION_UPDATE)]
+@inherits ParticipationContentBehind
+
+<NContent Title="@Configure_Participation_string" IsEmpty="Model == null">
+
+    <Main>
+        <ParticipationShell Model="Model" ReadOnly="@ReadOnly" />
+    </Main>
+
+</NContent>

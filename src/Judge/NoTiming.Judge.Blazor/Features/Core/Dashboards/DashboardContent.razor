@@ -1,0 +1,31 @@
+@using NoTiming.Domain.Setup.Aggregates
+@using NoTiming.Judge.Blazor.Features.Core.Dashboards.Components
+@using NoTiming.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations
+@using NoTiming.Judge.Blazor.Features.Core.Dashboards.Components.Inspections
+@using NoTiming.Judge.Blazor.Features.Core.Dashboards.Components.Snapshots
+@using NC.Blazor.Components.Layout
+
+@attribute [Route(DASHBOARD_PAGE)]
+@inherits DashboardContentBehind
+
+<NContent Title="@Dashboard_string" IsEmpty="@(!HasActiveEvent)">
+    
+    <Main>
+        @if (HasActiveEvent)
+        {
+            <Dashboard />
+        }
+    </Main>
+
+    <Rightbar>
+        @if (HasActiveEvent)
+        {
+            <SnapshotPanel Class="mb-2" />
+
+            <InspectionsPanel Class="mb-2" />
+
+            <EliminationsPanel Class="mb-2" />
+        }
+    </Rightbar>
+
+</NContent>

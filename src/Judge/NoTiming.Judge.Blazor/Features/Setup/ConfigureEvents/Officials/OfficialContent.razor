@@ -1,0 +1,15 @@
+﻿@using NoTiming.Domain.Setup.Aggregates
+@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Officials
+@using NC.Blazor.Components.Layout
+@using NC.Blazor.Navigation
+
+@attribute [Route(OFFICIAL_UPDATE)]
+@inherits OfficialContentBehind
+
+<NContent Title="@Configure_Official_string" IsEmpty="Model == null">
+
+    <Main>
+        <OfficialShell Model="Model" ReadOnly="@ReadOnly" />
+    </Main>
+
+</NContent>

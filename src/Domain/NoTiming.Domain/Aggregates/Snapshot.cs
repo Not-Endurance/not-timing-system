@@ -1,0 +1,24 @@
+﻿using NoTiming.Domain.Enums;
+
+namespace NoTiming.Domain.Aggregates;
+
+public record Snapshot
+{
+    public Snapshot(int number, SnapshotType type, SnapshotMethod method, Timestamp timestamp)
+    {
+        Number = number;
+        Type = type;
+        Method = method;
+        Timestamp = timestamp;
+    }
+
+    public int Number { get; }
+    public SnapshotType Type { get; }
+    public SnapshotMethod Method { get; }
+    public Timestamp Timestamp { get; set; }
+
+    public override string ToString()
+    {
+        return hash_string + $"{Number} at {Timestamp}";
+    }
+}

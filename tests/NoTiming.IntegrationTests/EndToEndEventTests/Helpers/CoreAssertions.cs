@@ -1,0 +1,130 @@
+using NC.Application.Behinds.Adapters;
+using NoTiming.Application.Contracts.Arrivelists;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Startlists;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Core.Objects.Arrivelists;
+using NoTiming.Domain.Core.Objects.Startlists;
+using NoTiming.Domain.Objects;
+using NoTiming.IntegrationTests.Drivers;
+
+namespace NoTiming.IntegrationTests.EndToEndEventTests.Helpers;
+
+internal static class CoreAssertions
+{
+    public static async Task AssertStartlistsMatchPersisted(
+        NoTimingApiDriver api,
+        JudgeDriver judge,
+        UiDriver ui,
+        int eventId
+    )
+    {
+        var expected = new Startlist(await api.ReadParticipations(eventId));
+        var judgeUpcoming = judge.GetRequiredService<IStartUpcoming>();
+        var judgeHistory = judge.GetRequiredService<IStartHistory>();
+        var uiUpcoming = ui.GetRequiredService<IStartUpcoming>();
+        var uiHistory = ui.GetRequiredService<IStartHistory>();
+
+        await Reload(judgeUpcoming);
+        await Reload(judgeHistory);
+        await Reload(uiUpcoming);
+        await Reload(uiHistory);
+
+        Assert.Equal(expected.Upcoming.Select(x => x.Number), judgeUpcoming.Upcoming.Select(x => x.Number));
+        Assert.Equal(expected.Upcoming.Select(x => x.Number), uiUpcoming.Upcoming.Select(x => x.Number));
+        Assert.Equal(Flatten(expected.HistoryByStage), Flatten(judgeHistory.HistoryByStage));
+        Assert.Equal(Flatten(expected.HistoryByStage), Flatten(uiHistory.HistoryByStage));
+    }
+
+    public static async Task AssertArrivelistMatchesPersisted(NoTimingApiDriver api, UiDriver ui, int eventId)
+    {
+        var arrivelist = ui.GetRequiredService<IArrivelistService>();
+        await arrivelist.Load();
+
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        IReadOnlyList<string> expected = [];
+        IReadOnlyList<string> actual = [];
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            expected = Flatten(new Arrivelist(await api.ReadParticipations(eventId)).Entries);
+            actual = Flatten(arrivelist.Entries);
+            if (expected.SequenceEqual(actual))
+            {
+                return;
+            }
+
+            await Task.Delay(100);
+        }
+
+        Assert.Equal(expected, actual);
+    }
+
+    public static void AssertPhaseMatches(Phase expected, Phase actual)
+    {
+        AssertEqualTimeOfDay(expected.StartTime, actual.StartTime);
+        AssertEqualTimeOfDay(expected.ArriveTime, actual.ArriveTime);
+        AssertEqualTimeOfDay(expected.PresentTime, actual.PresentTime);
+        AssertEqualTimeOfDay(expected.GetRequiredInspectionTime(), actual.GetRequiredInspectionTime());
+        AssertEqualTimeOfDay(expected.GetOutTime(), actual.GetOutTime());
+        Assert.Equal(expected.GetLoopInterval(), actual.GetLoopInterval());
+        Assert.Equal(expected.GetPhaseInterval(), actual.GetPhaseInterval());
+        Assert.Equal(expected.GetRecoveryInterval(), actual.GetRecoveryInterval());
+        Assert.Equal(expected.GetAverageLoopSpeed(), actual.GetAverageLoopSpeed());
+        Assert.Equal(expected.GetAveragePhaseSpeed(), actual.GetAveragePhaseSpeed());
+        Assert.Equal(expected.GetAverageSpeed(), actual.GetAverageSpeed());
+        Assert.Equal(expected.IsComplete(), actual.IsComplete());
+    }
+
+    public static void AssertEqualTimeOfDay(DateTimeOffset expected, Timestamp? actual)
+    {
+        Assert.True(
+            SameTimeOfDay(actual, expected),
+            $"Expected time {expected:HH:mm:ss}, got {actual?.ToDateTimeOffset():HH:mm:ss}."
+        );
+    }
+
+    public static void AssertEqualTimeOfDay(Timestamp? expected, Timestamp? actual)
+    {
+        if (expected == null || actual == null)
+        {
+            Assert.Equal(expected, actual);
+            return;
+        }
+
+        Assert.Equal(expected.ToDateTimeOffset().TimeOfDay, actual.ToDateTimeOffset().TimeOfDay);
+    }
+
+    public static bool SameTimeOfDay(Timestamp? actual, DateTimeOffset expected)
+    {
+        return actual?.ToDateTimeOffset().TimeOfDay == expected.TimeOfDay;
+    }
+
+    static IReadOnlyList<string> Flatten(IReadOnlyDictionary<int, IReadOnlyList<Starter>> starters)
+    {
+        return starters.SelectMany(x => x.Value.Select(starter => $"{x.Key}:{starter.Number}")).ToArray();
+    }
+
+    static IReadOnlyList<string> Flatten(IReadOnlyList<ArrivelistEntry> entries)
+    {
+        return entries
+            .Select(entry =>
+                $"{entry.Number}:{entry.AthleteName}:{entry.HorseName}:{Format(entry.Fast)}:{Format(entry.Average)}:{Format(entry.Slow)}"
+            )
+            .ToArray();
+    }
+
+    static string Format(Timestamp? timestamp)
+    {
+        return timestamp?.ToDateTimeOffset().TimeOfDay.ToString("c") ?? "";
+    }
+
+    static async Task Reload(IStatefulService service)
+    {
+        if (service is NStatefulService stateful)
+        {
+            stateful.ResetHasLoaded();
+        }
+
+        await service.Load();
+    }
+}

@@ -1,0 +1,25 @@
+@namespace NC.Blazor.Components.Buttons.Abstractions
+@inherits NButtonBaseBehind
+
+<MudButton 
+    Variant="@Variant"
+    ButtonType="@ButtonType" 
+    Color="@Color" 
+    Class="@Class" 
+    Style="@Style" 
+    StartIcon="@StartIcon" 
+    Disabled="@(Disabled || IsLoading)"
+    IconSize="@IconSize"
+    OnClick="@HandleClick"
+    Size="@Size">
+
+    @if (IsLoading)
+    {
+        <MudProgressCircular Class="mt-2" Color="SelectColor()" Size="Size.Small" Indeterminate="true" />
+    }
+    else
+    {
+        @ChildContent
+    }
+
+</MudButton>

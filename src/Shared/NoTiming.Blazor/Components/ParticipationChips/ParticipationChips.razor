@@ -1,0 +1,35 @@
+@using NoTiming.Domain.Extensions;
+@using NoTiming.Domain.Core.Aggregates;
+@using NC.Blazor.Components.Abstractions
+
+@inherits ParticipationChipsBehind
+
+<NChips T="Participation" SelectedValue="@Selected">
+
+    @foreach (var grouping in Participations.GroupBy(x => x.Phases.Distance))
+    {
+        <MudText Class="@CombineClass($"chip-header {GetGroupTextClass()}")" Typo="@GetGroupTextTypo()">
+            <strong>@($"{grouping.Key.RoundNumberToTens()} {km_string}")</strong>
+        </MudText>
+
+        <MudDivider />
+
+        @foreach (var participation in grouping.OrderBy(x => x.Combination.Number))
+        {
+            var number = participation.Combination.Number;
+            <MudChip T="Participation"
+                        Text="@number.ToString()"
+                        Value="@participation"
+                        Color="@GetColor(participation)"
+                        Size="@GetChipSize()"
+                        OnClick="() => Select(participation)"
+                        Style="@GetChipStyle()" />
+        }
+    }
+</NChips>
+ 
+<style>
+    .chip-header {
+        display: block;
+    }
+</style>

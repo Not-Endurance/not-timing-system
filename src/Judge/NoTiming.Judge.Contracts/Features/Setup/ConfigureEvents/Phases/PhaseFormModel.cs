@@ -1,0 +1,34 @@
+﻿using NC.Krud.Models;
+using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
+
+namespace NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
+
+public record PhaseFormModel : KrudFormModel<Phase>
+{
+    public PhaseFormModel()
+    {
+#if DEBUG
+        Recovery = 15;
+        Rest = 40;
+#endif
+    }
+
+    public Loop? Loop { get; set; }
+    public int? Recovery { get; set; }
+    public int? Rest { get; set; }
+    public bool IsCompulsoryInspectionRequired { get; set; }
+
+    protected override Phase MapTo()
+    {
+        return new Phase(Loop, Recovery, Rest, Id, IsCompulsoryInspectionRequired);
+    }
+
+    public override void MapFrom(Phase phase)
+    {
+        Id = phase.Id;
+        Loop = phase.Loop;
+        Recovery = phase.Recovery!;
+        Rest = phase.Rest!;
+        IsCompulsoryInspectionRequired = phase.IsCompulsoryInspectionRequired;
+    }
+}

@@ -1,0 +1,62 @@
+﻿using static NC.Localization.LocalizationHelper;
+// ReSharper disable InconsistentNaming
+
+#pragma warning disable IDE1006 // Naming Styles
+#pragma warning disable NA0004 // Member spacing rule violation
+namespace NC.Localization;
+
+public static class NStrings
+{
+    public static string Localize(Enum value)
+    {
+        return LocalizeEnum(value);
+    }
+
+    public static string hash_string => LocalizeString("#");
+    public static string X_string => LocalizeString("X");
+    public static string Create_string => LocalizeString(nameof(Create_string));
+    public static string Back_string => LocalizeString(nameof(Back_string));
+    public static string Update_string => LocalizeString(nameof(Update_string));
+    public static string Updated_string => LocalizeString(nameof(Updated_string));
+    public static string Delete_string => LocalizeString(nameof(Delete_string));
+    public static string Cascading_Delete_string => LocalizeString(nameof(Cascading_Delete_string));
+    public static string Print_string => LocalizeString(nameof(Print_string));
+    public static string Print_scale_string => LocalizeString(nameof(Print_scale_string));
+    public static string Page_format_string => LocalizeString(nameof(Page_format_string));
+    public static string Orientation_string => LocalizeString(nameof(Orientation_string));
+    public static string Date_string => LocalizeString(nameof(Date_string));
+    public static string Time_string => LocalizeString(nameof(Time_string));
+    public static string Export_string => LocalizeString(nameof(Export_string));
+    public static string Print_Preview_string => LocalizeString(nameof(Print_Preview_string));
+    public static string Search_string => LocalizeString(nameof(Search_string));
+    public static string Yes_string => LocalizeString(nameof(Yes_string));
+    public static string Cancel_string => LocalizeString(nameof(Cancel_string));
+    public static string Field_1_is_required_on_2_string => LocalizeString(nameof(Field_1_is_required_on_2_string));
+    public static string List_is_empty_string => LocalizeString(nameof(List_is_empty_string));
+    public static string Add_string => LocalizeString(nameof(Add_string));
+    public static string Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string =>
+        LocalizeString(nameof(Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string));
+    public static string Are_you_sure_you_want_to_delete_0_string =>
+        LocalizeString(nameof(Are_you_sure_you_want_to_delete_0_string));
+    public static string Cascading_delete_confirmation_prefix_string =>
+        LocalizeString(nameof(Cascading_delete_confirmation_prefix_string));
+    public static string Cascading_delete_warning_string => LocalizeString(nameof(Cascading_delete_warning_string));
+    public static string Affected_resources_string => LocalizeString(nameof(Affected_resources_string));
+    public static string Cannot_connect_to_server_string => LocalizeString(nameof(Cannot_connect_to_server_string));
+    public static string Language_string => LocalizeString(nameof(Language_string));
+    public static string Upload_string => LocalizeString(nameof(Upload_string));
+    public static string Delete_selection_string => LocalizeString(nameof(Delete_selection_string));
+    public static string Image_browser_string => LocalizeString(nameof(Image_browser_string));
+    public static string Image_browser_empty_string => LocalizeString(nameof(Image_browser_empty_string));
+    public static string Use_image_string => LocalizeString(nameof(Use_image_string));
+    public static string Empty_string => LocalizeString(nameof(Empty_string));
+    public static string Login_string => LocalizeString(nameof(Login_string));
+    public static string Sign_in_to_continue_string => LocalizeString(nameof(Sign_in_to_continue_string));
+    public static string Sign_in_with_Microsoft_string => LocalizeString(nameof(Sign_in_with_Microsoft_string));
+    public static string Register_string => LocalizeString(nameof(Register_string));
+    public static string Confirm_action_string => LocalizeString(nameof(Confirm_action_string));
+
+    public static string? Validation_errors_string => LocalizeString(nameof(Validation_errors_string));
+}
+#pragma warning restore NA0004
+#pragma warning restore IDE1006

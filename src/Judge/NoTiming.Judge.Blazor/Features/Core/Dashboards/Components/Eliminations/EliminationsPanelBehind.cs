@@ -1,0 +1,41 @@
+using NC.Blazor.Components.Abstractions;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
+using NoTiming.Domain.Core.Aggregates.Participations;
+using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+
+namespace NoTiming.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations;
+
+public class EliminationsPanelBehind : NStatefulComponent
+{
+    string? _inputValue;
+
+    protected Eliminated? Eliminated => ParticipationContext.Selected?.Eliminated;
+    protected string? ToggleValue
+    {
+        get => _inputValue != null ? _inputValue : Eliminated?.Code;
+        set => _inputValue = value;
+    }
+
+    [Inject]
+    protected IParticipationContext ParticipationContext { get; set; } = default!;
+
+    protected string? Reason { get; set; }
+
+    protected IEnumerable<DisqualifyCode> DisqualificationCodes { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(ParticipationContext);
+    }
+
+    protected override void OnBeforeRender()
+    {
+        ResetInput();
+    }
+
+    void ResetInput()
+    {
+        _inputValue = null;
+    }
+}

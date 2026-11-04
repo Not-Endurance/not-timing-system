@@ -1,0 +1,13 @@
+﻿@using System.Diagnostics
+@using NoTiming.Domain.Core.Aggregates.Participations
+@using NoTiming.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms.Shared
+@using NC.Blazor.Components.Input
+@using NC.Notify
+
+@inherits FinishNotRankedFormBehind
+
+<EliminationForm SubmitSafe="FinishNotRankedSafe">
+
+    <NTextField @bind-Value="Reason" Label="@Reason_string" Class="mt-4" />
+
+</EliminationForm>

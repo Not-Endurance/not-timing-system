@@ -1,0 +1,19 @@
+@using NoTiming.Judge.Contracts.Features.Settings
+@using NC.Blazor.Components.Input
+@using NC.Blazor.Components.Layout
+@using NC.Krud.Blazor.Components
+
+@inherits SettingShellBehind
+
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    <FormFields>
+        <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountrySafe" />
+
+        <NAutocomplete @bind-Value="Model.LanguageCountry" For="() => Model.LanguageCountry" @bind-Value:after="SetUiCulture"
+                        Label="@Language_string"
+                        SearchSafe="SearchLanguageSafe" />
+    </FormFields>
+</KrudForm>
+
+
+

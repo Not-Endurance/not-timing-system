@@ -1,0 +1,45 @@
+@using NoTiming.Domain.Setup.Aggregates.ConfigureEvents
+@using NoTiming.Judge.Blazor.Features.Setup.Combinations
+@using NoTiming.Judge.Blazor.Features.Setup.Loops
+@using NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents.Competitions
+@using NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents.Officials
+@using NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents.Operators
+@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations
+@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions
+@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Loops
+@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Officials
+@using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Operators
+@using NC.Blazor.Components.Layout
+@using NC.Krud.Blazor.Components
+
+@attribute [Route(UPCOMING_EVENT_PAGE)]
+@inherits ConfigureEventContentBehind
+
+<NContent Title="@Configure_Event_string" IsEmpty="Model == null">
+
+    <Main>
+        <ConfigureEventShell Model="Model" ReadOnly="@ReadOnly">
+            <AdditionalContent>
+                <NGrid Spacing="8">
+
+                    <MudItem xs="12" md="6">
+                        <MudStack Spacing="8">
+                            <KrudList T="Competition" TModel="CompetitionFormModel" TShell="CompetitionShell" Name="@Competitions_string" ReadOnly="@ReadOnly" />
+                            <KrudList T="Operator" TModel="OperatorFormModel" TShell="OperatorShell" Name="@Operators_string" ReadOnly="@ReadOnly" />
+                            <KrudList T="Loop" TModel="LoopFormModel" TShell="LoopShell" Name="@Loops_string" ReadOnly="@ReadOnly" />
+                        </MudStack>
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudStack Spacing="8">
+                            <KrudList T="Official" TModel="OfficialFormModel" TShell="OfficialShell" Name="@Officials_string" ReadOnly="@ReadOnly" />
+                            <KrudList T="Combination" TModel="CombinationFormModel" TShell="CombinationShell" Name="@Combinations_string" ReadOnly="@ReadOnly" />
+                        </MudStack>
+                    </MudItem>
+
+                </NGrid>
+            </AdditionalContent>
+        </ConfigureEventShell>
+    </Main>
+
+</NContent>
