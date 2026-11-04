@@ -1,10 +1,10 @@
-# NTS Warp
+# NoTiming
 
-Warp hosts three things on one port:
+NoTiming hosts three things on one port:
 
 - the REST API under `/api`
 - the SignalR hubs under `/event-bus/judge` and `/event-bus/witness`
-- the Witness UI under `/ui/` (the root redirects there)
+- the Ui under `/ui/` (the root redirects there)
 
 ## Run locally
 
@@ -19,10 +19,10 @@ Visual Studio, Rider, or `dotnet run` can start these launch profiles from `Prop
 Start Mongo for `Development` from the repository root:
 
 ```bash
-docker compose -f docker/nexus.yaml up mongodb
+docker compose -f docker/compose.yaml up mongodb
 ```
 
-`Development` also serves the Witness UI from a Debug build copy, and opens it in your browser once Warp is listening.
+`Development` also serves the Ui from a Debug build copy, and opens it in your browser once NoTiming is listening.
 
 ## Connection string secrets
 
@@ -38,4 +38,4 @@ dotnet user-secrets remove MONGO_CONNECTION_STRING --id nts-warp-staging
 
 The commands work from any directory. The secrets are stored per machine, in `%APPDATA%\Microsoft\UserSecrets\<id>\secrets.json` on Windows and `~/.microsoft/usersecrets/<id>/secrets.json` elsewhere. Do not commit connection strings to the repository.
 
-The profiles set `IS_LOCALHOST=true`, which loads these secrets. Deployed services don't set it, so they never read secrets from a developer's machine. If the secret is missing, Warp exits at startup with `MongoDB connection string is missing`.
+The profiles set `IS_LOCALHOST=true`, which loads these secrets. Deployed services don't set it, so they never read secrets from a developer's machine. If the secret is missing, NoTiming exits at startup with `MongoDB connection string is missing`.

@@ -5,7 +5,7 @@ Configuration keys:
 `NClientAuthenticationSettings` uses `ResourceClientId` for the target protected API app registration.
 `NClientAuthenticationSettings.SessionLifetime` controls how long the device can reuse a successful login; it defaults to 24 hours.
 
-`NTS.Witness.Web` is now a client-side Blazor WebAssembly app. It does not use confidential client secrets.
+`NoTiming.Ui` is now a client-side Blazor WebAssembly app. It does not use confidential client secrets.
 The app uses the normal Entra sign-in entrypoint for External ID sign-up/sign-in. Entra decides whether the user signs in or is taken through sign-up for the configured user flow.
 
 Environment configuration files are loaded from:
@@ -20,8 +20,8 @@ Localhost-only overrides are loaded when running from localhost:
 
 The `Development`, `Staging`, and `Production` launch profiles pass `?environment=...` so localhost can choose
 the target environment file while still running from `localhost`. If no environment is supplied, the client uses
-Blazor's configured application environment. Deployed builds are served by NTS Warp, which sends the
+Blazor's configured application environment. Deployed builds are served by NoTiming, which sends the
 `Blazor-Environment` header from its own `ASPNETCORE_ENVIRONMENT`.
 
 Deployed builds do not set `RpcSettings.Host` or `NHttpSettings.Url`. They call the origin the UI is served from, which is
-the NTS Warp instance. `localhostsettings.*.json` and `appsettings.Development.json` point at a Warp instance for localhost runs.
+the NoTiming instance. `localhostsettings.*.json` and `appsettings.Development.json` point at a NoTiming instance for localhost runs.

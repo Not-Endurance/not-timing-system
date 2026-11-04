@@ -65,7 +65,7 @@ done
 repo_root() {
   local current="$PWD"
   while [[ "$current" != "/" ]]; do
-    if [[ -f "$current/AGENTS.md" && -d "$current/tests/NTS.Tests.Integration" ]]; then
+    if [[ -f "$current/AGENTS.md" && -d "$current/tests/NoTiming.IntegrationTests" ]]; then
       printf '%s\n' "$current"
       return
     fi
@@ -206,6 +206,6 @@ verify
 
 if [[ "$run_tests" == true ]]; then
   export PATH="/mnt/wsl/docker-desktop/cli-tools/usr/bin:$HOME/.local/bin:$PATH"
-  dotnet build "$ROOT/tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj" -v:q
-  dotnet test "$ROOT/tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj" -v:m
+  dotnet build "$ROOT/tests/NoTiming.IntegrationTests/NoTiming.IntegrationTests.csproj" -v:q
+  dotnet test "$ROOT/tests/NoTiming.IntegrationTests/NoTiming.IntegrationTests.csproj" -v:m
 fi

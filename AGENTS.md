@@ -13,7 +13,7 @@
 
 ## Verification
 - After individual atomic changes build and run the unit test project that mirrors the changed source project, for example `dotnet build tests/NoTiming.Tests.sln -v:q` followed by `dotnet test tests/NTS.Domain.Core.Tests/NTS.Domain.Core.Tests.csproj -v:m`.
-- Verify each complete feature with a successful run of `dotnet test tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -v:m`. This needs Docker.
+- Verify each complete feature with a successful run of `dotnet test tests/NoTiming.IntegrationTests/NoTiming.IntegrationTests.csproj -v:m`. This needs Docker.
 
 ## Testing
 Conventions for unit tests (Integration tests are not subject to these rules):

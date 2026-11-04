@@ -6,7 +6,7 @@ on:
 env:
   DOTNET_CORE_VERSION: 10.0.x
   CONFIGURATION: Release
-  TEST_PROJECT_PATH: tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj
+  TEST_PROJECT_PATH: tests/NoTiming.IntegrationTests/NoTiming.IntegrationTests.csproj
   DOTNET_CLI_HOME: ${{ github.workspace }}/.tmp/dotnet-home
   NUGET_PACKAGES: ${{ github.workspace }}/.tmp/nuget-packages
 

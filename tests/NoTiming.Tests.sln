@@ -38,7 +38,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_confg", "_confg", "{6AAA82
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Tests", "..\nugets\Not.Tests\Not.Tests.csproj", "{46969AA7-60B3-4664-99B8-42CA1942CC1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Tests.Integration", "NTS.Tests.Integration\NTS.Tests.Integration.csproj", "{8D93EDAD-85B3-4F75-9B46-8AF33DA9D39D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.IntegrationTests", "NoTiming.IntegrationTests\NoTiming.IntegrationTests.csproj", "{8D93EDAD-85B3-4F75-9B46-8AF33DA9D39D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
@@ -52,7 +52,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Domain.Watcher", "..\sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Domain.Setup.Tests", "NTS.Domain.Setup.Tests\NTS.Domain.Setup.Tests.csproj", "{7CB37228-C01B-4256-8C63-F0C36D87F580}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Nexus.Warp.Tests", "NTS.Nexus.Warp.Tests\NTS.Nexus.Warp.Tests.csproj", "{EFDD016B-BE3A-44A8-B59D-5D981EA63429}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.Tests", "NoTiming.Tests\NoTiming.Tests.csproj", "{EFDD016B-BE3A-44A8-B59D-5D981EA63429}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

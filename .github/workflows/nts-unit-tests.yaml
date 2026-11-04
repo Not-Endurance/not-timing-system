@@ -26,4 +26,4 @@ jobs:
           dotnet test tests/NTS.Application.Tests/NTS.Application.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
           dotnet test tests/NTS.Domain.Core.Tests/NTS.Domain.Core.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
           dotnet test tests/NTS.Domain.Setup.Tests/NTS.Domain.Setup.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
-          dotnet test tests/NTS.Nexus.Warp.Tests/NTS.Nexus.Warp.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
+          dotnet test tests/NoTiming.Tests/NoTiming.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m

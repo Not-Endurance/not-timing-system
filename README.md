@@ -2,7 +2,7 @@
 Integrated app to create, configure and run your Endurance category equestrian sport events. NTS is the improved version of [EMS](https://github.com/Not-Endurance/endurance-management-system) which was started in 2018 on WPF
 
 # Running the app
-There are a couple of prerequisites related to MAUI Hybrid and Nexus API
+There are a couple of prerequisites related to MAUI Hybrid and NoTiming API
 
 ## Dotnet
 Dotnet 8 or later
@@ -15,10 +15,10 @@ Dotnet 8 or later
 MAUI Blazor hybrid apps use MS's WebView2 in order to run natively. This might not be necessary, I don't  recall if VS installer handles it or you need to download manually. If you see a popup regarding WebView follow the instructions or download manually [here](https://developer.microsoft.com/en-us/microsoft-edge/webview2/?form=MA13LH). You may need ro reboot after installation.
 
 ## Debug
-1. Start the Nexus API:
+1. Start the NoTiming API:
    ```
    // Execute in project root
-   docker compose -f docker/nexus.yaml up -d
+   docker compose -f docker/compose.yaml up -d
    ```
 3. Startup `NTS.Judge.MAUI`
 
@@ -44,5 +44,5 @@ MAUI Blazor hybrid apps use MS's WebView2 in order to run natively. This might n
 4. `NTS.Domain*` - contains the domain model for NTS. It defines 3 separate boundaries:
   - `Setup` - create and configure an event
   - `Core` - service the event
-  - `Watcher` - is not yet implemented and is supposed to encompass the timing modules - RFID tags, AI cameras, Witness app etc
+  - `Watcher` - is not yet implemented and is supposed to encompass the timing modules - RFID tags, AI cameras, Ui app etc
 5. `NTS.Persistence` - handles state and storage. As of now the "database" is a simple json file, as the day-to-day nature of the integrated app does not require an actual database at this point.
