@@ -5,7 +5,7 @@ internal static class BrowserAddress
 {
     static readonly string[] WildcardHosts = ["*", "+", "0.0.0.0", "[::]", "::"];
 
-    public static string? From(IEnumerable<string> serverAddresses)
+    public static string? From(IEnumerable<string> serverAddresses, string path)
     {
         foreach (var address in serverAddresses)
         {
@@ -15,7 +15,8 @@ internal static class BrowserAddress
             }
 
             var host = WildcardHosts.Contains(uri.Host, StringComparer.OrdinalIgnoreCase) ? "localhost" : uri.Host;
-            return new UriBuilder(uri.Scheme, host, uri.Port).Uri.AbsoluteUri;
+            var root = new UriBuilder(uri.Scheme, host, uri.Port).Uri;
+            return new Uri(root, path).AbsoluteUri;
         }
 
         return null;

@@ -10,12 +10,12 @@ namespace Not.Server.UiClient;
 // Opens the UI in the default browser. Failures are logged, not thrown, so a headless machine keeps running.
 internal static class BrowserLauncher
 {
-    public static void Open(WebApplication app, ILogger logger)
+    public static void Open(WebApplication app, ILogger logger, string path)
     {
         var addresses =
             app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>()?.Addresses
             ?? Array.Empty<string>();
-        var url = BrowserAddress.From(addresses);
+        var url = BrowserAddress.From(addresses, path);
         if (url is null)
         {
             logger.LogWarning("Not opening the UI in a browser: the server reports no address.");

@@ -431,12 +431,12 @@ public class SignalRSocket : ThreadSafePersistentConnection<SignalRSocket.Connec
             return _context.ClientName;
         }
 
-        if (_context.HubPattern.Equals("judge-hub", StringComparison.OrdinalIgnoreCase))
+        if (_context.HubPattern.Equals("judge", StringComparison.OrdinalIgnoreCase))
         {
             return "Judge";
         }
 
-        if (_context.HubPattern.Equals("witness-hub", StringComparison.OrdinalIgnoreCase))
+        if (_context.HubPattern.Equals("witness", StringComparison.OrdinalIgnoreCase))
         {
             return "Witness";
         }

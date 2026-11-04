@@ -7,10 +7,10 @@ public class UiClientSettings
     // Files to serve. Null serves the application's web root.
     public IFileProvider? FileProvider { get; set; }
 
-    // Request paths under these prefixes never receive the client's index.html; they get 404 instead, so server
-    // endpoints keep their own responses. Prefixes match whole path segments, for example "/api".
-    public string[] ReservedPathPrefixes { get; set; } = [];
+    // The path the client is served under, for example "ui". The client is served at /{PathPrefix}/ and the root
+    // redirects there. Required.
+    public string PathPrefix { get; set; } = string.Empty;
 
-    // Headers added to every response for the client, excluding reserved paths.
+    // Headers added to every response for the client.
     public Dictionary<string, string> ResponseHeaders { get; set; } = new();
 }

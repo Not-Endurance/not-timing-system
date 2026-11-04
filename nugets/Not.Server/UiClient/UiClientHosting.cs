@@ -14,54 +14,73 @@ internal static class UiClientHosting
 
     public static void Use(WebApplication app, UiClientSettings settings)
     {
+        var prefix = UiPath.Normalize(settings.PathPrefix);
         var files = settings.FileProvider ?? app.Environment.WebRootFileProvider;
-        var reserved = settings.ReservedPathPrefixes.Select(ToPathString).ToArray();
         var headers = settings.ResponseHeaders.ToArray();
+        var index = new IndexPage(files, prefix);
 
         app.Use(
             async (context, next) =>
             {
-                if (!IsReserved(context.Request.Path, reserved))
+                var path = context.Request.Path;
+                if (path.Value == "/" || path.Value == prefix)
                 {
-                    foreach (var header in headers)
-                    {
-                        context.Response.Headers[header.Key] = header.Value;
-                    }
+                    context.Response.Redirect(prefix + "/");
+                    return;
+                }
+
+                if (!path.StartsWithSegments(prefix, out var remaining))
+                {
+                    await next();
+                    return;
+                }
+
+                foreach (var header in headers)
+                {
+                    context.Response.Headers[header.Key] = header.Value;
+                }
+
+                if (remaining.Value == "/index.html")
+                {
+                    await index.WriteAsync(context);
+                    return;
+                }
+
+                if (await TryServePrecompressedAsync(context, files, remaining))
+                {
+                    return;
                 }
 
                 await next();
             }
         );
 
-        app.Use(
-            async (context, next) =>
+        app.UseStaticFiles(
+            new StaticFileOptions
             {
-                if (!await TryServePrecompressedAsync(context, files, reserved))
-                {
-                    await next();
-                }
+                FileProvider = files,
+                RequestPath = prefix,
+                ServeUnknownFileTypes = true,
             }
         );
-
-        app.UseStaticFiles(new StaticFileOptions { FileProvider = files, ServeUnknownFileTypes = true });
-        app.MapFallback(context => ServeIndexAsync(context, files, reserved));
+        app.MapFallback(prefix + "/{*path}", context => index.WriteAsync(context));
 
         // In Development the client opens in the default browser once the server is listening.
         if (app.Environment.IsDevelopment())
         {
             var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Not.Server.UiClient");
-            app.Lifetime.ApplicationStarted.Register(() => BrowserLauncher.Open(app, logger));
+            app.Lifetime.ApplicationStarted.Register(() => BrowserLauncher.Open(app, logger, prefix + "/"));
         }
     }
 
-    static async Task<bool> TryServePrecompressedAsync(HttpContext context, IFileProvider files, PathString[] reserved)
+    static async Task<bool> TryServePrecompressedAsync(HttpContext context, IFileProvider files, PathString remaining)
     {
-        if (!IsReadRequest(context) || IsReserved(context.Request.Path, reserved))
+        if (!IsReadRequest(context) || remaining.Value is null)
         {
             return false;
         }
 
-        var relativePath = context.Request.Path.Value!.TrimStart('/');
+        var relativePath = remaining.Value.TrimStart('/');
         if (relativePath.Length == 0 || relativePath.EndsWith('/'))
         {
             return false;
@@ -95,38 +114,53 @@ internal static class UiClientHosting
         return true;
     }
 
-    static async Task ServeIndexAsync(HttpContext context, IFileProvider files, PathString[] reserved)
-    {
-        if (!IsReadRequest(context) || IsReserved(context.Request.Path, reserved))
-        {
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            return;
-        }
-
-        var index = files.GetFileInfo("index.html");
-        if (!index.Exists)
-        {
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            return;
-        }
-
-        context.Response.ContentType = "text/html; charset=utf-8";
-        await using var stream = index.CreateReadStream();
-        await stream.CopyToAsync(context.Response.Body);
-    }
-
     static bool IsReadRequest(HttpContext context)
     {
         return HttpMethods.IsGet(context.Request.Method) || HttpMethods.IsHead(context.Request.Method);
     }
 
-    static bool IsReserved(PathString path, PathString[] reserved)
+    // The client's index.html with its base element pointed at the prefix. Read once, on first use.
+    sealed class IndexPage
     {
-        return reserved.Any(prefix => path.StartsWithSegments(prefix));
-    }
+        readonly IFileProvider _files;
+        readonly string _prefix;
+        string? _html;
 
-    static PathString ToPathString(string prefix)
-    {
-        return new PathString(prefix.StartsWith('/') ? prefix : "/" + prefix);
+        public IndexPage(IFileProvider files, string prefix)
+        {
+            _files = files;
+            _prefix = prefix;
+        }
+
+        public async Task WriteAsync(HttpContext context)
+        {
+            var html = IsReadRequest(context) ? await LoadAsync() : null;
+            if (html is null)
+            {
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                return;
+            }
+
+            context.Response.ContentType = "text/html; charset=utf-8";
+            await context.Response.WriteAsync(html);
+        }
+
+        async Task<string?> LoadAsync()
+        {
+            if (_html is not null)
+            {
+                return _html;
+            }
+
+            var file = _files.GetFileInfo("index.html");
+            if (!file.Exists)
+            {
+                return null;
+            }
+
+            using var reader = new StreamReader(file.CreateReadStream());
+            _html = BaseHref.Rewrite(await reader.ReadToEndAsync(), _prefix);
+            return _html;
+        }
     }
 }
