@@ -11,7 +11,7 @@ public interface IEventInformationRepository : IRepository<EventInformation>
     Task Deactivate();
 
     /// <summary>
-    /// Permanently resets the currently selected event information in Nexus.
+    /// Permanently resets the currently selected event information in NoTiming.
     /// </summary>
     /// <remarks>
     /// This call deletes the active event root together with the event-scoped Core documents that belong to it.

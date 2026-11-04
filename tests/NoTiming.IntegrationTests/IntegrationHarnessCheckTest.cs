@@ -32,8 +32,8 @@ using SetupOperator = NTS.Domain.Setup.Aggregates.ConfigureEvents.Operator;
 using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participation;
 using SetupPhase = NTS.Domain.Setup.Aggregates.ConfigureEvents.Phase;
 using SetupUser = NTS.Domain.Setup.Aggregates.User;
-using WitnessSnapshot = NTS.Domain.Watcher.Snapshot;
-using WitnessSnapshotService = NoTiming.Ui.Contracts.Features.Snapshots.ISnapshotService;
+using UiSnapshot = NTS.Domain.Watcher.Snapshot;
+using UiSnapshotService = NoTiming.Ui.Contracts.Features.Snapshots.ISnapshotService;
 
 namespace NoTiming.IntegrationTests;
 
@@ -58,7 +58,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
     }
 
     [Fact]
-    public async Task Judge_snapshot_flow_updates_connected_witness_applications()
+    public async Task Judge_snapshot_flow_updates_connected_ui_applications()
     {
         var eventId = 1701;
         var participationNumber = 42;
@@ -88,29 +88,29 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         Assert.Equal(participationNumber, seededParticipation.Combination.Number);
         Assert.True(
             seededParticipations.Any(x => x.Combination.Number == participationNumber),
-            $"Nexus API list endpoint did not return participation #{participationNumber}. Raw response: {seededParticipationsRaw}"
+            $"NoTiming API list endpoint did not return participation #{participationNumber}. Raw response: {seededParticipationsRaw}"
         );
 
         await using var judge = new JudgeDriver(_fixture.NoTimingBaseUrl);
-        await using var officialWitness = new UiDriver(
+        await using var officialUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             OFFICIAL_USER,
-            "IntegrationOfficialWitness"
+            "IntegrationOfficialUi"
         );
-        await using var participantWitness = new UiDriver(
+        await using var participantUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             PARTICIPANT_USER,
-            "IntegrationParticipantWitness"
+            "IntegrationParticipantUi"
         );
 
         await judge.Start();
-        await officialWitness.Start();
-        await participantWitness.Start();
+        await officialUi.Start();
+        await participantUi.Start();
 
-        await officialWitness.Connect(eventInformation);
-        await participantWitness.Connect(eventInformation);
+        await officialUi.Connect(eventInformation);
+        await participantUi.Connect(eventInformation);
         await judge.Connect(eventInformation);
-        var officialArrivelist = officialWitness.GetRequiredService<IArrivelistService>();
+        var officialArrivelist = officialUi.GetRequiredService<IArrivelistService>();
         await officialArrivelist.Load();
         Assert.Contains(officialArrivelist.Entries, x => x.Number == arrivelistParticipationNumber);
 
@@ -152,12 +152,12 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             TimeSpan.FromSeconds(10)
         );
 
-        var officialReceived = await officialWitness.WaitForParticipation(
+        var officialReceived = await officialUi.WaitForParticipation(
             participationNumber,
             received => received.Phases.Current.IsComplete(),
             TimeSpan.FromSeconds(10)
         );
-        var participantReceived = await participantWitness.WaitForParticipation(
+        var participantReceived = await participantUi.WaitForParticipation(
             participationNumber,
             received => received.Phases.Current.IsComplete(),
             TimeSpan.FromSeconds(10)
@@ -167,10 +167,10 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         Assert.Equal(eventId, officialReceived.EventId);
         Assert.Equal(42, participantReceived.Combination.Number);
         Assert.Equal(eventId, participantReceived.EventId);
-        Assert.Equal(UiAccessLevel.Official, officialWitness.AccessLevel);
-        Assert.Equal(UiAccessLevel.Participant, participantWitness.AccessLevel);
+        Assert.Equal(UiAccessLevel.Official, officialUi.AccessLevel);
+        Assert.Equal(UiAccessLevel.Participant, participantUi.AccessLevel);
 
-        var performanceParticipations = officialWitness.GetRequiredService<IPerformanceParticipations>();
+        var performanceParticipations = officialUi.GetRequiredService<IPerformanceParticipations>();
         if (performanceParticipations is NStatefulService performanceStateful)
         {
             performanceStateful.ResetHasLoaded();
@@ -182,7 +182,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             x => x.Combination.Number == participationNumber && x.Phases.Current.IsComplete()
         );
 
-        var snapshots = officialWitness.GetRequiredService<WitnessSnapshotService>();
+        var snapshots = officialUi.GetRequiredService<UiSnapshotService>();
         if (snapshots is NStatefulService snapshotsStateful)
         {
             snapshotsStateful.ResetHasLoaded();
@@ -292,7 +292,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
     }
 
     [Fact]
-    public async Task Witness_snapshot_selections_restore_from_user_session_until_published()
+    public async Task Ui_snapshot_selections_restore_from_user_session_until_published()
     {
         var eventId = 1901;
         var participationNumber = 61;
@@ -312,12 +312,12 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         await api.Create(participation);
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6701));
 
-        await using var witness = new UiDriver(_fixture.NoTimingBaseUrl, OFFICIAL_USER, "SnapshotSessionWitness");
+        await using var ui = new UiDriver(_fixture.NoTimingBaseUrl, OFFICIAL_USER, "SnapshotSessionUi");
 
-        await witness.Start();
-        await witness.Connect(eventInformation);
+        await ui.Start();
+        await ui.Connect(eventInformation);
 
-        var snapshots = witness.GetRequiredService<WitnessSnapshotService>();
+        var snapshots = ui.GetRequiredService<UiSnapshotService>();
         await snapshots.Load();
         snapshots.SelectForSnapshot(snapshots.Participations.Single(x => x.Combination.Number == participationNumber));
 
@@ -346,18 +346,18 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             "persist the captured snapshot timestamp"
         );
 
-        await witness.Disconnect();
+        await ui.Disconnect();
 
-        await using var restoredWitness = new UiDriver(
+        await using var restoredUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             OFFICIAL_USER,
-            "SnapshotSessionRestoredWitness"
+            "SnapshotSessionRestoredUi"
         );
 
-        await restoredWitness.Start();
-        await restoredWitness.Connect(eventInformation);
+        await restoredUi.Start();
+        await restoredUi.Connect(eventInformation);
 
-        var restoredSnapshots = restoredWitness.GetRequiredService<WitnessSnapshotService>();
+        var restoredSnapshots = restoredUi.GetRequiredService<UiSnapshotService>();
         await restoredSnapshots.Load();
         var restoredSnapshot = restoredSnapshots.Snapshots.Single(x => x.Number == participationNumber);
 
@@ -436,27 +436,27 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6601));
 
         await using var judge = new JudgeDriver(_fixture.NoTimingBaseUrl);
-        await using var officialWitness = new UiDriver(
+        await using var officialUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             OFFICIAL_USER,
-            "PresentlistOfficialWitness"
+            "PresentlistOfficialUi"
         );
-        await using var participantWitness = new UiDriver(
+        await using var participantUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             PARTICIPANT_USER,
-            "PresentlistParticipantWitness"
+            "PresentlistParticipantUi"
         );
 
         await judge.Start();
-        await officialWitness.Start();
-        await participantWitness.Start();
+        await officialUi.Start();
+        await participantUi.Start();
 
-        await officialWitness.Connect(eventInformation);
-        await participantWitness.Connect(eventInformation);
+        await officialUi.Connect(eventInformation);
+        await participantUi.Connect(eventInformation);
         await judge.Connect(eventInformation);
 
-        var officialPresentlist = officialWitness.GetRequiredService<IPresentlistService>();
-        var participantPresentlist = participantWitness.GetRequiredService<IPresentlistService>();
+        var officialPresentlist = officialUi.GetRequiredService<IPresentlistService>();
+        var participantPresentlist = participantUi.GetRequiredService<IPresentlistService>();
         await officialPresentlist.Load();
         await participantPresentlist.Load();
 
@@ -532,13 +532,13 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             participantPresentlist,
             riNumber,
             PresentlistEntryType.RI,
-            "show an RI entry on another connected Witness"
+            "show an RI entry on another connected Ui"
         );
         await WaitForPresentlistEntry(
             participantPresentlist,
             criNumber,
             PresentlistEntryType.CRI,
-            "show a CRI entry on another connected Witness"
+            "show a CRI entry on another connected Ui"
         );
 
         await officialPresentlist.Acknowledge(officialRiEntry);
@@ -548,18 +548,18 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             entries =>
                 !ContainsPresentlistEntry(entries, riNumber, PresentlistEntryType.RI)
                 && !ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
-            "hide acknowledged RI/CRI entries on the acknowledging Witness"
+            "hide acknowledged RI/CRI entries on the acknowledging Ui"
         );
         await WaitForPresentlist(
             participantPresentlist,
             entries =>
                 !ContainsPresentlistEntry(entries, riNumber, PresentlistEntryType.RI)
                 && !ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
-            "hide acknowledged RI/CRI entries on another connected Witness"
+            "hide acknowledged RI/CRI entries on another connected Ui"
         );
 
-        await participantWitness.Disconnect();
-        await participantWitness.Connect(eventInformation);
+        await participantUi.Disconnect();
+        await participantUi.Connect(eventInformation);
 
         await WaitForPresentlistEntry(
             participantPresentlist,
@@ -576,7 +576,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
     }
 
     [Fact]
-    public async Task Operators_are_projected_and_gate_witness_write_access()
+    public async Task Operators_are_projected_and_gate_ui_write_access()
     {
         var eventId = 1801;
         var operatorIdentity = new IntegrationUser(
@@ -624,52 +624,52 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         Assert.Equal(OfficialRole.Steward, activeOperators[0].Role);
         Assert.Single(activeRankings);
 
-        await using var operatorWitness = new UiDriver(
+        await using var operatorUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             operatorIdentity,
-            "IntegrationOperatorWitness"
+            "IntegrationOperatorUi"
         );
-        await using var eligibleOfficialWitness = new UiDriver(
+        await using var eligibleOfficialUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             eligibleOfficialIdentity,
-            "IntegrationEligibleOfficialWitness"
+            "IntegrationEligibleOfficialUi"
         );
-        await using var ineligibleOfficialWitness = new UiDriver(
+        await using var ineligibleOfficialUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             ineligibleOfficialIdentity,
-            "IntegrationIneligibleOfficialWitness"
+            "IntegrationIneligibleOfficialUi"
         );
-        await using var participantWitness = new UiDriver(
+        await using var participantUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             participantIdentity,
-            "IntegrationOperatorParticipantWitness"
+            "IntegrationOperatorParticipantUi"
         );
 
-        await operatorWitness.Start();
-        await eligibleOfficialWitness.Start();
-        await ineligibleOfficialWitness.Start();
-        await participantWitness.Start();
+        await operatorUi.Start();
+        await eligibleOfficialUi.Start();
+        await ineligibleOfficialUi.Start();
+        await participantUi.Start();
 
-        await operatorWitness.Connect(eventInformation);
-        await eligibleOfficialWitness.Connect(eventInformation);
-        await ineligibleOfficialWitness.Connect(eventInformation);
-        await participantWitness.Connect(eventInformation);
+        await operatorUi.Connect(eventInformation);
+        await eligibleOfficialUi.Connect(eventInformation);
+        await ineligibleOfficialUi.Connect(eventInformation);
+        await participantUi.Connect(eventInformation);
 
-        Assert.Equal(UiAccessLevel.Official, operatorWitness.AccessLevel);
-        Assert.Equal(UiAccessLevel.Official, eligibleOfficialWitness.AccessLevel);
-        Assert.Equal(UiAccessLevel.Participant, ineligibleOfficialWitness.AccessLevel);
-        Assert.Equal(UiAccessLevel.Participant, participantWitness.AccessLevel);
+        Assert.Equal(UiAccessLevel.Official, operatorUi.AccessLevel);
+        Assert.Equal(UiAccessLevel.Official, eligibleOfficialUi.AccessLevel);
+        Assert.Equal(UiAccessLevel.Participant, ineligibleOfficialUi.AccessLevel);
+        Assert.Equal(UiAccessLevel.Participant, participantUi.AccessLevel);
 
-        await operatorWitness.Publish(CreateSnapshotGroup());
-        await eligibleOfficialWitness.Publish(CreateSnapshotGroup());
+        await operatorUi.Publish(CreateSnapshotGroup());
+        await eligibleOfficialUi.Publish(CreateSnapshotGroup());
         var denied = await Assert.ThrowsAnyAsync<Exception>(
-            () => ineligibleOfficialWitness.Publish(CreateSnapshotGroup())
+            () => ineligibleOfficialUi.Publish(CreateSnapshotGroup())
         );
         Assert.Contains("Only authorized event staff", denied.Message);
     }
 
     [Fact]
-    public async Task Witness_registration_resolution_creates_missing_nexus_user()
+    public async Task Ui_registration_resolution_creates_missing_notiming_user()
     {
         var registeringUser = new IntegrationUser(
             "registering.witness@integration.test",
@@ -684,12 +684,12 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             "Rosa Display"
         );
         using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
-        await using var witness = new UiDriver(
+        await using var ui = new UiDriver(
             _fixture.NoTimingBaseUrl,
             registeringUser,
-            "IntegrationRegisteringWitness"
+            "IntegrationRegisteringUi"
         );
-        var resolver = witness.GetRequiredService<NUserResolver>();
+        var resolver = ui.GetRequiredService<NUserResolver>();
         var principal = CreatePrincipal(registeringUser);
         var profile = new NUserRegistrationProfile(
             registeringUser.Name,
@@ -720,7 +720,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
     }
 
     [Fact]
-    public async Task Witness_profile_update_completes_existing_email_only_user()
+    public async Task Ui_profile_update_completes_existing_email_only_user()
     {
         var profileUser = new IntegrationUser(
             "profile-completion.witness@integration.test",
@@ -906,7 +906,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         }
 
         throw new TimeoutException(
-            $"Witness Presentlist did not {expectedState}. Entries: {FormatPresentlistEntries(last)}."
+            $"Ui Presentlist did not {expectedState}. Entries: {FormatPresentlistEntries(last)}."
         );
     }
 
@@ -940,7 +940,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         }
 
         throw new TimeoutException(
-            $"Witness Arrivelist did not {expectedState}. Entries: {string.Join(", ", last.Select(x => x.Number))}."
+            $"Ui Arrivelist did not {expectedState}. Entries: {string.Join(", ", last.Select(x => x.Number))}."
         );
     }
 
@@ -996,7 +996,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         }
 
         throw new TimeoutException(
-            $"Witness user session did not {expectedState}. {FormatUserSessionState(last?.State)}"
+            $"Ui user session did not {expectedState}. {FormatUserSessionState(last?.State)}"
         );
     }
 
@@ -1023,7 +1023,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
     static SnapshotGroup CreateSnapshotGroup()
     {
         return new SnapshotGroup(
-            [new WitnessSnapshot(1, "Operator Rider", "Operator Rider", new Timestamp(DateTimeOffset.UtcNow))],
+            [new UiSnapshot(1, "Operator Rider", "Operator Rider", new Timestamp(DateTimeOffset.UtcNow))],
             SnapshotType.Automatic
         );
     }

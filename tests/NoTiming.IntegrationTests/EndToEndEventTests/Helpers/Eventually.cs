@@ -25,7 +25,7 @@ internal static class Eventually
             await Task.Delay(100);
         }
 
-        throw new TimeoutException($"Nexus API did not reach {expectedState}. Participation count: {last.Count}.");
+        throw new TimeoutException($"NoTiming API did not reach {expectedState}. Participation count: {last.Count}.");
     }
 
     public static async Task<Participation> ReadParticipation(

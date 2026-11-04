@@ -8,21 +8,21 @@ namespace NoTiming.IntegrationTests.EndToEndEventTests.Features;
 internal sealed class StartCoreEventFeature
 {
     readonly JudgeDriver _judge;
-    readonly NoTimingApiDriver _nexusApi;
+    readonly NoTimingApiDriver _noTimingApi;
 
-    public StartCoreEventFeature(JudgeDriver judge, NoTimingApiDriver nexusApi)
+    public StartCoreEventFeature(JudgeDriver judge, NoTimingApiDriver noTimingApi)
     {
         _judge = judge;
-        _nexusApi = nexusApi;
+        _noTimingApi = noTimingApi;
     }
 
     public async Task<EventInformation> Execute(SetupFeatureResult setup)
     {
-        var setupEvent = await _nexusApi.ReadSetupConfigureEvent(setup.SetupEvent.Id);
+        var setupEvent = await _noTimingApi.ReadSetupConfigureEvent(setup.SetupEvent.Id);
 
         await _judge.Start();
         await _judge.GetRequiredService<IDashService>().Start(setupEvent.Id);
 
-        return await _nexusApi.ReadEventInformation(setupEvent.Id);
+        return await _noTimingApi.ReadEventInformation(setupEvent.Id);
     }
 }

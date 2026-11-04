@@ -25,7 +25,7 @@ Requirements:
 - Verifies both Ui application instances update their real participation state through `UiRpcClient` and domain-event handlers.
 - Verifies one Ui resolves official access while the other resolves participant/default access.
 - Reads the persisted participation and snapshot results back through the NoTiming REST API.
-- Verifies NoTiming's CORS preflight allows the PATCH and DELETE methods used by the Witness.
+- Verifies NoTiming's CORS preflight allows the PATCH and DELETE methods used by the Ui.
 
 ## Next Expansion
 

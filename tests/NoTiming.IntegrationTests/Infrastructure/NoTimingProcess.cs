@@ -58,8 +58,8 @@ internal sealed class NoTimingProcess : IAsyncDisposable
         startInfo.Environment["NUGET_PACKAGES"] = nugetPackages;
 
         _process = Process.Start(startInfo) ?? throw new InvalidOperationException("Failed to start NoTiming process.");
-        _process.OutputDataReceived += (_, args) => _output.Add("warp", args.Data);
-        _process.ErrorDataReceived += (_, args) => _output.Add("warp-error", args.Data);
+        _process.OutputDataReceived += (_, args) => _output.Add("notiming", args.Data);
+        _process.ErrorDataReceived += (_, args) => _output.Add("notiming-error", args.Data);
         _process.BeginOutputReadLine();
         _process.BeginErrorReadLine();
 

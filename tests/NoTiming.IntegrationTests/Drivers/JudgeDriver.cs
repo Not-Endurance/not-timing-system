@@ -29,9 +29,9 @@ internal sealed class JudgeDriver : IAsyncDisposable
     readonly IEventScopedRepository<Participation> _participationRepository;
     readonly IOptions<NHttpSettings> _httpSettings;
 
-    public JudgeDriver(Uri warpBaseUrl)
+    public JudgeDriver(Uri noTimingBaseUrl)
     {
-        var configuration = CreateConfiguration(warpBaseUrl, ApplicationConstants.JUDGE_HUB, "IntegrationJudge");
+        var configuration = CreateConfiguration(noTimingBaseUrl, ApplicationConstants.JUDGE_HUB, "IntegrationJudge");
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
@@ -115,19 +115,19 @@ internal sealed class JudgeDriver : IAsyncDisposable
         }
     }
 
-    static IConfiguration CreateConfiguration(Uri warpBaseUrl, string hub, string clientName)
+    static IConfiguration CreateConfiguration(Uri noTimingBaseUrl, string hub, string clientName)
     {
         return new ConfigurationBuilder()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = warpBaseUrl.ToString().TrimEnd('/'),
+                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = noTimingBaseUrl.ToString().TrimEnd('/'),
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.HubPattern)}"] = hub,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.EndpointPrefix)}"] = ApplicationConstants.EVENT_BUS,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = clientName,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ConnectTimeoutSeconds)}"] = "10",
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = warpBaseUrl.ToString().TrimEnd('/'),
+                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = noTimingBaseUrl.ToString().TrimEnd('/'),
                     [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.EndpointPrefix)}"] = "api",
                 }
             )

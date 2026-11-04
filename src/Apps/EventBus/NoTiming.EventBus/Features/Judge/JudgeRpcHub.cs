@@ -158,7 +158,7 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
             stopwatch.Stop();
             _logger.LogWarning(
                 ex,
-                "Failed to flush {count} pending witness snapshots for event '{eventId}' after {ElapsedMilliseconds} ms. Keeping them persisted. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}.",
+                "Failed to flush {count} pending Ui snapshots for event '{eventId}' after {ElapsedMilliseconds} ms. Keeping them persisted. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}.",
                 pendingSnapshotCount,
                 eventId,
                 stopwatch.ElapsedMilliseconds,

@@ -6,7 +6,7 @@ using NTS.Domain.Objects;
 
 namespace NTS.Application.Factories;
 
-// TODO: Move Judge/Features/Core/State when consolidating Judge & Witness projects
+// TODO: Move Judge/Features/Core/State when consolidating Judge & Ui projects
 public static class ParticipationAndRankingFactory
 {
     public static (

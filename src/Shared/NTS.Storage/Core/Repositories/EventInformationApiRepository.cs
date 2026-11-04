@@ -65,7 +65,7 @@ public class EventInformationApiRepository
     }
 
     /// <summary>
-    /// Permanently resets the currently selected event information in Nexus.
+    /// Permanently resets the currently selected event information in NoTiming.
     /// </summary>
     /// <remarks>
     /// This deletes the active event root together with its event-scoped Core child documents, which removes the

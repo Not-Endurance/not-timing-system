@@ -5,11 +5,11 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 
-COPY /src /nexus/src
-COPY /nugets /nexus/nugets
-COPY .editorconfig /nexus/.editorconfig
+COPY /src /notiming/src
+COPY /nugets /notiming/nugets
+COPY .editorconfig /notiming/.editorconfig
 
-WORKDIR /nexus/src/Apps/NoTiming
+WORKDIR /notiming/src/Apps/NoTiming
 
 RUN dotnet restore "NoTiming.csproj"
 RUN dotnet build "NoTiming.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore

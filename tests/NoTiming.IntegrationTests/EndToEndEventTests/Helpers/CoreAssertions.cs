@@ -15,30 +15,30 @@ internal static class CoreAssertions
     public static async Task AssertStartlistsMatchPersisted(
         NoTimingApiDriver api,
         JudgeDriver judge,
-        UiDriver witness,
+        UiDriver ui,
         int eventId
     )
     {
         var expected = new Startlist(await api.ReadParticipations(eventId));
         var judgeUpcoming = judge.GetRequiredService<IStartUpcoming>();
         var judgeHistory = judge.GetRequiredService<IStartHistory>();
-        var witnessUpcoming = witness.GetRequiredService<IStartUpcoming>();
-        var witnessHistory = witness.GetRequiredService<IStartHistory>();
+        var uiUpcoming = ui.GetRequiredService<IStartUpcoming>();
+        var uiHistory = ui.GetRequiredService<IStartHistory>();
 
         await Reload(judgeUpcoming);
         await Reload(judgeHistory);
-        await Reload(witnessUpcoming);
-        await Reload(witnessHistory);
+        await Reload(uiUpcoming);
+        await Reload(uiHistory);
 
         Assert.Equal(expected.Upcoming.Select(x => x.Number), judgeUpcoming.Upcoming.Select(x => x.Number));
-        Assert.Equal(expected.Upcoming.Select(x => x.Number), witnessUpcoming.Upcoming.Select(x => x.Number));
+        Assert.Equal(expected.Upcoming.Select(x => x.Number), uiUpcoming.Upcoming.Select(x => x.Number));
         Assert.Equal(Flatten(expected.HistoryByStage), Flatten(judgeHistory.HistoryByStage));
-        Assert.Equal(Flatten(expected.HistoryByStage), Flatten(witnessHistory.HistoryByStage));
+        Assert.Equal(Flatten(expected.HistoryByStage), Flatten(uiHistory.HistoryByStage));
     }
 
-    public static async Task AssertArrivelistMatchesPersisted(NoTimingApiDriver api, UiDriver witness, int eventId)
+    public static async Task AssertArrivelistMatchesPersisted(NoTimingApiDriver api, UiDriver ui, int eventId)
     {
-        var arrivelist = witness.GetRequiredService<IArrivelistService>();
+        var arrivelist = ui.GetRequiredService<IArrivelistService>();
         await arrivelist.Load();
 
         var deadline = DateTimeOffset.UtcNow.AddSeconds(10);

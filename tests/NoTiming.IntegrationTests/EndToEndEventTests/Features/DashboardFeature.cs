@@ -10,7 +10,7 @@ using NTS.Domain.Objects;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NoTiming.IntegrationTests.Drivers;
 using NoTiming.IntegrationTests.EndToEndEventTests.Helpers;
-using WitnessSnapshotService = NoTiming.Ui.Contracts.Features.Snapshots.ISnapshotService;
+using UiSnapshotService = NoTiming.Ui.Contracts.Features.Snapshots.ISnapshotService;
 
 namespace NoTiming.IntegrationTests.EndToEndEventTests.Features;
 
@@ -21,7 +21,7 @@ internal sealed class DashboardFeature
     static readonly TimeSpan PRESENT_SNAPSHOT_GROUP_DELTA = TimeSpan.FromSeconds(10);
 
     readonly JudgeDriver _judge;
-    readonly UiDriver _witness;
+    readonly UiDriver _ui;
     readonly NoTimingApiDriver _api;
     readonly EventInformation _eventInformation;
     readonly HashSet<int> _manuallyEliminated = [];
@@ -30,13 +30,13 @@ internal sealed class DashboardFeature
 
     public DashboardFeature(
         JudgeDriver judge,
-        UiDriver witness,
+        UiDriver ui,
         NoTimingApiDriver api,
         EventInformation eventInformation
     )
     {
         _judge = judge;
-        _witness = witness;
+        _ui = ui;
         _api = api;
         _eventInformation = eventInformation;
     }
@@ -69,13 +69,13 @@ internal sealed class DashboardFeature
                 FEATURE,
                 $"Wave {outerWaveNumber}: assert startlists after arrival group",
                 group,
-                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id)
+                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _ui, _eventInformation.Id)
             );
             await FeatureStep.Run(
                 FEATURE,
                 $"Wave {outerWaveNumber}: assert arrivelist after arrival group",
                 group,
-                () => CoreAssertions.AssertArrivelistMatchesPersisted(_api, _witness, _eventInformation.Id)
+                () => CoreAssertions.AssertArrivelistMatchesPersisted(_api, _ui, _eventInformation.Id)
             );
         }
 
@@ -162,13 +162,13 @@ internal sealed class DashboardFeature
                 FEATURE,
                 $"Wave {outerWaveNumber}: assert startlists after presentation group",
                 group,
-                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id)
+                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _ui, _eventInformation.Id)
             );
             await FeatureStep.Run(
                 FEATURE,
                 $"Wave {outerWaveNumber}: assert arrivelist after presentation group",
                 group,
-                () => CoreAssertions.AssertArrivelistMatchesPersisted(_api, _witness, _eventInformation.Id)
+                () => CoreAssertions.AssertArrivelistMatchesPersisted(_api, _ui, _eventInformation.Id)
             );
         }
 
@@ -201,7 +201,7 @@ internal sealed class DashboardFeature
 
         try
         {
-            var snapshots = _witness.GetRequiredService<WitnessSnapshotService>();
+            var snapshots = _ui.GetRequiredService<UiSnapshotService>();
             var historyCount = snapshots.History.Count;
             foreach (var entry in group)
             {
@@ -214,7 +214,7 @@ internal sealed class DashboardFeature
 
             Assert.True(
                 await snapshots.Publish(snapshotType),
-                $"Witness did not publish a {snapshotType} snapshot group for #{string.Join(", #", group.Select(x => x.Number))}."
+                $"Ui did not publish a {snapshotType} snapshot group for #{string.Join(", #", group.Select(x => x.Number))}."
             );
 
             var published = snapshots.History.Skip(historyCount).Single();
@@ -371,12 +371,12 @@ internal sealed class DashboardFeature
                     ),
             $"ranking update for #{entry.Number} phase {entry.PhaseNumber}"
         );
-        await _witness.WaitForParticipation(
+        await _ui.WaitForParticipation(
             entry.Number,
             participation => participation.Phases[entry.PhaseIndex].IsComplete(),
             TimeSpan.FromSeconds(10)
         );
-        await CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id);
+        await CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _ui, _eventInformation.Id);
     }
 
     async Task ApplyManualElimination(EndToEndPhaseSnapshot entry)
@@ -448,7 +448,7 @@ internal sealed class DashboardFeature
                     ),
             $"ranking elimination for #{number}"
         );
-        await WaitForWitnessAbsence(number);
+        await WaitForUiAbsence(number);
         await WaitForStartlistUpcomingAbsence(number);
     }
 
@@ -470,7 +470,7 @@ internal sealed class DashboardFeature
         context.Selected = context.Participations.Single(x => x.Combination.Number == number);
     }
 
-    static async Task<Participation> WaitForSnapshotCandidate(WitnessSnapshotService snapshots, int number)
+    static async Task<Participation> WaitForSnapshotCandidate(UiSnapshotService snapshots, int number)
     {
         var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
         while (DateTimeOffset.UtcNow < deadline)
@@ -485,12 +485,12 @@ internal sealed class DashboardFeature
             await Task.Delay(100);
         }
 
-        throw new TimeoutException($"Witness snapshot list did not include participation #{number}.");
+        throw new TimeoutException($"Ui snapshot list did not include participation #{number}.");
     }
 
-    async Task WaitForWitnessAbsence(int number)
+    async Task WaitForUiAbsence(int number)
     {
-        var context = _witness.GetRequiredService<IParticipationContext>();
+        var context = _ui.GetRequiredService<IParticipationContext>();
         var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
         while (DateTimeOffset.UtcNow < deadline)
         {
@@ -502,22 +502,22 @@ internal sealed class DashboardFeature
             await Task.Delay(100);
         }
 
-        throw new TimeoutException($"Witness still listed eliminated participation #{number}.");
+        throw new TimeoutException($"Ui still listed eliminated participation #{number}.");
     }
 
     async Task WaitForStartlistUpcomingAbsence(int number)
     {
         var judgeUpcoming = _judge.GetRequiredService<IStartUpcoming>();
-        var witnessUpcoming = _witness.GetRequiredService<IStartUpcoming>();
+        var uiUpcoming = _ui.GetRequiredService<IStartUpcoming>();
         var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
         IReadOnlyList<int> lastJudgeUpcoming = [];
-        IReadOnlyList<int> lastWitnessUpcoming = [];
+        IReadOnlyList<int> lastUiUpcoming = [];
 
         while (DateTimeOffset.UtcNow < deadline)
         {
             lastJudgeUpcoming = judgeUpcoming.Upcoming.Select(x => x.Number).ToArray();
-            lastWitnessUpcoming = witnessUpcoming.Upcoming.Select(x => x.Number).ToArray();
-            if (!lastJudgeUpcoming.Contains(number) && !lastWitnessUpcoming.Contains(number))
+            lastUiUpcoming = uiUpcoming.Upcoming.Select(x => x.Number).ToArray();
+            if (!lastJudgeUpcoming.Contains(number) && !lastUiUpcoming.Contains(number))
             {
                 return;
             }
@@ -528,7 +528,7 @@ internal sealed class DashboardFeature
         throw new TimeoutException(
             $"Startlists still listed eliminated participation #{number}. "
                 + $"Judge upcoming: [{string.Join(", ", lastJudgeUpcoming)}]. "
-                + $"Witness upcoming: [{string.Join(", ", lastWitnessUpcoming)}]."
+                + $"Ui upcoming: [{string.Join(", ", lastUiUpcoming)}]."
         );
     }
 

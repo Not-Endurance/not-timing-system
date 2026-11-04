@@ -17,7 +17,7 @@ public sealed class NoTimingCorsTests : IClassFixture<NtsIntegrationFixture>
     [Theory]
     [InlineData("PATCH")]
     [InlineData("DELETE")]
-    public async Task Preflight_AllowsRestMethodFromLocalWitnessOrigin(string method)
+    public async Task Preflight_AllowsRestMethodFromLocalUiOrigin(string method)
     {
         using var http = new HttpClient { BaseAddress = _fixture.NoTimingBaseUrl };
         using var request = new HttpRequestMessage(HttpMethod.Options, "api/countries");

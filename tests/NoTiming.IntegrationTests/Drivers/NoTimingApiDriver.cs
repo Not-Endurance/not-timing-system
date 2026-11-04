@@ -211,7 +211,7 @@ internal sealed class NoTimingApiDriver : IDisposable
                 ? "no participation was returned"
                 : $"phase complete: {lastParticipation.Phases.Current.IsComplete()}";
         throw new TimeoutException(
-            $"Nexus API did not persist participation {participationId} before timeout ({state})."
+            $"NoTiming API did not persist participation {participationId} before timeout ({state})."
         );
     }
 
@@ -288,7 +288,7 @@ internal sealed class NoTimingApiDriver : IDisposable
             throw new InvalidOperationException(string.Join(Environment.NewLine, result.Errors));
         }
 
-        return result.Data ?? throw new InvalidOperationException($"Nexus API returned no payload for '{endpoint}'.");
+        return result.Data ?? throw new InvalidOperationException($"NoTiming API returned no payload for '{endpoint}'.");
     }
 
     async Task<T?> SendNullable<T>(HttpMethod method, string endpoint, object? payload = null)

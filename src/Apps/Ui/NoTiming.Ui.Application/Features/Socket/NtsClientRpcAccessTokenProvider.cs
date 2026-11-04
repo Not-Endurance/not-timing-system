@@ -105,13 +105,13 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
                 tokenResult.Status
             );
             throw new OperationCanceledException(
-                "Witness authentication redirect suppressed on auth route.",
+                "Ui authentication redirect suppressed on auth route.",
                 exception
             );
         }
 
         _authenticationRedirector.RedirectToSignIn(tokenResult);
-        throw new OperationCanceledException("Witness authentication redirect started.", exception);
+        throw new OperationCanceledException("Ui authentication redirect started.", exception);
     }
 
     void RedirectToAuthentication(AccessTokenNotAvailableException exception)
@@ -123,13 +123,13 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
                 "Skipping witness auth redirect because the app is already on an authentication route."
             );
             throw new OperationCanceledException(
-                "Witness authentication redirect suppressed on auth route.",
+                "Ui authentication redirect suppressed on auth route.",
                 exception
             );
         }
 
         _authenticationRedirector.RedirectToSignIn(exception);
-        throw new OperationCanceledException("Witness authentication redirect started.", exception);
+        throw new OperationCanceledException("Ui authentication redirect started.", exception);
     }
 
     void RedirectToAuthentication(InteractiveRequestOptions requestOptions, Exception? exception = null)
@@ -141,13 +141,13 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
                 "Skipping witness auth redirect because the app is already on an authentication route."
             );
             throw new OperationCanceledException(
-                "Witness authentication redirect suppressed on auth route.",
+                "Ui authentication redirect suppressed on auth route.",
                 exception
             );
         }
 
         _authenticationRedirector.RedirectToSignIn(requestOptions);
-        throw new OperationCanceledException("Witness authentication redirect started.", exception);
+        throw new OperationCanceledException("Ui authentication redirect started.", exception);
     }
 
     void CancelWithWarning(string message, Exception? exception = null)

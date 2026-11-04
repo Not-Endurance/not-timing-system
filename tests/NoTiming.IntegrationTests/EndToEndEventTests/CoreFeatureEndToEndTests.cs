@@ -36,18 +36,18 @@ public sealed class CoreFeatureEndToEndTests
     {
         var snapshot = EndToEndEventSnapshot.Load(snapshotName);
         await using var judge = new JudgeDriver(_fixture.NoTimingBaseUrl);
-        using var nexusApi = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
-        var configureEvent = new ConfigureEventFeature(judge, nexusApi);
-        var startEvent = new StartCoreEventFeature(judge, nexusApi);
+        using var noTimingApi = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
+        var configureEvent = new ConfigureEventFeature(judge, noTimingApi);
+        var startEvent = new StartCoreEventFeature(judge, noTimingApi);
 
-        await SeedOtherEventData(nexusApi, snapshot.EventId);
+        await SeedOtherEventData(noTimingApi, snapshot.EventId);
 
         var setup = await configureEvent.Execute(snapshot);
         var eventInformation = await startEvent.Execute(setup);
-        await AssertStartedConfigureEventCannotBeUpdated(nexusApi, setup.SetupEvent);
+        await AssertStartedConfigureEventCannotBeUpdated(noTimingApi, setup.SetupEvent);
 
         var startedDocuments = await ReadStartedDocumentsScopedToCurrentEvent(
-            nexusApi,
+            noTimingApi,
             eventInformation,
             setup,
             snapshot
@@ -58,21 +58,21 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(snapshot.Rankings.Count, startedRankings.Count);
         AssertStartedOperatorsMatchSetup(startedDocuments.Operators, setup.SetupEvent, eventInformation.Id);
 
-        await using var witness = new UiDriver(
+        await using var ui = new UiDriver(
             _fixture.NoTimingBaseUrl,
-            setup.WitnessOperator,
-            $"CoreEndToEndOperatorWitness-{snapshot.Name}"
+            setup.UiOperator,
+            $"CoreEndToEndOperatorUi-{snapshot.Name}"
         );
-        await witness.Start();
-        await witness.Connect(eventInformation);
-        Assert.Equal(UiAccessLevel.Official, witness.AccessLevel);
+        await ui.Start();
+        await ui.Connect(eventInformation);
+        Assert.Equal(UiAccessLevel.Official, ui.AccessLevel);
 
         var phaseWaves = CreatePhaseWaves(snapshot.PhasesWithSnapshots);
         Assert.Equal(snapshot.PhasesWithSnapshots.Count, phaseWaves.Sum(x => x.Count));
         Assert.All(phaseWaves, AssertWaveFitsThirtyMinuteWindow);
 
-        var dashboard = new DashboardFeature(judge, witness, nexusApi, eventInformation);
-        await CoreAssertions.AssertArrivelistMatchesPersisted(nexusApi, witness, eventInformation.Id);
+        var dashboard = new DashboardFeature(judge, ui, noTimingApi, eventInformation);
+        await CoreAssertions.AssertArrivelistMatchesPersisted(noTimingApi, ui, eventInformation.Id);
         var processedPhases = 0;
         var publishedSnapshotGroups = 0;
         foreach (var phaseWave in phaseWaves)
@@ -85,8 +85,8 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(snapshot.PhasesWithSnapshots.Count, processedPhases);
         Assert.True(publishedSnapshotGroups > 0);
 
-        await AssertFinalStateMatchesSnapshots(nexusApi, eventInformation, setup, snapshot);
-        await AssertCompletedEventCanBeDeactivatedAndExported(judge, nexusApi, eventInformation);
+        await AssertFinalStateMatchesSnapshots(noTimingApi, eventInformation, setup, snapshot);
+        await AssertCompletedEventCanBeDeactivatedAndExported(judge, noTimingApi, eventInformation);
     }
 
     static async Task AssertStartedConfigureEventCannotBeUpdated(NoTimingApiDriver api, SetupConfigureEvent setupEvent)
@@ -211,7 +211,7 @@ public sealed class CoreFeatureEndToEndTests
         }
 
         throw new TimeoutException(
-            "Nexus API did not reach the expected started event document counts. "
+            "NoTiming API did not reach the expected started event document counts. "
                 + $"Participations: {last.Participations.Count}/{snapshot.Participations.Count}, "
                 + $"Rankings: {last.Rankings.Count}/{snapshot.Rankings.Count}, "
                 + $"Officials: {last.Officials.Count}/{setup.SetupEvent.Officials.Count}, "

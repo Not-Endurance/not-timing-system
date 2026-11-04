@@ -1,6 +1,6 @@
 ## Authentication - Microsoft Entra ID (WASM)
 Configuration keys:
-- `NClientAuthenticationSettings` for Witness sign-in and protected server access tokens
+- `NClientAuthenticationSettings` for Ui sign-in and protected server access tokens
 
 `NClientAuthenticationSettings` uses `ResourceClientId` for the target protected API app registration.
 `NClientAuthenticationSettings.SessionLifetime` controls how long the device can reuse a successful login; it defaults to 24 hours.

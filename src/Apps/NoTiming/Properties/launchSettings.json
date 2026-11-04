@@ -8,7 +8,7 @@
         "IS_LOCALHOST": "true",
         "PORT": "11337",
         "MONGO_CONNECTION_STRING": "mongodb://localhost:27017/nts",
-        "WITNESS_UI_PATH": "obj/witness-ui/wwwroot"
+        "WITNESS_UI_PATH": "obj/ui/wwwroot"
       },
       "applicationUrl": "http://localhost:11337"
     },

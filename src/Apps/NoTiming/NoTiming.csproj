@@ -18,12 +18,12 @@
   </ItemGroup>
 
   <!--
-    Local Debug runs: publish the Ui to obj/witness-ui/wwwroot. It is deliberately not copied into this
+    Local Debug runs: publish the Ui to obj/ui/wwwroot. It is deliberately not copied into this
     project's wwwroot, because static web asset discovery then fails on duplicate Razor library assets.
     Development launch settings point WITNESS_UI_PATH at that folder.
   -->
   <PropertyGroup>
-    <UiPublishDir>$(BaseIntermediateOutputPath)witness-ui/</UiPublishDir>
+    <UiPublishDir>$(BaseIntermediateOutputPath)ui/</UiPublishDir>
   </PropertyGroup>
 
   <Target Name="PublishUiForLocalRun" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">

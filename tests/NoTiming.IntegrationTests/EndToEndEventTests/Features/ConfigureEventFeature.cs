@@ -23,12 +23,12 @@ namespace NoTiming.IntegrationTests.EndToEndEventTests.Features;
 internal class ConfigureEventFeature
 {
     readonly JudgeDriver _judge;
-    readonly NoTimingApiDriver _nexusApi;
+    readonly NoTimingApiDriver _noTimingApi;
 
-    public ConfigureEventFeature(JudgeDriver judge, NoTimingApiDriver nexusApi)
+    public ConfigureEventFeature(JudgeDriver judge, NoTimingApiDriver noTimingApi)
     {
         _judge = judge;
-        _nexusApi = nexusApi;
+        _noTimingApi = noTimingApi;
     }
 
     public async Task<SetupFeatureResult> Execute(EndToEndEventSnapshot eventSnapshot)
@@ -48,7 +48,7 @@ internal class ConfigureEventFeature
 
         foreach (var user in snapshot.Users)
         {
-            var registered = await _nexusApi.RegisterUser(
+            var registered = await _noTimingApi.RegisterUser(
                 new IntegrationUser(
                     user.Email,
                     $"setup-user-{user.Id}",
@@ -89,7 +89,7 @@ internal class ConfigureEventFeature
             Remember(idMap, club.Id, created.Id);
             createdClubs.Add(club.Id, created);
 
-            var persisted = await _nexusApi.ReadSetupClubs();
+            var persisted = await _noTimingApi.ReadSetupClubs();
             Assert.Contains(persisted, x => x.Id == created.Id && x.Name == club.Name);
         }
 
@@ -108,7 +108,7 @@ internal class ConfigureEventFeature
             Remember(idMap, horse.Id, created.Id);
             createdHorses.Add(horse.Id, created);
 
-            var persisted = await _nexusApi.ReadSetupHorses();
+            var persisted = await _noTimingApi.ReadSetupHorses();
             Assert.Contains(
                 persisted,
                 x =>
@@ -145,7 +145,7 @@ internal class ConfigureEventFeature
             Remember(idMap, athlete.Id, created.Id);
             createdAthletes.Add(athlete.Id, created);
 
-            var persisted = await _nexusApi.ReadSetupAthletes();
+            var persisted = await _noTimingApi.ReadSetupAthletes();
             Assert.Contains(
                 persisted,
                 x =>
@@ -169,7 +169,7 @@ internal class ConfigureEventFeature
         var setupEventId = RequiredId(eventForm);
         Remember(idMap, snapshot.ConfigureEvent.Id, setupEventId);
 
-        var currentEvent = await _nexusApi.ReadSetupConfigureEvent(setupEventId);
+        var currentEvent = await _noTimingApi.ReadSetupConfigureEvent(setupEventId);
         Assert.Equal(snapshot.ConfigureEvent.Name, currentEvent.Name);
         Assert.Empty(currentEvent.Loops);
         Assert.Empty(currentEvent.Combinations);
@@ -184,7 +184,7 @@ internal class ConfigureEventFeature
             await loopService.Create(form);
 
             currentEvent = await WaitForSetupEvent(
-                _nexusApi,
+                _noTimingApi,
                 setupEventId,
                 setupEvent => setupEvent.Loops.Any(x => x.Distance == loop.Distance),
                 $"loop {loop.Distance}"
@@ -218,7 +218,7 @@ internal class ConfigureEventFeature
             createdCombinations.Add(combination.Id, created);
 
             currentEvent = await WaitForSetupEvent(
-                _nexusApi,
+                _noTimingApi,
                 setupEventId,
                 setupEvent => setupEvent.Combinations.Any(x => x.Id == created.Id),
                 $"combination {combination.Number}"
@@ -249,7 +249,7 @@ internal class ConfigureEventFeature
             Remember(idMap, official.Id, officialId);
 
             currentEvent = await WaitForSetupEvent(
-                _nexusApi,
+                _noTimingApi,
                 setupEventId,
                 setupEvent => setupEvent.Officials.Any(x => x.Id == officialId),
                 $"official {official.Name}"
@@ -274,7 +274,7 @@ internal class ConfigureEventFeature
             Remember(idMap, @operator.Id, operatorId);
 
             currentEvent = await WaitForSetupEvent(
-                _nexusApi,
+                _noTimingApi,
                 setupEventId,
                 setupEvent => setupEvent.Operators.Any(x => x.Id == operatorId),
                 $"operator {@operator.User.Email}"
@@ -298,7 +298,7 @@ internal class ConfigureEventFeature
             Remember(idMap, competition.Id, competitionId);
 
             currentEvent = await WaitForSetupEvent(
-                _nexusApi,
+                _noTimingApi,
                 setupEventId,
                 setupEvent => setupEvent.Competitions.Any(x => x.Id == competitionId),
                 $"competition {competition.Name}"
@@ -324,7 +324,7 @@ internal class ConfigureEventFeature
                 Remember(idMap, phase.Id, phaseId);
 
                 currentEvent = await WaitForSetupEvent(
-                    _nexusApi,
+                    _noTimingApi,
                     setupEventId,
                     setupEvent =>
                         setupEvent.Competitions.Any(x => x.Id == competitionId && x.Phases.Any(y => y.Id == phaseId)),
@@ -350,7 +350,7 @@ internal class ConfigureEventFeature
                 Remember(idMap, participation.Id, participationId);
 
                 currentEvent = await WaitForSetupEvent(
-                    _nexusApi,
+                    _noTimingApi,
                     setupEventId,
                     setupEvent =>
                         setupEvent.Competitions.Any(x =>
@@ -370,7 +370,7 @@ internal class ConfigureEventFeature
             }
         }
 
-        currentEvent = await _nexusApi.ReadSetupConfigureEvent(setupEventId);
+        currentEvent = await _noTimingApi.ReadSetupConfigureEvent(setupEventId);
         var expected = snapshot.ExpectedConfigureEventWith(idMap);
         var actual = SnapshotJson.Canonicalize(ConfigureEventModel.From(currentEvent));
 
@@ -378,12 +378,12 @@ internal class ConfigureEventFeature
         return new SetupFeatureResult(
             currentEvent,
             new Dictionary<int, int>(idMap),
-            ResolveWitnessOfficial(currentEvent),
-            ResolveWitnessOperator(currentEvent)
+            ResolveUiOfficial(currentEvent),
+            ResolveUiOperator(currentEvent)
         );
     }
 
-    static IntegrationUser ResolveWitnessOfficial(ConfigureEvent setupEvent)
+    static IntegrationUser ResolveUiOfficial(ConfigureEvent setupEvent)
     {
         var user = setupEvent.Officials.Select(x => x.User).FirstOrDefault(x => x != null);
         if (user == null)
@@ -405,7 +405,7 @@ internal class ConfigureEventFeature
         );
     }
 
-    static IntegrationUser ResolveWitnessOperator(ConfigureEvent setupEvent)
+    static IntegrationUser ResolveUiOperator(ConfigureEvent setupEvent)
     {
         var user = setupEvent.Operators.Select(x => x.User).FirstOrDefault();
         if (user == null)
@@ -527,18 +527,18 @@ internal sealed class SetupFeatureResult
     public SetupFeatureResult(
         ConfigureEvent setupEvent,
         IReadOnlyDictionary<int, int> idMap,
-        IntegrationUser witnessOfficial,
-        IntegrationUser witnessOperator
+        IntegrationUser uiOfficial,
+        IntegrationUser uiOperator
     )
     {
         SetupEvent = setupEvent;
         IdMap = idMap;
-        WitnessOfficial = witnessOfficial;
-        WitnessOperator = witnessOperator;
+        UiOfficial = uiOfficial;
+        UiOperator = uiOperator;
     }
 
     public ConfigureEvent SetupEvent { get; }
     public IReadOnlyDictionary<int, int> IdMap { get; }
-    public IntegrationUser WitnessOfficial { get; }
-    public IntegrationUser WitnessOperator { get; }
+    public IntegrationUser UiOfficial { get; }
+    public IntegrationUser UiOperator { get; }
 }

@@ -30,15 +30,15 @@ internal sealed class UiDriver : IAsyncDisposable
     readonly IUiAccessContext _accessContext;
     readonly string _clientName;
 
-    public UiDriver(Uri warpBaseUrl, IntegrationUser user, string clientName)
+    public UiDriver(Uri noTimingBaseUrl, IntegrationUser user, string clientName)
     {
         _clientName = clientName;
-        var configuration = CreateConfiguration(warpBaseUrl, ApplicationConstants.WITNESS_HUB, clientName);
+        var configuration = CreateConfiguration(noTimingBaseUrl, ApplicationConstants.WITNESS_HUB, clientName);
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
-        services.AddNtsUiApplication(configuration, warpBaseUrl.ToString().TrimEnd('/'), typeof(NtsUiApplicationServices).Assembly);
+        services.AddNtsUiApplication(configuration, noTimingBaseUrl.ToString().TrimEnd('/'), typeof(NtsUiApplicationServices).Assembly);
         services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, IntegrationRpcAccessTokenProvider>());
         services.AddScoped<AuthenticationStateProvider>(_ => new IntegrationAuthenticationStateProvider(user));
 
@@ -73,7 +73,7 @@ internal sealed class UiDriver : IAsyncDisposable
         if (!_socketService.IsConnected)
         {
             throw new InvalidOperationException(
-                $"Witness '{_clientName}' did not connect to event {eventInformation.Id}."
+                $"Ui '{_clientName}' did not connect to event {eventInformation.Id}."
             );
         }
     }
@@ -103,7 +103,7 @@ internal sealed class UiDriver : IAsyncDisposable
             await Task.Delay(100);
         }
 
-        throw new TimeoutException($"Witness did not observe participation #{participationNumber} before timeout.");
+        throw new TimeoutException($"Ui did not observe participation #{participationNumber} before timeout.");
     }
 
     public async ValueTask DisposeAsync()
@@ -123,25 +123,25 @@ internal sealed class UiDriver : IAsyncDisposable
             rpcClient.RunAtStartup();
         }
 
-        if (_provider.GetService<ISnapshotPublisher>() is IRpcClient witnessRpcClient)
+        if (_provider.GetService<ISnapshotPublisher>() is IRpcClient uiRpcClient)
         {
-            witnessRpcClient.RunAtStartup();
+            uiRpcClient.RunAtStartup();
         }
     }
 
-    static IConfiguration CreateConfiguration(Uri warpBaseUrl, string hub, string clientName)
+    static IConfiguration CreateConfiguration(Uri noTimingBaseUrl, string hub, string clientName)
     {
         return new ConfigurationBuilder()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = warpBaseUrl.ToString().TrimEnd('/'),
+                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = noTimingBaseUrl.ToString().TrimEnd('/'),
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.HubPattern)}"] = hub,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.EndpointPrefix)}"] = ApplicationConstants.EVENT_BUS,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = clientName,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ConnectTimeoutSeconds)}"] = "10",
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = warpBaseUrl.ToString().TrimEnd('/'),
+                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = noTimingBaseUrl.ToString().TrimEnd('/'),
                     [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.EndpointPrefix)}"] = "api",
                     ["NClientAuthenticationSettings:ClientId"] = "integration-client",
                     ["NClientAuthenticationSettings:Instance"] = "https://login.microsoftonline.com",

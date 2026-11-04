@@ -5,9 +5,9 @@ namespace NoTiming.IntegrationTests.Infrastructure;
 public sealed class NtsIntegrationFixture : IAsyncLifetime
 {
     MongoDbContainer? _mongo;
-    NoTimingProcess? _warp;
+    NoTimingProcess? _noTiming;
 
-    public Uri NoTimingBaseUrl => _warp?.BaseUrl ?? throw new InvalidOperationException("NoTiming is not started.");
+    public Uri NoTimingBaseUrl => _noTiming?.BaseUrl ?? throw new InvalidOperationException("NoTiming is not started.");
 
     public async Task InitializeAsync()
     {
@@ -15,15 +15,15 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
         _mongo = new MongoDbBuilder().WithImage("mongo:6.0").Build();
         await _mongo.StartAsync();
 
-        _warp = new NoTimingProcess(paths, PortAllocator.GetFreeTcpPort(), _mongo.GetConnectionString());
-        await _warp.Start();
+        _noTiming = new NoTimingProcess(paths, PortAllocator.GetFreeTcpPort(), _mongo.GetConnectionString());
+        await _noTiming.Start();
     }
 
     public async Task DisposeAsync()
     {
-        if (_warp != null)
+        if (_noTiming != null)
         {
-            await _warp.DisposeAsync();
+            await _noTiming.DisposeAsync();
         }
 
         if (_mongo != null)

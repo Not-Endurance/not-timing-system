@@ -69,7 +69,7 @@ PATH="/mnt/wsl/docker-desktop/cli-tools/usr/bin:$HOME/.local/bin:$PATH" dotnet t
 - `func: command not found`: create or repair the shim after user approval for home-directory writes.
 - Docker reports `client version 1.43 is too old`: use `/mnt/wsl/docker-desktop/cli-tools/usr/bin/docker` instead of `/usr/bin/docker`.
 - `MongoDB connection string is null`: usually caused by launching Windows `func.exe`; switch to Linux `func`.
-- `Nexus HTTP did not become healthy` while Functions lists routes: often Windows `func.exe` loopback isolation; switch to Linux `func`.
+- `NoTiming did not become healthy` while Functions lists routes: often Windows `func.exe` loopback isolation; switch to Linux `func`.
 - Azurite storage errors: start the `azurite` Docker container on ports `10000`, `10001`, and `10002`.
 
 ## Script Notes
