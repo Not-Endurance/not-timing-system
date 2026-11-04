@@ -19,11 +19,7 @@ internal sealed class PrecompressedVariant
 internal static class PrecompressedEncoding
 {
     // Brotli first, then gzip: the same variants the build produces.
-    static readonly PrecompressedVariant[] Preferred =
-    [
-        new("br", ".br"),
-        new("gzip", ".gz"),
-    ];
+    static readonly PrecompressedVariant[] Preferred = [new("br", ".br"), new("gzip", ".gz")];
 
     public static PrecompressedVariant? Select(string? acceptEncoding, Func<string, bool> hasVariant)
     {
