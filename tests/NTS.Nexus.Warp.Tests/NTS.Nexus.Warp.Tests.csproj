@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.Warp\NTS.Nexus.Warp.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming\NTS.Nexus.Warp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

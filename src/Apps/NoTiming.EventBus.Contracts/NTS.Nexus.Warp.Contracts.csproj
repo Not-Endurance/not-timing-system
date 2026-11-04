@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\NTS.Application.Contracts\NTS.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\Shared\NTS.Application.Contracts\NTS.Application.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

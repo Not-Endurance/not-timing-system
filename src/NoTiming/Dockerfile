@@ -9,7 +9,7 @@ COPY /src /nexus/src
 COPY /nugets /nexus/nugets
 COPY .editorconfig /nexus/.editorconfig
 
-WORKDIR /nexus/src/Apps/Nexus/NTS.Nexus.Warp
+WORKDIR /nexus/src/NoTiming
 
 RUN dotnet restore "NTS.Nexus.Warp.csproj"
 RUN dotnet build "NTS.Nexus.Warp.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore

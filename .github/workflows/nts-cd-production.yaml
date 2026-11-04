@@ -9,9 +9,9 @@ on:
 env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 10.0.x
-  WITNESS_APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
+  WITNESS_APP_LOCATION: src/Apps/Ui/NoTiming.Ui
   WITNESS_PUBLISH_PATH: NTS.Witness.Web/publish
-  SOURCE_PATH: src/Apps/Nexus/NTS.Nexus.Warp
+  SOURCE_PATH: src/NoTiming
   ARTIFACT_PATH: NTS.Nexus.Warp/publish
   AZURE_RESOURCE: nts-warp-prod
 

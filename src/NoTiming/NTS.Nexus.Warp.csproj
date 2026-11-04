@@ -9,11 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\nugets\Not.Server\Not.Server.csproj" />
-    <ProjectReference Include="..\..\..\..\nugets\Not.Storage\Not.Storage.csproj" />
-    <ProjectReference Include="..\..\..\NTS.Application\NTS.Application.csproj" />
-    <ProjectReference Include="..\NTS.Nexus.Warp.Contracts\NTS.Nexus.Warp.Contracts.csproj" />
-    <ProjectReference Include="..\..\Witness\NTS.Witness.Contracts\NTS.Witness.Contracts.csproj" />
+    <ProjectReference Include="..\..\nugets\Not.Server\Not.Server.csproj" />
+    <ProjectReference Include="..\..\nugets\Not.Storage\Not.Storage.csproj" />
+    <ProjectReference Include="..\Shared\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\Apps\NoTiming.EventBus.Contracts\NTS.Nexus.Warp.Contracts.csproj" />
+    <ProjectReference Include="..\Apps\Ui\NoTiming.Ui.Contracts\NTS.Witness.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,7 +34,7 @@
 
   <Target Name="PublishWitnessUiForLocalRun" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
     <MSBuild
-      Projects="$(MSBuildProjectDirectory)/../../Witness/NTS.Witness.Web/NTS.Witness.Web.csproj"
+      Projects="$(MSBuildProjectDirectory)/../Apps/Ui/NoTiming.Ui/NTS.Witness.Web.csproj"
       Targets="Publish"
       Properties="Configuration=Debug;PublishDir=$(MSBuildProjectDirectory)/$(WitnessUiPublishDir);BlazorEnableCompression=false"
     />

@@ -8,8 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\nugets\Not.Storage\Not.Storage.csproj" />
-    <ProjectReference Include="..\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\..\..\Shared\NTS.Application.Contracts\NTS.Application.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

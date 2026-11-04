@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\..\src\Shared\NTS.Application\NTS.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

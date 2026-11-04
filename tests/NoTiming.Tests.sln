@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge.Blazor", "..\src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Blazor", "..\nugets\Not.Blazor\Not.Blazor.csproj", "{2BE584A5-AA80-43E1-AF8F-E3204AD0BA88}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Storage", "..\src\NTS.Storage\NTS.Storage.csproj", "{ED7F43B0-EBB5-4A5E-B1C9-E97AD3FB1F28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Storage", "..\src\Shared\NTS.Storage\NTS.Storage.csproj", "{ED7F43B0-EBB5-4A5E-B1C9-E97AD3FB1F28}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Domain.Setup", "..\src\Domain\NTS.Domain.Setup\NTS.Domain.Setup.csproj", "{CE507ACD-4ACC-4022-A675-D94DBB8089BB}"
 EndProject
@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Domain", "..\src\Domain
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RPC", "RPC", "{64D80DF7-A0E2-432B-B360-ADBAC6952CB2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Application", "..\src\NTS.Application\NTS.Application.csproj", "{D54B62EF-80FD-4C24-A0D0-FDE85200DAF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Application", "..\src\Shared\NTS.Application\NTS.Application.csproj", "{D54B62EF-80FD-4C24-A0D0-FDE85200DAF2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_confg", "_confg", "{6AAA82B5-6008-4CE4-94F1-D5BE91B3E593}"
 	ProjectSection(SolutionItems) = preProject

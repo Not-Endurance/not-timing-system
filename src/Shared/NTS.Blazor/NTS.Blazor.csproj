@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\nugets\Not.Krud\Not.Krud.csproj" />
+    <ProjectReference Include="..\..\..\nugets\Not.Krud\Not.Krud.csproj" />
     <ProjectReference Include="..\NTS.Application.Contracts\NTS.Application.Contracts.csproj" />
   </ItemGroup>
 

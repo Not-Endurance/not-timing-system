@@ -22,7 +22,7 @@ services:
     container_name: nts-nexus-warp
     build:
       context: ../
-      dockerfile: src/Apps/Nexus/NTS.Nexus.Warp/Dockerfile
+      dockerfile: src/NoTiming/Dockerfile
     environment:
       PORT: "80"
       MONGO_CONNECTION_STRING: mongodb://mongodb:27017

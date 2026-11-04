@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\NTS\NTS.csproj" />
-    <ProjectReference Include="..\..\..\NTS.Application.Contracts\NTS.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Shared\NTS\NTS.csproj" />
+    <ProjectReference Include="..\..\..\Shared\NTS.Application.Contracts\NTS.Application.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

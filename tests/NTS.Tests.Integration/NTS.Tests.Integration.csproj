@@ -13,11 +13,11 @@
     <ProjectReference Include="..\..\nugets\Not.Blazor\Not.Blazor.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Krud\Not.Krud.csproj" />
     <ProjectReference Include="..\..\src\Apps\Judge\NTS.Judge\NTS.Judge.csproj" />
-    <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.Warp\NTS.Nexus.Warp.csproj" />
-    <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.Warp.Contracts\NTS.Nexus.Warp.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\Apps\Witness\NTS.Witness\NTS.Witness.csproj" />
-    <ProjectReference Include="..\..\src\NTS.Blazor\NTS.Blazor.csproj" />
-    <ProjectReference Include="..\..\src\NTS.Storage\NTS.Storage.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming\NTS.Nexus.Warp.csproj" />
+    <ProjectReference Include="..\..\src\Apps\NoTiming.EventBus.Contracts\NTS.Nexus.Warp.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Apps\Ui\NoTiming.Ui.Application\NTS.Witness.csproj" />
+    <ProjectReference Include="..\..\src\Shared\NTS.Blazor\NTS.Blazor.csproj" />
+    <ProjectReference Include="..\..\src\Shared\NTS.Storage\NTS.Storage.csproj" />
   </ItemGroup>
 
   <ItemGroup>

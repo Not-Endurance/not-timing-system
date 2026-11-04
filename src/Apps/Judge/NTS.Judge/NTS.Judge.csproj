@@ -9,8 +9,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NTS.Judge.Contracts\NTS.Judge.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\NTS.Application\NTS.Application.csproj" />
-    <ProjectReference Include="..\..\Nexus\NTS.Nexus.Warp.Contracts\NTS.Nexus.Warp.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Shared\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\..\NoTiming.EventBus.Contracts\NTS.Nexus.Warp.Contracts.csproj" />
   </ItemGroup>
   
 </Project>
