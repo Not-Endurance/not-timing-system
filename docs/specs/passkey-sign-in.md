@@ -1,6 +1,6 @@
 # Passkey and email-code sign-in: implementation spec
 
-Status: ready for implementation. Derived from issue #597 and the decisions in `CONTEXT.md` and `docs/adr/0001` to `0003`. Where this spec differs from the issue, the differences are listed in section 14.
+Status: ready for implementation. Derived from issue #597 and the decisions in `CONTEXT.md` and `docs/adr/0001-passkey-authentication.md`. Where this spec differs from the issue, the differences are listed in section 14.
 
 Terms follow `CONTEXT.md`. Components are named by boundary (Api, EventBus, Ui). This spec names no files, paths or namespaces, because the project structure is changing.
 
@@ -24,7 +24,7 @@ Constraints:
 
 - The Witness hub relays to the Judge hub through in-memory state, so the resource runs a single instance while that relay exists.
 - Session validation is one component used by Api and EventBus, so REST, hub negotiation and hub connections apply the same rules.
-- The host serves Ui routes with fallback to the Ui entry page. Sign-in routes are Ui routes (ADR 0003).
+- The host serves Ui routes with fallback to the Ui entry page. Sign-in routes are Ui routes (ADR 0001).
 
 Origins per environment:
 
@@ -218,8 +218,8 @@ Never logged: codes, MACs, tokens, passkey material, or raw email. Where correla
 ## 14. Changes to issue #597
 
 - Legacy users: "not read, upgraded or linked" and "no legacy documents" are replaced by ADR 0001.
-- Sign-in pages: "the backend serves the sign-in pages" and the full-page navigation are replaced by in-app Ui routes (ADR 0003).
-- Passkey RP ID: `timing.no-company.eu` in production, as in the issue. The app runs on `app.` under it, which the issue did not specify (ADR 0002).
+- Sign-in pages: "the backend serves the sign-in pages" and the full-page navigation are replaced by in-app Ui routes (ADR 0001).
+- Passkey RP ID: `timing.no-company.eu` in production, as in the issue. The app runs on `app.` under it, which the issue did not specify (ADR 0001).
 
 ## 15. Open items to verify during implementation
 
