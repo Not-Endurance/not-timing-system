@@ -22,7 +22,7 @@ services:
     container_name: notiming
     build:
       context: ../
-      dockerfile: src/Apps/NoTiming/Dockerfile
+      dockerfile: src/NoTiming.Shell/Dockerfile
     environment:
       PORT: "80"
       MONGO_CONNECTION_STRING: mongodb://mongodb:27017

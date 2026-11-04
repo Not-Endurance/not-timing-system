@@ -9,14 +9,14 @@ COPY /src /notiming/src
 COPY /nugets /notiming/nugets
 COPY .editorconfig /notiming/.editorconfig
 
-WORKDIR /notiming/src/Apps/NoTiming
+WORKDIR /notiming/src/NoTiming.Shell
 
-RUN dotnet restore "NoTiming.csproj"
-RUN dotnet build "NoTiming.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
+RUN dotnet restore "NoTiming.Shell.csproj"
+RUN dotnet build "NoTiming.Shell.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "NoTiming.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "NoTiming.Shell.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

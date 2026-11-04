@@ -92,12 +92,12 @@ Keep logic in adapters only when it is framework or presentation plumbing.
 
 Use these default homes:
 
-- Domain model and invariant behavior: `src/Domain/NTS.Domain*`.
-- Shared application use cases, ports, factories, and orchestration: `src/NTS.Application*`.
-- Storage and direct infrastructure implementations: `src/NTS.Storage` or app infrastructure projects.
-- Azure Functions, Blazor components, hubs, controllers, and app entrypoints: `src/Apps/*`.
+- Domain model and invariant behavior: `src/Domain/NoTiming.Domain*`.
+- Shared application use cases, ports, factories, and orchestration: `src/Shared/NoTiming.Application*`.
+- Storage and direct infrastructure implementations: `src/Shared/NoTiming.Storage` or app infrastructure projects.
+- Azure Functions, Blazor components, hubs, controllers, and app entrypoints: `src/NoTiming/*, src/Judge/*, src/NoTiming.Shell`.
 
-Prefer `src/NTS.Application` for reusable Application services. App-specific services may live near the app when the behavior is genuinely app-local, but still treat them as Application services: inject them, keep adapters thin, keep domain state changes inside domain objects, and keep infrastructure behind ports.
+Prefer `src/Shared/NoTiming.Application` for reusable Application services. App-specific services may live near the app when the behavior is genuinely app-local, but still treat them as Application services: inject them, keep adapters thin, keep domain state changes inside domain objects, and keep infrastructure behind ports.
 
 Use interfaces for injected collaborators, implement services with the repo's injection marker such as `ITransient` when appropriate, and see `$service-helper-collaborator-definitions` when deciding between a Service, Helper, Processor, or more specific collaborator.
 

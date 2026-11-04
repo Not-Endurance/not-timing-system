@@ -1,11 +1,11 @@
 ---
 name: not-infrastructure-conventions
-description: Use when adding, reviewing, or refactoring reusable Not* nuget infrastructure, shared print/file/browser/backend services, Blazor support components, HTTP/storage abstractions, server adapters, or any code where Codex must decide whether behavior belongs in generic Not infrastructure versus NTS business/domain/application code. Apply conventions that keep Not* nugets generic, convention-driven, lightly customizable, and free of NTS-specific business logic.
+description: Use when adding, reviewing, or refactoring reusable NC* nuget infrastructure, shared print/file/browser/backend services, Blazor support components, HTTP/storage abstractions, server adapters, or any code where Codex must decide whether behavior belongs in generic Not infrastructure versus NTS business/domain/application code. Apply conventions that keep NC* nugets generic, convention-driven, lightly customizable, and free of NTS-specific business logic.
 ---
 
 # Not Infrastructure Conventions
 
-Use Not* nugets as reusable infrastructure and UI foundation packages. They should set consistent conventions, encapsulate repeated technical behavior, and expose a narrow customization surface. They should not become broad frameworks or places for NTS business logic.
+Use NC* nugets as reusable infrastructure and UI foundation packages. They should set consistent conventions, encapsulate repeated technical behavior, and expose a narrow customization surface. They should not become broad frameworks or places for NTS business logic.
 
 Use this together with `$logic-separation` when a change also involves domain rules, application orchestration, repositories, or business state transitions. Use `$blazor-components` when the change touches Razor component structure.
 
@@ -13,15 +13,15 @@ Use this together with `$logic-separation` when a change also involves domain ru
 
 Keep the meaning of the behavior in the owning layer:
 
-- Put NTS business rules, event-specific workflows, ranking/handout semantics, domain entities, and application use cases in `src/Domain`, `src/NTS.Application*`, or app-specific NTS projects.
-- Put generic technical behavior in Not* nugets: browser file delivery, print rendering infrastructure, HTTP helpers, Blazor building blocks, storage adapters, authentication primitives, serialization, localization plumbing, and framework integration.
-- Put app adapters in `src/Apps/*`: Azure Functions, Blazor pages, hubs, process entrypoints, route binding, response shaping, and app-local wiring.
+- Put NTS business rules, event-specific workflows, ranking/handout semantics, domain entities, and application use cases in `src/Domain`, `src/Shared/NoTiming.Application*`, or app-specific NTS projects.
+- Put generic technical behavior in NC* nugets: browser file delivery, print rendering infrastructure, HTTP helpers, Blazor building blocks, storage adapters, authentication primitives, serialization, localization plumbing, and framework integration.
+- Put app adapters in `src/NoTiming/*, src/Judge/*, src/NoTiming.Shell`: Azure Functions, Blazor pages, hubs, process entrypoints, route binding, response shaping, and app-local wiring.
 
-Not* code may know about generic contracts such as file content, print requests, HTTP settings, or component parameters. It must not know about NTS concepts such as event ids, document types, rankings, handouts, participations, officials, protocols, business statuses, or NTS-specific file naming.
+NC* code may know about generic contracts such as file content, print requests, HTTP settings, or component parameters. It must not know about NTS concepts such as event ids, document types, rankings, handouts, participations, officials, protocols, business statuses, or NTS-specific file naming.
 
 ## Convention, Not Framework
 
-Design Not* nugets to establish a convention that works out of the box.
+Design NC* nugets to establish a convention that works out of the box.
 
 Prefer:
 
@@ -36,7 +36,7 @@ Avoid:
 - Exposing every internal decision as a parameter or option.
 - Making consumers inject several low-level services just to perform one user action.
 - Requiring consumers to compose infrastructure steps such as API call, byte download, iframe print, and confirmation plumbing.
-- Adding app-specific enum values, ids, flags, paths, templates, or document names to Not* contracts.
+- Adding app-specific enum values, ids, flags, paths, templates, or document names to NC* contracts.
 - Creating framework surfaces with many knobs before repeated use proves they are needed.
 
 If a consumer must pass many configuration values, ask whether Not should choose a convention instead and expose only the meaningful variation.
@@ -59,7 +59,7 @@ Example direction:
 
 ## Not Package Responsibilities
 
-Put these in Not* nugets:
+Put these in NC* nugets:
 
 - Generic contracts such as `NFileContent`, `NPrintDocumentRequest`, and `NPrintPageOptions`.
 - Generic validation of transport/infrastructure contracts: required HTML, safe file names, supported template ids, generic page options.
@@ -67,7 +67,7 @@ Put these in Not* nugets:
 - Generic server infrastructure: Playwright rendering, template rendering, common CSS, static template assets.
 - Generic Blazor components that encapsulate their own infrastructure dependencies and expose minimal parameters.
 
-Do not put these in Not* nugets:
+Do not put these in NC* nugets:
 
 - NTS document type, event id, ranking id, participation id, official/logo paths, or business workflow decisions.
 - Business-specific naming such as ranklist ZIP entry names, handout deletion policy, or event completion sequencing.
@@ -94,7 +94,7 @@ Poor customization:
 
 ## Review Checklist
 
-Before committing a Not* change, check:
+Before committing a NC* change, check:
 
 - Does this package still make sense without NTS?
 - Is any NTS domain word or business rule leaking into Not contracts or services?

@@ -20,11 +20,11 @@ MAUI Blazor hybrid apps use MS's WebView2 in order to run natively. This might n
    // Execute in project root
    docker compose -f docker/compose.yaml up -d
    ```
-3. Startup `NTS.Judge.MAUI`
+3. Startup `NoTiming.Judge.MAUI`
 
 ### Publish and run release build
-1. Using a shell-based terminal (git bash for example) scope to [Judge MAUI directory](https://github.com/Not-Endurance/not-timing-system/tree/develop/src-v2/Judge/NTS.Judge.MAUI) and run `./publish-windows.sh` - this will run `dotnet publish` and open the bin directory when complete.
-2.  Find and run `NTS.Judge.MAUI.exe` in order to start the application.
+1. Using a shell-based terminal (git bash for example) scope to [Judge MAUI directory](https://github.com/Not-Endurance/not-timing-system/tree/develop/src-v2/Judge/NoTiming.Judge.MAUI) and run `./publish-windows.sh` - this will run `dotnet publish` and open the bin directory when complete.
+2.  Find and run `NoTiming.Judge.MAUI.exe` in order to start the application.
 
 ### Diagrams
 - A reasonably-updated [Domain Model diagram](https://github.com/Not-Endurance/not-timing-system/blob/develop/diagrams/NTS%20v2%20Domain%20Model.drawio.png)
@@ -33,15 +33,15 @@ MAUI Blazor hybrid apps use MS's WebView2 in order to run natively. This might n
 ### Project structure
 1. [src](https://github.com/Not-Endurance/not-timing-system/tree/develop/src) contains EMS and is already extracted in a separate repository and will be removed from here soon.
 2. [src-v2](https://github.com/Not-Endurance/not-timing-system/tree/develop/src) contains the NTS code and will be renamed to src soon
-1. [_EMS](https://github.com/Not-Endurance/not-timing-system/tree/develop/src/Compatibility.EMS) are objects from EMS necessary in order to achieve backwards compatibility with the mobile app [EMS.Witness](https://github.com/Not-Endurance/endurance-management-system/tree/release-witness-v5/src/Witness/EMS.Witness) You can see more of it's usage in [NTS.Judge/ACL](https://github.com/Not-Endurance/not-timing-system/tree/develop/src/Judge/NTS.Judge/ACL) which stands for anti-corruption layer and essentially converts to and from EMS state
+1. [_EMS](https://github.com/Not-Endurance/not-timing-system/tree/develop/src/Compatibility.EMS) are objects from EMS necessary in order to achieve backwards compatibility with the mobile app [EMS.Witness](https://github.com/Not-Endurance/endurance-management-system/tree/release-witness-v5/src/Witness/EMS.Witness) You can see more of it's usage in [NoTiming.Judge/ACL](https://github.com/Not-Endurance/not-timing-system/tree/develop/src/Judge/NoTiming.Judge/ACL) which stands for anti-corruption layer and essentially converts to and from EMS state
 2. [Not](https://github.com/Not-Endurance/not-timing-system/tree/develop/src/Not) is a future library where I stuff all of the infrastructure and components in order to reuse them for future projects. They are completely stripped from business logic and are desidned to be configurable and exensible
 3. [Judge](https://github.com/Not-Endurance/not-timing-system/tree/develop/src/Judge) contains the main app with the following separation:
-  - `NTS.Judge` contains the **Behinds** (from code-behind) which invoke the Domain Model and fascilitate the operations
-  - `NTS.Judge.MAUI` is the MAUI startup project
-  - `NTS.Judge.Blazor` contains the blazor components. These are segregated because once we reach a certain scale that we can afford to run servers it will be simpler to use a web-based blazor app, rather than integrated.
+  - `NoTiming.Judge` contains the **Behinds** (from code-behind) which invoke the Domain Model and fascilitate the operations
+  - `NoTiming.Judge.MAUI` is the MAUI startup project
+  - `NoTiming.Judge.Blazor` contains the blazor components. These are segregated because once we reach a certain scale that we can afford to run servers it will be simpler to use a web-based blazor app, rather than integrated.
 4. [Relay](https://github.com/Not-Endurance/not-timing-system/tree/develop/src/Relay) is a separet ASP.NET app kickstarted by Judge using `Process.Start`. It serves as SignalR relay between Judge and Witness
 5. [Nexus](https://github.com/Not-Endurance/not-timing-system/tree/develop/src/Nexus) is Azure Functions API that stores event archives and other data long term. 
-4. `NTS.Domain*` - contains the domain model for NTS. It defines 3 separate boundaries:
+4. `NoTiming.Domain*` - contains the domain model for NTS. It defines 3 separate boundaries:
   - `Setup` - create and configure an event
   - `Core` - service the event
   - `Watcher` - is not yet implemented and is supposed to encompass the timing modules - RFID tags, AI cameras, Ui app etc
