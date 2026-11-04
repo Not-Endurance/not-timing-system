@@ -17,6 +17,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Judge;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Storage;
+using NoTiming.IntegrationTests.Infrastructure;
 
 namespace NoTiming.IntegrationTests.Drivers;
 
@@ -31,7 +32,7 @@ internal sealed class JudgeDriver : IAsyncDisposable
 
     public JudgeDriver(Uri noTimingBaseUrl)
     {
-        var configuration = CreateConfiguration(noTimingBaseUrl, ApplicationConstants.JUDGE_HUB, "IntegrationJudge");
+        var configuration = DriverConfiguration.Create(noTimingBaseUrl, ApplicationConstants.JUDGE_HUB, "IntegrationJudge");
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
@@ -115,24 +116,6 @@ internal sealed class JudgeDriver : IAsyncDisposable
         }
     }
 
-    static IConfiguration CreateConfiguration(Uri noTimingBaseUrl, string hub, string clientName)
-    {
-        return new ConfigurationBuilder()
-            .AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = noTimingBaseUrl.ToString().TrimEnd('/'),
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.HubPattern)}"] = hub,
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.EndpointPrefix)}"] = ApplicationConstants.EVENT_BUS,
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = clientName,
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ConnectTimeoutSeconds)}"] = "10",
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = noTimingBaseUrl.ToString().TrimEnd('/'),
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.EndpointPrefix)}"] = "api",
-                }
-            )
-            .Build();
-    }
 }
 
 internal static class IntegrationServiceCollectionExtensions

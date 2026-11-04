@@ -17,7 +17,7 @@ public static class NoTimingApiApplicationServices
     )
     {
         services.AddPendingSnapshotsMongoStorage(configuration);
-        services.AddSingleton<IReceiveSnapshotAccessPolicy, MongoUiWriteAccessPolicy>();
+        services.AddSingleton<IReceiveSnapshotAccessPolicy, MongoUiReceiveAccessPolicy>();
         services.AddSingleton<IUiReceiveAuthorizer, UiReceiveAuthorizer>();
         services.AddTransient<IUserRepository, UserMongoRepository>();
 

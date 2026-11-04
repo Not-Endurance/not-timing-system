@@ -8,7 +8,7 @@ using NTS.Domain.Enums;
 namespace NoTiming.Api.Application.Features.Ui.Authorization;
 
 // TODO: Implement Search in IRepository abstraction and decouple the policy implementation from MongoDB
-internal sealed class MongoUiWriteAccessPolicy : IReceiveSnapshotAccessPolicy
+internal sealed class MongoUiReceiveAccessPolicy : IReceiveSnapshotAccessPolicy
 {
     const string DATABASE = "nts";
     const string USERS_COLLECTION = "users";
@@ -17,12 +17,12 @@ internal sealed class MongoUiWriteAccessPolicy : IReceiveSnapshotAccessPolicy
 
     readonly IMongoContext _context;
 
-    public MongoUiWriteAccessPolicy(IMongoContext context)
+    public MongoUiReceiveAccessPolicy(IMongoContext context)
     {
         _context = context;
     }
 
-    public async Task<bool> CanWriteSnapshots(string email, int eventId)
+    public async Task<bool> CanReceiveSnapshots(string email, int eventId)
     {
         var normalizedEmail = NormalizeEmail(email);
         if (normalizedEmail == null)

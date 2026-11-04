@@ -5,12 +5,12 @@ using NoTiming.EventBus.ConnectionDiagnostics;
 
 namespace NoTiming.EventBus.Abstractions;
 
-public abstract class NtsHub<T> : Hub<T>
+public abstract class NtsHubBase<T> : Hub<T>
     where T : class
 {
-    readonly ILogger<NtsHub<T>> _logger;
+    readonly ILogger<NtsHubBase<T>> _logger;
 
-    public NtsHub(ILogger<NtsHub<T>> logger)
+    public NtsHubBase(ILogger<NtsHubBase<T>> logger)
     {
         _logger = logger;
     }

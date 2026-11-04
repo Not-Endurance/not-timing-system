@@ -8,15 +8,15 @@ namespace NoTiming.Api.Application.Features.Ui.Authorization;
 
 internal sealed class UiReceiveAuthorizer : IUiReceiveAuthorizer
 {
-    readonly IReceiveSnapshotAccessPolicy _writeAccessPolicy;
+    readonly IReceiveSnapshotAccessPolicy _receiveAccessPolicy;
     readonly string? _requiredScope;
 
     public UiReceiveAuthorizer(
-        IReceiveSnapshotAccessPolicy writeAccessPolicy,
+        IReceiveSnapshotAccessPolicy receiveAccessPolicy,
         IOptions<NServerAuthenticationSettings> serverAuthenticationOptions
     )
     {
-        _writeAccessPolicy = writeAccessPolicy;
+        _receiveAccessPolicy = receiveAccessPolicy;
         _requiredScope = ResolveScopeName(serverAuthenticationOptions.Value);
     }
 
@@ -45,7 +45,7 @@ internal sealed class UiReceiveAuthorizer : IUiReceiveAuthorizer
             throw new HubException("Authenticated user email is missing.");
         }
 
-        if (!await _writeAccessPolicy.CanWriteSnapshots(email, connectedEvent))
+        if (!await _receiveAccessPolicy.CanReceiveSnapshots(email, connectedEvent))
         {
             throw new HubException("Only authorized event staff can send snapshots for this event.");
         }

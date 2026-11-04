@@ -12,7 +12,7 @@ using NoTiming.Api.Application.Features.Ui.PendingSnapshots;
 
 namespace NoTiming.EventBus.Features.Witness;
 
-internal class WitnessRpcHub : NtsHub<IUiClientProcedures>, IUiHubProcedures
+internal class WitnessRpcHub : NtsHubBase<IUiClientProcedures>, IUiHubProcedures
 {
     readonly IJudgeConnectionsContext _primaryConnections;
     readonly IHubContext<JudgeRpcHub, IJudgeClientProcedures> _judgeRelay;

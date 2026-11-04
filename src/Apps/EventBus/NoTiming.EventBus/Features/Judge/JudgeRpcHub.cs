@@ -11,7 +11,7 @@ using NoTiming.Api.Application.Features.Ui.PendingSnapshots;
 
 namespace NoTiming.EventBus.Features.Judge;
 
-internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
+internal class JudgeRpcHub : NtsHubBase<IJudgeClientProcedures>, IJudgeHubProcedures
 {
     readonly ILogger<JudgeRpcHub> _logger;
     readonly IHubContext<WitnessRpcHub, IUiClientProcedures> _witnessRelay;

@@ -33,7 +33,16 @@ internal sealed class UiDriver : IAsyncDisposable
     public UiDriver(Uri noTimingBaseUrl, IntegrationUser user, string clientName)
     {
         _clientName = clientName;
-        var configuration = CreateConfiguration(noTimingBaseUrl, ApplicationConstants.WITNESS_HUB, clientName);
+        var configuration = DriverConfiguration.Create(
+            noTimingBaseUrl,
+            ApplicationConstants.WITNESS_HUB,
+            clientName,
+            [
+                new("NClientAuthenticationSettings:ClientId", "integration-client"),
+                new("NClientAuthenticationSettings:Instance", "https://login.microsoftonline.com"),
+                new("NClientAuthenticationSettings:TenantId", "integration-tenant"),
+            ]
+        );
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
@@ -129,25 +138,4 @@ internal sealed class UiDriver : IAsyncDisposable
         }
     }
 
-    static IConfiguration CreateConfiguration(Uri noTimingBaseUrl, string hub, string clientName)
-    {
-        return new ConfigurationBuilder()
-            .AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = noTimingBaseUrl.ToString().TrimEnd('/'),
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.HubPattern)}"] = hub,
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.EndpointPrefix)}"] = ApplicationConstants.EVENT_BUS,
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = clientName,
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ConnectTimeoutSeconds)}"] = "10",
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = noTimingBaseUrl.ToString().TrimEnd('/'),
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.EndpointPrefix)}"] = "api",
-                    ["NClientAuthenticationSettings:ClientId"] = "integration-client",
-                    ["NClientAuthenticationSettings:Instance"] = "https://login.microsoftonline.com",
-                    ["NClientAuthenticationSettings:TenantId"] = "integration-tenant",
-                }
-            )
-            .Build();
-    }
 }
