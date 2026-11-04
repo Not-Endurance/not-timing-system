@@ -2,6 +2,8 @@ using System.Security.Claims;
 using Microsoft.Extensions.Localization;
 using Not.Localization;
 using Not.Startup;
+using Not.Application.Configurations;
+using Not.Application.Environments;
 using NTS.Application.Contracts;
 using NTS.Nexus.Warp.ConnectionDiagnostics;
 using NTS.Nexus.Warp.Features.Judge;
@@ -16,6 +18,12 @@ public static class Warp
     public static WebApplicationBuilder CreateBuilder(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        // Local runs read per-environment secrets (for example the Mongo connection string) from user secrets.
+        if (EnvironmentHelper.IsLocalhost())
+        {
+            builder.Configuration.AddSecrets($"nts-warp-{EnvironmentHelper.GetEnvironment()}");
+        }
 
         builder.Services.ConfigureNtsWarp(builder.Configuration);
 

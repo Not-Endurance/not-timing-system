@@ -60,10 +60,12 @@ internal static class NtsWarpServices
 
     static void AddPendingSnapshotsMongoStorage(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING");
+        var connectionString = configuration["MONGO_CONNECTION_STRING"];
         if (string.IsNullOrWhiteSpace(connectionString))
         {
-            throw new ApplicationException("MongoDB connection string is null");
+            throw new ApplicationException(
+                "MongoDB connection string is missing. Set MONGO_CONNECTION_STRING in configuration or user secrets."
+            );
         }
 
         var builder = new NStorageBuilder(services, configuration);
