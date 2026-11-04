@@ -10,9 +10,9 @@ using NoTiming.Domain.Aggregates;
 using NoTiming.Domain.Core.Objects.Payloads;
 using NoTiming.Domain.Enums;
 using NoTiming.Domain.Objects;
-using NoTiming.Judge.Contracts.Features.Core.Dashboard;
 using NoTiming.EventBus.Contracts;
 using NoTiming.EventBus.Contracts.Features.Judge.Procedures;
+using NoTiming.Judge.Contracts.Features.Core.Dashboard;
 
 namespace NoTiming.Judge.Features.Socket;
 

@@ -7,8 +7,8 @@ using NoTiming.Domain.Core.Aggregates.Participations.Objects;
 using NoTiming.Domain.Core.Objects;
 using NoTiming.Domain.Enums;
 using NoTiming.Domain.Objects;
-using NoTiming.Judge.Contracts.Features.Core.Rankings.FeiExport;
 using NoTiming.IntegrationTests.Drivers;
+using NoTiming.Judge.Contracts.Features.Core.Rankings.FeiExport;
 using CoreCompetition = NoTiming.Domain.Core.Aggregates.Participations.Objects.Competition;
 
 namespace NoTiming.IntegrationTests;

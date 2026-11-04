@@ -5,10 +5,10 @@ using NC.Application.UdpHandshake;
 using NC.Server.Authentication;
 using NoTiming.Api;
 using NoTiming.Api.Application;
+using NoTiming.Application;
 using NoTiming.EventBus;
 using NoTiming.Host.Cors;
 using NoTiming.Shared;
-using NoTiming.Application;
 
 namespace NoTiming;
 

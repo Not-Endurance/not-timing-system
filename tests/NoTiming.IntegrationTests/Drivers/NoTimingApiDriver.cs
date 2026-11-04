@@ -288,7 +288,8 @@ internal sealed class NoTimingApiDriver : IDisposable
             throw new InvalidOperationException(string.Join(Environment.NewLine, result.Errors));
         }
 
-        return result.Data ?? throw new InvalidOperationException($"NoTiming API returned no payload for '{endpoint}'.");
+        return result.Data
+            ?? throw new InvalidOperationException($"NoTiming API returned no payload for '{endpoint}'.");
     }
 
     async Task<T?> SendNullable<T>(HttpMethod method, string endpoint, object? payload = null)

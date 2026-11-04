@@ -1,7 +1,7 @@
 using System.Globalization;
+using NC.Serialization.JSON;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NC.Serialization.JSON;
 
 namespace NoTiming.IntegrationTests.EndToEndEventTests.Helpers;
 

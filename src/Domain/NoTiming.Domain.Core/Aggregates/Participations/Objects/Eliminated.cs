@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using NC.Domain.Exceptions;
+﻿using NC.Domain.Exceptions;
+using Newtonsoft.Json;
 
 namespace NoTiming.Domain.Core.Aggregates.Participations.Objects;
 

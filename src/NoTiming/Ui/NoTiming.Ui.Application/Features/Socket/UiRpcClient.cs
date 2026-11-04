@@ -19,12 +19,7 @@ using NoTiming.Ui.Application.Features.Core.Dashboard;
 
 namespace NoTiming.Ui.Application.Features.Socket;
 
-public class UiRpcClient
-    : RpcClient,
-        IUiClientProcedures,
-        ISnapshotPublisher,
-        IPresentlistActionPublisher,
-        IScoped
+public class UiRpcClient : RpcClient, IUiClientProcedures, ISnapshotPublisher, IPresentlistActionPublisher, IScoped
 {
     readonly IRpcSocket _socket;
     readonly INoTimingSocketContext _socketContext;

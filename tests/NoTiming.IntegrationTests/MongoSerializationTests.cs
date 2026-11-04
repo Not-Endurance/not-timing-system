@@ -1,6 +1,6 @@
 using MongoDB.Bson;
-using Newtonsoft.Json;
 using NC.Serialization.JSON;
+using Newtonsoft.Json;
 using NoTiming.Application.Mongo;
 
 namespace NoTiming.IntegrationTests;

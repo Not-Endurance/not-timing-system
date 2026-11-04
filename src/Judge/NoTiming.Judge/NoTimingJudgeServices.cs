@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NC.Krud.ServiceRegistration;
-using NoTiming.Shared;
 using NoTiming.Application;
 using NoTiming.Domain.Setup.Aggregates;
+using NoTiming.Shared;
 
 namespace NoTiming.Judge;
 

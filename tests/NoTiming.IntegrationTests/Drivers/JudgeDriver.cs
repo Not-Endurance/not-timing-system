@@ -14,10 +14,10 @@ using NoTiming.Application.Contracts.Core;
 using NoTiming.Application.Contracts.Socket;
 using NoTiming.Domain.Aggregates;
 using NoTiming.Domain.Core.Aggregates;
+using NoTiming.IntegrationTests.Infrastructure;
 using NoTiming.Judge;
 using NoTiming.Judge.Contracts.Features.Core.Dashboard;
 using NoTiming.Storage;
-using NoTiming.IntegrationTests.Infrastructure;
 
 namespace NoTiming.IntegrationTests.Drivers;
 
@@ -32,7 +32,11 @@ internal sealed class JudgeDriver : IAsyncDisposable
 
     public JudgeDriver(Uri noTimingBaseUrl)
     {
-        var configuration = DriverConfiguration.Create(noTimingBaseUrl, ApplicationConstants.JUDGE_HUB, "IntegrationJudge");
+        var configuration = DriverConfiguration.Create(
+            noTimingBaseUrl,
+            ApplicationConstants.JUDGE_HUB,
+            "IntegrationJudge"
+        );
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
@@ -115,7 +119,6 @@ internal sealed class JudgeDriver : IAsyncDisposable
             rpcClient.RunAtStartup();
         }
     }
-
 }
 
 internal static class IntegrationServiceCollectionExtensions

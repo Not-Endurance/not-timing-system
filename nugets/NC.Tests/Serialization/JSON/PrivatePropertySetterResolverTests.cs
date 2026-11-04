@@ -1,5 +1,5 @@
-using Newtonsoft.Json;
 using NC.Serialization.JSON;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace NC.Tests.Serialization.JSON;

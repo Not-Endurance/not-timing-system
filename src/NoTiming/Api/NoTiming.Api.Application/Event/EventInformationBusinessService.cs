@@ -281,7 +281,9 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
             || setupEvent.Competitions.Any(HasAnyCompetitionFeiConfiguration);
     }
 
-    static bool HasAnyCompetitionFeiConfiguration(NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Competition competition)
+    static bool HasAnyCompetitionFeiConfiguration(
+        NoTiming.Domain.Setup.Aggregates.ConfigureEvents.Competition competition
+    )
     {
         return !string.IsNullOrWhiteSpace(competition.FeiEventId)
             || !string.IsNullOrWhiteSpace(competition.FeiEventCode)

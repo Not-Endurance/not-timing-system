@@ -104,10 +104,7 @@ public class NoTimingClientRpcAccessTokenProvider : IRpcAccessTokenProvider, ISc
                 "Skipping witness auth redirect because the app is already on an authentication route. Status: {Status}",
                 tokenResult.Status
             );
-            throw new OperationCanceledException(
-                "Ui authentication redirect suppressed on auth route.",
-                exception
-            );
+            throw new OperationCanceledException("Ui authentication redirect suppressed on auth route.", exception);
         }
 
         _authenticationRedirector.RedirectToSignIn(tokenResult);
@@ -122,10 +119,7 @@ public class NoTimingClientRpcAccessTokenProvider : IRpcAccessTokenProvider, ISc
                 exception,
                 "Skipping witness auth redirect because the app is already on an authentication route."
             );
-            throw new OperationCanceledException(
-                "Ui authentication redirect suppressed on auth route.",
-                exception
-            );
+            throw new OperationCanceledException("Ui authentication redirect suppressed on auth route.", exception);
         }
 
         _authenticationRedirector.RedirectToSignIn(exception);
@@ -140,10 +134,7 @@ public class NoTimingClientRpcAccessTokenProvider : IRpcAccessTokenProvider, ISc
                 exception,
                 "Skipping witness auth redirect because the app is already on an authentication route."
             );
-            throw new OperationCanceledException(
-                "Ui authentication redirect suppressed on auth route.",
-                exception
-            );
+            throw new OperationCanceledException("Ui authentication redirect suppressed on auth route.", exception);
         }
 
         _authenticationRedirector.RedirectToSignIn(requestOptions);

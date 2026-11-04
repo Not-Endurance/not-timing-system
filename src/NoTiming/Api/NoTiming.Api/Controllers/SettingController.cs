@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NC.Application.CRUD.Ports;
-using NoTiming.Application.Contracts.Shared;
-using NoTiming.Application.Contracts.Shared.Models;
-using NoTiming.Api.Base;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Telemetry;
+using NoTiming.Api.Base;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Application.Contracts.Shared.Models;
 
 namespace NoTiming.Api.Controllers;
 

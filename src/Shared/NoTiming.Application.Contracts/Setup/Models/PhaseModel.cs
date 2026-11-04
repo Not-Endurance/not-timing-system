@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using NC.Krud.Abstractions;
+﻿using NC.Krud.Abstractions;
+using Newtonsoft.Json;
 using NoTiming.Application.Contracts.Shared;
 using NoTiming.Application.Contracts.Shared.Models;
 using NoTiming.Domain.Enums;

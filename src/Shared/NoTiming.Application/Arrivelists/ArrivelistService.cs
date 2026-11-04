@@ -29,7 +29,10 @@ public class ArrivelistService
     public ArrivelistService(IEventScopedRepository<Participation> participations)
         : this(participations, null) { }
 
-    public ArrivelistService(IEventScopedRepository<Participation> participations, INoTimingSocketContext? socketContext)
+    public ArrivelistService(
+        IEventScopedRepository<Participation> participations,
+        INoTimingSocketContext? socketContext
+    )
     {
         _participations = participations;
         _socketContext = socketContext;

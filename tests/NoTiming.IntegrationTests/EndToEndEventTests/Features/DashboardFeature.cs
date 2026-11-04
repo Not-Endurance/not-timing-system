@@ -7,9 +7,9 @@ using NoTiming.Domain.Core.Aggregates.Participations;
 using NoTiming.Domain.Core.Aggregates.Participations.Objects;
 using NoTiming.Domain.Enums;
 using NoTiming.Domain.Objects;
-using NoTiming.Judge.Contracts.Features.Core.Dashboard;
 using NoTiming.IntegrationTests.Drivers;
 using NoTiming.IntegrationTests.EndToEndEventTests.Helpers;
+using NoTiming.Judge.Contracts.Features.Core.Dashboard;
 using UiSnapshotService = NoTiming.Ui.Contracts.Features.Snapshots.ISnapshotService;
 
 namespace NoTiming.IntegrationTests.EndToEndEventTests.Features;
@@ -28,12 +28,7 @@ internal sealed class DashboardFeature
     int _innerWaveNumber;
     int _outerWaveNumber;
 
-    public DashboardFeature(
-        JudgeDriver judge,
-        UiDriver ui,
-        NoTimingApiDriver api,
-        EventInformation eventInformation
-    )
+    public DashboardFeature(JudgeDriver judge, UiDriver ui, NoTimingApiDriver api, EventInformation eventInformation)
     {
         _judge = judge;
         _ui = ui;

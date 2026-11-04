@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NC.Application.Authentication.User;
-using NoTiming.Api.Base;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Mongo.Repositories;
 using NoTiming.Api.Application.Telemetry;
+using NoTiming.Api.Base;
 using NoTiming.Ui.Contracts.API;
 
 namespace NoTiming.Api.Controllers;

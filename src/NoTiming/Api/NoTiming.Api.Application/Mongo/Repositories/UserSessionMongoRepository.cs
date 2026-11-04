@@ -2,10 +2,10 @@ using MongoDB.Driver;
 using NC.Application.Authentication.Abstractions;
 using NC.Injection;
 using NC.Storage.Mongo;
+using NoTiming.Api.Application.Telemetry;
 using NoTiming.Application.Contracts.Watcher;
 using NoTiming.Application.Contracts.Watcher.Models;
 using NoTiming.Application.UserSession;
-using NoTiming.Api.Application.Telemetry;
 
 namespace NoTiming.Api.Application.Mongo.Repositories;
 

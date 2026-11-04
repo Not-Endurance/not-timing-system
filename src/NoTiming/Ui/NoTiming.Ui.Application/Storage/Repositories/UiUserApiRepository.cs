@@ -3,8 +3,8 @@ using NC.Application.Authentication.User;
 using NC.Application.HTTP;
 using NC.Notify;
 using NC.Structures;
-using NoTiming.Ui.Contracts.API;
 using NoTiming.Ui.Application.Features.Profile;
+using NoTiming.Ui.Contracts.API;
 
 namespace NoTiming.Ui.Application.Storage.Repositories;
 

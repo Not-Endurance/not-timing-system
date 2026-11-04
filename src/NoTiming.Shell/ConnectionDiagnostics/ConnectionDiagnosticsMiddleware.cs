@@ -1,5 +1,4 @@
 using System.Diagnostics;
-
 using NoTiming.EventBus.ConnectionDiagnostics;
 
 namespace NoTiming.ConnectionDiagnostics;

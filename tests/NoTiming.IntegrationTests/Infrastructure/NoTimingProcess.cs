@@ -115,6 +115,8 @@ internal sealed class NoTimingProcess : IAsyncDisposable
             await Task.Delay(250, timeout.Token);
         }
 
-        throw new TimeoutException($"NoTiming did not become healthy at {BaseUrl}.{Environment.NewLine}{_output.Dump()}");
+        throw new TimeoutException(
+            $"NoTiming did not become healthy at {BaseUrl}.{Environment.NewLine}{_output.Dump()}"
+        );
     }
 }

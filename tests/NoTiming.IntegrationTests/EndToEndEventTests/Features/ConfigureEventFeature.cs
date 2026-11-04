@@ -1,8 +1,11 @@
-using Newtonsoft.Json;
 using NC.Krud.Abstractions;
+using Newtonsoft.Json;
 using NoTiming.Application.Contracts.Setup.Models;
 using NoTiming.Domain.Setup.Aggregates;
 using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
+using NoTiming.IntegrationTests.Drivers;
+using NoTiming.IntegrationTests.EndToEndEventTests.Helpers;
+using NoTiming.IntegrationTests.Infrastructure;
 using NoTiming.Judge.Contracts.Features.Setup.Athletes;
 using NoTiming.Judge.Contracts.Features.Setup.Clubs;
 using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents;
@@ -14,9 +17,6 @@ using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Operators;
 using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
 using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
 using NoTiming.Judge.Contracts.Features.Setup.Horses;
-using NoTiming.IntegrationTests.Drivers;
-using NoTiming.IntegrationTests.EndToEndEventTests.Helpers;
-using NoTiming.IntegrationTests.Infrastructure;
 
 namespace NoTiming.IntegrationTests.EndToEndEventTests.Features;
 

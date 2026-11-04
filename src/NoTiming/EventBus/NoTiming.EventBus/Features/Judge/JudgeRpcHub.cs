@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
+using NoTiming.Api.Application.Features.Ui.PendingSnapshots;
 using NoTiming.Domain.Core.Objects.Payloads;
 using NoTiming.EventBus.Abstractions;
 using NoTiming.EventBus.ConnectionDiagnostics;
@@ -7,7 +8,6 @@ using NoTiming.EventBus.Contracts;
 using NoTiming.EventBus.Contracts.Features.Judge.Procedures;
 using NoTiming.EventBus.Contracts.Features.Ui.Procedures;
 using NoTiming.EventBus.Features.Witness;
-using NoTiming.Api.Application.Features.Ui.PendingSnapshots;
 
 namespace NoTiming.EventBus.Features.Judge;
 

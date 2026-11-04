@@ -14,11 +14,11 @@ using NoTiming.Application.Contracts.Socket;
 using NoTiming.Application.Contracts.Watcher.Models;
 using NoTiming.Domain.Core.Aggregates;
 using NoTiming.Domain.Watcher;
-using NoTiming.Storage;
 using NoTiming.IntegrationTests.Infrastructure;
+using NoTiming.Storage;
 using NoTiming.Ui.Application;
-using NoTiming.Ui.Contracts.Features.Access;
 using NoTiming.Ui.Application.Features.Core.Dashboard;
+using NoTiming.Ui.Contracts.Features.Access;
 
 namespace NoTiming.IntegrationTests.Drivers;
 
@@ -47,7 +47,11 @@ internal sealed class UiDriver : IAsyncDisposable
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
         services.ConfigureNoTimingStorage(configuration).AddRestApiStorage();
-        services.AddNoTimingUiApplication(configuration, noTimingBaseUrl.ToString().TrimEnd('/'), typeof(NoTimingUiApplicationServices).Assembly);
+        services.AddNoTimingUiApplication(
+            configuration,
+            noTimingBaseUrl.ToString().TrimEnd('/'),
+            typeof(NoTimingUiApplicationServices).Assembly
+        );
         services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, IntegrationRpcAccessTokenProvider>());
         services.AddScoped<AuthenticationStateProvider>(_ => new IntegrationAuthenticationStateProvider(user));
 
@@ -81,9 +85,7 @@ internal sealed class UiDriver : IAsyncDisposable
         await _socketService.Connect(eventInformation);
         if (!_socketService.IsConnected)
         {
-            throw new InvalidOperationException(
-                $"Ui '{_clientName}' did not connect to event {eventInformation.Id}."
-            );
+            throw new InvalidOperationException($"Ui '{_clientName}' did not connect to event {eventInformation.Id}.");
         }
     }
 
@@ -137,5 +139,4 @@ internal sealed class UiDriver : IAsyncDisposable
             uiRpcClient.RunAtStartup();
         }
     }
-
 }

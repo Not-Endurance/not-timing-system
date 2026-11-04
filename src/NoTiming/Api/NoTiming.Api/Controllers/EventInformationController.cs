@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NC.Application.CRUD.Ports;
-using NoTiming.Application.Contracts.Core;
-using NoTiming.Application.Contracts.Core.Models;
-using NoTiming.Api.Base;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Telemetry;
+using NoTiming.Api.Base;
+using NoTiming.Application.Contracts.Core;
+using NoTiming.Application.Contracts.Core.Models;
 
 namespace NoTiming.Api.Application.Event;
 

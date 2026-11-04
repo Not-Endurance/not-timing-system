@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using NC.Application.Configurations;
 using NC.Application.Environments;
-using NoTiming.Ui.Application;
 using NoTiming.Ui;
+using NoTiming.Ui.Application;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 

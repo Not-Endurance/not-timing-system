@@ -13,11 +13,11 @@ using NoTiming.Domain.Core.Objects.Presentlists;
 using NoTiming.Domain.Enums;
 using NoTiming.Domain.Objects;
 using NoTiming.Domain.Watcher;
+using NoTiming.IntegrationTests.Drivers;
+using NoTiming.IntegrationTests.Infrastructure;
 using NoTiming.Judge.Contracts.Features.Core.Dashboard;
 using NoTiming.Judge.Contracts.Features.Core.Handouts;
 using NoTiming.Shared.Localization;
-using NoTiming.IntegrationTests.Drivers;
-using NoTiming.IntegrationTests.Infrastructure;
 using NoTiming.Ui.Contracts.API;
 using NoTiming.Ui.Contracts.Features.Access;
 using NoTiming.Ui.Contracts.Features.Performance;
@@ -92,11 +92,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         );
 
         await using var judge = new JudgeDriver(_fixture.NoTimingBaseUrl);
-        await using var officialUi = new UiDriver(
-            _fixture.NoTimingBaseUrl,
-            OFFICIAL_USER,
-            "IntegrationOfficialUi"
-        );
+        await using var officialUi = new UiDriver(_fixture.NoTimingBaseUrl, OFFICIAL_USER, "IntegrationOfficialUi");
         await using var participantUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             PARTICIPANT_USER,
@@ -348,11 +344,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
 
         await ui.Disconnect();
 
-        await using var restoredUi = new UiDriver(
-            _fixture.NoTimingBaseUrl,
-            OFFICIAL_USER,
-            "SnapshotSessionRestoredUi"
-        );
+        await using var restoredUi = new UiDriver(_fixture.NoTimingBaseUrl, OFFICIAL_USER, "SnapshotSessionRestoredUi");
 
         await restoredUi.Start();
         await restoredUi.Connect(eventInformation);
@@ -436,11 +428,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6601));
 
         await using var judge = new JudgeDriver(_fixture.NoTimingBaseUrl);
-        await using var officialUi = new UiDriver(
-            _fixture.NoTimingBaseUrl,
-            OFFICIAL_USER,
-            "PresentlistOfficialUi"
-        );
+        await using var officialUi = new UiDriver(_fixture.NoTimingBaseUrl, OFFICIAL_USER, "PresentlistOfficialUi");
         await using var participantUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             PARTICIPANT_USER,
@@ -624,11 +612,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         Assert.Equal(OfficialRole.Steward, activeOperators[0].Role);
         Assert.Single(activeRankings);
 
-        await using var operatorUi = new UiDriver(
-            _fixture.NoTimingBaseUrl,
-            operatorIdentity,
-            "IntegrationOperatorUi"
-        );
+        await using var operatorUi = new UiDriver(_fixture.NoTimingBaseUrl, operatorIdentity, "IntegrationOperatorUi");
         await using var eligibleOfficialUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
             eligibleOfficialIdentity,
@@ -662,9 +646,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
 
         await operatorUi.Publish(CreateSnapshotGroup());
         await eligibleOfficialUi.Publish(CreateSnapshotGroup());
-        var denied = await Assert.ThrowsAnyAsync<Exception>(
-            () => ineligibleOfficialUi.Publish(CreateSnapshotGroup())
-        );
+        var denied = await Assert.ThrowsAnyAsync<Exception>(() => ineligibleOfficialUi.Publish(CreateSnapshotGroup()));
         Assert.Contains("Only authorized event staff", denied.Message);
     }
 
@@ -684,11 +666,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
             "Rosa Display"
         );
         using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
-        await using var ui = new UiDriver(
-            _fixture.NoTimingBaseUrl,
-            registeringUser,
-            "IntegrationRegisteringUi"
-        );
+        await using var ui = new UiDriver(_fixture.NoTimingBaseUrl, registeringUser, "IntegrationRegisteringUi");
         var resolver = ui.GetRequiredService<NUserResolver>();
         var principal = CreatePrincipal(registeringUser);
         var profile = new NUserRegistrationProfile(
@@ -995,9 +973,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
             await Task.Delay(100);
         }
 
-        throw new TimeoutException(
-            $"Ui user session did not {expectedState}. {FormatUserSessionState(last?.State)}"
-        );
+        throw new TimeoutException($"Ui user session did not {expectedState}. {FormatUserSessionState(last?.State)}");
     }
 
     static string FormatUserSessionState(NoTimingUserSessionStateModel? state)
