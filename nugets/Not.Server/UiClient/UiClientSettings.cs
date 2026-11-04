@@ -12,4 +12,5 @@ public class UiClientSettings
     public string[] ReservedPathPrefixes { get; set; } = [];
 
     // Headers added to every response for the client, excluding reserved paths.
-    public Dictionary<string, string> ResponseHeaders { get; set; } = new();}
+    public Dictionary<string, string> ResponseHeaders { get; set; } = new();
+}
