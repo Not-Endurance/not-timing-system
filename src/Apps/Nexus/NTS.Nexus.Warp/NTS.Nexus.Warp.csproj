@@ -22,5 +22,22 @@
 
   <ItemGroup>
   </ItemGroup>
-  
+
+  <!--
+    Local Debug runs: publish the Witness UI to obj/witness-ui/wwwroot. It is deliberately not copied into this
+    project's wwwroot, because static web asset discovery then fails on duplicate Razor library assets.
+    Development launch settings point WITNESS_UI_PATH at that folder.
+  -->
+  <PropertyGroup>
+    <WitnessUiPublishDir>$(BaseIntermediateOutputPath)witness-ui/</WitnessUiPublishDir>
+  </PropertyGroup>
+
+  <Target Name="PublishWitnessUiForLocalRun" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    <MSBuild
+      Projects="$(MSBuildProjectDirectory)/../../Witness/NTS.Witness.Web/NTS.Witness.Web.csproj"
+      Targets="Publish"
+      Properties="Configuration=Debug;PublishDir=$(MSBuildProjectDirectory)/$(WitnessUiPublishDir);BlazorEnableCompression=false"
+    />
+  </Target>
+
 </Project>

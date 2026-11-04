@@ -6,12 +6,12 @@ using Not.Serialization.JSON;
 using Not.Server.Authentication;
 using Not.Storage;
 using NTS.Application;
-using NTS.Application.Cors;
 using NTS.Application.Mongo;
 using NTS.Nexus.Warp.Api.Errors;
 using NTS.Nexus.Warp.Api.Mongo.Repositories;
 using NTS.Nexus.Warp.Api.Telemetry;
 using NTS.Nexus.Warp.Features.Witness.Authorization;
+using NTS.Nexus.Warp.Host.Cors;
 using NTS.Nexus.Warp.Middlewares;
 
 namespace NTS.Nexus.Warp;
@@ -60,10 +60,12 @@ internal static class NtsWarpServices
 
     static void AddPendingSnapshotsMongoStorage(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING");
+        var connectionString = configuration["MONGO_CONNECTION_STRING"];
         if (string.IsNullOrWhiteSpace(connectionString))
         {
-            throw new ApplicationException("MongoDB connection string is null");
+            throw new ApplicationException(
+                "MongoDB connection string is missing. Set MONGO_CONNECTION_STRING in configuration or user secrets."
+            );
         }
 
         var builder = new NStorageBuilder(services, configuration);

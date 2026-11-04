@@ -1,0 +1,29 @@
+name: Unit tests
+
+on:
+  workflow_call:
+
+env:
+  DOTNET_CORE_VERSION: 10.0.x
+  CONFIGURATION: Release
+
+jobs:
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+
+      - name: Run unit tests
+        run: |
+          dotnet test nugets/Not.Tests/Not.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
+          dotnet test tests/NTS.Application.Tests/NTS.Application.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
+          dotnet test tests/NTS.Domain.Core.Tests/NTS.Domain.Core.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
+          dotnet test tests/NTS.Domain.Setup.Tests/NTS.Domain.Setup.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
+          dotnet test tests/NTS.Nexus.Warp.Tests/NTS.Nexus.Warp.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m

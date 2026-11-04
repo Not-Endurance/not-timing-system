@@ -1,4 +1,3 @@
-﻿using JsonNet.PrivatePropertySetterResolver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

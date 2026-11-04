@@ -1,12 +1,15 @@
 using System.Security.Claims;
 using Microsoft.Extensions.Localization;
+using Not.Application.Configurations;
+using Not.Application.Environments;
 using Not.Localization;
 using Not.Startup;
 using NTS.Application.Contracts;
-using NTS.Application.Cors;
 using NTS.Nexus.Warp.ConnectionDiagnostics;
 using NTS.Nexus.Warp.Features.Judge;
 using NTS.Nexus.Warp.Features.Witness;
+using NTS.Nexus.Warp.Host;
+using NTS.Nexus.Warp.Host.Cors;
 
 namespace NTS.Nexus.Warp;
 
@@ -15,6 +18,12 @@ public static class Warp
     public static WebApplicationBuilder CreateBuilder(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        // Local runs read per-environment secrets (for example the Mongo connection string) from user secrets.
+        if (EnvironmentHelper.IsLocalhost())
+        {
+            builder.Configuration.AddSecrets($"nts-warp-{EnvironmentHelper.GetEnvironment()}");
+        }
 
         builder.Services.ConfigureNtsWarp(builder.Configuration);
 
@@ -27,8 +36,8 @@ public static class Warp
         var environment =
             Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? app.Environment.EnvironmentName;
 
-        var judgeHubPath = new PathString($"/{ApplicationConstants.JUDGE_HUB}");
-        var witnessHubPath = new PathString($"/{ApplicationConstants.WITNESS_HUB}");
+        var judgeHubPath = new PathString($"/{ApplicationConstants.EventBusHub(ApplicationConstants.JUDGE_HUB)}");
+        var witnessHubPath = new PathString($"/{ApplicationConstants.EventBusHub(ApplicationConstants.WITNESS_HUB)}");
         var originValidator = app.Services.GetRequiredService<ICorsOriginValidator>();
 
         app.Urls.Add($"http://*:{port}");
@@ -56,7 +65,11 @@ public static class Warp
                 if (isHubWebSocketRequest)
                 {
                     var origin = context.Request.Headers.Origin.ToString();
-                    if (!string.IsNullOrWhiteSpace(origin) && !originValidator.IsAllowed(origin))
+                    if (
+                        !string.IsNullOrWhiteSpace(origin)
+                        && !originValidator.IsAllowed(origin)
+                        && !CorsOriginMatcher.IsSameHost(origin, context.Request.Host.Host)
+                    )
                     {
                         logger.LogWarning(
                             "Warp rejected WebSocket request for {Path} because origin {Origin} is not allowed. CorrelationId {CorrelationId}, Client {ClientName}, Version {ClientVersion}, InstanceId {InstanceId}.",
@@ -75,6 +88,8 @@ public static class Warp
                 await next();
             }
         );
+
+        app.UseWitnessUi();
 
         app.UseCors(NtsWarpServices.CORS_POLICY_NAME);
         app.UseAuthentication();
@@ -112,8 +127,10 @@ public static class Warp
                     }
                 )
         );
-        app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
-        app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
+        app.MapHub<JudgeRpcHub>(ApplicationConstants.EventBusHub(ApplicationConstants.JUDGE_HUB))
+            .RequireCors(NtsWarpServices.CORS_POLICY_NAME);
+        app.MapHub<WitnessRpcHub>(ApplicationConstants.EventBusHub(ApplicationConstants.WITNESS_HUB))
+            .RequireCors(NtsWarpServices.CORS_POLICY_NAME);
         app.MapControllers();
 
         LocalizationHelper.Configure(app.Services.GetRequiredService<IStringLocalizer>());

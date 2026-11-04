@@ -8,9 +8,8 @@
 - docker commands which would modify containers, volumes, images or similar
 2. Always dotnet `build`, `restore` with silent output `-v:q` unless instructed otherwise. Don't modify worklfows to use queit mode. This applies only for localhost verification
 3. Run dotnet `test` with minimal output `-v:m`.
-5. Changes and features should be represented in the Integration tests if reasonably possible.
-6. Domain logic is unit tested in the test project that mirrors its source project (for example NTS.Domain.Core.Tests and NTS.Domain.Setup.Tests). See Testing below.
-7. Don't concern yourself with code formatting. CSharpier formats code via CI, so don't run or check formatting locally.
+4. Domain logic is unit tested in the test project that mirrors its source project (for example NTS.Domain.Core.Tests and NTS.Domain.Setup.Tests). See Testing below.
+5. Don't concern yourself with code formatting. CSharpier formats code via CI, so don't run or check formatting locally.
 
 ## Verification
 - After individual atomic changes build and run the unit test project that mirrors the changed source project, for example `dotnet build tests/NoTiming.Tests.sln -v:q` followed by `dotnet test tests/NTS.Domain.Core.Tests/NTS.Domain.Core.Tests.csproj -v:m`.

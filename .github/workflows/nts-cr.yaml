@@ -125,3 +125,8 @@ jobs:
 
     - name: Build
       run: dotnet build ${{ env.SOURCE_DIR }}/${{ env.BUILD_SOLUTION_FILE }} -c ${{ env.CONFIGURATION }} --no-restore
+
+  pr-checks-unit-tests:
+    if: github.event.pull_request.draft == false
+    name: Unit tests
+    uses: ./.github/workflows/nts-unit-tests.yaml

@@ -9,14 +9,18 @@ on:
 env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 10.0.x
-  APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
-  OUTPUT_LOCATION: wwwroot
+  WITNESS_APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
+  WITNESS_PUBLISH_PATH: NTS.Witness.Web/publish
   SOURCE_PATH: src/Apps/Nexus/NTS.Nexus.Warp
   ARTIFACT_PATH: NTS.Nexus.Warp/publish
   AZURE_RESOURCE: nts-nexus-warp-dev
 
 jobs:
+  unit-tests:
+    uses: ./.github/workflows/nts-unit-tests.yaml
+
   deploy-message-bus:
+    needs: unit-tests
     runs-on: ubuntu-latest
     name: Staging - MessageBus
     steps:
@@ -44,50 +48,20 @@ jobs:
         --no-build \
         --output ${{ env.ARTIFACT_PATH }}
 
+    - name: Publish Witness UI
+      run: |
+        dotnet publish ${{ env.WITNESS_APP_LOCATION }} \
+        --configuration ${{ env.CONFIGURATION }} \
+        --output ${{ env.WITNESS_PUBLISH_PATH }}
+
+    - name: Add Witness UI to Warp package
+      run: |
+        mkdir -p "${{ env.ARTIFACT_PATH }}/wwwroot"
+        cp -r "${{ env.WITNESS_PUBLISH_PATH }}/wwwroot/." "${{ env.ARTIFACT_PATH }}/wwwroot/"
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
       with:
         app-name: ${{ env.AZURE_RESOURCE }}
         publish-profile: ${{ secrets.AZURE_NTS_NEXUS_WARP_DEV_PUBLISH_PROFILE }}
         package: ${{ env.ARTIFACT_PATH }}
-
-  deploy-client:
-    needs: deploy-message-bus
-    runs-on: ubuntu-latest
-    name: Staging - Client
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: true
-          lfs: false
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-
-      - name: Configure Witness Environment
-        shell: pwsh
-        env:
-          WITNESS_ENVIRONMENT: Staging
-        run: |
-          $configPath = Join-Path $env:GITHUB_WORKSPACE "${{ env.APP_LOCATION }}/wwwroot/staticwebapp.config.json"
-          $config = Get-Content -Raw -Path $configPath | ConvertFrom-Json
-
-          if ($null -eq $config.globalHeaders) {
-            $config | Add-Member -MemberType NoteProperty -Name globalHeaders -Value ([pscustomobject]@{})
-          }
-
-          $config.globalHeaders | Add-Member -MemberType NoteProperty -Name "Blazor-Environment" -Value $env:WITNESS_ENVIRONMENT -Force
-          $config | ConvertTo-Json -Depth 10 | Set-Content -Path $configPath
-
-      - name: Build And Deploy
-        id: builddeploy
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          action: "upload"
-          production_branch: develop
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_LIVELY_ROCK_07E20CD03 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
-          app_location: ${{ env.APP_LOCATION }}
-          output_location: ${{ env.OUTPUT_LOCATION }}

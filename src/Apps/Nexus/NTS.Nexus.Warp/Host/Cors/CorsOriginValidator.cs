@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace NTS.Application.Cors;
+namespace NTS.Nexus.Warp.Host.Cors;
 
 public sealed class CorsOriginValidator : ICorsOriginValidator
 {
