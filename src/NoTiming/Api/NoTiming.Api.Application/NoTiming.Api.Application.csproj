@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\nugets\NC.Server\NC.Server.csproj" />
+    <ProjectReference Include="..\..\..\..\nugets\NC.Storage\NC.Storage.csproj" />
+    <ProjectReference Include="..\..\..\Shared\NoTiming.Application\NoTiming.Application.csproj" />
+    <ProjectReference Include="..\..\..\Shared\NoTiming.Application.Contracts\NoTiming.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\Ui\NoTiming.Ui.Contracts\NoTiming.Ui.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

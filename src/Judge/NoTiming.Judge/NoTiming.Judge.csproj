@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NoTiming.Judge.Contracts\NoTiming.Judge.Contracts.csproj" />
+    <ProjectReference Include="..\..\Shared\NoTiming.Application\NoTiming.Application.csproj" />
+    <ProjectReference Include="..\..\NoTiming\EventBus\NoTiming.EventBus.Contracts\NoTiming.EventBus.Contracts.csproj" />
+  </ItemGroup>
+  
+</Project>

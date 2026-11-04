@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AddRazorSupportForMvc>false</AddRazorSupportForMvc>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\nugets\NC.Krud\NC.Krud.csproj" />
+    <ProjectReference Include="..\NoTiming.Application.Contracts\NoTiming.Application.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

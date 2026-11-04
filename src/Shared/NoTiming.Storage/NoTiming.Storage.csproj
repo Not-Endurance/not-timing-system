@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\nugets\NC.Storage\NC.Storage.csproj" />
+    <ProjectReference Include="..\NoTiming.Application\NoTiming.Application.csproj" />
+  </ItemGroup>
+
+</Project>

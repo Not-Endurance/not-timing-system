@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>NoTiming.Shell</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\nugets\NC.Server\NC.Server.csproj" />
+    <ProjectReference Include="..\Shared\NoTiming.Application\NoTiming.Application.csproj" />
+    <ProjectReference Include="..\NoTiming\Api\NoTiming.Api\NoTiming.Api.csproj" />
+    <ProjectReference Include="..\NoTiming\Api\NoTiming.Api.Application\NoTiming.Api.Application.csproj" />
+    <ProjectReference Include="..\NoTiming\EventBus\NoTiming.EventBus\NoTiming.EventBus.csproj" />
+  </ItemGroup>
+
+  <!--
+    Local Debug runs: publish the Ui to obj/ui/wwwroot. It is deliberately not copied into this
+    project's wwwroot, because static web asset discovery then fails on duplicate Razor library assets.
+    Development launch settings point WITNESS_UI_PATH at that folder.
+  -->
+  <PropertyGroup>
+    <UiPublishDir>$(BaseIntermediateOutputPath)ui/</UiPublishDir>
+  </PropertyGroup>
+
+  <Target Name="PublishUiForLocalRun" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    <MSBuild
+      Projects="$(MSBuildProjectDirectory)/../NoTiming/Ui/NoTiming.Ui/NoTiming.Ui.csproj"
+      Targets="Publish"
+      Properties="Configuration=Debug;PublishDir=$(MSBuildProjectDirectory)/$(UiPublishDir);BlazorEnableCompression=false"
+    />
+  </Target>
+
+</Project>

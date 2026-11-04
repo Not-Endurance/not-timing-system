@@ -9,15 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\nugets\Not\Not.csproj" />
-    <ProjectReference Include="..\..\nugets\Not.Blazor\Not.Blazor.csproj" />
-    <ProjectReference Include="..\..\nugets\Not.Krud\Not.Krud.csproj" />
-    <ProjectReference Include="..\..\src\Apps\Judge\NTS.Judge\NTS.Judge.csproj" />
-    <ProjectReference Include="..\..\src\Apps\NoTiming\NoTiming.csproj" />
-    <ProjectReference Include="..\..\src\Apps\EventBus\NoTiming.EventBus.Contracts\NoTiming.EventBus.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\Apps\Ui\NoTiming.Ui.Application\NoTiming.Ui.Application.csproj" />
-    <ProjectReference Include="..\..\src\Shared\NTS.Blazor\NTS.Blazor.csproj" />
-    <ProjectReference Include="..\..\src\Shared\NTS.Storage\NTS.Storage.csproj" />
+    <ProjectReference Include="..\..\nugets\NC.Shared\NC.Shared.csproj" />
+    <ProjectReference Include="..\..\nugets\NC.Blazor\NC.Blazor.csproj" />
+    <ProjectReference Include="..\..\nugets\NC.Krud\NC.Krud.csproj" />
+    <ProjectReference Include="..\..\src\Judge\NoTiming.Judge\NoTiming.Judge.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming.Shell\NoTiming.Shell.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming\EventBus\NoTiming.EventBus.Contracts\NoTiming.EventBus.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming\Ui\NoTiming.Ui.Application\NoTiming.Ui.Application.csproj" />
+    <ProjectReference Include="..\..\src\Shared\NoTiming.Blazor\NoTiming.Blazor.csproj" />
+    <ProjectReference Include="..\..\src\Shared\NoTiming.Storage\NoTiming.Storage.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -7,50 +7,50 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Judge", "Judge", "{24307454
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Not", "Not", "{33F6935E-EA68-4CC6-849F-5E42DAABD6DA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not", "..\nugets\Not\Not.csproj", "{70C49361-E118-4335-A90A-3A93493B636C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not", "..\nugets\NC.Shared\NC.Shared.csproj", "{70C49361-E118-4335-A90A-3A93493B636C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Application", "..\nugets\Not.Application\Not.Application.csproj", "{AF0919D9-9E6D-431C-A141-2EDB3EA9465F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Application", "..\nugets\NC.Application\NC.Application.csproj", "{AF0919D9-9E6D-431C-A141-2EDB3EA9465F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Domain", "..\nugets\Not.Domain\Not.Domain.csproj", "{E39FC7C6-6780-4B39-9850-032C8A139331}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Domain", "..\nugets\NC.Domain\NC.Domain.csproj", "{E39FC7C6-6780-4B39-9850-032C8A139331}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Storage", "..\nugets\Not.Storage\Not.Storage.csproj", "{D2A8807F-2DBE-4A10-996F-93F23614C61B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Storage", "..\nugets\NC.Storage\NC.Storage.csproj", "{D2A8807F-2DBE-4A10-996F-93F23614C61B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge", "..\src\Apps\Judge\NTS.Judge\NTS.Judge.csproj", "{30FD99FC-3E59-48D1-9D44-89CC4311E3E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge", "..\src\Judge\NoTiming.Judge\NoTiming.Judge.csproj", "{30FD99FC-3E59-48D1-9D44-89CC4311E3E7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge.Blazor", "..\src\Apps\Judge\NTS.Judge.Blazor\NTS.Judge.Blazor.csproj", "{8455C13B-E838-4025-8083-4935C086462C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge.Blazor", "..\src\Judge\NoTiming.Judge.Blazor\NoTiming.Judge.Blazor.csproj", "{8455C13B-E838-4025-8083-4935C086462C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Blazor", "..\nugets\Not.Blazor\Not.Blazor.csproj", "{2BE584A5-AA80-43E1-AF8F-E3204AD0BA88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Blazor", "..\nugets\NC.Blazor\NC.Blazor.csproj", "{2BE584A5-AA80-43E1-AF8F-E3204AD0BA88}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Storage", "..\src\Shared\NTS.Storage\NTS.Storage.csproj", "{ED7F43B0-EBB5-4A5E-B1C9-E97AD3FB1F28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Storage", "..\src\Shared\NoTiming.Storage\NoTiming.Storage.csproj", "{ED7F43B0-EBB5-4A5E-B1C9-E97AD3FB1F28}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Domain.Setup", "..\src\Domain\NTS.Domain.Setup\NTS.Domain.Setup.csproj", "{CE507ACD-4ACC-4022-A675-D94DBB8089BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Domain.Setup", "..\src\Domain\NoTiming.Domain.Setup\NoTiming.Domain.Setup.csproj", "{CE507ACD-4ACC-4022-A675-D94DBB8089BB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Domain", "..\src\Domain\NTS.Domain\NTS.Domain.csproj", "{A641F6F5-8B99-4E00-B36D-95AD0509037C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Domain", "..\src\Domain\NoTiming.Domain\NoTiming.Domain.csproj", "{A641F6F5-8B99-4E00-B36D-95AD0509037C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RPC", "RPC", "{64D80DF7-A0E2-432B-B360-ADBAC6952CB2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Application", "..\src\Shared\NTS.Application\NTS.Application.csproj", "{D54B62EF-80FD-4C24-A0D0-FDE85200DAF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Application", "..\src\Shared\NoTiming.Application\NoTiming.Application.csproj", "{D54B62EF-80FD-4C24-A0D0-FDE85200DAF2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_confg", "_confg", "{6AAA82B5-6008-4CE4-94F1-D5BE91B3E593}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Tests", "..\nugets\Not.Tests\Not.Tests.csproj", "{46969AA7-60B3-4664-99B8-42CA1942CC1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Tests", "..\nugets\NC.Tests\NC.Tests.csproj", "{46969AA7-60B3-4664-99B8-42CA1942CC1C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.IntegrationTests", "NoTiming.IntegrationTests\NoTiming.IntegrationTests.csproj", "{8D93EDAD-85B3-4F75-9B46-8AF33DA9D39D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Application.Tests", "NTS.Application.Tests\NTS.Application.Tests.csproj", "{C39EE349-9AC0-4D96-B586-8E6D76C594F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Application.Tests", "NoTiming.Application.Tests\NoTiming.Application.Tests.csproj", "{C39EE349-9AC0-4D96-B586-8E6D76C594F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Domain.Core.Tests", "NTS.Domain.Core.Tests\NTS.Domain.Core.Tests.csproj", "{B17044F8-4C59-4630-A8AA-37C881159C41}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Domain.Core.Tests", "NoTiming.Domain.Core.Tests\NoTiming.Domain.Core.Tests.csproj", "{B17044F8-4C59-4630-A8AA-37C881159C41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Domain.Core", "..\src\Domain\NTS.Domain.Core\NTS.Domain.Core.csproj", "{CE87EFA5-42FA-4693-AFCB-9CE7AD09AA0C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Domain.Core", "..\src\Domain\NoTiming.Domain.Core\NoTiming.Domain.Core.csproj", "{CE87EFA5-42FA-4693-AFCB-9CE7AD09AA0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Domain.Watcher", "..\src\Domain\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj", "{D02A2C81-6C9E-4E46-A01F-BD098E13E205}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Domain.Watcher", "..\src\Domain\NoTiming.Domain.Watcher\NoTiming.Domain.Watcher.csproj", "{D02A2C81-6C9E-4E46-A01F-BD098E13E205}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Domain.Setup.Tests", "NTS.Domain.Setup.Tests\NTS.Domain.Setup.Tests.csproj", "{7CB37228-C01B-4256-8C63-F0C36D87F580}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Domain.Setup.Tests", "NoTiming.Domain.Setup.Tests\NoTiming.Domain.Setup.Tests.csproj", "{7CB37228-C01B-4256-8C63-F0C36D87F580}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.Tests", "NoTiming.Tests\NoTiming.Tests.csproj", "{EFDD016B-BE3A-44A8-B59D-5D981EA63429}"
 EndProject
