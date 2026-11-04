@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NoTiming.Api.Application\NoTiming.Api.Application.csproj" />
+    <ProjectReference Include="..\..\..\Shared\NTS.Application.Contracts\NTS.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\Ui\NoTiming.Ui.Contracts\NoTiming.Ui.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.4.1" />
+  </ItemGroup>
+
+</Project>

@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\NoTiming\NoTiming.csproj" />
+    <ProjectReference Include="..\..\src\Apps\NoTiming\NoTiming.csproj" />
   </ItemGroup>
 
   <ItemGroup>
