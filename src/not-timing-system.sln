@@ -75,7 +75,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.Application.Contra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.Blazor", "Shared\NoTiming.Blazor\NoTiming.Blazor.csproj", "{1A38E13C-C606-92EE-4569-34D024EC193B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NC.Shared", "..\nugets\NC.Shared\NC.Shared.csproj", "{96E39A08-5E56-086B-C077-7D8243EF25E4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NC", "..\nugets\NC\NC.csproj", "{96E39A08-5E56-086B-C077-7D8243EF25E4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NC.Blazor", "..\nugets\NC.Blazor\NC.Blazor.csproj", "{EF80A34F-09B0-D039-1C37-87DC0C239675}"
 EndProject

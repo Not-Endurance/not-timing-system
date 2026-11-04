@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\nugets\NC.Shared\NC.Shared.csproj" />
+    <ProjectReference Include="..\..\..\nugets\NC\NC.csproj" />
   </ItemGroup>
 
   <ItemGroup>

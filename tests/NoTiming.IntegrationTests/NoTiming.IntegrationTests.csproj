@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\nugets\NC.Shared\NC.Shared.csproj" />
+    <ProjectReference Include="..\..\nugets\NC\NC.csproj" />
     <ProjectReference Include="..\..\nugets\NC.Blazor\NC.Blazor.csproj" />
     <ProjectReference Include="..\..\nugets\NC.Krud\NC.Krud.csproj" />
     <ProjectReference Include="..\..\src\Judge\NoTiming.Judge\NoTiming.Judge.csproj" />

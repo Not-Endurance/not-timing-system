@@ -110,6 +110,7 @@ public static class InjectionServiceCollectionExtensions
             .Where(x =>
                 x.FullName!.StartsWith(ntsPrefix, StringComparison.InvariantCulture)
                 || x.FullName!.StartsWith(NC_PREFIX, StringComparison.InvariantCulture)
+                || x.FullName!.StartsWith("NC,", StringComparison.InvariantCulture)
                 || x.FullName!.StartsWith("NoTiming.", StringComparison.InvariantCulture)
             ) // TODO: remove
             .ToList();
