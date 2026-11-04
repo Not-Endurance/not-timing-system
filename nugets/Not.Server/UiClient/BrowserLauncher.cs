@@ -12,7 +12,8 @@ internal static class BrowserLauncher
 {
     public static void Open(WebApplication app, ILogger logger)
     {
-        var addresses = app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>()?.Addresses
+        var addresses =
+            app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>()?.Addresses
             ?? Array.Empty<string>();
         var url = BrowserAddress.From(addresses);
         if (url is null)
