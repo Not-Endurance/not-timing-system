@@ -23,11 +23,11 @@ Notes:
 # NTS* projects
 NTS stands for *No Timing System*, the Brand of the current product - a cheap alternative to full-fledged Endurance timing systems.
 - Domain Model - hardcode business logic and validation is contained within the `NTS.Domain.*` namespace, which holds the domain model. It has to be as pure as reasonably possible. Some "pollution" is acceptable - like coupling with `MediatR.INotification` or `Not.Krud` framework, however there are no references to repositories or other infrastructure.
-- Secondary business logic - contained in `NTS.Application`, `NTS.Judge`, `NTS.Witness` or the so-called applicaiton level. It handles interactions between domain boundaries and infrastructure. The key component here and entry point should be the Service. Services should be suffixed with `*Service` and usually implement multiple segregated interfaces (conforms to Interface segregation principle)
+- Secondary business logic - contained in `NTS.Application`, `NTS.Judge`, the **Ui** application or the so-called applicaiton level. It handles interactions between domain boundaries and infrastructure. The key component here and entry point should be the Service. Services should be suffixed with `*Service` and usually implement multiple segregated interfaces (conforms to Interface segregation principle)
 - Storage - contains operations related to storing something. All of the storage should be conform to the `IRepository<T>` abstraction.
 - Blazor - the layout is composed of a Header, Drawer and Main content. Components that are navigated to via Router should be suffixed with `*Content.razor`.
 - Service registration - services in NTS projects should be registed to the container via the `ITransient`, `IScoped` and `ISingleton` marker interfaces. Those interfaces shouldn't be inherited by other interfaces, but implemented by the classes implementing those interfaces. Services should not be registered manually
-- *Exceptions*: `NTS.Application` - we need to keep service registraiton manual for NTS.Application as it's also being used by NTS.Warp application in order to share RPC contracts. 
+- *Exceptions*: `NTS.Application` - we need to keep service registraiton manual for NTS.Application as it's also being used by the **NoTiming** shell in order to share RPC contracts. 
 
 ## Blazor
 Component rules
