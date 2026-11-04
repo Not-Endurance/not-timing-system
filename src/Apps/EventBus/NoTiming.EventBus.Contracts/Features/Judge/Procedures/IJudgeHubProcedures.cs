@@ -4,10 +4,10 @@ namespace NoTiming.EventBus.Contracts.Features.Judge.Procedures;
 
 public interface IJudgeHubProcedures
 {
-    Task OnParticipationArrived(WarpRequest<ParticipationArrived> request);
-    Task OnInspectionRequired(WarpRequest<InspectionRequired> request);
-    Task OnRepresentationRequired(WarpRequest<RepresentationRequired> request);
-    Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request);
-    Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request);
-    Task OnParticipationRestored(WarpRequest<ParticipationRestored> request);
+    Task OnParticipationArrived(NoTimingRequest<ParticipationArrived> request);
+    Task OnInspectionRequired(NoTimingRequest<InspectionRequired> request);
+    Task OnRepresentationRequired(NoTimingRequest<RepresentationRequired> request);
+    Task OnPhaseCompleted(NoTimingRequest<PhaseCompleted> request);
+    Task OnParticipationEliminated(NoTimingRequest<ParticipationEliminated> request);
+    Task OnParticipationRestored(NoTimingRequest<ParticipationRestored> request);
 }

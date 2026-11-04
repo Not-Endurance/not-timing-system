@@ -17,7 +17,7 @@ internal sealed class ConnectionDiagnosticsMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (!WarpConnectionDiagnostics.TryDescribeTransportRequest(context, out var requestKind, out var hubPath))
+        if (!NoTimingConnectionDiagnostics.TryDescribeTransportRequest(context, out var requestKind, out var hubPath))
         {
             await _next(context);
             return;
@@ -32,7 +32,7 @@ internal sealed class ConnectionDiagnosticsMiddleware
         {
             stopwatch.Stop();
             _logger.LogInformation(
-                "Warp transport request {RequestKind} for {HubPath} completed with {StatusCode} in {ElapsedMilliseconds} ms. "
+                "NoTiming transport request {RequestKind} for {HubPath} completed with {StatusCode} in {ElapsedMilliseconds} ms. "
                     + "CorrelationId {CorrelationId}, Group {ConnectionGroup}, Client {ClientName}, Version {ClientVersion}, Method {Method}, "
                     + "Origin {Origin}, Upgrade {Upgrade}, ForwardedProto {ForwardedProto}, "
                     + "ForwardedHost {ForwardedHost}, ArrLogId {ArrLogId}, InstanceId {InstanceId}.",
@@ -40,17 +40,17 @@ internal sealed class ConnectionDiagnosticsMiddleware
                 hubPath,
                 context.Response.StatusCode,
                 stopwatch.ElapsedMilliseconds,
-                WarpConnectionDiagnostics.GetCorrelationId(context),
-                WarpConnectionDiagnostics.GetConnectionGroup(context),
-                WarpConnectionDiagnostics.GetClientName(context),
-                WarpConnectionDiagnostics.GetClientVersion(context),
+                NoTimingConnectionDiagnostics.GetCorrelationId(context),
+                NoTimingConnectionDiagnostics.GetConnectionGroup(context),
+                NoTimingConnectionDiagnostics.GetClientName(context),
+                NoTimingConnectionDiagnostics.GetClientVersion(context),
                 context.Request.Method,
                 context.Request.Headers.Origin.ToString(),
                 context.Request.Headers.Upgrade.ToString(),
-                WarpConnectionDiagnostics.GetForwardedProto(context),
-                WarpConnectionDiagnostics.GetForwardedHost(context),
+                NoTimingConnectionDiagnostics.GetForwardedProto(context),
+                NoTimingConnectionDiagnostics.GetForwardedHost(context),
                 context.Request.Headers["X-ARR-LOG-ID"].ToString(),
-                WarpConnectionDiagnostics.GetInstanceId()
+                NoTimingConnectionDiagnostics.GetInstanceId()
             );
         }
     }

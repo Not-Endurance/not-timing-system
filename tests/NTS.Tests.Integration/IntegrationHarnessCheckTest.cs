@@ -167,8 +167,8 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         Assert.Equal(eventId, officialReceived.EventId);
         Assert.Equal(42, participantReceived.Combination.Number);
         Assert.Equal(eventId, participantReceived.EventId);
-        Assert.Equal(WitnessAccessLevel.Official, officialWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Participant, participantWitness.AccessLevel);
+        Assert.Equal(UiAccessLevel.Official, officialWitness.AccessLevel);
+        Assert.Equal(UiAccessLevel.Participant, participantWitness.AccessLevel);
 
         var performanceParticipations = officialWitness.GetRequiredService<IPerformanceParticipations>();
         if (performanceParticipations is NStatefulService performanceStateful)
@@ -655,10 +655,10 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         await ineligibleOfficialWitness.Connect(eventInformation);
         await participantWitness.Connect(eventInformation);
 
-        Assert.Equal(WitnessAccessLevel.Official, operatorWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Official, eligibleOfficialWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Participant, ineligibleOfficialWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Participant, participantWitness.AccessLevel);
+        Assert.Equal(UiAccessLevel.Official, operatorWitness.AccessLevel);
+        Assert.Equal(UiAccessLevel.Official, eligibleOfficialWitness.AccessLevel);
+        Assert.Equal(UiAccessLevel.Participant, ineligibleOfficialWitness.AccessLevel);
+        Assert.Equal(UiAccessLevel.Participant, participantWitness.AccessLevel);
 
         await operatorWitness.Publish(CreateSnapshotGroup());
         await eligibleOfficialWitness.Publish(CreateSnapshotGroup());

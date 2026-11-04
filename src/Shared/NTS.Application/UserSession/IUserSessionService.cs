@@ -4,7 +4,7 @@ using NTS.Domain.Watcher;
 
 namespace NTS.Application.UserSession;
 
-public interface IWitnessUserSession
+public interface IUiUserSession
 {
     Task<NtsUserSessionStateModel?> GetCurrent();
     Task SetEventId(int? eventId);

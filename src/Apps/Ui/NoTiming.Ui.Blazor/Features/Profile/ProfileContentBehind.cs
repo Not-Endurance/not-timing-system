@@ -7,13 +7,13 @@ namespace NoTiming.Ui.Blazor.Features.Profile;
 public class ProfileContentBehind : NStatefulComponent
 {
     [Inject]
-    IWitnessProfileContext ProfileContext { get; set; } = default!;
+    IUiProfileContext ProfileContext { get; set; } = default!;
 
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
 
-    protected WitnessProfileFormModel Model { get; private set; } = new();
-    protected bool CanSave => WitnessProfilePolicy.IsComplete(Model);
+    protected UiProfileFormModel Model { get; private set; } = new();
+    protected bool CanSave => UiProfilePolicy.IsComplete(Model);
 
     protected override async Task OnInitializedAsync()
     {

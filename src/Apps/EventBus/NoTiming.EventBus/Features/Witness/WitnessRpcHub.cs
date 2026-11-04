@@ -5,26 +5,26 @@ using NTS.Domain.Core.Objects.Payloads;
 using NoTiming.EventBus.Abstractions;
 using NoTiming.EventBus.Contracts;
 using NoTiming.EventBus.Contracts.Features.Judge.Procedures;
-using NoTiming.EventBus.Contracts.Features.Witness.Procedures;
+using NoTiming.EventBus.Contracts.Features.Ui.Procedures;
 using NoTiming.EventBus.Features.Judge;
-using NoTiming.Api.Application.Features.Witness.Authorization;
-using NoTiming.Api.Application.Features.Witness.PendingSnapshots;
+using NoTiming.Api.Application.Features.Ui.Authorization;
+using NoTiming.Api.Application.Features.Ui.PendingSnapshots;
 
 namespace NoTiming.EventBus.Features.Witness;
 
-internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProcedures
+internal class WitnessRpcHub : NtsHub<IUiClientProcedures>, IUiHubProcedures
 {
     readonly IJudgeConnectionsContext _primaryConnections;
     readonly IHubContext<JudgeRpcHub, IJudgeClientProcedures> _judgeRelay;
     readonly IPendingSnapshotsService _pendingSnapshots;
-    readonly IWitnessReceiveAuthorizer _receiveAuthorizer;
+    readonly IUiReceiveAuthorizer _receiveAuthorizer;
 
     public WitnessRpcHub(
         ILogger<WitnessRpcHub> logger,
         IJudgeConnectionsContext primaryConnections,
         IHubContext<JudgeRpcHub, IJudgeClientProcedures> judgeRelay,
         IPendingSnapshotsService pendingSnapshots,
-        IWitnessReceiveAuthorizer receiveAuthorizer
+        IUiReceiveAuthorizer receiveAuthorizer
     )
         : base(logger)
     {
@@ -34,7 +34,7 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
         _receiveAuthorizer = receiveAuthorizer;
     }
 
-    public async Task Receive(WarpRequest<SnapshotGroupModel> request)
+    public async Task Receive(NoTimingRequest<SnapshotGroupModel> request)
     {
         var eventId = GetEventId(request.EventId);
         await _receiveAuthorizer.Authorize(Context.User, GetConnectionGroup(), eventId);
@@ -53,7 +53,7 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
         await _judgeRelay.Clients.Client(connectionId).Receive(request.Payload);
     }
 
-    public async Task AcknoledgeVetIn(WarpRequest<VetInAcknoledged> request)
+    public async Task AcknoledgeVetIn(NoTimingRequest<VetInAcknoledged> request)
     {
         var eventId = GetEventId(request.EventId);
         await _receiveAuthorizer.Authorize(Context.User, GetConnectionGroup(), eventId);

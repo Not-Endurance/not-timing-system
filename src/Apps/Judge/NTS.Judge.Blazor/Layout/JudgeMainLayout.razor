@@ -1,0 +1,20 @@
+﻿@using NTS.Application
+@using NTS.Application.Contracts
+@using NTS.Judge.Blazor.Layout.Drawer
+@using Not.Blazor.Components.Layout
+
+@inherits JudgeMainLayoutBehind
+
+<NLayout Watermark="@LayoutWatermark" MenuTitle="@Main_menu_string">
+
+    <Drawer>
+        <JudgeNavMenu />
+
+        <EventMenu />
+    </Drawer>
+    
+    <Content>
+        @Body
+    </Content>
+
+</NLayout>

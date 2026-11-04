@@ -33,7 +33,7 @@ internal sealed class NexusApiDriver : IDisposable
         return Send<NUserModel>(
             HttpMethod.Post,
             "api/users/register",
-            new RegisterUserPaload(
+            new RegisterUserPayload(
                 user.Email,
                 user.Name,
                 user.GivenName,

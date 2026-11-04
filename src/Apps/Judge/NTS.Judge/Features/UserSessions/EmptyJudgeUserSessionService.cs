@@ -6,7 +6,7 @@ using NTS.Domain.Watcher;
 
 namespace NTS.Judge.Features.UserSessions;
 
-internal class EmptyJudgeUserSessionService : IWitnessUserSession, IScoped
+internal class EmptyJudgeUserSessionService : IUiUserSession, IScoped
 {
     public Task AppendSnapshot(SnapshotGroup snapshot)
     {

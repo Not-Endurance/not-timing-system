@@ -13,7 +13,7 @@ using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 using NTS.Judge.Blazor.Features.Print;
 using NTS.Judge.Blazor.Layout.Drawer.Deactivate;
-using static NTS.Judge.Blazor.Routes;
+using static NTS.Judge.Blazor.JudgeRoutes;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings;
 

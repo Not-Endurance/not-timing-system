@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Authentication.User;
 using Not.Storage;
-using NoTiming.Api.Application.Features.Witness.Authorization;
+using NoTiming.Api.Application.Features.Ui.Authorization;
 using NoTiming.Api.Application.Mongo.Repositories;
 using NTS.Application.Mongo;
 
@@ -17,8 +17,8 @@ public static class NoTimingApiApplicationServices
     )
     {
         services.AddPendingSnapshotsMongoStorage(configuration);
-        services.AddSingleton<IReceiveSnapshotAccessPolicy, MongoWitnessWriteAccessPolicy>();
-        services.AddSingleton<IWitnessReceiveAuthorizer, WitnessReceiveAuthorizer>();
+        services.AddSingleton<IReceiveSnapshotAccessPolicy, MongoUiWriteAccessPolicy>();
+        services.AddSingleton<IUiReceiveAuthorizer, UiReceiveAuthorizer>();
         services.AddTransient<IUserRepository, UserMongoRepository>();
 
         return services;

@@ -37,13 +37,13 @@ public class SnapshotService
     readonly ISnapshotPublisher _snapshotPublisher;
     readonly object _snapshotSelectionPersistenceLock = new();
     readonly List<Snapshot> _snapshots = [];
-    readonly IWitnessUserSession _userSessionService;
+    readonly IUiUserSession _userSessionService;
     Task _snapshotSelectionPersistence = Task.CompletedTask;
 
     public SnapshotService(
         INtsSocketContext socketContext,
         IEventScopedRepository<Participation> participationReader,
-        IWitnessUserSession userSessionService,
+        IUiUserSession userSessionService,
         ISnapshotPublisher snapshotPublisher
     )
     {

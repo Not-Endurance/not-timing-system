@@ -49,7 +49,7 @@ public class UserController : ApiControllerBase
         TagRequest(request);
         LogInformation(request, nameof(Register));
 
-        var payload = await ReadBody<RegisterUserPaload>(request);
+        var payload = await ReadBody<RegisterUserPayload>(request);
         if (string.IsNullOrWhiteSpace(payload.Email))
         {
             return InvalidPayload($"Value '{payload.Email}' is not a valid email");

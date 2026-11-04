@@ -4,7 +4,7 @@ namespace NoTiming.Api.Application.Telemetry;
 
 public class TelemetryService : ITelemetryService
 {
-    static readonly ActivitySource SOURCE = new(NexusTelemetryConstants.ACTIVITY_SOURCE_NAME);
+    static readonly ActivitySource SOURCE = new(NoTimingTelemetryConstants.ACTIVITY_SOURCE_NAME);
     static readonly bool DEBUG_ACTIVITY_SOURCE =
         bool.TryParse(Environment.GetEnvironmentVariable("OTEL_DEBUG_ACTIVITY_SOURCE"), out var debug) && debug;
 

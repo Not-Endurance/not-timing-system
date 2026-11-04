@@ -22,7 +22,7 @@ public class SnapshotContentBehind : NStatefulComponent
     BlazorSocketService BlazorSocketService { get; set; } = default!;
 
     [Inject]
-    IWitnessAccessContext AccessState { get; set; } = default!;
+    IUiAccessContext AccessState { get; set; } = default!;
 
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
@@ -45,9 +45,9 @@ public class SnapshotContentBehind : NStatefulComponent
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (WitnessAccessPolicy.ShouldRedirectFromSnapshots(AccessState.AccessLevel))
+        if (UiAccessPolicy.ShouldRedirectFromSnapshots(AccessState.AccessLevel))
         {
-            Navigator.NavigateTo(WitnessAccessPolicy.ResolveSnapshotFallbackRoute());
+            Navigator.NavigateTo(UiAccessPolicy.ResolveSnapshotFallbackRoute());
             return;
         }
 

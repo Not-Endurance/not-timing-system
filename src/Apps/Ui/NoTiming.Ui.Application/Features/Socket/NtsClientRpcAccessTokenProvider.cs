@@ -15,7 +15,7 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
     readonly IAccessTokenProvider _accessTokenProvider;
     readonly NClientAuthenticationSettings _clientAuthenticationSettings;
     readonly NavigationManager _navigationManager;
-    readonly IWitnessAuthenticationRedirector _authenticationRedirector;
+    readonly IUiAuthenticationRedirector _authenticationRedirector;
     readonly INotifier _notifier;
     readonly ILogger<NtsClientRpcAccessTokenProvider> _logger;
 
@@ -23,7 +23,7 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
         IAccessTokenProvider accessTokenProvider,
         IOptions<NClientAuthenticationSettings> clientAuthenticationOptions,
         NavigationManager navigationManager,
-        IWitnessAuthenticationRedirector authenticationRedirector,
+        IUiAuthenticationRedirector authenticationRedirector,
         INotifier notifier,
         ILogger<NtsClientRpcAccessTokenProvider> logger
     )

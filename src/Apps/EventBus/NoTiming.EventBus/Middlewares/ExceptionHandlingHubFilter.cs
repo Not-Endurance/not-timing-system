@@ -72,15 +72,15 @@ internal class ExceptionHandlingHubFilter : IHubFilter
         var httpContext = context.GetHttpContext();
         _logger.LogError(
             exception,
-            "Warp hub exception in {HubName}.{MethodName}. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}, Client {ClientName}, Version {ClientVersion}, InstanceId {InstanceId}.",
+            "NoTiming hub exception in {HubName}.{MethodName}. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}, Client {ClientName}, Version {ClientVersion}, InstanceId {InstanceId}.",
             hubName,
             methodName,
             context.ConnectionId,
-            WarpConnectionDiagnostics.GetCorrelationId(httpContext),
-            WarpConnectionDiagnostics.GetConnectionGroup(httpContext),
-            WarpConnectionDiagnostics.GetClientName(httpContext),
-            WarpConnectionDiagnostics.GetClientVersion(httpContext),
-            WarpConnectionDiagnostics.GetInstanceId()
+            NoTimingConnectionDiagnostics.GetCorrelationId(httpContext),
+            NoTimingConnectionDiagnostics.GetConnectionGroup(httpContext),
+            NoTimingConnectionDiagnostics.GetClientName(httpContext),
+            NoTimingConnectionDiagnostics.GetClientVersion(httpContext),
+            NoTimingConnectionDiagnostics.GetInstanceId()
         );
     }
 }

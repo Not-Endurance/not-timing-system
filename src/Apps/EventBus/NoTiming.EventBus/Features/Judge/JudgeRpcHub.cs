@@ -5,22 +5,22 @@ using NoTiming.EventBus.Abstractions;
 using NoTiming.EventBus.ConnectionDiagnostics;
 using NoTiming.EventBus.Contracts;
 using NoTiming.EventBus.Contracts.Features.Judge.Procedures;
-using NoTiming.EventBus.Contracts.Features.Witness.Procedures;
+using NoTiming.EventBus.Contracts.Features.Ui.Procedures;
 using NoTiming.EventBus.Features.Witness;
-using NoTiming.Api.Application.Features.Witness.PendingSnapshots;
+using NoTiming.Api.Application.Features.Ui.PendingSnapshots;
 
 namespace NoTiming.EventBus.Features.Judge;
 
 internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 {
     readonly ILogger<JudgeRpcHub> _logger;
-    readonly IHubContext<WitnessRpcHub, IWitnessClientProcedures> _witnessRelay;
+    readonly IHubContext<WitnessRpcHub, IUiClientProcedures> _witnessRelay;
     readonly JudgeConnectionsContext _primaryConnections;
     readonly IPendingSnapshotsService _pendingSnapshots;
 
     public JudgeRpcHub(
         ILogger<JudgeRpcHub> logger,
-        IHubContext<WitnessRpcHub, IWitnessClientProcedures> witnessRelay,
+        IHubContext<WitnessRpcHub, IUiClientProcedures> witnessRelay,
         JudgeConnectionsContext primaryConnections,
         IPendingSnapshotsService pendingSnapshots
     )
@@ -44,7 +44,7 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
             "Judge hub OnConnectedAsync finished in {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, EventId {EventId}.",
             stopwatch.ElapsedMilliseconds,
             Context.ConnectionId,
-            WarpConnectionDiagnostics.GetCorrelationId(Context.GetHttpContext()),
+            NoTimingConnectionDiagnostics.GetCorrelationId(Context.GetHttpContext()),
             eventId
         );
     }
@@ -55,32 +55,32 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
         _primaryConnections.Remove(Context.ConnectionId);
     }
 
-    public async Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request)
+    public async Task OnParticipationEliminated(NoTimingRequest<ParticipationEliminated> request)
     {
         await _witnessRelay.Clients.Group(request.EventId).OnParticipationEliminated(request.Payload);
     }
 
-    public async Task OnParticipationArrived(WarpRequest<ParticipationArrived> request)
+    public async Task OnParticipationArrived(NoTimingRequest<ParticipationArrived> request)
     {
         await _witnessRelay.Clients.Group(request.EventId).OnParticipationArrived(request.Payload);
     }
 
-    public async Task OnInspectionRequired(WarpRequest<InspectionRequired> request)
+    public async Task OnInspectionRequired(NoTimingRequest<InspectionRequired> request)
     {
         await _witnessRelay.Clients.Group(request.EventId).OnInspectionRequired(request.Payload);
     }
 
-    public async Task OnRepresentationRequired(WarpRequest<RepresentationRequired> request)
+    public async Task OnRepresentationRequired(NoTimingRequest<RepresentationRequired> request)
     {
         await _witnessRelay.Clients.Group(request.EventId).OnRepresentationRequired(request.Payload);
     }
 
-    public async Task OnParticipationRestored(WarpRequest<ParticipationRestored> request)
+    public async Task OnParticipationRestored(NoTimingRequest<ParticipationRestored> request)
     {
         await _witnessRelay.Clients.Group(request.EventId).OnParticipationRestored(request.Payload);
     }
 
-    public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
+    public async Task OnPhaseCompleted(NoTimingRequest<PhaseCompleted> request)
     {
         var participation = request.Payload.Participation;
         _logger.LogInformation(
@@ -99,7 +99,7 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 
     async Task FlushPendingSnapshots(string eventId)
     {
-        var correlationId = WarpConnectionDiagnostics.GetCorrelationId(Context.GetHttpContext());
+        var correlationId = NoTimingConnectionDiagnostics.GetCorrelationId(Context.GetHttpContext());
         var stopwatch = Stopwatch.StartNew();
         _logger.LogInformation(
             "Judge pending snapshot flush started. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, EventId {EventId}.",

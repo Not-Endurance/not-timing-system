@@ -25,26 +25,26 @@ public abstract class NtsHub<T> : Hub<T>
         var stopwatch = Stopwatch.StartNew();
         var httpContext = Context.GetHttpContext();
         var query = httpContext?.Request.Query;
-        var correlationId = WarpConnectionDiagnostics.GetCorrelationId(httpContext);
-        var clientName = WarpConnectionDiagnostics.GetClientName(httpContext);
-        var clientVersion = WarpConnectionDiagnostics.GetClientVersion(httpContext);
+        var correlationId = NoTimingConnectionDiagnostics.GetCorrelationId(httpContext);
+        var clientName = NoTimingConnectionDiagnostics.GetClientName(httpContext);
+        var clientVersion = NoTimingConnectionDiagnostics.GetClientVersion(httpContext);
 
         _logger.LogInformation(
-            "Warp hub {HubName} OnConnectedAsync started. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}, Client {ClientName}, Version {ClientVersion}, InstanceId {InstanceId}.",
+            "NoTiming hub {HubName} OnConnectedAsync started. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}, Client {ClientName}, Version {ClientVersion}, InstanceId {InstanceId}.",
             GetType().Name,
             Context.ConnectionId,
             correlationId,
             GetConnectionGroup(),
             clientName,
             clientVersion,
-            WarpConnectionDiagnostics.GetInstanceId()
+            NoTimingConnectionDiagnostics.GetInstanceId()
         );
 
         if (query == null || !query.TryGetValue(RpcConstants.CONNECTION_GROUP_KEY, out var value))
         {
             const string message = "SignalR connection rejected because the event ID query parameter is missing.";
             _logger.LogWarning(
-                "Warp hub {HubName} rejected connection {ConnectionId}. CorrelationId {CorrelationId}. Reason: {Message}",
+                "NoTiming hub {HubName} rejected connection {ConnectionId}. CorrelationId {CorrelationId}. Reason: {Message}",
                 GetType().Name,
                 Context.ConnectionId,
                 correlationId,
@@ -59,7 +59,7 @@ public abstract class NtsHub<T> : Hub<T>
             await Groups.AddToGroupAsync(Context.ConnectionId, eventId);
             stopwatch.Stop();
             _logger.LogInformation(
-                "Warp hub {HubName} OnConnectedAsync completed in {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}.",
+                "NoTiming hub {HubName} OnConnectedAsync completed in {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}.",
                 GetType().Name,
                 stopwatch.ElapsedMilliseconds,
                 Context.ConnectionId,
@@ -72,7 +72,7 @@ public abstract class NtsHub<T> : Hub<T>
             stopwatch.Stop();
             _logger.LogError(
                 ex,
-                "Warp hub {HubName} OnConnectedAsync failed after {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}.",
+                "NoTiming hub {HubName} OnConnectedAsync failed after {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}.",
                 GetType().Name,
                 stopwatch.ElapsedMilliseconds,
                 Context.ConnectionId,
@@ -87,7 +87,7 @@ public abstract class NtsHub<T> : Hub<T>
     {
         var stopwatch = Stopwatch.StartNew();
         var httpContext = Context.GetHttpContext();
-        var correlationId = WarpConnectionDiagnostics.GetCorrelationId(httpContext);
+        var correlationId = NoTimingConnectionDiagnostics.GetCorrelationId(httpContext);
         var connectionGroup = GetConnectionGroup();
 
         try
@@ -101,7 +101,7 @@ public abstract class NtsHub<T> : Hub<T>
             if (exception == null)
             {
                 _logger.LogInformation(
-                    "Warp hub {HubName} OnDisconnectedAsync completed in {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}.",
+                    "NoTiming hub {HubName} OnDisconnectedAsync completed in {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}.",
                     GetType().Name,
                     stopwatch.ElapsedMilliseconds,
                     Context.ConnectionId,
@@ -113,7 +113,7 @@ public abstract class NtsHub<T> : Hub<T>
             {
                 _logger.LogWarning(
                     exception,
-                    "Warp hub {HubName} disconnected with an error after {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}.",
+                    "NoTiming hub {HubName} disconnected with an error after {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}.",
                     GetType().Name,
                     stopwatch.ElapsedMilliseconds,
                     Context.ConnectionId,
@@ -127,7 +127,7 @@ public abstract class NtsHub<T> : Hub<T>
             stopwatch.Stop();
             _logger.LogError(
                 ex,
-                "Warp hub {HubName} OnDisconnectedAsync failed after {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}.",
+                "NoTiming hub {HubName} OnDisconnectedAsync failed after {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}.",
                 GetType().Name,
                 stopwatch.ElapsedMilliseconds,
                 Context.ConnectionId,

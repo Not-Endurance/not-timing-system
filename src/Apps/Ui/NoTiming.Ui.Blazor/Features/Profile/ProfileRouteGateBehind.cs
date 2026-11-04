@@ -7,7 +7,7 @@ namespace NoTiming.Ui.Blazor.Features.Profile;
 public class ProfileRouteGateBehind : NComponent
 {
     [Inject]
-    IWitnessProfileContext ProfileContext { get; set; } = default!;
+    IUiProfileContext ProfileContext { get; set; } = default!;
 
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
@@ -23,7 +23,7 @@ public class ProfileRouteGateBehind : NComponent
         {
             await ProfileContext.Load();
             var relativePath = Navigator.ToBaseRelativePath(Navigator.Uri);
-            IsRedirecting = WitnessProfileRoutePolicy.ShouldRedirectToProfile(ProfileContext.User, relativePath);
+            IsRedirecting = UiProfileRoutePolicy.ShouldRedirectToProfile(ProfileContext.User, relativePath);
             if (IsRedirecting)
             {
                 Navigator.NavigateTo(Routes.PROFILE_PAGE, replace: true);

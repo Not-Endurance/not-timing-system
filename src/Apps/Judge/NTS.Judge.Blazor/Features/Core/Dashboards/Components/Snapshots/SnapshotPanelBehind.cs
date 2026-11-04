@@ -18,7 +18,7 @@ public class SnapshotPanelBehind : NComponent
     IParticipationContext ParticipationContext { get; set; } = default!;
 
     [Inject]
-    ISnapshotService TimingService { get; set; } = default!;
+    IJudgeSnapshotService TimingService { get; set; } = default!;
 
     [Inject]
     INotifier Notifier { get; set; } = default!;

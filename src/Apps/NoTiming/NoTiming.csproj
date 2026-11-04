@@ -23,14 +23,14 @@
     Development launch settings point WITNESS_UI_PATH at that folder.
   -->
   <PropertyGroup>
-    <WitnessUiPublishDir>$(BaseIntermediateOutputPath)witness-ui/</WitnessUiPublishDir>
+    <UiPublishDir>$(BaseIntermediateOutputPath)witness-ui/</UiPublishDir>
   </PropertyGroup>
 
-  <Target Name="PublishWitnessUiForLocalRun" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+  <Target Name="PublishUiForLocalRun" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
     <MSBuild
       Projects="$(MSBuildProjectDirectory)/../Ui/NoTiming.Ui/NoTiming.Ui.csproj"
       Targets="Publish"
-      Properties="Configuration=Debug;PublishDir=$(MSBuildProjectDirectory)/$(WitnessUiPublishDir);BlazorEnableCompression=false"
+      Properties="Configuration=Debug;PublishDir=$(MSBuildProjectDirectory)/$(UiPublishDir);BlazorEnableCompression=false"
     />
   </Target>
 

@@ -9,7 +9,7 @@ public class HomeContentBehind : NStatefulComponent
     bool _hasRedirected;
 
     [Inject]
-    IWitnessAccessContext AccessState { get; set; } = default!;
+    IUiAccessContext AccessState { get; set; } = default!;
 
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
@@ -31,6 +31,6 @@ public class HomeContentBehind : NStatefulComponent
 
         _hasRedirected = true;
         await BlazorSocketService.EnsureConnected();
-        Navigator.NavigateTo(WitnessAccessPolicy.ResolveHomeRoute(AccessState.AccessLevel));
+        Navigator.NavigateTo(UiAccessPolicy.ResolveHomeRoute(AccessState.AccessLevel));
     }
 }

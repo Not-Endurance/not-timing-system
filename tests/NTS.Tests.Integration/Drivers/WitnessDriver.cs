@@ -27,7 +27,7 @@ internal sealed class WitnessDriver : IAsyncDisposable
     readonly ServiceProvider _provider;
     readonly INtsSocketService _socketService;
     readonly IParticipationContext _participationContext;
-    readonly IWitnessAccessContext _accessContext;
+    readonly IUiAccessContext _accessContext;
     readonly string _clientName;
 
     public WitnessDriver(Uri warpBaseUrl, IntegrationUser user, string clientName)
@@ -38,17 +38,17 @@ internal sealed class WitnessDriver : IAsyncDisposable
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
-        services.AddNtsWitness(configuration, warpBaseUrl.ToString().TrimEnd('/'), typeof(NtsWitnessServices).Assembly);
+        services.AddNtsUiApplication(configuration, warpBaseUrl.ToString().TrimEnd('/'), typeof(NtsUiApplicationServices).Assembly);
         services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, IntegrationRpcAccessTokenProvider>());
         services.AddScoped<AuthenticationStateProvider>(_ => new IntegrationAuthenticationStateProvider(user));
 
         _provider = services.BuildServiceProvider();
         _socketService = _provider.GetRequiredService<INtsSocketService>();
         _participationContext = _provider.GetRequiredService<IParticipationContext>();
-        _accessContext = _provider.GetRequiredService<IWitnessAccessContext>();
+        _accessContext = _provider.GetRequiredService<IUiAccessContext>();
     }
 
-    public WitnessAccessLevel AccessLevel => _accessContext.AccessLevel;
+    public UiAccessLevel AccessLevel => _accessContext.AccessLevel;
 
     public T GetRequiredService<T>()
         where T : notnull

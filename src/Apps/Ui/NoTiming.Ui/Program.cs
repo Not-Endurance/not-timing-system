@@ -14,8 +14,8 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton(new NEnvironment(builder.HostEnvironment.Environment));
-builder.Services.AddNtsWitnessWeb(builder.Configuration);
-builder.Services.AddNtsWitness(
+builder.Services.AddNtsUi(builder.Configuration);
+builder.Services.AddNtsUiApplication(
     builder.Configuration,
     builder.HostEnvironment.BaseAddress,
     Assembly.GetExecutingAssembly()

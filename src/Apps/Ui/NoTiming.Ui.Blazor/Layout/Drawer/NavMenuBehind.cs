@@ -18,10 +18,10 @@ public class NavMenuBehind : NStatefulComponent
     INAuthentication Authentication { get; set; } = default!;
 
     [Inject]
-    IWitnessAccessContext AccessState { get; set; } = default!;
+    IUiAccessContext AccessState { get; set; } = default!;
 
     [Inject]
-    IWitnessProfileContext ProfileContext { get; set; } = default!;
+    IUiProfileContext ProfileContext { get; set; } = default!;
 
     [Inject]
     INtsSocketService SocketService { get; set; } = default!;
@@ -29,7 +29,7 @@ public class NavMenuBehind : NStatefulComponent
     [CascadingParameter(Name = "CloseResponsiveDrawer")]
     Func<Task>? CloseResponsiveDrawer { get; set; }
 
-    protected bool ShowSnapshots => WitnessAccessPolicy.CanViewSnapshots(AccessState.AccessLevel);
+    protected bool ShowSnapshots => UiAccessPolicy.CanViewSnapshots(AccessState.AccessLevel);
     protected bool ShowProfileHeader => ProfileContext.User != null;
     protected bool HasActiveEvent => SocketService.IsConnected && SocketService.Event != null;
     protected string ActiveEventTitle => SocketService.Event?.Name ?? Event_string;

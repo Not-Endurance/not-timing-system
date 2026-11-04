@@ -24,7 +24,7 @@ internal sealed class JudgeDriver : IAsyncDisposable
 {
     readonly ServiceProvider _provider;
     readonly INtsSocketService _socketService;
-    readonly ISnapshotService _snapshotService;
+    readonly IJudgeSnapshotService _snapshotService;
     readonly IParticipationContext _participationContext;
     readonly IEventScopedRepository<Participation> _participationRepository;
     readonly IOptions<NHttpSettings> _httpSettings;
@@ -41,7 +41,7 @@ internal sealed class JudgeDriver : IAsyncDisposable
 
         _provider = services.BuildServiceProvider();
         _socketService = _provider.GetRequiredService<INtsSocketService>();
-        _snapshotService = _provider.GetRequiredService<ISnapshotService>();
+        _snapshotService = _provider.GetRequiredService<IJudgeSnapshotService>();
         _participationContext = _provider.GetRequiredService<IParticipationContext>();
         _participationRepository = _provider.GetRequiredService<IEventScopedRepository<Participation>>();
         _httpSettings = _provider.GetRequiredService<IOptions<NHttpSettings>>();

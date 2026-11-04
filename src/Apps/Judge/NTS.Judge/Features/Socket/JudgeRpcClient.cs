@@ -28,10 +28,10 @@ public class JudgeRpcClient
         IScoped
 {
     readonly INtsSocketService _eventContext;
-    readonly ISnapshotService _snapshotService;
+    readonly IJudgeSnapshotService _snapshotService;
     readonly HubProcedures _hubProcedures;
 
-    public JudgeRpcClient(INtsSocketService eventContext, IRpcSocket socket, ISnapshotService snapshotService)
+    public JudgeRpcClient(INtsSocketService eventContext, IRpcSocket socket, IJudgeSnapshotService snapshotService)
         : base(socket)
     {
         _eventContext = eventContext;
@@ -56,37 +56,37 @@ public class JudgeRpcClient
 
     public async Task Handle(PhaseCompleted completed, CancellationToken cancellationToken)
     {
-        var request = WarpRequest.Create(GetGroupId(), completed);
+        var request = NoTimingRequest.Create(GetGroupId(), completed);
         await _hubProcedures.OnPhaseCompleted(request);
     }
 
     public async Task Handle(ParticipationArrived arrived, CancellationToken cancellationToken)
     {
-        var request = WarpRequest.Create(GetGroupId(), arrived);
+        var request = NoTimingRequest.Create(GetGroupId(), arrived);
         await _hubProcedures.OnParticipationArrived(request);
     }
 
     public async Task Handle(InspectionRequired inspectionRequired, CancellationToken cancellationToken)
     {
-        var request = WarpRequest.Create(GetGroupId(), inspectionRequired);
+        var request = NoTimingRequest.Create(GetGroupId(), inspectionRequired);
         await _hubProcedures.OnInspectionRequired(request);
     }
 
     public async Task Handle(RepresentationRequired representationRequired, CancellationToken cancellationToken)
     {
-        var request = WarpRequest.Create(GetGroupId(), representationRequired);
+        var request = NoTimingRequest.Create(GetGroupId(), representationRequired);
         await _hubProcedures.OnRepresentationRequired(request);
     }
 
     public async Task Handle(ParticipationEliminated eliminated, CancellationToken cancellationToken)
     {
-        var request = WarpRequest.Create(GetGroupId(), eliminated);
+        var request = NoTimingRequest.Create(GetGroupId(), eliminated);
         await _hubProcedures.OnParticipationEliminated(request);
     }
 
     public async Task Handle(ParticipationRestored restored, CancellationToken cancellationToken)
     {
-        var request = WarpRequest.Create(GetGroupId(), restored);
+        var request = NoTimingRequest.Create(GetGroupId(), restored);
         await _hubProcedures.OnParticipationRestored(request);
     }
 
@@ -104,32 +104,32 @@ public class JudgeRpcClient
             _socket = socket;
         }
 
-        public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
+        public async Task OnPhaseCompleted(NoTimingRequest<PhaseCompleted> request)
         {
             await _socket.InvokeInputProcedure(nameof(OnPhaseCompleted), request);
         }
 
-        public async Task OnParticipationArrived(WarpRequest<ParticipationArrived> request)
+        public async Task OnParticipationArrived(NoTimingRequest<ParticipationArrived> request)
         {
             await _socket.InvokeInputProcedure(nameof(OnParticipationArrived), request);
         }
 
-        public async Task OnInspectionRequired(WarpRequest<InspectionRequired> request)
+        public async Task OnInspectionRequired(NoTimingRequest<InspectionRequired> request)
         {
             await _socket.InvokeInputProcedure(nameof(OnInspectionRequired), request);
         }
 
-        public async Task OnRepresentationRequired(WarpRequest<RepresentationRequired> request)
+        public async Task OnRepresentationRequired(NoTimingRequest<RepresentationRequired> request)
         {
             await _socket.InvokeInputProcedure(nameof(OnRepresentationRequired), request);
         }
 
-        public async Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request)
+        public async Task OnParticipationEliminated(NoTimingRequest<ParticipationEliminated> request)
         {
             await _socket.InvokeInputProcedure(nameof(OnParticipationEliminated), request);
         }
 
-        public async Task OnParticipationRestored(WarpRequest<ParticipationRestored> request)
+        public async Task OnParticipationRestored(NoTimingRequest<ParticipationRestored> request)
         {
             await _socket.InvokeInputProcedure(nameof(OnParticipationRestored), request);
         }

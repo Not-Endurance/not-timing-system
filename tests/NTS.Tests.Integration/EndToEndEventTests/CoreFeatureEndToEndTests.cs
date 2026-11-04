@@ -65,7 +65,7 @@ public sealed class CoreFeatureEndToEndTests
         );
         await witness.Start();
         await witness.Connect(eventInformation);
-        Assert.Equal(WitnessAccessLevel.Official, witness.AccessLevel);
+        Assert.Equal(UiAccessLevel.Official, witness.AccessLevel);
 
         var phaseWaves = CreatePhaseWaves(snapshot.PhasesWithSnapshots);
         Assert.Equal(snapshot.PhasesWithSnapshots.Count, phaseWaves.Sum(x => x.Count));

@@ -2,7 +2,7 @@
 
 namespace NTS.Judge.Contracts.Features.Core.Dashboard;
 
-public interface ISnapshotService
+public interface IJudgeSnapshotService
 {
     Task Record(Snapshot snapshot);
 }
