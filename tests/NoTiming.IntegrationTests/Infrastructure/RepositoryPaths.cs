@@ -10,7 +10,7 @@ internal sealed class RepositoryPaths
     RepositoryPaths(string root)
     {
         Root = root;
-        NoTimingProject = Path.Combine(root, "src", "Apps", "NoTiming", "NoTiming.csproj");
+        NoTimingProject = Path.Combine(root, "src", "NoTiming.Shell", "NoTiming.Shell.csproj");
         DotnetHome = Path.Combine(root, ".tmp", "integration-dotnet-home");
         NuGetPackages = Path.Combine(root, ".tmp", "integration-nuget-packages");
     }
