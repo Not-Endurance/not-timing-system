@@ -1,0 +1,3 @@
+# Passkey RP ID is the product's apex domain, separate from the app host
+
+The RP ID is `timing.no-company.eu` in production, `staging.timing.no-company.eu` in staging and `localhost` locally, and the app runs on a subdomain of it, so the app host can change without losing passkeys. The RP ID is per product rather than `no-company.eu`, because a shared RP ID would share passkey scope and ceremony origins with every sibling product on the zone. Every subdomain of the RP ID becomes a valid ceremony origin, so no untrusted content may be served under it, and the origin check is pinned to the exact app origin. The RP ID is set before the first passkey is enrolled, since changing it later invalidates every enrolled passkey.
