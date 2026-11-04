@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
@@ -39,7 +38,8 @@ internal static class WitnessUiHosting
 
         if (app.Environment.IsDevelopment())
         {
-            app.Lifetime.ApplicationStarted.Register(OpenLocalUi);
+            var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("NTS.Nexus.Warp.Host.WitnessUi");
+            app.Lifetime.ApplicationStarted.Register(() => OpenLocalUi(logger));
         }
 
         return app;
@@ -47,21 +47,30 @@ internal static class WitnessUiHosting
 
     // Development only: open the UI in the default browser once Warp is listening.
     // Done here rather than in launchSettings, because `dotnet run` ignores launchBrowser.
-    static void OpenLocalUi()
+    // Logs what it does, so a failed launch shows up in the IDE output instead of being silent.
+    static void OpenLocalUi(ILogger logger)
     {
         var port = Environment.GetEnvironmentVariable("PORT");
         if (string.IsNullOrWhiteSpace(port))
         {
+            logger.LogWarning("Not opening the Witness UI: the PORT variable is not set.");
             return;
         }
 
+        var url = $"http://localhost:{port}/";
+        logger.LogInformation("Opening the Witness UI at {Url}.", url);
         try
         {
-            Process.Start(new ProcessStartInfo($"http://localhost:{port}/") { UseShellExecute = true });
+            using var process = Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            if (process is null)
+            {
+                logger.LogInformation("The system reported no new browser process for {Url}; a tab may already be open.", url);
+            }
         }
-        catch (Win32Exception)
+        catch (Exception exception)
         {
-            // No desktop browser available (for example a headless machine). Warp keeps running.
+            // No desktop browser or no handler for http URLs (for example a headless machine). Warp keeps running.
+            logger.LogWarning(exception, "Could not open a browser for {Url}.", url);
         }
     }
 
