@@ -54,6 +54,7 @@ internal sealed class NoTimingProcess : IAsyncDisposable
         startInfo.Environment["PORT"] = Port.ToString();
         startInfo.Environment["MONGO_CONNECTION_STRING"] = MongoConnectionString;
         startInfo.Environment["NTS_INTEGRATION_AUTH"] = "true";
+        startInfo.Environment["OPEN_BROWSER"] = "false";
         startInfo.Environment["DOTNET_CLI_HOME"] = dotnetHome;
         startInfo.Environment["NUGET_PACKAGES"] = nugetPackages;
 
