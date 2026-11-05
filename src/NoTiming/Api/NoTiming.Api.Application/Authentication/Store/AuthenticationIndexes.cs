@@ -31,6 +31,7 @@ public sealed class AuthenticationIndexes : IHostedService
         var users = database.GetCollection<IdentityUserDocument>(_settings.UsersCollection);
         await users.Indexes.CreateManyAsync(
             [
+                // Default collation: the exact match MongoUiReceiveAccessPolicy uses. Sign-in uses identity_email_ci.
                 new CreateIndexModel<IdentityUserDocument>(
                     Builders<IdentityUserDocument>.IndexKeys.Ascending(x => x.Email),
                     new CreateIndexOptions<IdentityUserDocument> { Name = "identity_email" }

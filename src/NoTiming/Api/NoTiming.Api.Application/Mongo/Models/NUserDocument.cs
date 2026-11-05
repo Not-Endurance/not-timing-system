@@ -1,5 +1,4 @@
 using NC.Application.Authentication.User;
-using NC.Random;
 using NoTiming.Application.Contracts.Shared;
 using NoTiming.Application.Contracts.Shared.Models;
 
@@ -7,55 +6,6 @@ namespace NoTiming.Api.Application.Mongo.Models;
 
 public class NUserDocument : IDocument
 {
-    public static NUserDocument Create(
-        string email,
-        string? name = null,
-        string? givenName = null,
-        string? surname = null,
-        string? countryRegion = null,
-        string? middleName = null,
-        string? club = null,
-        string? feiId = null,
-        string? displayName = null
-    )
-    {
-        var normalizedGivenName = Normalize(givenName);
-        var normalizedSurname = Normalize(surname);
-        var normalizedMiddleName = Normalize(middleName);
-
-        return new NUserDocument
-        {
-            Id = RandomHelper.GenerateUniqueInteger(),
-            Email = email,
-            Name = BuildName(normalizedGivenName, normalizedMiddleName, normalizedSurname) ?? Normalize(name),
-            DisplayName = Normalize(displayName),
-            GivenName = normalizedGivenName,
-            Surname = normalizedSurname,
-            CountryRegion = Normalize(countryRegion),
-            MiddleName = normalizedMiddleName,
-            Club = Normalize(club),
-            FeiId = Normalize(feiId),
-        };
-    }
-
-    public static NUserDocument From(NUserModel user)
-    {
-        return new NUserDocument
-        {
-            Id = user.Id == default ? RandomHelper.GenerateUniqueInteger() : user.Id,
-            Email = user.Email,
-            Name = user.Name,
-            DisplayName = user.DisplayName,
-            GivenName = user.GivenName,
-            Surname = user.Surname,
-            CountryRegion = user.CountryRegion,
-            MiddleName = user.MiddleName,
-            Club = user.Club,
-            FeiId = user.FeiId,
-            Roles = user.Roles.ToArray(),
-        };
-    }
-
     public int Id { get; set; }
     public string Email { get; set; } = default!;
     public string? Name { get; set; }
@@ -82,16 +32,5 @@ public class NUserDocument : IDocument
             Club = Club,
             FeiId = FeiId,
         };
-    }
-
-    static string? BuildName(params string?[] parts)
-    {
-        var nameParts = parts.Where(part => !string.IsNullOrWhiteSpace(part)).ToArray();
-        return nameParts.Length == 0 ? null : string.Join(" ", nameParts);
-    }
-
-    static string? Normalize(string? value)
-    {
-        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
 }

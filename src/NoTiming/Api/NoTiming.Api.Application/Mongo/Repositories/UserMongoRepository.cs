@@ -3,7 +3,6 @@ using NC.Application.Authentication.User;
 using NC.Storage.Mongo;
 using NoTiming.Api.Application.Mongo.Models;
 using NoTiming.Api.Application.Telemetry;
-using NoTiming.Ui.Contracts.API;
 
 namespace NoTiming.Api.Application.Mongo.Repositories;
 
@@ -18,20 +17,6 @@ public class UserMongoRepository : IUserRepository
         _telemetry = telemetry;
     }
 
-    public async Task<NUserModel?> ReadByEmail(string email)
-    {
-        using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(ReadByEmail));
-
-        var normalizedEmail = NormalizeEmail(email);
-        if (normalizedEmail == null)
-        {
-            return null;
-        }
-
-        var user = await GetCollection().Find(x => x.Email == normalizedEmail).FirstOrDefaultAsync();
-        return user?.ToUser();
-    }
-
     public async Task<IEnumerable<NUserModel>> ReadMany()
     {
         using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(ReadMany));
@@ -40,113 +25,15 @@ public class UserMongoRepository : IUserRepository
         return users.Select(x => x.ToUser()).ToArray();
     }
 
-    public async Task<NUserModel> Register(NUserRegistration registration)
-    {
-        using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(Register));
-
-        var normalizedEmail =
-            NormalizeEmail(registration.Email)
-            ?? throw new ArgumentException("Email cannot be empty", nameof(registration));
-        var existing = await ReadByEmail(normalizedEmail);
-        if (existing != null)
-        {
-            return existing;
-        }
-
-        var user = NUserDocument.Create(
-            normalizedEmail,
-            registration.Name,
-            registration.GivenName,
-            registration.Surname,
-            registration.CountryRegion,
-            registration.MiddleName,
-            registration.Club,
-            registration.FeiId,
-            registration.DisplayName
-        );
-
-        try
-        {
-            await GetCollection().InsertOneAsync(user);
-            return user.ToUser();
-        }
-        catch (MongoWriteException ex) when (ex.WriteError.Code == 11000)
-        {
-            existing = await ReadByEmail(normalizedEmail);
-            if (existing != null)
-            {
-                return existing;
-            }
-
-            throw new ApplicationException($"Could not register user '{normalizedEmail}'", ex);
-        }
-    }
-
-    public async Task<NUserModel?> UpdateProfile(string email, UpdateUserProfilePayload payload)
-    {
-        using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(UpdateProfile));
-
-        var normalizedEmail =
-            NormalizeEmail(email) ?? throw new ArgumentException("Email cannot be empty", nameof(email));
-
-        var update = Builders<NUserDocument>
-            .Update.Set(x => x.Name, payload.Name)
-            .Set(x => x.GivenName, payload.GivenName)
-            .Set(x => x.MiddleName, payload.MiddleName)
-            .Set(x => x.Surname, payload.Surname)
-            .Set(x => x.CountryRegion, payload.CountryRegion)
-            .Set(x => x.Club, payload.Club)
-            .Set(x => x.FeiId, payload.FeiId);
-
-        var user = await GetCollection()
-            .FindOneAndUpdateAsync(
-                x => x.Email == normalizedEmail,
-                update,
-                new FindOneAndUpdateOptions<NUserDocument> { ReturnDocument = ReturnDocument.After }
-            );
-
-        return user?.ToUser();
-    }
-
-    public async Task Create(NUserModel item)
-    {
-        using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(Create));
-
-        var model = NUserDocument.From(item);
-        model.Email = NormalizeEmail(model.Email) ?? throw new ApplicationException("Email cannot be empty");
-
-        try
-        {
-            await GetCollection().InsertOneAsync(model);
-        }
-        catch (MongoWriteException ex) when (ex.WriteError.Code == 11000)
-        {
-            throw new ApplicationException($"Could not insert. Document with ID '{model.Id}' already exists", ex);
-        }
-    }
-
     IMongoCollection<NUserDocument> GetCollection()
     {
         return _context
             .Client.GetDatabase(MongoConstants.NTS_DATABASE)
             .GetCollection<NUserDocument>(MongoConstants.USERS_COLLECTION);
     }
-
-    static string? NormalizeEmail(string? email)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            return null;
-        }
-
-        return email.Trim().ToLowerInvariant();
-    }
 }
 
 public interface IUserRepository
 {
-    Task<NUserModel?> ReadByEmail(string email);
     Task<IEnumerable<NUserModel>> ReadMany();
-    Task<NUserModel> Register(NUserRegistration registration);
-    Task<NUserModel?> UpdateProfile(string email, UpdateUserProfilePayload payload);
 }
