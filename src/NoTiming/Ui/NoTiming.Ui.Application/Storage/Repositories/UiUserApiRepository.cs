@@ -1,15 +1,21 @@
+using System.Net;
 using NC.Application.Authentication.Abstractions;
 using NC.Application.Authentication.User;
 using NC.Application.HTTP;
 using NC.Notify;
+using NC.Serialization.JSON;
 using NC.Structures;
 using NoTiming.Ui.Application.Features.Profile;
 using NoTiming.Ui.Contracts.API;
 
 namespace NoTiming.Ui.Application.Storage.Repositories;
 
+/// <summary>The signed-in person's own profile, read and changed through the session. There is no lookup by address.</summary>
 public class UiUserApiRepository : IUserRegister, IUiUserProfileRepository
 {
+    const string PROFILE_ENDPOINT = "me/profile";
+    const string PROFILE_UPDATE_ENDPOINT = "me";
+
     readonly NHttpClient _client;
 
     public UiUserApiRepository(NHttpClient client)
@@ -26,39 +32,18 @@ public class UiUserApiRepository : IUserRegister, IUiUserProfileRepository
 
         try
         {
-            var encodedEmail = Uri.EscapeDataString(email);
-            return await _client.Get<NUserModel>($"users/{encodedEmail}");
-        }
-        catch (Exception ex)
-        {
-            NotificationHelper.Current?.Error(ex);
-            return Result.Failure<NUserModel>(ex.Message);
-        }
-    }
+            var json = await _client.SendRawJson(HttpMethod.Get, PROFILE_ENDPOINT);
+            var profile = json.FromJson<SignedInProfile>();
+            if (!string.Equals(profile.Email, email, StringComparison.OrdinalIgnoreCase))
+            {
+                return Result.Failure<NUserModel>("The signed-in profile belongs to another address.");
+            }
 
-    public async Task<Result<NUserModel>> Register(NUserRegistration registration)
-    {
-        if (string.IsNullOrWhiteSpace(registration.Email))
-        {
-            return Result.Cancel<NUserModel>();
+            return Result.Success(profile.ToModel());
         }
-
-        try
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized)
         {
-            return await _client.Post<NUserModel>(
-                "users/register",
-                new RegisterUserPayload(
-                    registration.Email,
-                    registration.Name,
-                    registration.GivenName,
-                    registration.Surname,
-                    registration.CountryRegion,
-                    registration.MiddleName,
-                    registration.Club,
-                    registration.FeiId,
-                    registration.DisplayName
-                )
-            );
+            return Result.Failure<NUserModel>("The session has ended.");
         }
         catch (Exception ex)
         {
@@ -76,13 +61,51 @@ public class UiUserApiRepository : IUserRegister, IUiUserProfileRepository
 
         try
         {
-            var encodedEmail = Uri.EscapeDataString(email);
-            return await _client.Patch<NUserModel>($"users/{encodedEmail}/profile", payload);
+            await _client.SendRawJson(HttpMethod.Patch, PROFILE_UPDATE_ENDPOINT, payload.ToJson());
+            return await Get(email);
         }
         catch (Exception ex)
         {
             NotificationHelper.Current?.Error(ex);
             return Result.Failure<NUserModel>(ex.Message);
+        }
+    }
+
+    /// <summary>The identity the server returns from the profile route.</summary>
+    sealed class SignedInProfile
+    {
+        public int Id { get; set; }
+
+        public string Email { get; set; } = string.Empty;
+
+        public string? Name { get; set; }
+
+        public string? GivenName { get; set; }
+
+        public string? MiddleName { get; set; }
+
+        public string? Surname { get; set; }
+
+        public string? CountryRegion { get; set; }
+
+        public string? Club { get; set; }
+
+        public string? FeiId { get; set; }
+
+        public string[] Roles { get; set; } = [];
+
+        public NUserModel ToModel()
+        {
+            return new NUserModel(Email, Roles, Id)
+            {
+                Name = Name,
+                GivenName = GivenName,
+                MiddleName = MiddleName,
+                Surname = Surname,
+                CountryRegion = CountryRegion,
+                Club = Club,
+                FeiId = FeiId,
+            };
         }
     }
 }

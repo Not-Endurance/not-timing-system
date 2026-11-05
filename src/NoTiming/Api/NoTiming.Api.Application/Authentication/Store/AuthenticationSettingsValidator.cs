@@ -20,6 +20,11 @@ public sealed class AuthenticationSettingsValidator : IValidateOptions<Authentic
         var production = _environment.IsProduction();
         var failures = new List<string>();
 
+        if (production && !options.AppOrigin.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            failures.Add("Production must serve the app over https, because the session cookie and passkeys need it.");
+        }
+
         var relyingPartyProblem = RelyingPartyPolicy.Problem(options.RelyingPartyId, options.AppOrigin, production);
         if (relyingPartyProblem != null)
         {

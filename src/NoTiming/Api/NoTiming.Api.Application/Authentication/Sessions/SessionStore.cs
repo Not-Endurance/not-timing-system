@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using NC.Storage.Mongo;
+using NoTiming.Api.Application.Authentication.Passkeys;
 using NoTiming.Api.Application.Authentication.Store;
 
 namespace NoTiming.Api.Application.Authentication.Sessions;
@@ -29,7 +30,7 @@ public sealed class SessionDocument
     public DateTime ExpiresAt { get; set; }
 }
 
-public sealed class SessionStore
+public sealed class SessionStore : IPasskeySessionStore
 {
     readonly IMongoCollection<SessionDocument> _sessions;
 

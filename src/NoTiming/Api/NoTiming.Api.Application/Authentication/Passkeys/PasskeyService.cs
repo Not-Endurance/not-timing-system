@@ -1,8 +1,6 @@
 using System.Buffers.Text;
-using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NoTiming.Api.Application.Authentication.Email;
 using NoTiming.Api.Application.Authentication.Sessions;
 using NoTiming.Api.Application.Authentication.Store;
@@ -30,23 +28,23 @@ public sealed class PasskeyOutcome
 /// </summary>
 public sealed class PasskeyService
 {
-    readonly SignInManager<IdentityUserDocument> _signIn;
-    readonly IdentityUserStore _users;
-    readonly SessionStore _sessions;
+    readonly IPasskeyCeremony _ceremony;
+    readonly IPasskeyUsers _users;
+    readonly IPasskeySessionStore _sessions;
     readonly EmailDispatchQueue _mail;
     readonly TimeProvider _time;
     readonly ILogger<PasskeyService> _logger;
 
     public PasskeyService(
-        SignInManager<IdentityUserDocument> signIn,
-        IdentityUserStore users,
-        SessionStore sessions,
+        IPasskeyCeremony ceremony,
+        IPasskeyUsers users,
+        IPasskeySessionStore sessions,
         EmailDispatchQueue mail,
         TimeProvider time,
         ILogger<PasskeyService> logger
     )
     {
-        _signIn = signIn;
+        _ceremony = ceremony;
         _users = users;
         _sessions = sessions;
         _mail = mail;
@@ -57,11 +55,14 @@ public sealed class PasskeyService
     /// <summary>Options for a passkey sign-in. They name no user, so the authenticator offers the passkeys it holds.</summary>
     public Task<string> RequestOptionsAsync()
     {
-        return _signIn.MakePasskeyRequestOptionsAsync(null!);
+        return _ceremony.MakeRequestOptionsAsync();
     }
 
-    /// <summary>Options for a new passkey. The user gets a random handle the first time, never the integer id.</summary>
-    public async Task<string> CreationOptionsAsync(int userId, CancellationToken cancellationToken)
+    /// <summary>
+    /// Options for a new passkey. The user gets a random handle the first time, never the integer id. Null when the
+    /// handle could not be stored, so the caller can ask again.
+    /// </summary>
+    public async Task<string?> CreationOptionsAsync(int userId, CancellationToken cancellationToken)
     {
         var user = await _users.FindByUserIdAsync(userId, cancellationToken)
             ?? throw new InvalidOperationException("The signed-in user does not exist.");
@@ -78,12 +79,16 @@ public sealed class PasskeyService
                 cancellationToken
             );
             user = await _users.FindByUserIdAsync(userId, cancellationToken) ?? user;
+            if (user.UserHandle is null)
+            {
+                return null;
+            }
         }
 
-        return await _signIn.MakePasskeyCreationOptionsAsync(
+        return await _ceremony.MakeCreationOptionsAsync(
             new PasskeyUserEntity
             {
-                Id = Base64Url.EncodeToString(user.UserHandle!),
+                Id = Base64Url.EncodeToString(user.UserHandle),
                 Name = user.Email ?? string.Empty,
                 DisplayName = user.DisplayName ?? user.Name ?? user.Email ?? string.Empty,
             }
@@ -99,14 +104,13 @@ public sealed class PasskeyService
         CancellationToken cancellationToken
     )
     {
-        var attestation = await TryCeremonyAsync(() => _signIn.PerformPasskeyAttestationAsync(credentialJson));
-        if (attestation?.Passkey is null)
+        var passkey = await TryCeremonyAsync(() => _ceremony.PerformAttestationAsync(credentialJson));
+        if (passkey is null)
         {
             return new PasskeyOutcome { Kind = PasskeyOutcomeKind.Refused };
         }
 
         var now = _time.GetUtcNow();
-        var passkey = attestation.Passkey;
         passkey.Name = string.IsNullOrWhiteSpace(name) ? $"Passkey, {now:yyyy-MM-dd}" : name.Trim();
 
         var result = await _users.ChangeAsync(
@@ -126,7 +130,7 @@ public sealed class PasskeyService
         var user = await _users.FindByUserIdAsync(userId, cancellationToken);
         if (user?.Email != null)
         {
-            _mail.Enqueue(Email.EmailTemplates.PasskeyAdded(user.Email, language, passkey.Name!, now));
+            _mail.Enqueue(EmailTemplates.PasskeyAdded(user.Email, language, passkey.Name!, now));
         }
 
         _logger.LogInformation("User {UserId} added a passkey.", userId);
@@ -136,8 +140,8 @@ public sealed class PasskeyService
     /// <summary>Checks a passkey sign-in and starts a session for its user. Null when the answer is not accepted.</summary>
     public async Task<PasskeySignIn?> SignInAsync(string credentialJson, CancellationToken cancellationToken)
     {
-        var assertion = await TryCeremonyAsync(() => _signIn.PerformPasskeyAssertionAsync(credentialJson));
-        if (assertion?.User is null || assertion.Passkey is null)
+        var assertion = await TryCeremonyAsync(() => _ceremony.PerformAssertionAsync(credentialJson));
+        if (assertion is null)
         {
             return null;
         }
@@ -155,9 +159,16 @@ public sealed class PasskeyService
         );
 
         var user = await _users.FindByUserIdAsync(userId, cancellationToken) ?? assertion.User;
+        if (user.SecurityStamp is null)
+        {
+            // A session is bound to the stamp, so a user without one cannot be given a session.
+            _logger.LogWarning("A passkey sign-in was refused: the user has no security stamp.");
+            return null;
+        }
+
         var now = _time.GetUtcNow();
         var issued = SessionToken.Issue();
-        await _sessions.CreateAsync(issued.TokenHash, user.Id, user.SecurityStamp!, now, cancellationToken);
+        await _sessions.CreateAsync(issued.TokenHash, user.Id, user.SecurityStamp, now, cancellationToken);
         _logger.LogInformation("User {UserId} signed in with a passkey.", user.Id);
 
         return new PasskeySignIn { UserId = user.Id, SessionToken = issued.Token, ExpiresAtUtc = SessionRules.ExpiresAt(now) };
@@ -214,7 +225,7 @@ public sealed class PasskeyService
             return new PasskeyOutcome { Kind = PasskeyOutcomeKind.NotFound };
         }
 
-        if (!Authentication.Passkeys.PasskeyRemovalRules.CanRemove(passkeys.Count))
+        if (!PasskeyRemovalRules.CanRemove(passkeys.Count))
         {
             return new PasskeyOutcome { Kind = PasskeyOutcomeKind.LastPasskey };
         }
@@ -224,7 +235,7 @@ public sealed class PasskeyService
     }
 
     /// <summary>An answer that cannot be checked is refused the same way whatever the reason. Cancellation is not.</summary>
-    async Task<T?> TryCeremonyAsync<T>(Func<Task<T>> ceremony)
+    async Task<T?> TryCeremonyAsync<T>(Func<Task<T?>> ceremony)
         where T : class
     {
         try

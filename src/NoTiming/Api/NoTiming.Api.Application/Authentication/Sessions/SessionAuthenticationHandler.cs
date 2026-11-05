@@ -69,22 +69,17 @@ public sealed class SessionAuthenticationHandler : AuthenticationHandler<Authent
             }
         }
 
-        var identity = new System.Security.Claims.ClaimsIdentity(Scheme.Name);
-        identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, user.Id.ToString()));
-        identity.AddClaim(
-            new System.Security.Claims.Claim(
-                System.Security.Claims.ClaimTypes.Name,
-                user.DisplayName ?? user.Name ?? user.Email ?? string.Empty
-            )
-        );
+        var identity = new ClaimsIdentity(Scheme.Name);
+        identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+        identity.AddClaim(new Claim(ClaimTypes.Name, user.DisplayName ?? user.Name ?? user.Email ?? string.Empty));
         if (user.Email != null)
         {
-            identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, user.Email));
+            identity.AddClaim(new Claim(ClaimTypes.Email, user.Email));
         }
 
         foreach (var role in user.Roles)
         {
-            identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, role));
+            identity.AddClaim(new Claim(ClaimTypes.Role, role));
         }
 
         return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), Scheme.Name));

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -103,6 +104,11 @@ public class NHttpClient
             }
 
             return content;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            // A signed-out visitor is refused on purpose: the normal anonymous answer, not a fault.
+            throw;
         }
         catch (Exception ex)
         {

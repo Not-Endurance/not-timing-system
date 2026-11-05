@@ -22,8 +22,6 @@ public static class AuthenticationExtensions
             provider.GetRequiredService<SessionAuthenticationStateProvider>()
         );
 
-        return services
-            .AddScoped<NUserResolver>()
-            .AddTransient<IBrowserLocalStorage, BrowserLocalStorage>();
+        return services.AddTransient<IBrowserLocalStorage, BrowserLocalStorage>();
     }
 }

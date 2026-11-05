@@ -36,7 +36,7 @@ public sealed class CoreFeatureEndToEndTests
     {
         var snapshot = EndToEndEventSnapshot.Load(snapshotName);
         await using var judge = new JudgeDriver(_fixture.NoTimingBaseUrl);
-        using var noTimingApi = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
+        using var noTimingApi = new NoTimingApiDriver(_fixture);
         var configureEvent = new ConfigureEventFeature(judge, noTimingApi);
         var startEvent = new StartCoreEventFeature(judge, noTimingApi);
 

@@ -8,19 +8,22 @@ using static NoTiming.IntegrationTests.Authentication.Harness.AccountTestData;
 namespace NoTiming.IntegrationTests.Authentication;
 
 /// <summary>
-/// Passkey options, sign-in refusal and the management of a user's passkeys over HTTP. A real WebAuthn ceremony needs a
-/// browser authenticator, so enrolment and sign-in with a passkey are not covered here; the passkeys this class manages
-/// are seeded directly. This class sends one code, to sign in.
+/// Passkey options, enrolment and sign-in with a passkey. Enrolment and sign-in run the real WebAuthn ceremony through a
+/// software authenticator, so the server runs its own checks. The list, rename and removal tests seed passkeys directly.
 /// </summary>
 public sealed class PasskeyTests : IClassFixture<NoTimingIntegrationFixture>, IDisposable
 {
+    const string RelyingPartyId = "localhost";
+
     readonly AccountClient _client;
     readonly MongoAccess _mongo;
+    readonly string _origin;
 
     public PasskeyTests(NoTimingIntegrationFixture fixture)
     {
         _client = new AccountClient(fixture.NoTimingBaseUrl, fixture.NoTimingPort);
         _mongo = new MongoAccess(fixture.MongoConnectionString);
+        _origin = $"http://app.localhost:{fixture.NoTimingPort}";
     }
 
     public void Dispose()
@@ -166,9 +169,38 @@ public sealed class PasskeyTests : IClassFixture<NoTimingIntegrationFixture>, ID
         Assert.Equal(HttpStatusCode.NotFound, missing.StatusCode);
     }
 
-    static byte[] NewCredential()
+    [Fact]
+    public async Task Enrol_WhenTheAuthenticatorAnswers_ShouldStoreThePasskeyForTheUser()
     {
-        return System.Security.Cryptography.RandomNumberGenerator.GetBytes(32);
+        var cookie = await RegisterAndSignInAsync(_client, _mongo, Address("enrol"));
+        using var authenticator = new SoftwareAuthenticator();
+        var options = await _client.PasskeyEnrolOptionsAsync(cookie);
+        var credential = authenticator.Register(await options.Content.ReadAsStringAsync(), _origin, RelyingPartyId);
+
+        var enrolled = await _client.EnrolPasskeyAsync(Join(cookie, AccountClient.CookiesOf(options)), "Phone", credential);
+
+        Assert.Equal(HttpStatusCode.Created, enrolled.StatusCode);
+        Assert.Equal(new[] { "Phone" }, await PasskeyNamesAsync(cookie));
+    }
+
+    [Fact]
+    public async Task SignInWithPasskey_WhenTheAuthenticatorAnswers_ShouldStartASession()
+    {
+        var cookie = await RegisterAndSignInAsync(_client, _mongo, Address("passkey-sign-in"));
+        using var authenticator = new SoftwareAuthenticator();
+        var enrolOptions = await _client.PasskeyEnrolOptionsAsync(cookie);
+        var credential = authenticator.Register(await enrolOptions.Content.ReadAsStringAsync(), _origin, RelyingPartyId);
+        await _client.EnrolPasskeyAsync(Join(cookie, AccountClient.CookiesOf(enrolOptions)), "Phone", credential);
+
+        var signInOptions = await _client.PasskeySignInOptionsAsync();
+        var answer = authenticator.Answer(await signInOptions.Content.ReadAsStringAsync(), _origin, RelyingPartyId);
+        var verified = await _client.PasskeySignInVerifyAsync(
+            JsonDocument.Parse(answer).RootElement.Clone(),
+            AccountClient.CookiesOf(signInOptions)
+        );
+
+        Assert.Equal(HttpStatusCode.OK, verified.StatusCode);
+        Assert.True(await IsSignedInAsync(await _client.MeAsync(AccountClient.SessionCookieOf(verified))));
     }
 
     async Task<int> CountPasskeysAsync(string cookie)
@@ -176,5 +208,22 @@ public sealed class PasskeyTests : IClassFixture<NoTimingIntegrationFixture>, ID
         var list = await _client.ListPasskeysAsync(cookie);
         using var json = JsonDocument.Parse(await list.Content.ReadAsStringAsync());
         return json.RootElement.GetArrayLength();
+    }
+
+    static byte[] NewCredential()
+    {
+        return System.Security.Cryptography.RandomNumberGenerator.GetBytes(32);
+    }
+
+    static string Join(string cookie, string ceremony)
+    {
+        return ceremony.Length == 0 ? cookie : $"{cookie}; {ceremony}";
+    }
+
+    async Task<List<string>> PasskeyNamesAsync(string cookie)
+    {
+        var response = await _client.ListPasskeysAsync(cookie);
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        return json.RootElement.EnumerateArray().Select(x => x.GetProperty("name").GetString()!).ToList();
     }
 }

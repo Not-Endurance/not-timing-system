@@ -39,6 +39,14 @@ public sealed class AuthenticationIndexes : IHostedService
                     Builders<IdentityUserDocument>.IndexKeys.Ascending(x => x.Email),
                     new CreateIndexOptions<IdentityUserDocument>
                     {
+                        Name = "identity_email_ci",
+                        Collation = EmailCollation.Value,
+                    }
+                ),
+                new CreateIndexModel<IdentityUserDocument>(
+                    Builders<IdentityUserDocument>.IndexKeys.Ascending(x => x.Email),
+                    new CreateIndexOptions<IdentityUserDocument>
+                    {
                         Name = "identity_email_proved_unique",
                         Unique = true,
                         PartialFilterExpression = Builders<IdentityUserDocument>.Filter.Exists(x => x.ProvedAt),

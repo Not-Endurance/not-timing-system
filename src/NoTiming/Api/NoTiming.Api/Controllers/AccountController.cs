@@ -51,6 +51,7 @@ public sealed class AccountController : ControllerBase
                 Id = user.Id,
                 Email = user.Email,
                 Name = user.Name,
+                DisplayName = user.DisplayName,
                 GivenName = user.GivenName,
                 MiddleName = user.MiddleName,
                 Surname = user.Surname,
@@ -65,7 +66,7 @@ public sealed class AccountController : ControllerBase
     [HttpPatch("me")]
     public async Task<IActionResult> UpdateProfile([FromBody] ProfileRequest request, CancellationToken cancellationToken)
     {
-        var userId = await CurrentUserIdAsync();
+        var userId = await SessionUser.IdOfAsync(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
@@ -142,20 +143,8 @@ public sealed class AccountController : ControllerBase
 
     async Task<IdentityUserDocument?> CurrentUserAsync(CancellationToken cancellationToken)
     {
-        var userId = await CurrentUserIdAsync();
+        var userId = await SessionUser.IdOfAsync(HttpContext);
         return userId is null ? null : await _account.FindAsync(userId.Value, cancellationToken);
-    }
-
-    /// <summary>The user of the session cookie, read through the session scheme itself, whatever the default scheme is.</summary>
-    async Task<int?> CurrentUserIdAsync()
-    {
-        var result = await HttpContext.AuthenticateAsync(SessionAuthenticationHandler.SCHEME);
-        if (!result.Succeeded || result.Principal is null)
-        {
-            return null;
-        }
-
-        return int.TryParse(result.Principal.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : null;
     }
 
     string Language()
@@ -254,6 +243,8 @@ public sealed class ProfileResponse
     public string? Email { get; init; }
 
     public string? Name { get; init; }
+
+    public string? DisplayName { get; init; }
 
     public string? GivenName { get; init; }
 

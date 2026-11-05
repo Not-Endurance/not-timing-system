@@ -34,6 +34,31 @@ internal sealed class MongoAccess
         return _database.GetCollection<BsonDocument>("users").InsertOneAsync(document);
     }
 
+    /// <summary>
+    /// A user row as it was before identity, with each profile field exactly as given (absent fields stay absent). Sign-in
+    /// adopts such a row when its address is proved, keeping its id and profile.
+    /// </summary>
+    public Task SeedLegacyUserAsync(int id, string email, string? name, string? givenName, string? middleName, string? surname, string? countryRegion, string? club, string? feiId, string? displayName)
+    {
+        var document = new BsonDocument
+        {
+            { "_id", id },
+            { "Email", email },
+            { "Name", BsonValueOrNull(name) },
+            { "GivenName", BsonValueOrNull(givenName) },
+            { "MiddleName", BsonValueOrNull(middleName) },
+            { "Surname", BsonValueOrNull(surname) },
+            { "CountryRegion", BsonValueOrNull(countryRegion) },
+            { "Club", BsonValueOrNull(club) },
+            { "FeiId", BsonValueOrNull(feiId) },
+            { "DisplayName", BsonValueOrNull(displayName) },
+            { "Roles", new BsonArray() },
+            { "TenantId", "nts" },
+        };
+
+        return _database.GetCollection<BsonDocument>("users").InsertOneAsync(document);
+    }
+
     public async Task<bool> UserExistsAsync(string email)
     {
         var count = await _database
@@ -115,5 +140,10 @@ internal sealed class MongoAccess
         }
 
         throw new TimeoutException($"No code reached the outbox for {email}.");
+    }
+
+    static BsonValue BsonValueOrNull(string? value)
+    {
+        return value is null ? BsonNull.Value : new BsonString(value);
     }
 }

@@ -50,6 +50,7 @@ public static class NoTimingHost
             string.Join(", ", app.Urls)
         );
 
+        app.UseForwardedHeaders();
         app.UseMiddleware<ConnectionDiagnosticsMiddleware>();
         app.Use(
             async (context, next) =>

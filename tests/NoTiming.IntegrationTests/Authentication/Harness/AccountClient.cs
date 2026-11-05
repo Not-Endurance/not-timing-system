@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace NoTiming.IntegrationTests.Authentication.Harness;
 
@@ -13,6 +14,22 @@ internal sealed class AccountClient : IDisposable
     {
         var setCookie = response.Headers.GetValues("Set-Cookie").Single(x => x.StartsWith(SESSION_COOKIE + "=", StringComparison.Ordinal));
         return setCookie.Split(';')[0];
+    }
+
+    /// <summary>
+    /// The cookies a response set, as a Cookie header: name and value only. A cookie that the response expired is left out.
+    /// </summary>
+    public static string CookiesOf(HttpResponseMessage response)
+    {
+        if (!response.Headers.TryGetValues("Set-Cookie", out var setCookies))
+        {
+            return string.Empty;
+        }
+
+        return string.Join(
+            "; ",
+            setCookies.Select(x => x.Split(';')[0]).Where(x => !x.EndsWith('='))
+        );
     }
 
     /// <summary>The Set-Cookie header of the session cookie, for checking its attributes.</summary>
@@ -71,9 +88,15 @@ internal sealed class AccountClient : IDisposable
         return SendAsync(HttpMethod.Post, "api/sign-in/passkey/options", body: null);
     }
 
-    public Task<HttpResponseMessage> PasskeySignInVerifyAsync(object credential)
+    public Task<HttpResponseMessage> PasskeySignInVerifyAsync(object credential, string? cookie = null)
     {
-        return SendAsync(HttpMethod.Post, "api/sign-in/passkey/verify", credential);
+        return SendAsync(HttpMethod.Post, "api/sign-in/passkey/verify", credential, cookie);
+    }
+
+    public Task<HttpResponseMessage> EnrolPasskeyAsync(string cookie, string name, string credentialJson)
+    {
+        var credential = JsonDocument.Parse(credentialJson).RootElement.Clone();
+        return SendAsync(HttpMethod.Post, "api/me/passkeys", new { name, credential }, cookie);
     }
 
     public Task<HttpResponseMessage> PasskeyEnrolOptionsAsync(string cookie)

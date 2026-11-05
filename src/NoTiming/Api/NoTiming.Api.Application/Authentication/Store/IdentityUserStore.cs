@@ -1,11 +1,11 @@
 using System.Buffers.Text;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NC.Random;
 using NC.Storage.Mongo;
+using NoTiming.Api.Application.Authentication.Passkeys;
 
 namespace NoTiming.Api.Application.Authentication.Store;
 
@@ -19,7 +19,8 @@ public sealed class IdentityUserStore
         IUserEmailStore<IdentityUserDocument>,
         IUserSecurityStampStore<IdentityUserDocument>,
         IUserLockoutStore<IdentityUserDocument>,
-        IUserPasskeyStore<IdentityUserDocument>
+        IUserPasskeyStore<IdentityUserDocument>,
+        IPasskeyUsers
 {
     const int ChangeAttempts = 4;
 
@@ -163,12 +164,7 @@ public sealed class IdentityUserStore
     /// <summary>Case-insensitive, because a legacy row may still hold a mixed-case address.</summary>
     public async Task<IdentityUserDocument?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
     {
-        var pattern = "^" + Regex.Escape(normalizedEmail) + "$";
-        var matches = await _users
-            .Find(Builders<IdentityUserDocument>.Filter.Regex(x => x.Email, new MongoDB.Bson.BsonRegularExpression(pattern, "i")))
-            .Limit(2)
-            .ToListAsync(cancellationToken);
-
+        var matches = await FindAllByEmailAsync(normalizedEmail, cancellationToken);
         return matches.Count == 1 ? matches[0] : null;
     }
 
@@ -351,9 +347,11 @@ public sealed class IdentityUserStore
     /// <summary>Every row with the address, case-insensitively, up to two. Two is enough to tell a duplicate apart.</summary>
     public async Task<List<IdentityUserDocument>> FindAllByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
     {
-        var pattern = "^" + Regex.Escape(normalizedEmail) + "$";
         return await _users
-            .Find(Builders<IdentityUserDocument>.Filter.Regex(x => x.Email, new BsonRegularExpression(pattern, "i")))
+            .Find(
+                Builders<IdentityUserDocument>.Filter.Eq(x => x.Email, normalizedEmail),
+                new FindOptions { Collation = EmailCollation.Value }
+            )
             .Limit(2)
             .ToListAsync(cancellationToken);
     }

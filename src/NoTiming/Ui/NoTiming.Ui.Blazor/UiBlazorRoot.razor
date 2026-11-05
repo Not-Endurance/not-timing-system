@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using NoTiming.Ui.Blazor.Layout
 @using NoTiming.Ui.Blazor.Features.Profile
+@using NoTiming.Ui.Blazor.Features.Authentication
 
 @inherits UiBlazorRootBehind
 
@@ -15,7 +16,11 @@
                 <Found Context="routeData">
 
                     <ProfileRouteGate RouteData="@routeData">
-                        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                            <NotAuthorized>
+                                <SignInRedirect />
+                            </NotAuthorized>
+                        </AuthorizeRouteView>
                     </ProfileRouteGate>
 
                     <FocusOnNavigate RouteData="@routeData" Selector=".n-route-focus-target" />

@@ -65,7 +65,8 @@ public sealed class PasskeyController : ControllerBase
             return Unauthorized();
         }
 
-        return Content(await _passkeys.CreationOptionsAsync(userId.Value, cancellationToken), "application/json");
+        var options = await _passkeys.CreationOptionsAsync(userId.Value, cancellationToken);
+        return options is null ? Conflict(new { error = "try-again" }) : Content(options, "application/json");
     }
 
     [HttpGet("me/passkeys")]

@@ -82,6 +82,9 @@ public static class AuthenticationServices
         services.AddSingleton<AccountSignInService>();
         services.AddSingleton<AccountService>();
         services.AddScoped<PasskeyService>();
+        services.AddScoped<IPasskeyCeremony, SignInManagerPasskeyCeremony>();
+        services.AddSingleton<IPasskeyUsers>(provider => provider.GetRequiredService<IdentityUserStore>());
+        services.AddSingleton<IPasskeySessionStore>(provider => provider.GetRequiredService<SessionStore>());
         services.AddSingleton<ILegacyUserAdoption, LegacyUserAdoption>();
         services.AddScoped<StateChangeGuard>();
 

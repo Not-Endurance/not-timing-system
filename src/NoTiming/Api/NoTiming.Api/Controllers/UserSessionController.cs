@@ -1,6 +1,8 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NC.Storage.Mongo;
+using NoTiming.Api.Application.Authentication.Sessions;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Telemetry;
 using NoTiming.Api.Base;
@@ -10,6 +12,10 @@ using NoTiming.Application.UserSession;
 
 namespace NoTiming.Api.Controllers;
 
+/// <summary>
+/// A person's own event session. Every route needs a session, and a route that names or changes another person's
+/// session is refused, so the Ui reads and writes only what the person who is signed in owns.
+/// </summary>
 public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel>
 {
     readonly INoTimingUserSessionRepository _sessions;
@@ -32,6 +38,21 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         using var activity = StartFunctionActivity(nameof(Create));
         TagRequest(request);
         LogInformation(request, nameof(Create));
+
+        var userId = await SessionUser.IdOfAsync(HttpContext);
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        request.EnableBuffering();
+        var payload = await ReadBody<NoTimingUserSessionModel>(request);
+        if (!IsOwnedBy(payload.UserIdentifier, userId.Value))
+        {
+            return Forbidden();
+        }
+
+        request.Body.Position = 0;
         return await CreateCore(request);
     }
 
@@ -42,6 +63,27 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         using var activity = StartFunctionActivity(nameof(Update));
         TagRequest(request);
         LogInformation(request, nameof(Update));
+
+        var userId = await SessionUser.IdOfAsync(HttpContext);
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        request.EnableBuffering();
+        var payload = await ReadBody<NoTimingUserSessionModel>(request);
+        var stored = await Repository.Read(payload.Id);
+        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId.Value))
+        {
+            return Forbidden();
+        }
+
+        if (!IsOwnedBy(payload.UserIdentifier, userId.Value))
+        {
+            return Forbidden();
+        }
+
+        request.Body.Position = 0;
         return await UpdateCore(request);
     }
 
@@ -52,6 +94,19 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         using var activity = StartFunctionActivity(nameof(Delete));
         TagRequest(request);
         LogInformation(request, nameof(Delete));
+
+        var userId = await SessionUser.IdOfAsync(HttpContext);
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var stored = await Repository.Read(id);
+        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId.Value))
+        {
+            return Forbidden();
+        }
+
         return await DeleteCore(id);
     }
 
@@ -63,18 +118,20 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(DeleteForEvent));
 
+        var userId = await SessionUser.IdOfAsync(HttpContext);
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var stored = await Repository.Read(id);
+        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId.Value))
+        {
+            return Forbidden();
+        }
+
         await _sessions.Delete(new NoTimingUserSessionModel { Id = id, EventId = eventId });
         return Ok();
-    }
-
-    [HttpDelete("user-sessions")]
-    public async Task<IActionResult> DeleteMany()
-    {
-        var request = Request;
-        using var activity = StartFunctionActivity(nameof(DeleteMany));
-        TagRequest(request);
-        LogInformation(request, nameof(DeleteMany));
-        return await DeleteManyCore(request);
     }
 
     [HttpGet("user-sessions/{id:int}")]
@@ -84,7 +141,20 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         using var activity = StartFunctionActivity(nameof(Read));
         TagRequest(request);
         LogInformation(request, nameof(Read));
-        return await ReadCore(id);
+
+        var userId = await SessionUser.IdOfAsync(HttpContext);
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var stored = await Repository.Read(id);
+        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId.Value))
+        {
+            return Forbidden();
+        }
+
+        return Ok(stored);
     }
 
     [HttpGet("user-sessions/by-user-identifier/{userIdentifier}")]
@@ -95,7 +165,19 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(ReadByUserIdentifier));
 
-        return Ok(await _sessions.ReadByUserIdentifier(Uri.UnescapeDataString(userIdentifier)));
+        var userId = await SessionUser.IdOfAsync(HttpContext);
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var identifier = Uri.UnescapeDataString(userIdentifier);
+        if (!IsOwnedBy(identifier, userId.Value))
+        {
+            return Forbidden();
+        }
+
+        return Ok(await _sessions.ReadByUserIdentifier(identifier));
     }
 
     [HttpGet("user-sessions/{eventId:int}/by-user-identifier/{userIdentifier}")]
@@ -106,16 +188,28 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(ReadByUserIdentifierAndEvent));
 
-        return Ok(await _sessions.ReadByUserIdentifier(Uri.UnescapeDataString(userIdentifier), eventId));
+        var userId = await SessionUser.IdOfAsync(HttpContext);
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var identifier = Uri.UnescapeDataString(userIdentifier);
+        if (!IsOwnedBy(identifier, userId.Value))
+        {
+            return Forbidden();
+        }
+
+        return Ok(await _sessions.ReadByUserIdentifier(identifier, eventId));
     }
 
-    [HttpGet("user-sessions")]
-    public async Task<IActionResult> ReadMany()
+    static bool IsOwnedBy(string? userIdentifier, int userId)
     {
-        var request = Request;
-        using var activity = StartFunctionActivity(nameof(ReadMany));
-        TagRequest(request);
-        LogInformation(request, nameof(ReadMany));
-        return await ReadManyCore(request);
+        return string.Equals(userIdentifier, userId.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
+    }
+
+    IActionResult Forbidden()
+    {
+        return StatusCode(StatusCodes.Status403Forbidden);
     }
 }

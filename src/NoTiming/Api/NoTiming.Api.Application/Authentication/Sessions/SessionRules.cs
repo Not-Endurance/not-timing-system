@@ -15,9 +15,4 @@ public static class SessionRules
     {
         return now.Add(Lifetime);
     }
-
-    public static bool IsLive(DateTimeOffset expiresAtUtc, DateTimeOffset now)
-    {
-        return now < expiresAtUtc;
-    }
 }

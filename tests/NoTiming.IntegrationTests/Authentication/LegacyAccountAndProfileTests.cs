@@ -1,4 +1,5 @@
 using System.Net;
+using MongoDB.Bson;
 using NoTiming.IntegrationTests.Authentication.Harness;
 using NoTiming.IntegrationTests.Infrastructure;
 using static NoTiming.IntegrationTests.Authentication.Harness.AccountTestData;
@@ -7,7 +8,7 @@ namespace NoTiming.IntegrationTests.Authentication;
 
 /// <summary>
 /// Existing users keep their id and roles when they first prove their address, the profile needs its required details,
-/// and a code is refused after five attempts. This class sends at most four codes.
+/// and a code is refused after five attempts.
 /// </summary>
 public sealed class LegacyAccountAndProfileTests : IClassFixture<NoTimingIntegrationFixture>, IDisposable
 {
@@ -23,6 +24,27 @@ public sealed class LegacyAccountAndProfileTests : IClassFixture<NoTimingIntegra
     public void Dispose()
     {
         _client.Dispose();
+    }
+
+    [Fact]
+    public async Task SignIn_WhenLegacyAddressIsStoredInMixedCase_ShouldAdoptTheRow()
+    {
+        var lowerCase = Address("mixed-case");
+        var mixedCase = lowerCase.Replace("mixed-case", "Mixed-Case");
+        var userId = AccountTestData.NewId();
+        await _mongo.SeedUserAsync(userId, mixedCase, proved: false, roles: ["Official"]);
+
+        var code = await _client.RequestSignInCodeAsync(lowerCase);
+        var accepted = code.StatusCode == HttpStatusCode.Accepted;
+        var sentCode = await _mongo.WaitForCodeAsync(lowerCase, CodeTimeout);
+        var verified = await _client.VerifyAsync(lowerCase, sentCode);
+
+        Assert.True(accepted);
+        Assert.Equal(HttpStatusCode.OK, verified.StatusCode);
+        var adopted = await _mongo.ReadUserAsync(userId);
+        Assert.Equal(userId, adopted!["_id"].AsInt32);
+        Assert.Equal(lowerCase, adopted["Email"].AsString);
+        Assert.Equal(new[] { "Official" }, adopted["Roles"].AsBsonArray.Select(x => x.AsString).ToArray());
     }
 
     [Fact]

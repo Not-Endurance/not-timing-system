@@ -23,16 +23,4 @@ public sealed class SessionRulesTests
     {
         Assert.Equal(Now.AddDays(30), SessionRules.ExpiresAt(Now));
     }
-
-    [Fact]
-    public void IsLive_WhenExpiryHasPassed_ShouldReturnFalse()
-    {
-        Assert.False(SessionRules.IsLive(expiresAtUtc: Now.AddSeconds(-1), now: Now));
-    }
-
-    [Fact]
-    public void IsLive_WhenExpiryIsAhead_ShouldReturnTrue()
-    {
-        Assert.True(SessionRules.IsLive(expiresAtUtc: Now.AddSeconds(1), now: Now));
-    }
 }
