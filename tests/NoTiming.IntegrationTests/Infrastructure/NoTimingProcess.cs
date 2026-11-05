@@ -53,7 +53,10 @@ internal sealed class NoTimingProcess : IAsyncDisposable
         startInfo.Environment["ASPNETCORE_ENVIRONMENT"] = "Development";
         startInfo.Environment["PORT"] = Port.ToString();
         startInfo.Environment["MONGO_CONNECTION_STRING"] = MongoConnectionString;
-        startInfo.Environment["NTS_INTEGRATION_AUTH"] = "true";
+        startInfo.Environment["Authentication__RelyingPartyId"] = "localhost";
+        startInfo.Environment["Authentication__AppOrigin"] = $"http://app.localhost:{Port}";
+        startInfo.Environment["Authentication__CodeSecret"] = "integration-only-code-secret";
+        startInfo.Environment["Authentication__EmailProvider"] = "outbox";
         startInfo.Environment["DOTNET_CLI_HOME"] = dotnetHome;
         startInfo.Environment["NUGET_PACKAGES"] = nugetPackages;
 

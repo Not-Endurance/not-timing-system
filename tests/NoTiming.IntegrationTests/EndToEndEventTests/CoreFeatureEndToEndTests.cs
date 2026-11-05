@@ -58,9 +58,7 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(snapshot.Rankings.Count, startedRankings.Count);
         AssertStartedOperatorsMatchSetup(startedDocuments.Operators, setup.SetupEvent, eventInformation.Id);
 
-        await using var ui = new UiDriver(
-            _fixture.NoTimingBaseUrl,
-            setup.UiOperator,
+        await using var ui = new UiDriver(_fixture.NoTimingBaseUrl, await _fixture.SignInAsync(setup.UiOperator),
             $"CoreEndToEndOperatorUi-{snapshot.Name}"
         );
         await ui.Start();

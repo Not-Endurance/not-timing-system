@@ -329,6 +329,41 @@ namespace NoTiming.Shared.Localization
             LocalizeString(nameof(Configure_events_cannot_be_deleted_string));
         public static string Is_on_time_for_Presentation_Inspection_string =>
             LocalizeString(nameof(Is_on_time_for_Presentation_Inspection_string));
+        public static string Code_not_right_or_expired_string =>
+            LocalizeString(nameof(Code_not_right_or_expired_string));
+        public static string Too_many_codes_requested_string => LocalizeString(nameof(Too_many_codes_requested_string));
+        public static string Request_could_not_be_checked_string =>
+            LocalizeString(nameof(Request_could_not_be_checked_string));
+        public static string Sign_in_string => LocalizeString(nameof(Sign_in_string));
+        public static string Sign_in_with_passkey_string => LocalizeString(nameof(Sign_in_with_passkey_string));
+        public static string Or_sign_in_with_code_string => LocalizeString(nameof(Or_sign_in_with_code_string));
+        public static string Email_string => LocalizeString(nameof(Email_string));
+        public static string Send_me_a_code_string => LocalizeString(nameof(Send_me_a_code_string));
+        public static string Create_an_account_string => LocalizeString(nameof(Create_an_account_string));
+        public static string Enter_six_digit_code_string => LocalizeString(nameof(Enter_six_digit_code_string));
+        public static string Code_string => LocalizeString(nameof(Code_string));
+        public static string Browser_cannot_use_passkeys_sign_in_with_code_string =>
+            LocalizeString(nameof(Browser_cannot_use_passkeys_sign_in_with_code_string));
+        public static string Passkey_not_used_string => LocalizeString(nameof(Passkey_not_used_string));
+        public static string Passkey_not_accepted_string => LocalizeString(nameof(Passkey_not_accepted_string));
+        public static string Create_account_string => LocalizeString(nameof(Create_account_string));
+        public static string Country_code_string => LocalizeString(nameof(Country_code_string));
+        public static string Privacy_email_use_string => LocalizeString(nameof(Privacy_email_use_string));
+        public static string I_already_have_an_account_string =>
+            LocalizeString(nameof(I_already_have_an_account_string));
+        public static string Passkeys_string => LocalizeString(nameof(Passkeys_string));
+        public static string Sign_in_to_manage_passkeys_string =>
+            LocalizeString(nameof(Sign_in_to_manage_passkeys_string));
+        public static string Passkey_explanation_string => LocalizeString(nameof(Passkey_explanation_string));
+        public static string Rename_string => LocalizeString(nameof(Rename_string));
+        public static string Remove_string => LocalizeString(nameof(Remove_string));
+        public static string Added_on_string => LocalizeString(nameof(Added_on_string));
+        public static string Name_for_new_passkey_string => LocalizeString(nameof(Name_for_new_passkey_string));
+        public static string Add_passkey_to_device_string => LocalizeString(nameof(Add_passkey_to_device_string));
+        public static string Browser_cannot_use_passkeys_string =>
+            LocalizeString(nameof(Browser_cannot_use_passkeys_string));
+        public static string Passkey_not_added_string => LocalizeString(nameof(Passkey_not_added_string));
+        public static string Last_passkey_string => LocalizeString(nameof(Last_passkey_string));
     }
 }
 #pragma warning restore NA0004

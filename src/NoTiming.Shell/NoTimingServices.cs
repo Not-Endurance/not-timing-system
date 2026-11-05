@@ -2,9 +2,9 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NC.Application.UdpHandshake;
-using NC.Server.Authentication;
 using NoTiming.Api;
 using NoTiming.Api.Application;
+using NoTiming.Api.Application.Authentication;
 using NoTiming.Application;
 using NoTiming.EventBus;
 using NoTiming.Host.Cors;
@@ -36,7 +36,7 @@ internal static class NoTimingServices
         services.ConfigureNoTimingApplication(configuration, Assembly.GetCallingAssembly());
         services.AddNoTiming(configuration);
         services.AddNoTimingApiApplication(configuration);
-        services.NJwtTokenValidation(configuration);
+        services.AddNoTimingAuthentication(configuration);
         services.AddNoTimingApi();
 
         return services.AddTransient<INetworkBroadcastService, JudgeHandshakeService>();

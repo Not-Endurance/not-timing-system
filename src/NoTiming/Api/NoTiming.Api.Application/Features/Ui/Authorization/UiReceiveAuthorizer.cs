@@ -1,23 +1,16 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Options;
 using NC.Application.Authentication.User;
-using NC.Server.Authentication;
 
 namespace NoTiming.Api.Application.Features.Ui.Authorization;
 
 internal sealed class UiReceiveAuthorizer : IUiReceiveAuthorizer
 {
     readonly IReceiveSnapshotAccessPolicy _receiveAccessPolicy;
-    readonly string? _requiredScope;
 
-    public UiReceiveAuthorizer(
-        IReceiveSnapshotAccessPolicy receiveAccessPolicy,
-        IOptions<NServerAuthenticationSettings> serverAuthenticationOptions
-    )
+    public UiReceiveAuthorizer(IReceiveSnapshotAccessPolicy receiveAccessPolicy)
     {
         _receiveAccessPolicy = receiveAccessPolicy;
-        _requiredScope = ResolveScopeName(serverAuthenticationOptions.Value);
     }
 
     public async Task Authorize(ClaimsPrincipal? principal, string? connectedEventId, string? requestedEventId)
@@ -32,11 +25,6 @@ internal sealed class UiReceiveAuthorizer : IUiReceiveAuthorizer
         if (principal?.Identity?.IsAuthenticated != true)
         {
             throw new HubException("Authentication is required to send snapshots.");
-        }
-
-        if (!NScopeClaimsHelper.HasScope(principal, _requiredScope))
-        {
-            throw new HubException("The authenticated user is missing the required Warp access scope.");
         }
 
         var email = NUserClaimsHelper.ResolveEmail(principal);
@@ -61,15 +49,4 @@ internal sealed class UiReceiveAuthorizer : IUiReceiveAuthorizer
         return parsedEventId;
     }
 
-    static string? ResolveScopeName(NServerAuthenticationSettings settings)
-    {
-        var scope = settings.Scope?.Trim();
-        if (string.IsNullOrWhiteSpace(scope))
-        {
-            return null;
-        }
-
-        var separatorIndex = scope.LastIndexOf('/');
-        return separatorIndex < 0 ? scope : scope[(separatorIndex + 1)..];
-    }
 }
