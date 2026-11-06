@@ -51,11 +51,14 @@ internal sealed class MongoUiReceiveAccessPolicy : IReceiveSnapshotAccessPolicy
             return true;
         }
 
-        var allowedOfficialRoles = SnapshotAccessPolicy.AllowedOfficialRoles;
-        return await database
-            .GetCollection<OfficialModel>(OFFICIALS_COLLECTION)
-            .Find(x => x.EventId == eventId && x.UserId == userId.Value && allowedOfficialRoles.Contains(x.Role))
-            .AnyAsync();
+        // Built with the filter builder: the LINQ translator fails on the captured SnapshotAccessPolicy.AllowedOfficialRoles array.
+        var filters = Builders<OfficialModel>.Filter;
+        var officialFilter = filters.And(
+            filters.Eq(x => x.EventId, eventId),
+            filters.Eq(x => x.UserId, userId.Value),
+            filters.In(x => x.Role, SnapshotAccessPolicy.AllowedOfficialRoles)
+        );
+        return await database.GetCollection<OfficialModel>(OFFICIALS_COLLECTION).Find(officialFilter).AnyAsync();
     }
 
     static string? NormalizeEmail(string? email)

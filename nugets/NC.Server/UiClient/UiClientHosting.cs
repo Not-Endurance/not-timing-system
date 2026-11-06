@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace NC.Server.UiClient;
@@ -65,8 +64,7 @@ internal static class UiClientHosting
         );
         app.MapFallback(prefix + "/{*path}", context => index.WriteAsync(context));
 
-        // In Development the client opens in the default browser once the server is listening.
-        if (app.Environment.IsDevelopment())
+        if (settings.OpenInBrowser)
         {
             var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("NC.Server.UiClient");
             app.Lifetime.ApplicationStarted.Register(() => BrowserLauncher.Open(app, logger, prefix + "/"));

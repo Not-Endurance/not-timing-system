@@ -17,9 +17,16 @@ internal static class UiHosting
             settings.FileProvider = localUi;
             settings.PathPrefix = ApplicationConstants.UI;
             settings.ResponseHeaders["Blazor-Environment"] = app.Environment.EnvironmentName;
+            settings.OpenInBrowser = ResolveOpenInBrowser();
         });
 
         return app;
+    }
+
+    // Set to true by the local launch profiles. Unset elsewhere, so tests and deployed hosts never open a browser.
+    static bool ResolveOpenInBrowser()
+    {
+        return bool.TryParse(Environment.GetEnvironmentVariable("OPEN_BROWSER"), out var open) && open;
     }
 
     // Development only: WITNESS_UI_PATH serves a locally published UI instead of this project's wwwroot.

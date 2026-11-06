@@ -57,6 +57,7 @@ internal sealed class NoTimingProcess : IAsyncDisposable
         startInfo.Environment["Authentication__AppOrigin"] = $"http://app.localhost:{Port}";
         startInfo.Environment["Authentication__CodeSecret"] = "integration-only-code-secret";
         startInfo.Environment["Authentication__EmailProvider"] = "outbox";
+        startInfo.Environment["OPEN_BROWSER"] = "false";
         startInfo.Environment["DOTNET_CLI_HOME"] = dotnetHome;
         startInfo.Environment["NUGET_PACKAGES"] = nugetPackages;
 
