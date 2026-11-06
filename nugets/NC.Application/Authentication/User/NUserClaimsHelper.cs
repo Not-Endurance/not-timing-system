@@ -7,23 +7,18 @@ public static class NUserClaimsHelper
 {
     public static NUserRegistration? ResolveRegistration(ClaimsPrincipal? principal)
     {
-        return ResolveRegistration(principal, null);
-    }
-
-    public static NUserRegistration? ResolveRegistration(ClaimsPrincipal? principal, NUserRegistrationProfile? profile)
-    {
         var email = ResolveEmail(principal);
         if (string.IsNullOrWhiteSpace(email))
         {
             return null;
         }
 
-        var givenName = profile?.GivenName ?? ResolveGivenName(principal);
-        var middleName = profile?.MiddleName ?? ResolveMiddleName(principal);
-        var surname = profile?.Surname ?? ResolveSurname(principal);
-        var club = profile?.Club ?? ResolveClub(principal);
-        var feiId = profile?.FeiId ?? ResolveFeiId(principal);
-        var displayName = profile?.DisplayName ?? ResolveDisplayName(principal);
+        var givenName = ResolveGivenName(principal);
+        var middleName = ResolveMiddleName(principal);
+        var surname = ResolveSurname(principal);
+        var club = ResolveClub(principal);
+        var feiId = ResolveFeiId(principal);
+        var displayName = ResolveDisplayName(principal);
         var name = ResolveName(givenName, middleName, surname);
 
         return new NUserRegistration(

@@ -38,25 +38,16 @@ public class NUserSessionService : INUserSession
             return null;
         }
 
+        // Accounts are created at sign-in, so a signed-in person always has a profile to read.
         var userResult = await _userRegister.Get(registration.Email);
-        if (userResult.IsSuccess && userResult.Data != null)
-        {
-            return new NUserSessionModel<TSessionState>(
-                userIdentifier,
-                userResult.Data,
-                await ResolveCurrentSession<TSessionState>(userIdentifier)
-            );
-        }
-
-        var registerResult = await _userRegister.Register(registration);
-        if (!registerResult.IsSuccess || registerResult.Data == null)
+        if (!userResult.IsSuccess || userResult.Data == null)
         {
             return null;
         }
 
         return new NUserSessionModel<TSessionState>(
             userIdentifier,
-            registerResult.Data,
+            userResult.Data,
             await ResolveCurrentSession<TSessionState>(userIdentifier)
         );
     }

@@ -1053,4 +1053,91 @@
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Are you sure you want to delete '{0}'?</value>
   </data>
+  <data name="Code_not_right_or_expired_string" xml:space="preserve">
+    <value>That code is not right, or it has expired. Ask for a new one.</value>
+  </data>
+  <data name="Too_many_codes_requested_string" xml:space="preserve">
+    <value>Too many codes were requested. Try again later.</value>
+  </data>
+  <data name="Request_could_not_be_checked_string" xml:space="preserve">
+    <value>This request could not be checked. Reload the page and try again.</value>
+  </data>
+  <data name="Sign_in_string" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="Sign_in_with_passkey_string" xml:space="preserve">
+    <value>Sign in with a passkey</value>
+  </data>
+  <data name="Or_sign_in_with_code_string" xml:space="preserve">
+    <value>Or, sign in with a code sent to your email.</value>
+  </data>
+  <data name="Email_string" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Send_me_a_code_string" xml:space="preserve">
+    <value>Send me a code</value>
+  </data>
+  <data name="Create_an_account_string" xml:space="preserve">
+    <value>Create an account</value>
+  </data>
+  <data name="Enter_six_digit_code_string" xml:space="preserve">
+    <value>Enter the six-digit code we sent to your email.</value>
+  </data>
+  <data name="Code_string" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="Browser_cannot_use_passkeys_sign_in_with_code_string" xml:space="preserve">
+    <value>This browser cannot use passkeys. Sign in with a code instead.</value>
+  </data>
+  <data name="Passkey_not_used_string" xml:space="preserve">
+    <value>The passkey was not used. Try again, or sign in with a code.</value>
+  </data>
+  <data name="Passkey_not_accepted_string" xml:space="preserve">
+    <value>That passkey was not accepted. Sign in with a code instead.</value>
+  </data>
+  <data name="Create_account_string" xml:space="preserve">
+    <value>Create account</value>
+  </data>
+  <data name="Country_code_string" xml:space="preserve">
+    <value>Country code</value>
+  </data>
+  <data name="Privacy_email_use_string" xml:space="preserve">
+    <value>We use your email only to sign you in and to send event notices.</value>
+  </data>
+  <data name="I_already_have_an_account_string" xml:space="preserve">
+    <value>I already have an account</value>
+  </data>
+  <data name="Passkeys_string" xml:space="preserve">
+    <value>Passkeys</value>
+  </data>
+  <data name="Sign_in_to_manage_passkeys_string" xml:space="preserve">
+    <value>Sign in to manage your passkeys.</value>
+  </data>
+  <data name="Passkey_explanation_string" xml:space="preserve">
+    <value>A passkey lets you sign in with this device's biometric check. Add one for each device you use.</value>
+  </data>
+  <data name="Rename_string" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Remove_string" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Added_on_string" xml:space="preserve">
+    <value>added {0}</value>
+  </data>
+  <data name="Name_for_new_passkey_string" xml:space="preserve">
+    <value>Name for a new passkey</value>
+  </data>
+  <data name="Add_passkey_to_device_string" xml:space="preserve">
+    <value>Add a passkey to this device</value>
+  </data>
+  <data name="Browser_cannot_use_passkeys_string" xml:space="preserve">
+    <value>This browser cannot use passkeys.</value>
+  </data>
+  <data name="Passkey_not_added_string" xml:space="preserve">
+    <value>The passkey was not added. Try again.</value>
+  </data>
+  <data name="Last_passkey_string" xml:space="preserve">
+    <value>This is your last passkey. Add another before you remove it.</value>
+  </data>
 </root>

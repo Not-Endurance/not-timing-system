@@ -1,0 +1,41 @@
+@using MudBlazor
+@using NC.Blazor.Components.Input
+@using NC.Blazor.Components.Layout
+
+@attribute [Route("register")]
+@inherits RegisterContentBehind
+
+<NContent Title="@Create_an_account_string" Class="not-mid-width">
+    <Main>
+        <MudStack Spacing="3">
+            @if (!CodeSent)
+            {
+                <NTextField @bind-Value="Email" For="() => Email" Label="@Email_string" Required />
+                <NTextField @bind-Value="GivenName" For="() => GivenName" Label="@First_name_string" Required />
+                <NTextField @bind-Value="Surname" For="() => Surname" Label="@Last_name_string" Required />
+                <NTextField @bind-Value="CountryRegion" For="() => CountryRegion" Label="@Country_code_string" Required />
+
+                @* A field no person fills in: a bot does, and gets the normal answer and nothing else. *@
+                <input type="text" name="website" autocomplete="off" tabindex="-1" aria-hidden="true"
+                       style="position:absolute;left:-10000px;width:1px;height:1px;opacity:0" @bind="Website" />
+
+                <MudText Typo="Typo.caption">
+                    @Privacy_email_use_string
+                </MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="RegisterSafe">@Send_me_a_code_string</MudButton>
+                <MudButton Href="/authentication" Variant="Variant.Text">@I_already_have_an_account_string</MudButton>
+            }
+            else
+            {
+                <MudText>@Enter_six_digit_code_string</MudText>
+                <NTextField @bind-Value="Code" For="() => Code" Label="@Code_string" Required />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="VerifySafe">@Create_account_string</MudButton>
+            }
+
+            @if (Message != null)
+            {
+                <MudText Color="Color.Error" role="alert">@Message</MudText>
+            }
+        </MudStack>
+    </Main>
+</NContent>

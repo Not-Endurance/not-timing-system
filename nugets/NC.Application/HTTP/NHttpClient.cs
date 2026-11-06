@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -71,6 +72,49 @@ public class NHttpClient
         where TResult : class
     {
         return await SendRequest<TResult>(HttpMethod.Patch, endpoint, payload);
+    }
+
+    /// <summary>
+    /// Sends a JSON body exactly as given and returns the response body exactly as received, without the Result envelope.
+    /// For endpoints that answer with their own JSON, or with no body. A refused request throws an
+    /// <see cref="HttpRequestException"/> that carries the status code.
+    /// </summary>
+    public async Task<string> SendRawJson(
+        HttpMethod method,
+        string endpoint,
+        string? json = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var url = BuildUrl(endpoint);
+
+        try
+        {
+            using var request = new HttpRequestMessage(method, url);
+            if (json != null)
+            {
+                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            }
+
+            using var response = await _httpClient.SendAsync(request, cancellationToken);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw CreateUnhandledResponseException(response, content);
+            }
+
+            return content;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            // A signed-out visitor is refused on purpose: the normal anonymous answer, not a fault.
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during {Method} request to {Url}", method, url);
+            throw;
+        }
     }
 
     Uri BuildUrl(string endpoint)

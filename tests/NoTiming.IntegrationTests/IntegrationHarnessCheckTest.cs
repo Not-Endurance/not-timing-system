@@ -74,7 +74,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
             maxAverageSpeed: 20,
             startTime: arrivelistStart
         );
-        using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
+        using var api = new NoTimingApiDriver(_fixture);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
         await api.RegisterUser(PARTICIPANT_USER);
@@ -92,10 +92,14 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         );
 
         await using var judge = new JudgeDriver(_fixture.NoTimingBaseUrl);
-        await using var officialUi = new UiDriver(_fixture.NoTimingBaseUrl, OFFICIAL_USER, "IntegrationOfficialUi");
+        await using var officialUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(OFFICIAL_USER),
+            "IntegrationOfficialUi"
+        );
         await using var participantUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
-            PARTICIPANT_USER,
+            await _fixture.SignInAsync(PARTICIPANT_USER),
             "IntegrationParticipantUi"
         );
 
@@ -202,7 +206,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         var manualNumber = 73;
         var start = DateTimeOffset.UtcNow.Date.AddHours(8);
         var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
-        using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
+        using var api = new NoTimingApiDriver(_fixture);
 
         await api.Create(eventInformation);
         await api.Create(
@@ -301,14 +305,18 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
             id: 5701,
             startTime: timestamp.AddHours(-2)
         );
-        using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
+        using var api = new NoTimingApiDriver(_fixture);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
         await api.Create(eventInformation);
         await api.Create(participation);
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6701));
 
-        await using var ui = new UiDriver(_fixture.NoTimingBaseUrl, OFFICIAL_USER, "SnapshotSessionUi");
+        await using var ui = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(OFFICIAL_USER),
+            "SnapshotSessionUi"
+        );
 
         await ui.Start();
         await ui.Connect(eventInformation);
@@ -319,7 +327,8 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
 
         await WaitForUserSession(
             api,
-            OFFICIAL_USER.UserIdentifier,
+            await _fixture.SignInAsync(OFFICIAL_USER),
+            officialUser.Id.ToString(),
             eventId,
             state =>
                 state.SnapshotSelections.Length == 1
@@ -333,7 +342,8 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
 
         await WaitForUserSession(
             api,
-            OFFICIAL_USER.UserIdentifier,
+            await _fixture.SignInAsync(OFFICIAL_USER),
+            officialUser.Id.ToString(),
             eventId,
             state =>
                 state.SnapshotSelections.Length == 1
@@ -344,7 +354,11 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
 
         await ui.Disconnect();
 
-        await using var restoredUi = new UiDriver(_fixture.NoTimingBaseUrl, OFFICIAL_USER, "SnapshotSessionRestoredUi");
+        await using var restoredUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(OFFICIAL_USER),
+            "SnapshotSessionRestoredUi"
+        );
 
         await restoredUi.Start();
         await restoredUi.Connect(eventInformation);
@@ -359,7 +373,8 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
 
         var publishedSession = await WaitForUserSession(
             api,
-            OFFICIAL_USER.UserIdentifier,
+            await _fixture.SignInAsync(OFFICIAL_USER),
+            officialUser.Id.ToString(),
             eventId,
             state =>
                 state.SnapshotSelections.Length == 0
@@ -387,7 +402,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         var criNumber = 54;
         var baseTime = DateTimeOffset.UtcNow.Date.AddHours(10);
         var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
-        using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
+        using var api = new NoTimingApiDriver(_fixture);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
         await api.RegisterUser(PARTICIPANT_USER);
@@ -428,10 +443,14 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6601));
 
         await using var judge = new JudgeDriver(_fixture.NoTimingBaseUrl);
-        await using var officialUi = new UiDriver(_fixture.NoTimingBaseUrl, OFFICIAL_USER, "PresentlistOfficialUi");
+        await using var officialUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(OFFICIAL_USER),
+            "PresentlistOfficialUi"
+        );
         await using var participantUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
-            PARTICIPANT_USER,
+            await _fixture.SignInAsync(PARTICIPANT_USER),
             "PresentlistParticipantUi"
         );
 
@@ -587,7 +606,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
             "operator-participant-witness-user",
             "Operator Participant Witness"
         );
-        using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
+        using var api = new NoTimingApiDriver(_fixture);
 
         var operatorUser = ToSetupUser(await api.RegisterUser(operatorIdentity));
         var eligibleOfficialUser = ToSetupUser(await api.RegisterUser(eligibleOfficialIdentity));
@@ -612,20 +631,24 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         Assert.Equal(OfficialRole.Steward, activeOperators[0].Role);
         Assert.Single(activeRankings);
 
-        await using var operatorUi = new UiDriver(_fixture.NoTimingBaseUrl, operatorIdentity, "IntegrationOperatorUi");
+        await using var operatorUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(operatorIdentity),
+            "IntegrationOperatorUi"
+        );
         await using var eligibleOfficialUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
-            eligibleOfficialIdentity,
+            await _fixture.SignInAsync(eligibleOfficialIdentity),
             "IntegrationEligibleOfficialUi"
         );
         await using var ineligibleOfficialUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
-            ineligibleOfficialIdentity,
+            await _fixture.SignInAsync(ineligibleOfficialIdentity),
             "IntegrationIneligibleOfficialUi"
         );
         await using var participantUi = new UiDriver(
             _fixture.NoTimingBaseUrl,
-            participantIdentity,
+            await _fixture.SignInAsync(participantIdentity),
             "IntegrationOperatorParticipantUi"
         );
 
@@ -651,87 +674,33 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
     }
 
     [Fact]
-    public async Task Ui_registration_resolution_creates_missing_notiming_user()
-    {
-        var registeringUser = new IntegrationUser(
-            "registering.witness@integration.test",
-            "registering-witness-user",
-            "Rosa Maria Register",
-            "Rosa",
-            "Maria",
-            "Register",
-            "Bulgaria",
-            "Konarche",
-            "10101010",
-            "Rosa Display"
-        );
-        using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
-        await using var ui = new UiDriver(_fixture.NoTimingBaseUrl, registeringUser, "IntegrationRegisteringUi");
-        var resolver = ui.GetRequiredService<NUserResolver>();
-        var principal = CreatePrincipal(registeringUser);
-        var profile = new NUserRegistrationProfile(
-            registeringUser.Name,
-            registeringUser.GivenName,
-            registeringUser.MiddleName,
-            registeringUser.Surname,
-            registeringUser.Club,
-            registeringUser.FeiId,
-            registeringUser.DisplayName
-        );
-
-        Assert.Null(await api.ReadUser(registeringUser.Email));
-
-        var result = await resolver.ResolvePrincipal(principal, profile);
-
-        Assert.True(result.IsSuccess, result.Error);
-        var created = await api.ReadUser(registeringUser.Email);
-        Assert.NotNull(created);
-        Assert.Equal(registeringUser.Email, created!.Email);
-        Assert.Equal(registeringUser.Name, created.Name);
-        Assert.Equal(registeringUser.DisplayName, created.DisplayName);
-        Assert.Equal(registeringUser.GivenName, created.GivenName);
-        Assert.Equal(registeringUser.MiddleName, created.MiddleName);
-        Assert.Equal(registeringUser.Surname, created.Surname);
-        Assert.Equal(registeringUser.CountryRegion, created.CountryRegion);
-        Assert.Equal(registeringUser.Club, created.Club);
-        Assert.Equal(registeringUser.FeiId, created.FeiId);
-    }
-
-    [Fact]
-    public async Task Ui_profile_update_completes_existing_email_only_user()
+    public async Task Own_profile_update_persists_for_the_signed_in_user()
     {
         var profileUser = new IntegrationUser(
             "profile-completion.witness@integration.test",
             "profile-completion-witness-user",
             "Profile Completion"
         );
-        using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
-
-        var registered = await api.RegisterUser(profileUser);
+        using var api = new NoTimingApiDriver(_fixture);
+        var cookie = await _fixture.SignInAsync(profileUser);
+        var registered = await api.ReadOwnProfile(cookie);
 
         Assert.Equal(profileUser.Email, registered.Email);
-        Assert.Null(registered.GivenName);
-        Assert.Null(registered.Surname);
-        Assert.Null(registered.CountryRegion);
 
-        var updated = await api.UpdateUserProfile(
-            profileUser.Email,
+        await api.UpdateOwnProfile(
+            cookie,
             new UpdateUserProfilePayload("Petra", "Profile", "Bulgaria", club: "Konarche", feiId: "20202020")
         );
-        var persisted = await api.ReadUser(profileUser.Email);
+        var persisted = await api.ReadOwnProfile(cookie);
 
-        Assert.Equal(registered.Id, updated.Id);
-        Assert.Equal(profileUser.Email, updated.Email);
-        Assert.Equal("Petra Profile", updated.Name);
-        Assert.Equal("Petra", updated.GivenName);
-        Assert.Equal("Profile", updated.Surname);
-        Assert.Equal("Bulgaria", updated.CountryRegion);
-        Assert.Equal("Konarche", updated.Club);
-        Assert.Equal("20202020", updated.FeiId);
-        Assert.NotNull(persisted);
-        Assert.Equal(updated.Id, persisted!.Id);
-        Assert.Equal(updated.Name, persisted.Name);
-        Assert.Equal(updated.CountryRegion, persisted.CountryRegion);
+        Assert.Equal(registered.Id, persisted.Id);
+        Assert.Equal(profileUser.Email, persisted.Email);
+        Assert.Equal("Petra Profile", persisted.Name);
+        Assert.Equal("Petra", persisted.GivenName);
+        Assert.Equal("Profile", persisted.Surname);
+        Assert.Equal("Bulgaria", persisted.CountryRegion);
+        Assert.Equal("Konarche", persisted.Club);
+        Assert.Equal("20202020", persisted.FeiId);
     }
 
     static SetupConfigureEvent CreateOperatorSetupEvent(
@@ -954,6 +923,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
 
     static async Task<NoTimingUserSessionModel> WaitForUserSession(
         NoTimingApiDriver api,
+        string cookie,
         string userIdentifier,
         int eventId,
         Func<NoTimingUserSessionStateModel, bool> predicate,
@@ -964,7 +934,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         NoTimingUserSessionModel? last = null;
         while (DateTimeOffset.UtcNow < deadline)
         {
-            last = await api.ReadUserSession(userIdentifier, eventId);
+            last = await api.ReadUserSession(userIdentifier, eventId, cookie);
             if (last?.State != null && predicate(last.State))
             {
                 return last;
@@ -1002,23 +972,6 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
             [new UiSnapshot(1, "Operator Rider", "Operator Rider", new Timestamp(DateTimeOffset.UtcNow))],
             SnapshotType.Automatic
         );
-    }
-
-    static ClaimsPrincipal CreatePrincipal(IntegrationUser user)
-    {
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.Email, user.Email),
-            new("oid", user.UserIdentifier),
-            new("name", user.DisplayName ?? user.Name),
-        };
-
-        AddClaim(claims, ClaimTypes.GivenName, user.GivenName);
-        AddClaim(claims, "middle_name", user.MiddleName);
-        AddClaim(claims, ClaimTypes.Surname, user.Surname);
-        AddClaim(claims, ClaimTypes.Country, user.CountryRegion);
-
-        return new ClaimsPrincipal(new ClaimsIdentity(claims, "IntegrationTest"));
     }
 
     static void AddClaim(List<Claim> claims, string type, string? value)

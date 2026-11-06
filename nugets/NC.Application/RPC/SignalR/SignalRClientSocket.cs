@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using Microsoft.AspNetCore.Http.Connections.Client;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,10 +61,20 @@ public class SignalRSocket : ThreadSafePersistentConnection<SignalRSocket.Connec
 
         return builder
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = new NJsonSettings())
-            .WithUrl(url, options => options.AccessTokenProvider = ResolveAccessToken)
+            .WithUrl(
+                url,
+                options =>
+                {
+                    options.AccessTokenProvider = ResolveAccessToken;
+                    ConfigureHttpConnection(options);
+                }
+            )
             .WithAutomaticReconnect(new AutomaticReconnectSetting())
             .Build();
     }
+
+    /// <summary>Lets a caller add to the connection before it starts, such as the cookies of a signed-in session.</summary>
+    protected virtual void ConfigureHttpConnection(HttpConnectionOptions options) { }
 
     protected virtual Task StartConnectionAsync(HubConnection connection, CancellationToken cancellationToken)
     {
