@@ -1,0 +1,14 @@
+{
+  "name": "nts-database",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MongoDB migrations for NTS, applied by the CD workflows with migrate-mongo",
+  "scripts": {
+    "migrate:status": "migrate-mongo status",
+    "migrate:up": "migrate-mongo up",
+    "migrate:down": "migrate-mongo down"
+  },
+  "dependencies": {
+    "migrate-mongo": "14.0.7"
+  }
+}
