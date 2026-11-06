@@ -27,16 +27,30 @@ public sealed class RateCounterStore
     public RateCounterStore(IMongoContext context, IOptions<AuthenticationSettings> options)
     {
         var settings = options.Value;
-        _counters = context.Client.GetDatabase(settings.Database).GetCollection<RateCounterDocument>(settings.RateCountersCollection);
+        _counters = context
+            .Client.GetDatabase(settings.Database)
+            .GetCollection<RateCounterDocument>(settings.RateCountersCollection);
     }
 
-    public async Task<int> CountAsync(string scope, string key, DateTimeOffset hourStart, CancellationToken cancellationToken = default)
+    public async Task<int> CountAsync(
+        string scope,
+        string key,
+        DateTimeOffset hourStart,
+        CancellationToken cancellationToken = default
+    )
     {
-        var counter = await _counters.Find(x => x.Key == Name(scope, key, hourStart)).FirstOrDefaultAsync(cancellationToken);
+        var counter = await _counters
+            .Find(x => x.Key == Name(scope, key, hourStart))
+            .FirstOrDefaultAsync(cancellationToken);
         return counter?.Count ?? 0;
     }
 
-    public Task IncrementAsync(string scope, string key, DateTimeOffset hourStart, CancellationToken cancellationToken = default)
+    public Task IncrementAsync(
+        string scope,
+        string key,
+        DateTimeOffset hourStart,
+        CancellationToken cancellationToken = default
+    )
     {
         return _counters.UpdateOneAsync(
             x => x.Key == Name(scope, key, hourStart),

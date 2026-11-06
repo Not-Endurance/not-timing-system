@@ -52,7 +52,9 @@ internal sealed class UiDriver : IAsyncDisposable
         services.AddScoped<AuthenticationStateProvider, SessionAuthenticationStateProvider>();
         if (sessionCookie != null)
         {
-            services.AddHttpClient(nameof(NHttpClient)).AddHttpMessageHandler(() => new SessionCookieHandler(sessionCookie));
+            services
+                .AddHttpClient(nameof(NHttpClient))
+                .AddHttpMessageHandler(() => new SessionCookieHandler(sessionCookie));
             services.Replace(
                 ServiceDescriptor.Scoped<IRpcSocket>(provider =>
                     ActivatorUtilities.CreateInstance<SessionCookieSocket>(provider, noTimingBaseUrl, sessionCookie)

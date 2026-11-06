@@ -37,11 +37,7 @@ public sealed class UiPasskeyService : IUiPasskeyService, IScoped
 
     public async Task EnrolAsync(string credentialJson, string? name)
     {
-        var body = new JsonObject
-        {
-            ["name"] = name,
-            ["credential"] = JsonNode.Parse(credentialJson),
-        };
+        var body = new JsonObject { ["name"] = name, ["credential"] = JsonNode.Parse(credentialJson) };
         await _client.SendRawJson(HttpMethod.Post, PASSKEYS, body.ToJsonString());
     }
 

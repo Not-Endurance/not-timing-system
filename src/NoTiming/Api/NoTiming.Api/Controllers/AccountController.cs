@@ -21,7 +21,11 @@ public sealed class AccountController : ControllerBase
     readonly AccountService _account;
     readonly IOptions<AuthenticationSettings> _settings;
 
-    public AccountController(AccountSignInService signIn, AccountService account, IOptions<AuthenticationSettings> settings)
+    public AccountController(
+        AccountSignInService signIn,
+        AccountService account,
+        IOptions<AuthenticationSettings> settings
+    )
     {
         _signIn = signIn;
         _account = account;
@@ -64,7 +68,10 @@ public sealed class AccountController : ControllerBase
     }
 
     [HttpPatch("me")]
-    public async Task<IActionResult> UpdateProfile([FromBody] ProfileRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateProfile(
+        [FromBody] ProfileRequest request,
+        CancellationToken cancellationToken
+    )
     {
         var userId = await SessionUser.IdOfAsync(HttpContext);
         if (userId is null)
@@ -77,14 +84,22 @@ public sealed class AccountController : ControllerBase
     }
 
     [HttpPost("sign-in/code")]
-    public async Task<IActionResult> RequestSignInCode([FromBody] EmailRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> RequestSignInCode(
+        [FromBody] EmailRequest request,
+        CancellationToken cancellationToken
+    )
     {
         if (!IsPlausibleEmail(request.Email))
         {
             return BadRequest(new { error = "invalid-email" });
         }
 
-        var outcome = await _signIn.RequestSignInCodeAsync(request.Email!, Language(), ClientAddress(), cancellationToken);
+        var outcome = await _signIn.RequestSignInCodeAsync(
+            request.Email!,
+            Language(),
+            ClientAddress(),
+            cancellationToken
+        );
         return CodeRequestAnswer(outcome);
     }
 
@@ -113,7 +128,13 @@ public sealed class AccountController : ControllerBase
             Surname = request.Surname!,
             CountryRegion = request.CountryRegion!,
         };
-        var outcome = await _signIn.RequestRegistrationCodeAsync(request.Email!, details, Language(), ClientAddress(), cancellationToken);
+        var outcome = await _signIn.RequestRegistrationCodeAsync(
+            request.Email!,
+            details,
+            Language(),
+            ClientAddress(),
+            cancellationToken
+        );
         return CodeRequestAnswer(outcome);
     }
 
@@ -121,13 +142,21 @@ public sealed class AccountController : ControllerBase
     [HttpPost("sign-in/verify")]
     public async Task<IActionResult> VerifyCode([FromBody] VerifyRequest request, CancellationToken cancellationToken)
     {
-        var outcome = await _signIn.VerifyCodeAsync(request.Email ?? string.Empty, request.Code ?? string.Empty, cancellationToken);
+        var outcome = await _signIn.VerifyCodeAsync(
+            request.Email ?? string.Empty,
+            request.Code ?? string.Empty,
+            cancellationToken
+        );
         if (!outcome.SignedIn || outcome.SessionToken is null)
         {
             return Unauthorized(new { error = "code-not-accepted" });
         }
 
-        Response.Cookies.Append(_settings.Value.CookieName, outcome.SessionToken, SessionCookie.Options(outcome.ExpiresAtUtc));
+        Response.Cookies.Append(
+            _settings.Value.CookieName,
+            outcome.SessionToken,
+            SessionCookie.Options(outcome.ExpiresAtUtc)
+        );
         var user = await _account.FindAsync(outcome.UserId, cancellationToken);
         return Ok(user is null ? MeResponse.Anonymous() : MeResponse.For(user));
     }

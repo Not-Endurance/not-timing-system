@@ -22,7 +22,11 @@ public sealed class LegacyUserAdoption : ILegacyUserAdoption
         _logger = logger;
     }
 
-    public async Task<IdentityUserDocument?> AdoptAsync(IdentityUserDocument legacy, DateTimeOffset now, CancellationToken cancellationToken)
+    public async Task<IdentityUserDocument?> AdoptAsync(
+        IdentityUserDocument legacy,
+        DateTimeOffset now,
+        CancellationToken cancellationToken
+    )
     {
         legacy.Email = Identity.EmailAddress.Normalize(legacy.Email ?? string.Empty);
         legacy.ProvedAt = now.UtcDateTime;
@@ -44,5 +48,9 @@ public sealed class LegacyUserAdoption : ILegacyUserAdoption
 /// <summary>Adopts a legacy user row when its address is proved. Several implementations may be registered; the first to adopt wins.</summary>
 public interface ILegacyUserAdoption
 {
-    Task<IdentityUserDocument?> AdoptAsync(IdentityUserDocument legacy, DateTimeOffset now, CancellationToken cancellationToken);
+    Task<IdentityUserDocument?> AdoptAsync(
+        IdentityUserDocument legacy,
+        DateTimeOffset now,
+        CancellationToken cancellationToken
+    );
 }

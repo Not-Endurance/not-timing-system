@@ -18,7 +18,12 @@ public sealed class CodeSendGate
         _challenges = challenges;
     }
 
-    public async Task<SendDecision> ReviewAsync(string email, string clientAddress, DateTimeOffset now, CancellationToken cancellationToken)
+    public async Task<SendDecision> ReviewAsync(
+        string email,
+        string clientAddress,
+        DateTimeOffset now,
+        CancellationToken cancellationToken
+    )
     {
         var hour = HourStart(now);
         var challenge = await _challenges.FindAsync(email, cancellationToken);
@@ -33,7 +38,12 @@ public sealed class CodeSendGate
         return CodeSendLimits.Decide(history, now);
     }
 
-    public async Task RecordAsync(string email, string clientAddress, DateTimeOffset now, CancellationToken cancellationToken)
+    public async Task RecordAsync(
+        string email,
+        string clientAddress,
+        DateTimeOffset now,
+        CancellationToken cancellationToken
+    )
     {
         var hour = HourStart(now);
         await _counters.IncrementAsync(ADDRESS_SCOPE, email, hour, cancellationToken);

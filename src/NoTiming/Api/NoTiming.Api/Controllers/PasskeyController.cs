@@ -38,7 +38,10 @@ public sealed class PasskeyController : ControllerBase
 
     /// <summary>Every failure gets the same answer, as a code check does.</summary>
     [HttpPost("sign-in/passkey/verify")]
-    public async Task<IActionResult> SignInVerify([FromBody] JsonElement credential, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignInVerify(
+        [FromBody] JsonElement credential,
+        CancellationToken cancellationToken
+    )
     {
         if (credential.ValueKind != JsonValueKind.Object)
         {
@@ -51,7 +54,11 @@ public sealed class PasskeyController : ControllerBase
             return Unauthorized(new { error = "passkey-not-accepted" });
         }
 
-        Response.Cookies.Append(_settings.Value.CookieName, signIn.SessionToken, SessionCookie.Options(signIn.ExpiresAtUtc));
+        Response.Cookies.Append(
+            _settings.Value.CookieName,
+            signIn.SessionToken,
+            SessionCookie.Options(signIn.ExpiresAtUtc)
+        );
         var user = await _account.FindAsync(signIn.UserId, cancellationToken);
         return Ok(user is null ? MeResponse.Anonymous() : MeResponse.For(user));
     }
@@ -117,7 +124,11 @@ public sealed class PasskeyController : ControllerBase
     }
 
     [HttpPatch("me/passkeys/{id}")]
-    public async Task<IActionResult> Rename(string id, [FromBody] RenamePasskeyRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Rename(
+        string id,
+        [FromBody] RenamePasskeyRequest request,
+        CancellationToken cancellationToken
+    )
     {
         var userId = await SessionUser.IdOfAsync(HttpContext);
         if (userId is null)

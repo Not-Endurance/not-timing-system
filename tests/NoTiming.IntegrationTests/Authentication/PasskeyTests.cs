@@ -177,7 +177,11 @@ public sealed class PasskeyTests : IClassFixture<NoTimingIntegrationFixture>, ID
         var options = await _client.PasskeyEnrolOptionsAsync(cookie);
         var credential = authenticator.Register(await options.Content.ReadAsStringAsync(), _origin, RelyingPartyId);
 
-        var enrolled = await _client.EnrolPasskeyAsync(Join(cookie, AccountClient.CookiesOf(options)), "Phone", credential);
+        var enrolled = await _client.EnrolPasskeyAsync(
+            Join(cookie, AccountClient.CookiesOf(options)),
+            "Phone",
+            credential
+        );
 
         Assert.Equal(HttpStatusCode.Created, enrolled.StatusCode);
         Assert.Equal(new[] { "Phone" }, await PasskeyNamesAsync(cookie));
@@ -189,7 +193,11 @@ public sealed class PasskeyTests : IClassFixture<NoTimingIntegrationFixture>, ID
         var cookie = await RegisterAndSignInAsync(_client, _mongo, Address("passkey-sign-in"));
         using var authenticator = new SoftwareAuthenticator();
         var enrolOptions = await _client.PasskeyEnrolOptionsAsync(cookie);
-        var credential = authenticator.Register(await enrolOptions.Content.ReadAsStringAsync(), _origin, RelyingPartyId);
+        var credential = authenticator.Register(
+            await enrolOptions.Content.ReadAsStringAsync(),
+            _origin,
+            RelyingPartyId
+        );
         await _client.EnrolPasskeyAsync(Join(cookie, AccountClient.CookiesOf(enrolOptions)), "Phone", credential);
 
         var signInOptions = await _client.PasskeySignInOptionsAsync();

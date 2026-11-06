@@ -33,9 +33,6 @@ public sealed class SessionTokenTests
     public void HashOf_WhenGivenAbc_ShouldReturnTheSha256Digest()
     {
         // SHA-256("abc"), from FIPS 180-2 appendix B.1.
-        Assert.Equal(
-            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
-            SessionToken.HashOf("abc")
-        );
+        Assert.Equal("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", SessionToken.HashOf("abc"));
     }
 }

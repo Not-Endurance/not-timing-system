@@ -74,7 +74,9 @@ public sealed class OutboxEmailSender : IEmailSender
     public OutboxEmailSender(IMongoContext context, IOptions<AuthenticationSettings> options)
     {
         var settings = options.Value;
-        _outbox = context.Client.GetDatabase(settings.Database).GetCollection<OutboxMessageDocument>(settings.OutboxCollection);
+        _outbox = context
+            .Client.GetDatabase(settings.Database)
+            .GetCollection<OutboxMessageDocument>(settings.OutboxCollection);
     }
 
     public Task SendAsync(EmailMessage message, CancellationToken cancellationToken)

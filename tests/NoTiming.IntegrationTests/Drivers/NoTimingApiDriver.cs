@@ -69,7 +69,6 @@ internal sealed class NoTimingApiDriver : IDisposable
         return SendSignedIn(HttpMethod.Patch, "api/me", payload, cookie);
     }
 
-
     public Task Create(EventInformation eventInformation)
     {
         return Send(HttpMethod.Post, "api/event", EventInformationModel.From(eventInformation));

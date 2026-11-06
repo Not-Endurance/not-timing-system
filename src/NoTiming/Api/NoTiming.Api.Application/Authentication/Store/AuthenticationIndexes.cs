@@ -2,8 +2,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NC.Storage.Mongo;
-using NoTiming.Api.Application.Authentication.RateLimits;
 using NoTiming.Api.Application.Authentication.Codes;
+using NoTiming.Api.Application.Authentication.RateLimits;
 using NoTiming.Api.Application.Authentication.Sessions;
 
 namespace NoTiming.Api.Application.Authentication.Store;
@@ -68,13 +68,22 @@ public sealed class AuthenticationIndexes : IHostedService
 
         await database
             .GetCollection<SessionDocument>(_settings.SessionsCollection)
-            .Indexes.CreateOneAsync(ExpiresAtIndex<SessionDocument>("sessions_expire_at"), cancellationToken: cancellationToken);
+            .Indexes.CreateOneAsync(
+                ExpiresAtIndex<SessionDocument>("sessions_expire_at"),
+                cancellationToken: cancellationToken
+            );
         await database
             .GetCollection<CodeChallengeDocument>(_settings.ChallengesCollection)
-            .Indexes.CreateOneAsync(ExpiresAtIndex<CodeChallengeDocument>("challenges_expire_at"), cancellationToken: cancellationToken);
+            .Indexes.CreateOneAsync(
+                ExpiresAtIndex<CodeChallengeDocument>("challenges_expire_at"),
+                cancellationToken: cancellationToken
+            );
         await database
             .GetCollection<RateCounterDocument>(_settings.RateCountersCollection)
-            .Indexes.CreateOneAsync(ExpiresAtIndex<RateCounterDocument>("rate_counters_expire_at"), cancellationToken: cancellationToken);
+            .Indexes.CreateOneAsync(
+                ExpiresAtIndex<RateCounterDocument>("rate_counters_expire_at"),
+                cancellationToken: cancellationToken
+            );
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

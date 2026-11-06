@@ -33,7 +33,11 @@ public sealed class RelyingPartyPolicyTests
     [Fact]
     public void Problem_WhenOriginIsTheRelyingPartyItself_ShouldReturnAProblem()
     {
-        var problem = RelyingPartyPolicy.Problem(ProductionRelyingParty, "https://timing.no-company.eu", production: true);
+        var problem = RelyingPartyPolicy.Problem(
+            ProductionRelyingParty,
+            "https://timing.no-company.eu",
+            production: true
+        );
 
         Assert.NotNull(problem);
     }

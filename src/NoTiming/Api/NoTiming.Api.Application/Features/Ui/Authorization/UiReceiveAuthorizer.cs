@@ -48,5 +48,4 @@ internal sealed class UiReceiveAuthorizer : IUiReceiveAuthorizer
 
         return parsedEventId;
     }
-
 }

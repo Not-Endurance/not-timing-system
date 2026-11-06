@@ -37,17 +37,29 @@ public sealed class SessionStore : IPasskeySessionStore
     public SessionStore(IMongoContext context, IOptions<AuthenticationSettings> options)
     {
         var settings = options.Value;
-        _sessions = context.Client.GetDatabase(settings.Database).GetCollection<SessionDocument>(settings.SessionsCollection);
+        _sessions = context
+            .Client.GetDatabase(settings.Database)
+            .GetCollection<SessionDocument>(settings.SessionsCollection);
     }
 
-    public Task<SessionDocument?> FindLiveAsync(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken = default)
+    public Task<SessionDocument?> FindLiveAsync(
+        string tokenHash,
+        DateTimeOffset now,
+        CancellationToken cancellationToken = default
+    )
     {
         return _sessions
             .Find(x => x.TokenHash == tokenHash && x.ExpiresAt > now.UtcDateTime)
             .FirstOrDefaultAsync(cancellationToken)!;
     }
 
-    public Task CreateAsync(string tokenHash, int userId, string securityStamp, DateTimeOffset now, CancellationToken cancellationToken = default)
+    public Task CreateAsync(
+        string tokenHash,
+        int userId,
+        string securityStamp,
+        DateTimeOffset now,
+        CancellationToken cancellationToken = default
+    )
     {
         return _sessions.InsertOneAsync(
             new SessionDocument
@@ -68,8 +80,8 @@ public sealed class SessionStore : IPasskeySessionStore
     {
         return _sessions.UpdateOneAsync(
             x => x.TokenHash == tokenHash,
-            Builders<SessionDocument>.Update
-                .Set(x => x.LastExtendedAt, now.UtcDateTime)
+            Builders<SessionDocument>
+                .Update.Set(x => x.LastExtendedAt, now.UtcDateTime)
                 .Set(x => x.ExpiresAt, SessionRules.ExpiresAt(now).UtcDateTime),
             cancellationToken: cancellationToken
         );

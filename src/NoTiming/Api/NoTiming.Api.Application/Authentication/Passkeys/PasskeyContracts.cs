@@ -21,24 +21,20 @@ public sealed class PasskeyAssertion
 {
     public IdentityUserDocument User { get; init; } = new();
 
-    public UserPasskeyInfo Passkey { get; init; } = new(
-        [],
-        [],
-        DateTimeOffset.UnixEpoch,
-        0,
-        [],
-        false,
-        false,
-        false,
-        [],
-        []
-    );
+    public UserPasskeyInfo Passkey { get; init; } =
+        new([], [], DateTimeOffset.UnixEpoch, 0, [], false, false, false, [], []);
 }
 
 /// <summary>Starts the session of a user who signed in with a passkey. The session store implements it.</summary>
 public interface IPasskeySessionStore
 {
-    Task CreateAsync(string tokenHash, int userId, string securityStamp, DateTimeOffset now, CancellationToken cancellationToken);
+    Task CreateAsync(
+        string tokenHash,
+        int userId,
+        string securityStamp,
+        DateTimeOffset now,
+        CancellationToken cancellationToken
+    );
 }
 
 /// <summary>The stored users a passkey needs. The identity user store implements it.</summary>
@@ -54,7 +50,11 @@ public interface IPasskeyUsers
 
     Task<IdentityResult> UpdateAsync(IdentityUserDocument user, CancellationToken cancellationToken);
 
-    Task AddOrUpdatePasskeyAsync(IdentityUserDocument user, UserPasskeyInfo passkey, CancellationToken cancellationToken);
+    Task AddOrUpdatePasskeyAsync(
+        IdentityUserDocument user,
+        UserPasskeyInfo passkey,
+        CancellationToken cancellationToken
+    );
 
     Task<IList<UserPasskeyInfo>> GetPasskeysAsync(IdentityUserDocument user, CancellationToken cancellationToken);
 

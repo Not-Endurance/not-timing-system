@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.HttpOverrides;
 using System.Reflection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NC.Application.UdpHandshake;

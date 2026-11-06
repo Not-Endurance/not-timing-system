@@ -28,13 +28,14 @@ internal sealed class SoftwareAuthenticator : IDisposable
         _userHandle = Base64Url.DecodeFromChars(root.GetProperty("user").GetProperty("id").GetString()!);
 
         var clientData = ClientData("webauthn.create", root.GetProperty("challenge").GetString()!, origin);
-        var authenticatorData = AuthenticatorData(rpId, UserPresentAndVerified | AttestedCredentialData, attested: true, signCount: 0);
+        var authenticatorData = AuthenticatorData(
+            rpId,
+            UserPresentAndVerified | AttestedCredentialData,
+            attested: true,
+            signCount: 0
+        );
         var attestationObject = Cbor.Encode(
-            [
-                ("fmt", "none"),
-                ("attStmt", Array.Empty<(object, object)>()),
-                ("authData", authenticatorData),
-            ]
+            [("fmt", "none"), ("attStmt", Array.Empty<(object, object)>()), ("authData", authenticatorData)]
         );
 
         return JsonSerializer.Serialize(
@@ -59,7 +60,12 @@ internal sealed class SoftwareAuthenticator : IDisposable
         using var options = JsonDocument.Parse(optionsJson);
         var clientData = ClientData("webauthn.get", options.RootElement.GetProperty("challenge").GetString()!, origin);
         // The counter moves on every answer, as a real authenticator's does, so the server sees it increase.
-        var authenticatorData = AuthenticatorData(rpId, UserPresentAndVerified, attested: false, signCount: ++_signCount);
+        var authenticatorData = AuthenticatorData(
+            rpId,
+            UserPresentAndVerified,
+            attested: false,
+            signCount: ++_signCount
+        );
         var signed = authenticatorData.Concat(SHA256.HashData(clientData)).ToArray();
 
         return JsonSerializer.Serialize(
@@ -72,14 +78,15 @@ internal sealed class SoftwareAuthenticator : IDisposable
                 {
                     clientDataJSON = Base64Url.EncodeToString(clientData),
                     authenticatorData = Base64Url.EncodeToString(authenticatorData),
-                    signature = Base64Url.EncodeToString(_key.SignData(signed, HashAlgorithmName.SHA256, DSASignatureFormat.Rfc3279DerSequence)),
+                    signature = Base64Url.EncodeToString(
+                        _key.SignData(signed, HashAlgorithmName.SHA256, DSASignatureFormat.Rfc3279DerSequence)
+                    ),
                     userHandle = Base64Url.EncodeToString(_userHandle),
                 },
                 clientExtensionResults = new { },
             }
         );
     }
-
 
     public void Dispose()
     {
@@ -126,15 +133,7 @@ internal sealed class SoftwareAuthenticator : IDisposable
     byte[] CoseKey()
     {
         var point = _key.ExportParameters(false).Q;
-        return Cbor.Encode(
-            [
-                (1, 2),
-                (3, -7),
-                (-1, 1),
-                (-2, point.X!),
-                (-3, point.Y!),
-            ]
-        );
+        return Cbor.Encode([(1, 2), (3, -7), (-1, 1), (-2, point.X!), (-3, point.Y!)]);
     }
 
     /// <summary>The few CBOR types an attestation object and a COSE key use: integers, text, byte strings and maps.</summary>

@@ -5,7 +5,10 @@ public sealed class UiRequestGuardHandler : DelegatingHandler
 {
     public const string HEADER = "X-NTS-Request";
 
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken
+    )
     {
         if (request.Method != HttpMethod.Get)
         {

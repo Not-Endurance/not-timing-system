@@ -73,11 +73,7 @@ public sealed class CodeSendLimitsTests
     [Fact]
     public void Decide_WhenFourCodesSentThisHourAndCooldownHasPassed_ShouldAllow()
     {
-        var history = new SendHistory
-        {
-            ForAddressThisHour = 4,
-            LastSentForAddressUtc = Now.AddSeconds(-61),
-        };
+        var history = new SendHistory { ForAddressThisHour = 4, LastSentForAddressUtc = Now.AddSeconds(-61) };
 
         var decision = CodeSendLimits.Decide(history, Now);
 

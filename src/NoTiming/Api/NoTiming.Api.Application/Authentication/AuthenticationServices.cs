@@ -27,9 +27,15 @@ public static class AuthenticationServices
     /// Sign-in by passkey or emailed code, over a server-side cookie session. The session scheme is the default, so the
     /// REST routes and the hubs read the same session. The settings are validated when the host starts.
     /// </summary>
-    public static IServiceCollection AddNoTimingAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddNoTimingAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
-        services.AddOptions<AuthenticationSettings>().Bind(configuration.GetSection(AuthenticationSettings.SECTION)).ValidateOnStart();
+        services
+            .AddOptions<AuthenticationSettings>()
+            .Bind(configuration.GetSection(AuthenticationSettings.SECTION))
+            .ValidateOnStart();
         services.AddSingleton<IValidateOptions<AuthenticationSettings>, AuthenticationSettingsValidator>();
         services.TryAddSingleton(TimeProvider.System);
 
@@ -98,14 +104,19 @@ public static class AuthenticationServices
         // The session is the default scheme: the REST routes and the hubs read the same cookie the Ui signs in with.
         services
             .AddAuthentication(SessionAuthenticationHandler.SCHEME)
-            .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(SessionAuthenticationHandler.SCHEME, _ => { });
+            .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
+                SessionAuthenticationHandler.SCHEME,
+                _ => { }
+            );
 
         return services;
     }
 
     static IEmailSender ChooseEmailSender(IServiceProvider provider)
     {
-        return provider.GetRequiredService<IOptions<AuthenticationSettings>>().Value.EmailProvider.ToLowerInvariant() switch
+        return provider
+            .GetRequiredService<IOptions<AuthenticationSettings>>()
+            .Value.EmailProvider.ToLowerInvariant() switch
         {
             "brevo" => provider.GetRequiredService<BrevoEmailSender>(),
             "console" => provider.GetRequiredService<ConsoleEmailSender>(),

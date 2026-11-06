@@ -53,7 +53,9 @@ public sealed class CodeChallengeStore
     public CodeChallengeStore(IMongoContext context, IOptions<AuthenticationSettings> options)
     {
         var settings = options.Value;
-        _challenges = context.Client.GetDatabase(settings.Database).GetCollection<CodeChallengeDocument>(settings.ChallengesCollection);
+        _challenges = context
+            .Client.GetDatabase(settings.Database)
+            .GetCollection<CodeChallengeDocument>(settings.ChallengesCollection);
     }
 
     public Task<CodeChallengeDocument?> FindAsync(string email, CancellationToken cancellationToken = default)
@@ -76,7 +78,11 @@ public sealed class CodeChallengeStore
     /// Uses up one attempt before the code is compared, and returns the challenge with the attempt spent. Null when the
     /// challenge is missing, expired or out of attempts.
     /// </summary>
-    public Task<CodeChallengeDocument?> SpendAttemptAsync(string email, DateTimeOffset now, CancellationToken cancellationToken = default)
+    public Task<CodeChallengeDocument?> SpendAttemptAsync(
+        string email,
+        DateTimeOffset now,
+        CancellationToken cancellationToken = default
+    )
     {
         return _challenges.FindOneAndUpdateAsync(
             Builders<CodeChallengeDocument>.Filter.And(

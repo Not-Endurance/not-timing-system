@@ -60,12 +60,22 @@ public static class CodeSendLimits
             return Refuse(SendLimitScope.Overall, untilNextHour);
         }
 
-        return new SendDecision { Allowed = true, Scope = null, RetryAfter = TimeSpan.Zero };
+        return new SendDecision
+        {
+            Allowed = true,
+            Scope = null,
+            RetryAfter = TimeSpan.Zero,
+        };
     }
 
     static SendDecision Refuse(SendLimitScope scope, TimeSpan retryAfter)
     {
-        return new SendDecision { Allowed = false, Scope = scope, RetryAfter = retryAfter };
+        return new SendDecision
+        {
+            Allowed = false,
+            Scope = scope,
+            RetryAfter = retryAfter,
+        };
     }
 
     static DateTimeOffset NextHourStart(DateTimeOffset now)

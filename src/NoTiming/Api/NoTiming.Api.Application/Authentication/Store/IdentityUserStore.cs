@@ -30,7 +30,9 @@ public sealed class IdentityUserStore
     public IdentityUserStore(IMongoContext context, IOptions<AuthenticationSettings> options)
     {
         var settings = options.Value;
-        _users = context.Client.GetDatabase(settings.Database).GetCollection<IdentityUserDocument>(settings.UsersCollection);
+        _users = context
+            .Client.GetDatabase(settings.Database)
+            .GetCollection<IdentityUserDocument>(settings.UsersCollection);
     }
 
     /// <summary>The WebAuthn user handle, base64url. The integer id is never exposed to an authenticator.</summary>
@@ -60,7 +62,11 @@ public sealed class IdentityUserStore
         return Task.FromResult(user.Email);
     }
 
-    public Task SetNormalizedUserNameAsync(IdentityUserDocument user, string? normalizedName, CancellationToken cancellationToken)
+    public Task SetNormalizedUserNameAsync(
+        IdentityUserDocument user,
+        string? normalizedName,
+        CancellationToken cancellationToken
+    )
     {
         user.Email = normalizedName ?? user.Email;
         return Task.CompletedTask;
@@ -92,14 +98,17 @@ public sealed class IdentityUserStore
 
         // Absent fields are removed rather than set to null: the partial unique index counts a null as present.
         update = user.ProvedAt is null ? update.Unset(x => x.ProvedAt) : update.Set(x => x.ProvedAt, user.ProvedAt);
-        update = user.LockoutEnd is null ? update.Unset(x => x.LockoutEnd) : update.Set(x => x.LockoutEnd, user.LockoutEnd);
+        update = user.LockoutEnd is null
+            ? update.Unset(x => x.LockoutEnd)
+            : update.Set(x => x.LockoutEnd, user.LockoutEnd);
         update = user.SecurityStamp is null
             ? update.Unset(x => x.SecurityStamp)
             : update.Set(x => x.SecurityStamp, user.SecurityStamp);
         update = user.UserHandle is null ? update : update.Set(x => x.UserHandle, user.UserHandle);
 
         // The field exists only while there is a passkey, so a user without one stays out of the credential index.
-        update = Passkeys(user).Count == 0 ? update.Unset(x => x.Passkeys) : update.Set(x => x.Passkeys, Passkeys(user));
+        update =
+            Passkeys(user).Count == 0 ? update.Unset(x => x.Passkeys) : update.Set(x => x.Passkeys, Passkeys(user));
 
         try
         {
@@ -162,7 +171,10 @@ public sealed class IdentityUserStore
     }
 
     /// <summary>Case-insensitive, because a legacy row may still hold a mixed-case address.</summary>
-    public async Task<IdentityUserDocument?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+    public async Task<IdentityUserDocument?> FindByEmailAsync(
+        string normalizedEmail,
+        CancellationToken cancellationToken
+    )
     {
         var matches = await FindAllByEmailAsync(normalizedEmail, cancellationToken);
         return matches.Count == 1 ? matches[0] : null;
@@ -195,7 +207,11 @@ public sealed class IdentityUserStore
         return Task.FromResult(user.Email);
     }
 
-    public Task SetNormalizedEmailAsync(IdentityUserDocument user, string? normalizedEmail, CancellationToken cancellationToken)
+    public Task SetNormalizedEmailAsync(
+        IdentityUserDocument user,
+        string? normalizedEmail,
+        CancellationToken cancellationToken
+    )
     {
         user.Email = normalizedEmail ?? user.Email;
         return Task.CompletedTask;
@@ -214,10 +230,16 @@ public sealed class IdentityUserStore
 
     public Task<DateTimeOffset?> GetLockoutEndDateAsync(IdentityUserDocument user, CancellationToken cancellationToken)
     {
-        return Task.FromResult(user.LockoutEnd.HasValue ? new DateTimeOffset(user.LockoutEnd.Value, TimeSpan.Zero) : (DateTimeOffset?)null);
+        return Task.FromResult(
+            user.LockoutEnd.HasValue ? new DateTimeOffset(user.LockoutEnd.Value, TimeSpan.Zero) : (DateTimeOffset?)null
+        );
     }
 
-    public Task SetLockoutEndDateAsync(IdentityUserDocument user, DateTimeOffset? lockoutEnd, CancellationToken cancellationToken)
+    public Task SetLockoutEndDateAsync(
+        IdentityUserDocument user,
+        DateTimeOffset? lockoutEnd,
+        CancellationToken cancellationToken
+    )
     {
         user.LockoutEnd = lockoutEnd?.UtcDateTime;
         return Task.CompletedTask;
@@ -251,7 +273,11 @@ public sealed class IdentityUserStore
         return Task.CompletedTask;
     }
 
-    public Task AddOrUpdatePasskeyAsync(IdentityUserDocument user, UserPasskeyInfo passkey, CancellationToken cancellationToken)
+    public Task AddOrUpdatePasskeyAsync(
+        IdentityUserDocument user,
+        UserPasskeyInfo passkey,
+        CancellationToken cancellationToken
+    )
     {
         // Replaced in place when the credential is known, because its sign count moves each time it signs in.
         var stored = ToDocument(passkey);
@@ -270,14 +296,21 @@ public sealed class IdentityUserStore
         return Task.CompletedTask;
     }
 
-    public async Task<IdentityUserDocument?> FindByPasskeyIdAsync(byte[] credentialId, CancellationToken cancellationToken)
+    public async Task<IdentityUserDocument?> FindByPasskeyIdAsync(
+        byte[] credentialId,
+        CancellationToken cancellationToken
+    )
     {
         return await _users
             .Find(Builders<IdentityUserDocument>.Filter.ElemMatch(x => x.Passkeys, x => x.CredentialId == credentialId))
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public Task<UserPasskeyInfo?> FindPasskeyAsync(IdentityUserDocument user, byte[] credentialId, CancellationToken cancellationToken)
+    public Task<UserPasskeyInfo?> FindPasskeyAsync(
+        IdentityUserDocument user,
+        byte[] credentialId,
+        CancellationToken cancellationToken
+    )
     {
         var passkey = Passkeys(user).Find(x => x.CredentialId.AsSpan().SequenceEqual(credentialId));
         return Task.FromResult(passkey is null ? null : ToInfo(passkey));
@@ -312,7 +345,9 @@ public sealed class IdentityUserStore
             var user = await FindByUserIdAsync(userId, cancellationToken);
             if (user is null)
             {
-                return IdentityResult.Failed(new IdentityError { Code = "UserNotFound", Description = "There is no such user." });
+                return IdentityResult.Failed(
+                    new IdentityError { Code = "UserNotFound", Description = "There is no such user." }
+                );
             }
 
             result = await change(user);
@@ -329,7 +364,11 @@ public sealed class IdentityUserStore
     /// Removes one passkey as a single update, and only while another passkey remains. The condition is part of the
     /// update, so two removals at once cannot leave a user with none.
     /// </summary>
-    public async Task<bool> RemovePasskeyWhileAnotherRemainsAsync(int userId, byte[] credentialId, CancellationToken cancellationToken = default)
+    public async Task<bool> RemovePasskeyWhileAnotherRemainsAsync(
+        int userId,
+        byte[] credentialId,
+        CancellationToken cancellationToken = default
+    )
     {
         var result = await _users.UpdateOneAsync(
             Builders<IdentityUserDocument>.Filter.And(
@@ -345,7 +384,10 @@ public sealed class IdentityUserStore
     }
 
     /// <summary>Every row with the address, case-insensitively, up to two. Two is enough to tell a duplicate apart.</summary>
-    public async Task<List<IdentityUserDocument>> FindAllByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+    public async Task<List<IdentityUserDocument>> FindAllByEmailAsync(
+        string normalizedEmail,
+        CancellationToken cancellationToken
+    )
     {
         return await _users
             .Find(
@@ -418,7 +460,10 @@ public sealed class IdentityUserStore
 
     static string BuildName(string givenName, string? middleName, string surname)
     {
-        return string.Join(" ", new[] { givenName, middleName, surname }.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x!.Trim()));
+        return string.Join(
+            " ",
+            new[] { givenName, middleName, surname }.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x!.Trim())
+        );
     }
 
     static List<IdentityPasskeyDocument> Passkeys(IdentityUserDocument user)

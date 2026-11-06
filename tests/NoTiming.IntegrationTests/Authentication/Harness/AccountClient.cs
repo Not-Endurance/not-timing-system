@@ -12,7 +12,9 @@ internal sealed class AccountClient : IDisposable
     /// <summary>The session cookie as the browser sends it back: name and value only.</summary>
     public static string SessionCookieOf(HttpResponseMessage response)
     {
-        var setCookie = response.Headers.GetValues("Set-Cookie").Single(x => x.StartsWith(SESSION_COOKIE + "=", StringComparison.Ordinal));
+        var setCookie = response
+            .Headers.GetValues("Set-Cookie")
+            .Single(x => x.StartsWith(SESSION_COOKIE + "=", StringComparison.Ordinal));
         return setCookie.Split(';')[0];
     }
 
@@ -26,16 +28,15 @@ internal sealed class AccountClient : IDisposable
             return string.Empty;
         }
 
-        return string.Join(
-            "; ",
-            setCookies.Select(x => x.Split(';')[0]).Where(x => !x.EndsWith('='))
-        );
+        return string.Join("; ", setCookies.Select(x => x.Split(';')[0]).Where(x => !x.EndsWith('=')));
     }
 
     /// <summary>The Set-Cookie header of the session cookie, for checking its attributes.</summary>
     public static string SessionSetCookieOf(HttpResponseMessage response)
     {
-        return response.Headers.GetValues("Set-Cookie").Single(x => x.StartsWith(SESSION_COOKIE + "=", StringComparison.Ordinal));
+        return response
+            .Headers.GetValues("Set-Cookie")
+            .Single(x => x.StartsWith(SESSION_COOKIE + "=", StringComparison.Ordinal));
     }
 
     readonly HttpClient _http;
@@ -60,7 +61,18 @@ internal sealed class AccountClient : IDisposable
         string? website = null
     )
     {
-        return SendAsync(HttpMethod.Post, "api/register", new { email, givenName, surname, countryRegion = country, website });
+        return SendAsync(
+            HttpMethod.Post,
+            "api/register",
+            new
+            {
+                email,
+                givenName,
+                surname,
+                countryRegion = country,
+                website,
+            }
+        );
     }
 
     public Task<HttpResponseMessage> VerifyAsync(string email, string? code)

@@ -92,8 +92,14 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         );
 
         await using var judge = new JudgeDriver(_fixture.NoTimingBaseUrl);
-        await using var officialUi = new UiDriver(_fixture.NoTimingBaseUrl, await _fixture.SignInAsync(OFFICIAL_USER), "IntegrationOfficialUi");
-        await using var participantUi = new UiDriver(_fixture.NoTimingBaseUrl, await _fixture.SignInAsync(PARTICIPANT_USER),
+        await using var officialUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(OFFICIAL_USER),
+            "IntegrationOfficialUi"
+        );
+        await using var participantUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(PARTICIPANT_USER),
             "IntegrationParticipantUi"
         );
 
@@ -306,7 +312,11 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         await api.Create(participation);
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6701));
 
-        await using var ui = new UiDriver(_fixture.NoTimingBaseUrl, await _fixture.SignInAsync(OFFICIAL_USER), "SnapshotSessionUi");
+        await using var ui = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(OFFICIAL_USER),
+            "SnapshotSessionUi"
+        );
 
         await ui.Start();
         await ui.Connect(eventInformation);
@@ -344,7 +354,11 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
 
         await ui.Disconnect();
 
-        await using var restoredUi = new UiDriver(_fixture.NoTimingBaseUrl, await _fixture.SignInAsync(OFFICIAL_USER), "SnapshotSessionRestoredUi");
+        await using var restoredUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(OFFICIAL_USER),
+            "SnapshotSessionRestoredUi"
+        );
 
         await restoredUi.Start();
         await restoredUi.Connect(eventInformation);
@@ -429,8 +443,14 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6601));
 
         await using var judge = new JudgeDriver(_fixture.NoTimingBaseUrl);
-        await using var officialUi = new UiDriver(_fixture.NoTimingBaseUrl, await _fixture.SignInAsync(OFFICIAL_USER), "PresentlistOfficialUi");
-        await using var participantUi = new UiDriver(_fixture.NoTimingBaseUrl, await _fixture.SignInAsync(PARTICIPANT_USER),
+        await using var officialUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(OFFICIAL_USER),
+            "PresentlistOfficialUi"
+        );
+        await using var participantUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(PARTICIPANT_USER),
             "PresentlistParticipantUi"
         );
 
@@ -611,14 +631,24 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         Assert.Equal(OfficialRole.Steward, activeOperators[0].Role);
         Assert.Single(activeRankings);
 
-        await using var operatorUi = new UiDriver(_fixture.NoTimingBaseUrl, await _fixture.SignInAsync(operatorIdentity), "IntegrationOperatorUi");
-        await using var eligibleOfficialUi = new UiDriver(_fixture.NoTimingBaseUrl, await _fixture.SignInAsync(eligibleOfficialIdentity),
+        await using var operatorUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(operatorIdentity),
+            "IntegrationOperatorUi"
+        );
+        await using var eligibleOfficialUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(eligibleOfficialIdentity),
             "IntegrationEligibleOfficialUi"
         );
-        await using var ineligibleOfficialUi = new UiDriver(_fixture.NoTimingBaseUrl, await _fixture.SignInAsync(ineligibleOfficialIdentity),
+        await using var ineligibleOfficialUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(ineligibleOfficialIdentity),
             "IntegrationIneligibleOfficialUi"
         );
-        await using var participantUi = new UiDriver(_fixture.NoTimingBaseUrl, await _fixture.SignInAsync(participantIdentity),
+        await using var participantUi = new UiDriver(
+            _fixture.NoTimingBaseUrl,
+            await _fixture.SignInAsync(participantIdentity),
             "IntegrationOperatorParticipantUi"
         );
 

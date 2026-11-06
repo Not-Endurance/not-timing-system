@@ -38,7 +38,18 @@ internal sealed class MongoAccess
     /// A user row as it was before identity, with each profile field exactly as given (absent fields stay absent). Sign-in
     /// adopts such a row when its address is proved, keeping its id and profile.
     /// </summary>
-    public Task SeedLegacyUserAsync(int id, string email, string? name, string? givenName, string? middleName, string? surname, string? countryRegion, string? club, string? feiId, string? displayName)
+    public Task SeedLegacyUserAsync(
+        int id,
+        string email,
+        string? name,
+        string? givenName,
+        string? middleName,
+        string? surname,
+        string? countryRegion,
+        string? club,
+        string? feiId,
+        string? displayName
+    )
     {
         var document = new BsonDocument
         {
@@ -104,7 +115,10 @@ internal sealed class MongoAccess
 
     public Task<BsonDocument?> ReadUserAsync(int id)
     {
-        return _database.GetCollection<BsonDocument>("users").Find(Builders<BsonDocument>.Filter.Eq("_id", id)).FirstOrDefaultAsync()!;
+        return _database
+            .GetCollection<BsonDocument>("users")
+            .Find(Builders<BsonDocument>.Filter.Eq("_id", id))
+            .FirstOrDefaultAsync()!;
     }
 
     public async Task<int> CountOutboxAsync(string email)

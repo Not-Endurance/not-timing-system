@@ -52,8 +52,24 @@ public sealed class LegacyAccountAndProfileTests : IClassFixture<NoTimingIntegra
     {
         var cookie = await RegisterAndSignInAsync(_client, _mongo, Address("profile"));
 
-        var refused = await _client.UpdateProfileAsync(cookie, new { givenName = "Ana", surname = "Ivanova", countryRegion = "" });
-        var saved = await _client.UpdateProfileAsync(cookie, new { givenName = "Ana", surname = "Ivanova", countryRegion = "BG" });
+        var refused = await _client.UpdateProfileAsync(
+            cookie,
+            new
+            {
+                givenName = "Ana",
+                surname = "Ivanova",
+                countryRegion = "",
+            }
+        );
+        var saved = await _client.UpdateProfileAsync(
+            cookie,
+            new
+            {
+                givenName = "Ana",
+                surname = "Ivanova",
+                countryRegion = "BG",
+            }
+        );
 
         Assert.Equal(HttpStatusCode.BadRequest, refused.StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, saved.StatusCode);

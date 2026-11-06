@@ -41,7 +41,9 @@ public sealed class NHttpClientTests
         var stub = new StubHandler(HttpStatusCode.Unauthorized, "{\"error\":\"code-not-accepted\"}");
         var client = CreateClient(stub);
 
-        var exception = await Assert.ThrowsAsync<HttpRequestException>(() => client.SendRawJson(HttpMethod.Post, "sign-in/verify", "{}"));
+        var exception = await Assert.ThrowsAsync<HttpRequestException>(
+            () => client.SendRawJson(HttpMethod.Post, "sign-in/verify", "{}")
+        );
 
         Assert.Equal(HttpStatusCode.Unauthorized, exception.StatusCode);
     }
@@ -60,7 +62,11 @@ public sealed class NHttpClientTests
     static NHttpClient CreateClient(HttpMessageHandler handler)
     {
         var factory = new StubFactory(new HttpClient(handler));
-        return new NHttpClient(factory, NullLogger<NHttpClient>.Instance, Options.Create(new NHttpSettings { Url = BASE_URL }));
+        return new NHttpClient(
+            factory,
+            NullLogger<NHttpClient>.Instance,
+            Options.Create(new NHttpSettings { Url = BASE_URL })
+        );
     }
 
     sealed class StubFactory : IHttpClientFactory
@@ -93,7 +99,10 @@ public sealed class NHttpClientTests
 
         public string? RequestBody { get; private set; }
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken
+        )
         {
             Request = request;
             RequestBody = request.Content == null ? null : await request.Content.ReadAsStringAsync(cancellationToken);

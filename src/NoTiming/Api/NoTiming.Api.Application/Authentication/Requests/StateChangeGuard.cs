@@ -25,7 +25,11 @@ public sealed class StateChangeGuard : IAsyncActionFilter
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var request = context.HttpContext.Request;
-        if (HttpMethods.IsGet(request.Method) || HttpMethods.IsHead(request.Method) || HttpMethods.IsOptions(request.Method))
+        if (
+            HttpMethods.IsGet(request.Method)
+            || HttpMethods.IsHead(request.Method)
+            || HttpMethods.IsOptions(request.Method)
+        )
         {
             await next();
             return;
@@ -48,13 +52,26 @@ public sealed class StateChangeGuard : IAsyncActionFilter
             return "missing-request-header";
         }
 
-        if (string.Equals(request.Headers["Sec-Fetch-Site"].ToString(), "cross-site", StringComparison.OrdinalIgnoreCase))
+        if (
+            string.Equals(
+                request.Headers["Sec-Fetch-Site"].ToString(),
+                "cross-site",
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
         {
             return "cross-site";
         }
 
         var origin = request.Headers.Origin.ToString();
-        if (origin.Length > 0 && !string.Equals(origin.TrimEnd('/'), _settings.Value.AppOrigin.TrimEnd('/'), StringComparison.OrdinalIgnoreCase))
+        if (
+            origin.Length > 0
+            && !string.Equals(
+                origin.TrimEnd('/'),
+                _settings.Value.AppOrigin.TrimEnd('/'),
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
         {
             return "foreign-origin";
         }

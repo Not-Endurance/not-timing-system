@@ -40,7 +40,16 @@ public static class EmailLanguage
         foreach (var piece in pieces.Skip(1))
         {
             var parts = piece.Trim().Split('=');
-            if (parts.Length == 2 && parts[0].Trim() == "q" && double.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var quality))
+            if (
+                parts.Length == 2
+                && parts[0].Trim() == "q"
+                && double.TryParse(
+                    parts[1],
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out var quality
+                )
+            )
             {
                 return quality;
             }

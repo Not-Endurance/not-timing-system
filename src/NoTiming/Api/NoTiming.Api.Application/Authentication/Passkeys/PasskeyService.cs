@@ -64,7 +64,8 @@ public sealed class PasskeyService
     /// </summary>
     public async Task<string?> CreationOptionsAsync(int userId, CancellationToken cancellationToken)
     {
-        var user = await _users.FindByUserIdAsync(userId, cancellationToken)
+        var user =
+            await _users.FindByUserIdAsync(userId, cancellationToken)
             ?? throw new InvalidOperationException("The signed-in user does not exist.");
 
         if (user.UserHandle is null)
@@ -171,7 +172,12 @@ public sealed class PasskeyService
         await _sessions.CreateAsync(issued.TokenHash, user.Id, user.SecurityStamp, now, cancellationToken);
         _logger.LogInformation("User {UserId} signed in with a passkey.", user.Id);
 
-        return new PasskeySignIn { UserId = user.Id, SessionToken = issued.Token, ExpiresAtUtc = SessionRules.ExpiresAt(now) };
+        return new PasskeySignIn
+        {
+            UserId = user.Id,
+            SessionToken = issued.Token,
+            ExpiresAtUtc = SessionRules.ExpiresAt(now),
+        };
     }
 
     public async Task<IReadOnlyList<UserPasskeyInfo>> ListAsync(int userId, CancellationToken cancellationToken)
@@ -185,7 +191,12 @@ public sealed class PasskeyService
         return [.. (await _users.GetPasskeysAsync(user, cancellationToken)).OrderBy(x => x.CreatedAt)];
     }
 
-    public async Task<PasskeyOutcome> RenameAsync(int userId, byte[] credentialId, string name, CancellationToken cancellationToken)
+    public async Task<PasskeyOutcome> RenameAsync(
+        int userId,
+        byte[] credentialId,
+        string name,
+        CancellationToken cancellationToken
+    )
     {
         var found = false;
         var result = await _users.ChangeAsync(

@@ -98,7 +98,14 @@ public sealed class AccountSignInService
         }
 
         var code = OneTimeCodes.Generate();
-        await StoreChallengeAsync(address, CodeChallengeStore.SIGN_IN, registration: null, code, now, cancellationToken);
+        await StoreChallengeAsync(
+            address,
+            CodeChallengeStore.SIGN_IN,
+            registration: null,
+            code,
+            now,
+            cancellationToken
+        );
         await _gate.RecordAsync(address, clientAddress, now, cancellationToken);
 
         // Mail goes out only for an address that has an account. The response is the same either way.
@@ -141,7 +148,11 @@ public sealed class AccountSignInService
         return Accepted();
     }
 
-    public async Task<VerificationOutcome> VerifyCodeAsync(string email, string code, CancellationToken cancellationToken)
+    public async Task<VerificationOutcome> VerifyCodeAsync(
+        string email,
+        string code,
+        CancellationToken cancellationToken
+    )
     {
         var address = EmailAddress.Normalize(email);
         var now = _time.GetUtcNow();
