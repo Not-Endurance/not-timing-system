@@ -5,6 +5,7 @@
       "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
+        "OPEN_BROWSER": "true",
         "IS_LOCALHOST": "true",
         "PORT": "11337",
         "MONGO_CONNECTION_STRING": "mongodb://localhost:27017/nts",
@@ -17,6 +18,7 @@
       "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Staging",
+        "OPEN_BROWSER": "true",
         "IS_LOCALHOST": "true",
         "PORT": "11338"
       },
@@ -27,6 +29,7 @@
       "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production",
+        "OPEN_BROWSER": "true",
         "IS_LOCALHOST": "true",
         "PORT": "11339"
       },
