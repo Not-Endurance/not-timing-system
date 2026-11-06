@@ -4,12 +4,15 @@ namespace NoTiming.Domain.Core.Objects;
 
 public record EventSpan
 {
-    public EventSpan(DateTimeOffset startDay, DateTimeOffset endDay)
+    public EventSpan(DateTimeOffset startDay, DateTimeOffset endDay, string timeZoneId)
     {
-        StartDay = new DateTimeOffset(startDay.Year, startDay.Month, startDay.Day, 0, 0, 0, startDay.Offset);
-        EndDay = new DateTimeOffset(endDay.Year, endDay.Month, endDay.Day, 23, 59, 59, endDay.Offset);
+        var zone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+        TimeZoneId = timeZoneId;
+        StartDay = AtLocalTime(startDay, zone, 0, 0, 0);
+        EndDay = AtLocalTime(endDay, zone, 23, 59, 59);
     }
 
+    public string TimeZoneId { get; }
     public DateTimeOffset StartDay { get; }
     public DateTimeOffset EndDay { get; }
 
@@ -35,5 +38,12 @@ public record EventSpan
             date = EndDay;
         }
         return date.ToString("d", CultureInfo.CurrentCulture);
+    }
+
+    static DateTimeOffset AtLocalTime(DateTimeOffset instant, TimeZoneInfo zone, int hour, int minute, int second)
+    {
+        var date = TimeZoneInfo.ConvertTime(instant, zone).Date;
+        var local = new DateTime(date.Year, date.Month, date.Day, hour, minute, second);
+        return new DateTimeOffset(local, zone.GetUtcOffset(local));
     }
 }

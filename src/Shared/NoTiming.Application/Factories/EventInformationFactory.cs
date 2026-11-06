@@ -21,7 +21,7 @@ public static class EventInformationFactory
             setupEvent.Country,
             setupEvent.Name,
             setupEvent.Location,
-            new EventSpan(startDate, endDate),
+            new EventSpan(startDate, endDate, EventTimeZone.ForCountry(setupEvent.Country)),
             setupEvent.FeiShowId,
             setupEvent.Id,
             isActive: true

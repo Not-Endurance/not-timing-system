@@ -107,14 +107,14 @@ public sealed class CoreFeatureEndToEndTests
         await SeedOtherEvent(
             api,
             pastEventId,
-            new EventSpan(today.AddDays(-30), today.AddDays(-29)),
+            new EventSpan(today.AddDays(-30), today.AddDays(-29), "Europe/Sofia"),
             documentBase,
             "Past"
         );
         await SeedOtherEvent(
             api,
             activeEventId,
-            new EventSpan(today, today.AddDays(1)),
+            new EventSpan(today, today.AddDays(1), "Europe/Sofia"),
             documentBase + 10_000,
             "Active"
         );

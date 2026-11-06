@@ -90,7 +90,7 @@ public sealed class ResultsDocumentTests
             CreateCountry(),
             "Event",
             "Location",
-            new EventSpan(DateTimeOffset.Now.Date, DateTimeOffset.Now.Date.AddDays(1)),
+            new EventSpan(DateTimeOffset.Now.Date, DateTimeOffset.Now.Date.AddDays(1), "Europe/Sofia"),
             null,
             id: 10
         );

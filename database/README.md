@@ -16,7 +16,7 @@ npm ci --prefix database
 npx --prefix database migrate-mongo create <short-description>
 ```
 
-Each migration exports `up(db)` and `down(db)`. A migration that changes stored data ships in the same change as the `DomainVersion` bump it belongs to. The version check refuses to load data the code can't read, so the migration has to run first.
+Each migration exports `up(db)` and `down(db)`. A migration that changes stored data ships in the same change as the code that reads the new shape, and it runs before that code deploys. There is no version check yet: nothing stops old code from reading migrated data, which is why the deploy window is accepted.
 
 ## Running against a database locally
 

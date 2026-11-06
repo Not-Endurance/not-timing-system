@@ -20,7 +20,7 @@ internal static class IntegrationPayloadFactory
             country,
             name ?? "Integration Event",
             "Sofia",
-            eventSpan ?? new EventSpan(today, today.AddDays(1)),
+            eventSpan ?? new EventSpan(today, today.AddDays(1), "Europe/Sofia"),
             null,
             eventId
         );
