@@ -42,19 +42,6 @@ public class EventInformationController : ApiControllerBase
         return Ok();
     }
 
-    [HttpPatch("event")]
-    public async Task<IActionResult> Update()
-    {
-        var request = Request;
-        using var activity = StartFunctionActivity(nameof(Update));
-        TagRequest(request);
-        LogInformation(request, nameof(Update));
-
-        var payload = await ReadBody<EventInformationModel>(request);
-        await _events.Update(payload);
-        return Ok();
-    }
-
     [HttpGet("event/{id:int}")]
     public async Task<IActionResult> Read(int id)
     {

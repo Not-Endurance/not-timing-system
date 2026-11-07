@@ -47,9 +47,7 @@ public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKru
     public EventInformation MapToEntity()
     {
         var country = Country.MapToEntity();
-        var timeZoneId =
-            TimeZoneId ?? throw new InvalidOperationException($"Event {Id} has no TimeZoneId. Run the database migrations.");
-        var span = new EventSpan(StartDay, EndDay, timeZoneId);
+        var span = new EventSpan(StartDay, EndDay, TimeZoneId ?? EventTimeZone.ForCountry(country));
         return new EventInformation(country, Name, Location, span, FeiShowId, Id, IsActive);
     }
 }

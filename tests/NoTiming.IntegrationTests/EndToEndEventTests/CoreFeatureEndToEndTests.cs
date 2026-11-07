@@ -341,8 +341,6 @@ public sealed class CoreFeatureEndToEndTests
         EventInformation eventInformation
     )
     {
-        eventInformation = CreateFeiExportEventInformation(eventInformation);
-        await api.Update(eventInformation);
         var finalRankings = await api.ReadRankings(eventInformation.Id);
         var exportableRanking = CreateFeiExportRanking(finalRankings.First());
         await api.Update(exportableRanking);
@@ -366,19 +364,6 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Contains(eventInformation.FeiShowId!, export.Content);
         Assert.Contains(exportableRanking.FeiEventId!, export.Content);
         Assert.Contains(exportableRanking.FeiCompetitionId!, export.Content);
-    }
-
-    static EventInformation CreateFeiExportEventInformation(EventInformation source)
-    {
-        return new EventInformation(
-            source.Country,
-            source.Name,
-            source.Location,
-            source.EventSpan,
-            $"FEI-SHOW-{source.Id}",
-            source.Id,
-            source.IsActive
-        );
     }
 
     static Ranking CreateFeiExportRanking(Ranking source)

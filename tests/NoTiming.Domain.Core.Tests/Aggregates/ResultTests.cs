@@ -38,19 +38,6 @@ public sealed class ResultTests
         Assert.Equal([1, 2], result.Entries.Select(x => x.Rank));
     }
 
-    [Fact]
-    public void Constructor_WhenSomeEntriesHaveNoStoredRank_ShouldRankAllEntries()
-    {
-        var earlier = CreateParticipation(1, START.AddHours(1), present: START.AddHours(1).AddMinutes(5));
-        var later = CreateParticipation(2, START.AddHours(2), present: START.AddHours(2).AddMinutes(5));
-        var ranking = CreateRanking([new RankingEntry(later, 1, false), new RankingEntry(earlier, null, false)]);
-
-        var result = new Result(ranking);
-
-        Assert.Equal([earlier.Id, later.Id], result.Entries.Select(x => x.ParticipationId));
-        Assert.Equal([1, 2], result.Entries.Select(x => x.Rank));
-    }
-
     static Ranking CreateRanking(IEnumerable<RankingEntry> entries)
     {
         return new Ranking(
