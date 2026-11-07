@@ -42,7 +42,7 @@ public sealed class UiAccountService : IUiAccountService, IScoped
     /// <summary>The account routes answer with their own JSON, or none, so the body is sent and read as it is.</summary>
     async Task SendAsync(string endpoint, object? payload)
     {
-        await _client.SendRawJson(HttpMethod.Post, endpoint, payload?.ToJson());
+        await _client.PostJson(endpoint, payload?.ToJson());
     }
 
     sealed class EmailPayload

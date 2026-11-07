@@ -20,40 +20,40 @@ public sealed class UiPasskeyService : IUiPasskeyService, IScoped
         _client = client;
     }
 
-    public Task<string> SignInOptionsAsync()
+    public async Task<string> SignInOptionsAsync()
     {
-        return _client.SendRawJson(HttpMethod.Post, SIGN_IN_OPTIONS);
+        return (await _client.PostJson(SIGN_IN_OPTIONS)).Data!;
     }
 
     public async Task SignInAsync(string credentialJson)
     {
-        await _client.SendRawJson(HttpMethod.Post, SIGN_IN_VERIFY, credentialJson);
+        await _client.PostJson(SIGN_IN_VERIFY, credentialJson);
     }
 
-    public Task<string> EnrolOptionsAsync()
+    public async Task<string> EnrolOptionsAsync()
     {
-        return _client.SendRawJson(HttpMethod.Post, ENROL_OPTIONS);
+        return (await _client.PostJson(ENROL_OPTIONS)).Data!;
     }
 
     public async Task EnrolAsync(string credentialJson, string? name)
     {
         var body = new JsonObject { ["name"] = name, ["credential"] = JsonNode.Parse(credentialJson) };
-        await _client.SendRawJson(HttpMethod.Post, PASSKEYS, body.ToJsonString());
+        await _client.PostJson(PASSKEYS, body.ToJsonString());
     }
 
     public async Task<IReadOnlyList<UiPasskey>> ListAsync()
     {
-        var json = await _client.SendRawJson(HttpMethod.Get, PASSKEYS);
+        var json = (await _client.GetJson(PASSKEYS)).Data!;
         return json.FromJson<UiPasskey[]>();
     }
 
     public async Task RenameAsync(string id, string name)
     {
-        await _client.SendRawJson(HttpMethod.Patch, $"{PASSKEYS}/{id}", new { name }.ToJson());
+        await _client.PatchJson($"{PASSKEYS}/{id}", new { name }.ToJson());
     }
 
     public async Task RemoveAsync(string id)
     {
-        await _client.SendRawJson(HttpMethod.Delete, $"{PASSKEYS}/{id}");
+        await _client.DeleteJson($"{PASSKEYS}/{id}");
     }
 }

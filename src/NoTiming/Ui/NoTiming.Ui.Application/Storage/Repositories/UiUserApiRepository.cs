@@ -32,7 +32,7 @@ public class UiUserApiRepository : IUserRegister, IUiUserProfileRepository
 
         try
         {
-            var json = await _client.SendRawJson(HttpMethod.Get, PROFILE_ENDPOINT);
+            var json = (await _client.GetJson(PROFILE_ENDPOINT)).Data!;
             var profile = json.FromJson<SignedInProfile>();
             if (!string.Equals(profile.Email, email, StringComparison.OrdinalIgnoreCase))
             {
@@ -61,7 +61,7 @@ public class UiUserApiRepository : IUserRegister, IUiUserProfileRepository
 
         try
         {
-            await _client.SendRawJson(HttpMethod.Patch, PROFILE_UPDATE_ENDPOINT, payload.ToJson());
+            await _client.PatchJson(PROFILE_UPDATE_ENDPOINT, payload.ToJson());
             return await Get(email);
         }
         catch (Exception ex)

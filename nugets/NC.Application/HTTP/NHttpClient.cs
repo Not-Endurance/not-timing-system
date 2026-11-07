@@ -74,16 +74,47 @@ public class NHttpClient
         return await SendRequest<TResult>(HttpMethod.Patch, endpoint, payload);
     }
 
-    /// <summary>
-    /// Sends a JSON body exactly as given and returns the response body exactly as received, without the Result envelope.
-    /// For endpoints that answer with their own JSON, or with no body. A refused request throws an
-    /// <see cref="HttpRequestException"/> that carries the status code.
-    /// </summary>
-    public async Task<string> SendRawJson(
-        HttpMethod method,
+    /// <summary>Gets an endpoint that answers with its own JSON. The body is returned exactly as received.</summary>
+    public async Task<Result<string>> GetJson(string endpoint, CancellationToken cancellationToken = default)
+    {
+        return await SendJson(HttpMethod.Get, endpoint, null, cancellationToken);
+    }
+
+    /// <summary>Posts an optional JSON body to an endpoint. The response body is returned exactly as received.</summary>
+    public async Task<Result<string>> PostJson(
         string endpoint,
         string? json = null,
         CancellationToken cancellationToken = default
+    )
+    {
+        return await SendJson(HttpMethod.Post, endpoint, json, cancellationToken);
+    }
+
+    /// <summary>Patches an endpoint with a JSON body. The response body is returned exactly as received.</summary>
+    public async Task<Result<string>> PatchJson(
+        string endpoint,
+        string json,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await SendJson(HttpMethod.Patch, endpoint, json, cancellationToken);
+    }
+
+    /// <summary>Deletes an endpoint. The response body is returned exactly as received, or empty when there is none.</summary>
+    public async Task<Result<string>> DeleteJson(string endpoint, CancellationToken cancellationToken = default)
+    {
+        return await SendJson(HttpMethod.Delete, endpoint, null, cancellationToken);
+    }
+
+    /// <summary>
+    /// Sends the JSON exactly as given. A refused request throws an <see cref="HttpRequestException"/> that carries
+    /// the status code, as the typed methods do.
+    /// </summary>
+    async Task<Result<string>> SendJson(
+        HttpMethod method,
+        string endpoint,
+        string? json,
+        CancellationToken cancellationToken
     )
     {
         var url = BuildUrl(endpoint);
@@ -103,7 +134,7 @@ public class NHttpClient
                 throw CreateUnhandledResponseException(response, content);
             }
 
-            return content;
+            return Result.Success(content);
         }
         catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized)
         {

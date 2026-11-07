@@ -38,7 +38,7 @@ public sealed class SessionAuthenticationStateProvider : AuthenticationStateProv
     {
         try
         {
-            var json = await _client.SendRawJson(HttpMethod.Get, PROFILE_ENDPOINT);
+            var json = (await _client.GetJson(PROFILE_ENDPOINT)).Data!;
             var profile = json.FromJson<SessionProfile>();
             return new AuthenticationState(new ClaimsPrincipal(profile.ToIdentity()));
         }

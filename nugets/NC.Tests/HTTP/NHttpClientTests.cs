@@ -11,12 +11,12 @@ public sealed class NHttpClientTests
     const string BASE_URL = "http://test.local/api";
 
     [Fact]
-    public async Task SendRawJson_WhenPostWithJson_ShouldSendTheBodyUnchangedAsJson()
+    public async Task PostJson_WhenJsonIsGiven_ShouldSendTheBodyUnchangedAsJson()
     {
         var stub = new StubHandler(HttpStatusCode.Accepted, string.Empty);
         var client = CreateClient(stub);
 
-        await client.SendRawJson(HttpMethod.Post, "sign-in/code", "{\"email\":\"ana@example.test\"}");
+        await client.PostJson("sign-in/code", "{\"email\":\"ana@example.test\"}");
 
         Assert.Equal(HttpMethod.Post, stub.Request!.Method);
         Assert.EndsWith("/sign-in/code", stub.Request.RequestUri!.ToString());
@@ -25,38 +25,66 @@ public sealed class NHttpClientTests
     }
 
     [Fact]
-    public async Task SendRawJson_WhenRequestSucceeds_ShouldReturnTheBodyUnchanged()
+    public async Task PostJson_WhenNoJsonIsGiven_ShouldSendNoBody()
+    {
+        var stub = new StubHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(stub);
+
+        await client.PostJson("sign-out");
+
+        Assert.Null(stub.Request!.Content);
+    }
+
+    [Fact]
+    public async Task GetJson_WhenRequestSucceeds_ShouldReturnTheBodyInASuccessfulResult()
     {
         var stub = new StubHandler(HttpStatusCode.OK, "{\"signedIn\":true,\"displayName\":\"Ana Ivanova\"}");
         var client = CreateClient(stub);
 
-        var body = await client.SendRawJson(HttpMethod.Get, "me");
+        var result = await client.GetJson("me");
 
-        Assert.Equal("{\"signedIn\":true,\"displayName\":\"Ana Ivanova\"}", body);
+        Assert.Equal(HttpMethod.Get, stub.Request!.Method);
+        Assert.True(result.IsSuccess);
+        Assert.Equal("{\"signedIn\":true,\"displayName\":\"Ana Ivanova\"}", result.Data);
     }
 
     [Fact]
-    public async Task SendRawJson_WhenStatusIsRefused_ShouldThrowWithTheStatusCode()
+    public async Task GetJson_WhenStatusIsRefused_ShouldThrowWithTheStatusCode()
     {
-        var stub = new StubHandler(HttpStatusCode.Unauthorized, "{\"error\":\"code-not-accepted\"}");
+        var stub = new StubHandler(HttpStatusCode.Unauthorized, "{\"error\":\"not-signed-in\"}");
         var client = CreateClient(stub);
 
-        var exception = await Assert.ThrowsAsync<HttpRequestException>(
-            () => client.SendRawJson(HttpMethod.Post, "sign-in/verify", "{}")
-        );
+        var exception = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetJson("me/profile"));
 
         Assert.Equal(HttpStatusCode.Unauthorized, exception.StatusCode);
     }
 
     [Fact]
-    public async Task SendRawJson_WhenNoJsonIsGiven_ShouldSendNoBody()
+    public async Task PatchJson_ShouldSendPatchWithTheBodyAsJson()
+    {
+        var stub = new StubHandler(HttpStatusCode.OK, "{}");
+        var client = CreateClient(stub);
+
+        var result = await client.PatchJson("me/passkeys/1", "{\"name\":\"Laptop\"}");
+
+        Assert.Equal(HttpMethod.Patch, stub.Request!.Method);
+        Assert.EndsWith("/me/passkeys/1", stub.Request.RequestUri!.ToString());
+        Assert.Equal("{\"name\":\"Laptop\"}", stub.RequestBody);
+        Assert.Equal("application/json", stub.Request.Content!.Headers.ContentType!.MediaType);
+        Assert.True(result.IsSuccess);
+    }
+
+    [Fact]
+    public async Task DeleteJson_ShouldSendDeleteWithNoBody()
     {
         var stub = new StubHandler(HttpStatusCode.NoContent, string.Empty);
         var client = CreateClient(stub);
 
-        await client.SendRawJson(HttpMethod.Post, "sign-out");
+        var result = await client.DeleteJson("me/passkeys/1");
 
-        Assert.Null(stub.Request!.Content);
+        Assert.Equal(HttpMethod.Delete, stub.Request!.Method);
+        Assert.Null(stub.Request.Content);
+        Assert.True(result.IsSuccess);
     }
 
     static NHttpClient CreateClient(HttpMessageHandler handler)
