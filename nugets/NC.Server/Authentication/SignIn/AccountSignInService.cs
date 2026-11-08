@@ -9,7 +9,7 @@ using NC.Server.Authentication.Email;
 using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.RateLimits;
 using NC.Server.Authentication.Sessions;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Settings;
 
 namespace NC.Server.Authentication.SignIn;
 
@@ -20,9 +20,9 @@ namespace NC.Server.Authentication.SignIn;
 /// </summary>
 public sealed class AccountSignInService
 {
-    readonly IdentityUserStore _users;
-    readonly SessionStore _sessions;
-    readonly CodeChallengeStore _challenges;
+    readonly IIdentityUserRepository _users;
+    readonly ISessionRepository _sessions;
+    readonly ICodeChallengeRepository _challenges;
     readonly CodeSendGate _gate;
     readonly EmailDispatchQueue _mail;
     readonly IEnumerable<ILegacyUserAdoption> _adoptions;
@@ -31,9 +31,9 @@ public sealed class AccountSignInService
     readonly ILogger<AccountSignInService> _logger;
 
     public AccountSignInService(
-        IdentityUserStore users,
-        SessionStore sessions,
-        CodeChallengeStore challenges,
+        IIdentityUserRepository users,
+        ISessionRepository sessions,
+        ICodeChallengeRepository challenges,
         CodeSendGate gate,
         EmailDispatchQueue mail,
         IEnumerable<ILegacyUserAdoption> adoptions,
@@ -53,7 +53,7 @@ public sealed class AccountSignInService
         _logger = logger;
     }
 
-    public async Task<CodeRequestOutcome> RequestSignInCodeAsync(
+    public async Task<CodeRequestOutcome> RequestSignInCode(
         string email,
         string language,
         string clientAddress,
@@ -62,25 +62,18 @@ public sealed class AccountSignInService
     {
         var address = EmailAddress.Normalize(email);
         var now = _time.GetUtcNow();
-        var decision = await _gate.ReviewAsync(address, clientAddress, now, cancellationToken);
+        var decision = await _gate.Review(address, clientAddress, now, cancellationToken);
         if (!decision.Allowed)
         {
             return Refused(decision.RetryAfter);
         }
 
         var code = OneTimeCodes.Generate();
-        await StoreChallengeAsync(
-            address,
-            CodeChallengeStore.SIGN_IN,
-            registration: null,
-            code,
-            now,
-            cancellationToken
-        );
-        await _gate.RecordAsync(address, clientAddress, now, cancellationToken);
+        await StoreChallenge(address, CodeChallengePurpose.SIGN_IN, registration: null, code, now, cancellationToken);
+        await _gate.Record(address, clientAddress, now, cancellationToken);
 
         // Mail goes out only for an address that has an account. The response is the same either way.
-        var accounts = await _users.FindAllByEmailAsync(address, cancellationToken);
+        var accounts = await _users.FindAllByEmail(address, cancellationToken);
         if (accounts.Count > 0)
         {
             _mail.Enqueue(EmailTemplates.SignInCode(address, language, code));
@@ -89,7 +82,7 @@ public sealed class AccountSignInService
         return Accepted();
     }
 
-    public async Task<CodeRequestOutcome> RequestRegistrationCodeAsync(
+    public async Task<CodeRequestOutcome> RequestRegistrationCode(
         string email,
         RegistrationDetails details,
         string language,
@@ -99,7 +92,7 @@ public sealed class AccountSignInService
     {
         var address = EmailAddress.Normalize(email);
         var now = _time.GetUtcNow();
-        var decision = await _gate.ReviewAsync(address, clientAddress, now, cancellationToken);
+        var decision = await _gate.Review(address, clientAddress, now, cancellationToken);
         if (!decision.Allowed)
         {
             return Refused(decision.RetryAfter);
@@ -112,24 +105,20 @@ public sealed class AccountSignInService
             Surname = details.Surname.Trim(),
             CountryRegion = details.CountryRegion.Trim(),
         };
-        await StoreChallengeAsync(address, CodeChallengeStore.REGISTER, registration, code, now, cancellationToken);
-        await _gate.RecordAsync(address, clientAddress, now, cancellationToken);
+        await StoreChallenge(address, CodeChallengePurpose.REGISTER, registration, code, now, cancellationToken);
+        await _gate.Record(address, clientAddress, now, cancellationToken);
         _mail.Enqueue(EmailTemplates.RegistrationCode(address, language, code));
 
         return Accepted();
     }
 
-    public async Task<VerificationOutcome> VerifyCodeAsync(
-        string email,
-        string code,
-        CancellationToken cancellationToken
-    )
+    public async Task<VerificationOutcome> VerifyCode(string email, string code, CancellationToken cancellationToken)
     {
         var address = EmailAddress.Normalize(email);
         var now = _time.GetUtcNow();
 
         // The attempt is spent before the code is compared, so a guess is counted even when it is right.
-        var spent = await _challenges.SpendAttemptAsync(address, now, cancellationToken);
+        var spent = await _challenges.SpendAttempt(address, now, cancellationToken);
         if (spent is null)
         {
             return Refused();
@@ -138,7 +127,7 @@ public sealed class AccountSignInService
         var matches = CryptographicOperations.FixedTimeEquals(CodeMac.Compute(Secret(), address, code), spent.Mac);
         var before = new CodeChallengeState
         {
-            ExpiresAtUtc = new DateTimeOffset(spent.ExpiresAt, TimeSpan.Zero),
+            ExpiresAtUtc = new DateTimeOffset(spent.ExpiresAtUtc, TimeSpan.Zero),
             AttemptsLeft = spent.AttemptsLeft + 1,
             Used = false,
         };
@@ -149,19 +138,19 @@ public sealed class AccountSignInService
         }
 
         // A correct code is deleted atomically, so it signs in once even if two requests check it together.
-        if (!await _challenges.ConsumeAsync(address, spent.Mac, cancellationToken))
+        if (!await _challenges.Consume(address, spent.Mac, cancellationToken))
         {
             return Refused();
         }
 
-        var user = await ResolveUserAsync(address, spent, now, cancellationToken);
+        var user = await ResolveUser(address, spent, now, cancellationToken);
         if (user is null)
         {
             return Refused();
         }
 
         var issued = SessionToken.Issue();
-        await _sessions.CreateAsync(issued.TokenHash, user.Id, user.SecurityStamp!, now, cancellationToken);
+        await _sessions.Create(issued.TokenHash, user.Id, user.SecurityStamp!, now, cancellationToken);
         _logger.LogInformation("User {UserId} signed in by code.", user.Id);
 
         return new VerificationOutcome
@@ -173,14 +162,14 @@ public sealed class AccountSignInService
         };
     }
 
-    async Task<IdentityUserDocument?> ResolveUserAsync(
+    async Task<IdentityUserDocument?> ResolveUser(
         string address,
         CodeChallengeDocument challenge,
         DateTimeOffset now,
         CancellationToken cancellationToken
     )
     {
-        var matches = await _users.FindAllByEmailAsync(address, cancellationToken);
+        var matches = await _users.FindAllByEmail(address, cancellationToken);
         if (matches.Count > 1)
         {
             _logger.LogWarning("A sign-in was refused: more than one user record matches the address.");
@@ -192,12 +181,12 @@ public sealed class AccountSignInService
             var existing = matches[0];
             if (existing.IsProved)
             {
-                return await EnsureStampAsync(existing, cancellationToken);
+                return await EnsureStamp(existing, cancellationToken);
             }
 
             foreach (var adoption in _adoptions)
             {
-                var adopted = await adoption.AdoptAsync(existing, now, cancellationToken);
+                var adopted = await adoption.Adopt(existing, now, cancellationToken);
                 if (adopted is not null)
                 {
                     return adopted;
@@ -207,11 +196,11 @@ public sealed class AccountSignInService
             return null;
         }
 
-        if (challenge.Purpose == CodeChallengeStore.REGISTER && challenge.Registration is { } details)
+        if (challenge.Purpose == CodeChallengePurpose.REGISTER && challenge.Registration is { } details)
         {
             try
             {
-                return await _users.CreateProvedUserAsync(
+                return await _users.CreateProvedUser(
                     address,
                     details.GivenName,
                     details.Surname,
@@ -230,7 +219,7 @@ public sealed class AccountSignInService
         return null;
     }
 
-    async Task<IdentityUserDocument> EnsureStampAsync(IdentityUserDocument user, CancellationToken cancellationToken)
+    async Task<IdentityUserDocument> EnsureStamp(IdentityUserDocument user, CancellationToken cancellationToken)
     {
         if (user.SecurityStamp is not null)
         {
@@ -242,7 +231,7 @@ public sealed class AccountSignInService
         return user;
     }
 
-    async Task StoreChallengeAsync(
+    async Task StoreChallenge(
         string address,
         string purpose,
         RegistrationDetailsDocument? registration,
@@ -252,15 +241,15 @@ public sealed class AccountSignInService
     )
     {
         var state = CodeChallengeRules.Issue(now);
-        await _challenges.ReplaceAsync(
+        await _challenges.Replace(
             new CodeChallengeDocument
             {
                 Email = address,
                 Purpose = purpose,
                 Mac = CodeMac.Compute(Secret(), address, code),
                 AttemptsLeft = state.AttemptsLeft,
-                LastSentAt = now.UtcDateTime,
-                ExpiresAt = state.ExpiresAtUtc.UtcDateTime,
+                LastSentAtUtc = now.UtcDateTime,
+                ExpiresAtUtc = state.ExpiresAtUtc.UtcDateTime,
                 Registration = registration,
             },
             cancellationToken

@@ -1,4 +1,4 @@
-namespace NC.Server.Authentication.Store;
+namespace NC.Server.Authentication.Settings;
 
 /// <summary>Configuration of sign-in: the collections it uses, the session cookie, the passkey relying party and email.</summary>
 public sealed class AuthenticationSettings

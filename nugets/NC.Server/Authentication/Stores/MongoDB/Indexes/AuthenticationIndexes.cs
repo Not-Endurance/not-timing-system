@@ -2,18 +2,20 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NC.Server.Authentication.Codes;
+using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.RateLimits;
 using NC.Server.Authentication.Sessions;
+using NC.Server.Authentication.Settings;
 using NC.Storage.Mongo;
 
-namespace NC.Server.Authentication.Store;
+namespace NC.Server.Authentication.Stores.MongoDB.Indexes;
 
 /// <summary>
 /// Creates the indexes sign-in depends on when the host starts. Uniqueness on the address applies only to proved users,
 /// so legacy duplicates stay allowed until they are proved, and the expiry indexes remove sessions, challenges and
 /// counters once they have passed. Creating an index that already exists with the same definition does nothing.
 /// </summary>
-public sealed class AuthenticationIndexes : IHostedService
+internal sealed class AuthenticationIndexes : IHostedService
 {
     readonly IMongoContext _context;
     readonly AuthenticationSettings _settings;
@@ -48,9 +50,9 @@ public sealed class AuthenticationIndexes : IHostedService
                     Builders<IdentityUserDocument>.IndexKeys.Ascending(x => x.Email),
                     new CreateIndexOptions<IdentityUserDocument>
                     {
-                        Name = "identity_email_proved_unique",
+                        Name = "identity_email_proved_unique_utc",
                         Unique = true,
-                        PartialFilterExpression = Builders<IdentityUserDocument>.Filter.Exists(x => x.ProvedAt),
+                        PartialFilterExpression = Builders<IdentityUserDocument>.Filter.Exists(x => x.ProvedAtUtc),
                     }
                 ),
                 new CreateIndexModel<IdentityUserDocument>(
@@ -69,19 +71,19 @@ public sealed class AuthenticationIndexes : IHostedService
         await database
             .GetCollection<SessionDocument>(_settings.SessionsCollection)
             .Indexes.CreateOneAsync(
-                ExpiresAtIndex<SessionDocument>("sessions_expire_at"),
+                ExpiresAtIndex<SessionDocument>("sessions_expire_at_utc"),
                 cancellationToken: cancellationToken
             );
         await database
             .GetCollection<CodeChallengeDocument>(_settings.ChallengesCollection)
             .Indexes.CreateOneAsync(
-                ExpiresAtIndex<CodeChallengeDocument>("challenges_expire_at"),
+                ExpiresAtIndex<CodeChallengeDocument>("challenges_expire_at_utc"),
                 cancellationToken: cancellationToken
             );
         await database
             .GetCollection<RateCounterDocument>(_settings.RateCountersCollection)
             .Indexes.CreateOneAsync(
-                ExpiresAtIndex<RateCounterDocument>("rate_counters_expire_at"),
+                ExpiresAtIndex<RateCounterDocument>("rate_counters_expire_at_utc"),
                 cancellationToken: cancellationToken
             );
     }
@@ -93,7 +95,7 @@ public sealed class AuthenticationIndexes : IHostedService
 
     static CreateIndexModel<T> ExpiresAtIndex<T>(string name)
     {
-        var keys = Builders<T>.IndexKeys.Ascending("ExpiresAt");
+        var keys = Builders<T>.IndexKeys.Ascending("ExpiresAtUtc");
         return new CreateIndexModel<T>(keys, new CreateIndexOptions { Name = name, ExpireAfter = TimeSpan.Zero });
     }
 }

@@ -2,6 +2,7 @@ using System.Buffers.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using NC.Server.Authentication.Email;
+using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.Sessions;
 
 namespace NC.Server.Authentication.Passkeys;
@@ -10,11 +11,11 @@ namespace NC.Server.Authentication.Passkeys;
 /// Passkeys on top of ASP.NET Core Identity's passkey handler: the options for creating and using one, the check of the
 /// browser's answer, and the management of the passkeys a user has. Every change goes through a concurrency-checked update.
 /// </summary>
-public sealed class PasskeyService
+internal sealed class PasskeyService : IPasskeyService
 {
     readonly IPasskeyCeremony _ceremony;
     readonly IPasskeyUsers _users;
-    readonly IPasskeySessionStore _sessions;
+    readonly ISessionRepository _sessions;
     readonly EmailDispatchQueue _mail;
     readonly TimeProvider _time;
     readonly ILogger<PasskeyService> _logger;
@@ -22,7 +23,7 @@ public sealed class PasskeyService
     public PasskeyService(
         IPasskeyCeremony ceremony,
         IPasskeyUsers users,
-        IPasskeySessionStore sessions,
+        ISessionRepository sessions,
         EmailDispatchQueue mail,
         TimeProvider time,
         ILogger<PasskeyService> logger
@@ -37,24 +38,24 @@ public sealed class PasskeyService
     }
 
     /// <summary>Options for a passkey sign-in. They name no user, so the authenticator offers the passkeys it holds.</summary>
-    public Task<string> RequestOptionsAsync()
+    public Task<string> RequestOptions()
     {
-        return _ceremony.MakeRequestOptionsAsync();
+        return _ceremony.MakeRequestOptions();
     }
 
     /// <summary>
     /// Options for a new passkey. The user gets a random handle the first time, never the integer id. Null when the
     /// handle could not be stored, so the caller can ask again.
     /// </summary>
-    public async Task<string?> CreationOptionsAsync(int userId, CancellationToken cancellationToken)
+    public async Task<string?> CreationOptions(int userId, CancellationToken cancellationToken)
     {
         var user =
-            await _users.FindByUserIdAsync(userId, cancellationToken)
+            await _users.FindByUserId(userId, cancellationToken)
             ?? throw new InvalidOperationException("The signed-in user does not exist.");
 
         if (user.UserHandle is null)
         {
-            await _users.ChangeAsync(
+            await _users.Change(
                 userId,
                 changed =>
                 {
@@ -63,14 +64,14 @@ public sealed class PasskeyService
                 },
                 cancellationToken
             );
-            user = await _users.FindByUserIdAsync(userId, cancellationToken) ?? user;
+            user = await _users.FindByUserId(userId, cancellationToken) ?? user;
             if (user.UserHandle is null)
             {
                 return null;
             }
         }
 
-        return await _ceremony.MakeCreationOptionsAsync(
+        return await _ceremony.MakeCreationOptions(
             new PasskeyUserEntity
             {
                 Id = Base64Url.EncodeToString(user.UserHandle),
@@ -81,7 +82,7 @@ public sealed class PasskeyService
     }
 
     /// <summary>Stores the passkey the browser created for the signed-in user, and tells them by email.</summary>
-    public async Task<PasskeyOutcome> EnrolAsync(
+    public async Task<PasskeyOutcome> Enrol(
         int userId,
         string credentialJson,
         string? name,
@@ -89,7 +90,7 @@ public sealed class PasskeyService
         CancellationToken cancellationToken
     )
     {
-        var passkey = await TryCeremonyAsync(() => _ceremony.PerformAttestationAsync(credentialJson));
+        var passkey = await TryCeremony(() => _ceremony.PerformAttestation(credentialJson));
         if (passkey is null)
         {
             return new PasskeyOutcome { Kind = PasskeyOutcomeKind.Refused };
@@ -98,7 +99,7 @@ public sealed class PasskeyService
         var now = _time.GetUtcNow();
         passkey.Name = string.IsNullOrWhiteSpace(name) ? $"Passkey, {now:yyyy-MM-dd}" : name.Trim();
 
-        var result = await _users.ChangeAsync(
+        var result = await _users.Change(
             userId,
             async changed =>
             {
@@ -112,7 +113,7 @@ public sealed class PasskeyService
             return new PasskeyOutcome { Kind = PasskeyOutcomeKind.Refused };
         }
 
-        var user = await _users.FindByUserIdAsync(userId, cancellationToken);
+        var user = await _users.FindByUserId(userId, cancellationToken);
         if (user?.Email != null)
         {
             _mail.Enqueue(EmailTemplates.PasskeyAdded(user.Email, language, passkey.Name!, now));
@@ -123,9 +124,9 @@ public sealed class PasskeyService
     }
 
     /// <summary>Checks a passkey sign-in and starts a session for its user. Null when the answer is not accepted.</summary>
-    public async Task<PasskeySignIn?> SignInAsync(string credentialJson, CancellationToken cancellationToken)
+    public async Task<PasskeySignIn?> SignIn(string credentialJson, CancellationToken cancellationToken)
     {
-        var assertion = await TryCeremonyAsync(() => _ceremony.PerformAssertionAsync(credentialJson));
+        var assertion = await TryCeremony(() => _ceremony.PerformAssertion(credentialJson));
         if (assertion is null)
         {
             return null;
@@ -133,7 +134,7 @@ public sealed class PasskeyService
 
         var userId = assertion.User.Id;
         var passkey = assertion.Passkey;
-        await _users.ChangeAsync(
+        await _users.Change(
             userId,
             async changed =>
             {
@@ -143,7 +144,7 @@ public sealed class PasskeyService
             cancellationToken
         );
 
-        var user = await _users.FindByUserIdAsync(userId, cancellationToken) ?? assertion.User;
+        var user = await _users.FindByUserId(userId, cancellationToken) ?? assertion.User;
         if (user.SecurityStamp is null)
         {
             // A session is bound to the stamp, so a user without one cannot be given a session.
@@ -153,7 +154,7 @@ public sealed class PasskeyService
 
         var now = _time.GetUtcNow();
         var issued = SessionToken.Issue();
-        await _sessions.CreateAsync(issued.TokenHash, user.Id, user.SecurityStamp, now, cancellationToken);
+        await _sessions.Create(issued.TokenHash, user.Id, user.SecurityStamp, now, cancellationToken);
         _logger.LogInformation("User {UserId} signed in with a passkey.", user.Id);
 
         return new PasskeySignIn
@@ -164,9 +165,9 @@ public sealed class PasskeyService
         };
     }
 
-    public async Task<IReadOnlyList<UserPasskeyInfo>> ListAsync(int userId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<UserPasskeyInfo>> ListPasskeys(int userId, CancellationToken cancellationToken)
     {
-        var user = await _users.FindByUserIdAsync(userId, cancellationToken);
+        var user = await _users.FindByUserId(userId, cancellationToken);
         if (user is null)
         {
             return [];
@@ -175,15 +176,11 @@ public sealed class PasskeyService
         return [.. (await _users.GetPasskeysAsync(user, cancellationToken)).OrderBy(x => x.CreatedAt)];
     }
 
-    public async Task<PasskeyOutcome> RenameAsync(
-        int userId,
-        byte[] credentialId,
-        string name,
-        CancellationToken cancellationToken
-    )
+    /// <summary>Renames one of the user's passkeys. The name is what the user sees on the Passkeys page to tell them apart.</summary>
+    public async Task<PasskeyOutcome> Rename(int userId, byte[] credentialId, string name, CancellationToken cancellationToken)
     {
         var found = false;
-        var result = await _users.ChangeAsync(
+        var result = await _users.Change(
             userId,
             changed =>
             {
@@ -211,9 +208,9 @@ public sealed class PasskeyService
     }
 
     /// <summary>Removes a passkey, but never the user's last one.</summary>
-    public async Task<PasskeyOutcome> RemoveAsync(int userId, byte[] credentialId, CancellationToken cancellationToken)
+    public async Task<PasskeyOutcome> Remove(int userId, byte[] credentialId, CancellationToken cancellationToken)
     {
-        var user = await _users.FindByUserIdAsync(userId, cancellationToken);
+        var user = await _users.FindByUserId(userId, cancellationToken);
         var passkeys = user?.Passkeys ?? [];
         if (!passkeys.Any(x => x.CredentialId.AsSpan().SequenceEqual(credentialId)))
         {
@@ -225,12 +222,12 @@ public sealed class PasskeyService
             return new PasskeyOutcome { Kind = PasskeyOutcomeKind.LastPasskey };
         }
 
-        var removed = await _users.RemovePasskeyWhileAnotherRemainsAsync(userId, credentialId, cancellationToken);
+        var removed = await _users.RemovePasskeyWhileAnotherRemains(userId, credentialId, cancellationToken);
         return new PasskeyOutcome { Kind = removed ? PasskeyOutcomeKind.Done : PasskeyOutcomeKind.LastPasskey };
     }
 
     /// <summary>An answer that cannot be checked is refused the same way whatever the reason. Cancellation is not.</summary>
-    async Task<T?> TryCeremonyAsync<T>(Func<Task<T?>> ceremony)
+    async Task<T?> TryCeremony<T>(Func<Task<T?>> ceremony)
         where T : class
     {
         try

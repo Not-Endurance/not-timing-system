@@ -9,16 +9,16 @@ public sealed class CodeSendGate
     const string IP_SCOPE = "ip";
     const string OVERALL_SCOPE = "overall";
 
-    readonly RateCounterStore _counters;
-    readonly CodeChallengeStore _challenges;
+    readonly IRateCounterRepository _counters;
+    readonly ICodeChallengeRepository _challenges;
 
-    public CodeSendGate(RateCounterStore counters, CodeChallengeStore challenges)
+    public CodeSendGate(IRateCounterRepository counters, ICodeChallengeRepository challenges)
     {
         _counters = counters;
         _challenges = challenges;
     }
 
-    public async Task<SendDecision> ReviewAsync(
+    public async Task<SendDecision> Review(
         string email,
         string clientAddress,
         DateTimeOffset now,
@@ -26,29 +26,26 @@ public sealed class CodeSendGate
     )
     {
         var hour = HourStart(now);
-        var challenge = await _challenges.FindAsync(email, cancellationToken);
+        var challenge = await _challenges.Find(email, cancellationToken);
         var history = new SendHistory
         {
-            ForAddressThisHour = await _counters.CountAsync(ADDRESS_SCOPE, email, hour, cancellationToken),
-            ForIpThisHour = await _counters.CountAsync(IP_SCOPE, clientAddress, hour, cancellationToken),
-            OverallThisHour = await _counters.CountAsync(OVERALL_SCOPE, "all", hour, cancellationToken),
-            LastSentForAddressUtc = challenge is null ? null : new DateTimeOffset(challenge.LastSentAt, TimeSpan.Zero),
+            ForAddressThisHour = await _counters.Count(ADDRESS_SCOPE, email, hour, cancellationToken),
+            ForIpThisHour = await _counters.Count(IP_SCOPE, clientAddress, hour, cancellationToken),
+            OverallThisHour = await _counters.Count(OVERALL_SCOPE, "all", hour, cancellationToken),
+            LastSentForAddressUtc = challenge is null
+                ? null
+                : new DateTimeOffset(challenge.LastSentAtUtc, TimeSpan.Zero),
         };
 
         return CodeSendLimits.Decide(history, now);
     }
 
-    public async Task RecordAsync(
-        string email,
-        string clientAddress,
-        DateTimeOffset now,
-        CancellationToken cancellationToken
-    )
+    public async Task Record(string email, string clientAddress, DateTimeOffset now, CancellationToken cancellationToken)
     {
         var hour = HourStart(now);
-        await _counters.IncrementAsync(ADDRESS_SCOPE, email, hour, cancellationToken);
-        await _counters.IncrementAsync(IP_SCOPE, clientAddress, hour, cancellationToken);
-        await _counters.IncrementAsync(OVERALL_SCOPE, "all", hour, cancellationToken);
+        await _counters.Increment(ADDRESS_SCOPE, email, hour, cancellationToken);
+        await _counters.Increment(IP_SCOPE, clientAddress, hour, cancellationToken);
+        await _counters.Increment(OVERALL_SCOPE, "all", hour, cancellationToken);
     }
 
     static DateTimeOffset HourStart(DateTimeOffset now)

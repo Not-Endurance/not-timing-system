@@ -52,4 +52,4 @@ GitHub Issues in `Not-Endurance/not-timing-system`, managed with the `gh` CLI. S
 
 ### Domain docs
 
-Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root, created lazily. See `docs/agents/domain.md`.
+Single-context: one `CONTEXT.md` (the glossary) and `docs/adr/` at the repo root, created lazily. Architecture is in `docs/architecture.md`. See `docs/agents/domain.md`.

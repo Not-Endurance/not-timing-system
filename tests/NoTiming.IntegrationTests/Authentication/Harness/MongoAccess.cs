@@ -27,7 +27,7 @@ internal sealed class MongoAccess
         };
         if (proved)
         {
-            document.Add("ProvedAt", DateTime.UtcNow);
+            document.Add("ProvedAtUtc", DateTime.UtcNow);
             document.Add("SecurityStamp", $"seed-{id}");
         }
 
@@ -95,7 +95,7 @@ internal sealed class MongoAccess
             { "CredentialId", new BsonBinaryData(passkey.CredentialId) },
             { "PublicKey", new BsonBinaryData(new byte[] { 1, 2, 3 }) },
             { "Name", passkey.Name },
-            { "CreatedAt", DateTime.UtcNow },
+            { "CreatedAtUtc", DateTime.UtcNow },
             { "SignCount", 0L },
             { "Transports", new BsonArray() },
             { "IsUserVerified", true },

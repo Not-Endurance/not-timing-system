@@ -9,12 +9,17 @@ using NC.Server.Authentication.Account;
 using NC.Server.Authentication.Adoption;
 using NC.Server.Authentication.Codes;
 using NC.Server.Authentication.Email;
+using NC.Server.Authentication.Email.Outbox;
+using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.Passkeys;
 using NC.Server.Authentication.RateLimits;
 using NC.Server.Authentication.Requests;
 using NC.Server.Authentication.Sessions;
+using NC.Server.Authentication.Settings;
 using NC.Server.Authentication.SignIn;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Stores.MongoDB.Indexes;
+using NC.Server.Authentication.Stores.MongoDB.Mapping;
+using NC.Server.Authentication.Stores.MongoDB.Repositories;
 
 namespace NC.Server.Authentication;
 
@@ -24,13 +29,18 @@ public static class AuthenticationServices
 
     /// <summary>
     /// Sign-in by passkey or emailed code, over a server-side cookie session. The session scheme is the default, so the
-    /// REST routes and the hubs read the same session. The settings are validated when the host starts.
+    /// REST routes and the hubs read the same session. The settings are validated when the host starts. The emails are
+    /// written in the languages the host passes in, which the host reads from the resources it ships.
     /// </summary>
     public static IServiceCollection AddNoTimingAuthentication(
         this IServiceCollection services,
-        IConfiguration configuration
+        IConfiguration configuration,
+        IEnumerable<string> emailLanguages
     )
     {
+        AuthenticationBsonMapping.Register();
+        services.AddSingleton(new EmailLanguage(emailLanguages));
+
         services
             .AddOptions<AuthenticationSettings>()
             .Bind(configuration.GetSection(AuthenticationSettings.SECTION))
@@ -38,8 +48,10 @@ public static class AuthenticationServices
         services.AddSingleton<IValidateOptions<AuthenticationSettings>, AuthenticationSettingsValidator>();
         services.TryAddSingleton(TimeProvider.System);
 
-        services.AddSingleton<IdentityUserStore>();
-        services.AddIdentityCore<IdentityUserDocument>().AddUserStore<IdentityUserStore>().AddSignInManager();
+        services.AddSingleton<IdentityUserRepository>();
+        services.AddSingleton<IIdentityUserRepository>(provider => provider.GetRequiredService<IdentityUserRepository>());
+        services.AddSingleton<IPasskeyUsers>(provider => provider.GetRequiredService<IdentityUserRepository>());
+        services.AddIdentityCore<IdentityUserDocument>().AddUserStore<IdentityUserRepository>().AddSignInManager();
         services.AddHttpContextAccessor();
         services.AddHostedService<AuthenticationIndexes>();
 
@@ -80,16 +92,14 @@ public static class AuthenticationServices
                 }
             );
 
-        services.AddSingleton<SessionStore>();
-        services.AddSingleton<CodeChallengeStore>();
-        services.AddSingleton<RateCounterStore>();
+        services.AddSingleton<ISessionRepository, SessionRepository>();
+        services.AddSingleton<ICodeChallengeRepository, CodeChallengeRepository>();
+        services.AddSingleton<IRateCounterRepository, RateCounterRepository>();
         services.AddSingleton<CodeSendGate>();
         services.AddSingleton<AccountSignInService>();
         services.AddSingleton<AccountService>();
-        services.AddScoped<PasskeyService>();
+        services.AddScoped<IPasskeyService, PasskeyService>();
         services.AddScoped<IPasskeyCeremony, SignInManagerPasskeyCeremony>();
-        services.AddSingleton<IPasskeyUsers>(provider => provider.GetRequiredService<IdentityUserStore>());
-        services.AddSingleton<IPasskeySessionStore>(provider => provider.GetRequiredService<SessionStore>());
         services.AddSingleton<ILegacyUserAdoption, LegacyUserAdoption>();
         services.AddScoped<StateChangeGuard>();
 

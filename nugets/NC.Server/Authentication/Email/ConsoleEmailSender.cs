@@ -1,9 +1,9 @@
 namespace NC.Server.Authentication.Email;
 
 /// <summary>Writes to the terminal of a developer. Non-production only.</summary>
-public sealed class ConsoleEmailSender : IEmailSender
+internal sealed class ConsoleEmailSender : IEmailSender
 {
-    public Task SendAsync(EmailMessage message, CancellationToken cancellationToken)
+    public Task Send(EmailMessage message, CancellationToken cancellationToken)
     {
         Console.WriteLine($"[email] to {message.To}: {message.Subject}");
         Console.WriteLine(message.TextBody);

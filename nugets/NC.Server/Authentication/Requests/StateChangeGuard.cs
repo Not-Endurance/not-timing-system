@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Settings;
 
 namespace NC.Server.Authentication.Requests;
 

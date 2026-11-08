@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 
 namespace NC.Server.Authentication.Codes;
 
-public static class OneTimeCodes
+internal static class OneTimeCodes
 {
     /// <summary>Six digits from the system generator. Leading zeros are kept.</summary>
     public static string Generate()

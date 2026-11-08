@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Identity;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Identity;
 
 namespace NC.Server.Authentication.Passkeys;
 
-public sealed class PasskeyAssertion
+internal sealed class PasskeyAssertion
 {
     public IdentityUserDocument User { get; init; } = new();
 

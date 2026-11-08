@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Settings;
 using NC.Storage.Mongo;
 
-namespace NC.Server.Authentication.Email;
+namespace NC.Server.Authentication.Email.Outbox;
 
 /// <summary>Keeps every message in a collection, so a test can read the code the person would have received. Non-production only.</summary>
-public sealed class OutboxEmailSender : IEmailSender
+internal sealed class OutboxEmailSender : IEmailSender
 {
     readonly IMongoCollection<OutboxMessageDocument> _outbox;
 
@@ -18,7 +18,7 @@ public sealed class OutboxEmailSender : IEmailSender
             .GetCollection<OutboxMessageDocument>(settings.OutboxCollection);
     }
 
-    public Task SendAsync(EmailMessage message, CancellationToken cancellationToken)
+    public Task Send(EmailMessage message, CancellationToken cancellationToken)
     {
         return _outbox.InsertOneAsync(
             new OutboxMessageDocument

@@ -29,7 +29,7 @@ public class UserController : ApiControllerBase
         TagRequest(request);
         LogInformation(request, nameof(ReadMany));
 
-        if (await SessionUser.IdOfAsync(HttpContext) is null)
+        if (await SessionUser.IdOf(HttpContext) is null)
         {
             return Unauthorized();
         }

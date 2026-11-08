@@ -1140,4 +1140,22 @@
   <data name="Last_passkey_string" xml:space="preserve">
     <value>This is your last passkey. Add another before you remove it.</value>
   </data>
+  <data name="Your_sign_in_code_string" xml:space="preserve">
+    <value>Your sign-in code</value>
+  </data>
+  <data name="Your_sign_in_code_is_0_string" xml:space="preserve">
+    <value>Your sign-in code is '{0}'. It expires in 10 minutes and works once. If you did not ask for it, ignore this email.</value>
+  </data>
+  <data name="Your_registration_code_string" xml:space="preserve">
+    <value>Your registration code</value>
+  </data>
+  <data name="Your_registration_code_is_0_string" xml:space="preserve">
+    <value>Your registration code is '{0}'. It expires in 10 minutes and works once. If you did not register, ignore this email.</value>
+  </data>
+  <data name="A_passkey_was_added_to_your_account_string" xml:space="preserve">
+    <value>A passkey was added to your account</value>
+  </data>
+  <data name="A_passkey_named_1_was_added_to_your_account_on_0_string" xml:space="preserve">
+    <value>A passkey named '{1}' was added to your account on '{0}'. If you did not add it, sign in and remove it.</value>
+  </data>
 </root>

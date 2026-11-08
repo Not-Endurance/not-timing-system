@@ -7,7 +7,8 @@ using NC.Server.Authentication.Email;
 using NC.Server.Authentication.Requests;
 using NC.Server.Authentication.Sessions;
 using NC.Server.Authentication.SignIn;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Identity;
+using NC.Server.Authentication.Settings;
 
 namespace NoTiming.Api.Controllers;
 
@@ -19,16 +20,19 @@ public sealed class AccountController : ControllerBase
 {
     readonly AccountSignInService _signIn;
     readonly AccountService _account;
+    readonly EmailLanguage _languages;
     readonly IOptions<AuthenticationSettings> _settings;
 
     public AccountController(
         AccountSignInService signIn,
         AccountService account,
+        EmailLanguage languages,
         IOptions<AuthenticationSettings> settings
     )
     {
         _signIn = signIn;
         _account = account;
+        _languages = languages;
         _settings = settings;
     }
 
@@ -73,13 +77,13 @@ public sealed class AccountController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
         }
 
-        var saved = await _account.UpdateProfileAsync(userId.Value, request.ToChanges(), cancellationToken);
+        var saved = await _account.UpdateProfile(userId.Value, request.ToChanges(), cancellationToken);
         return saved ? NoContent() : BadRequest(new { error = "missing-details" });
     }
 
@@ -94,7 +98,7 @@ public sealed class AccountController : ControllerBase
             return BadRequest(new { error = "invalid-email" });
         }
 
-        var outcome = await _signIn.RequestSignInCodeAsync(
+        var outcome = await _signIn.RequestSignInCode(
             request.Email!,
             Language(),
             ClientAddress(),
@@ -128,7 +132,7 @@ public sealed class AccountController : ControllerBase
             Surname = request.Surname!,
             CountryRegion = request.CountryRegion!,
         };
-        var outcome = await _signIn.RequestRegistrationCodeAsync(
+        var outcome = await _signIn.RequestRegistrationCode(
             request.Email!,
             details,
             Language(),
@@ -142,7 +146,7 @@ public sealed class AccountController : ControllerBase
     [HttpPost("sign-in/verify")]
     public async Task<IActionResult> VerifyCode([FromBody] VerifyRequest request, CancellationToken cancellationToken)
     {
-        var outcome = await _signIn.VerifyCodeAsync(
+        var outcome = await _signIn.VerifyCode(
             request.Email ?? string.Empty,
             request.Code ?? string.Empty,
             cancellationToken
@@ -157,7 +161,7 @@ public sealed class AccountController : ControllerBase
             outcome.SessionToken,
             SessionCookie.Options(outcome.ExpiresAtUtc)
         );
-        var user = await _account.FindAsync(outcome.UserId, cancellationToken);
+        var user = await _account.Find(outcome.UserId, cancellationToken);
         return Ok(user is null ? MeResponse.Anonymous() : MeResponse.For(user));
     }
 
@@ -165,20 +169,20 @@ public sealed class AccountController : ControllerBase
     public async Task<IActionResult> SignOut(CancellationToken cancellationToken)
     {
         var name = _settings.Value.CookieName;
-        await _account.SignOutAsync(Request.Cookies[name], cancellationToken);
+        await _account.SignOut(Request.Cookies[name], cancellationToken);
         Response.Cookies.Append(name, string.Empty, SessionCookie.Options(DateTimeOffset.UnixEpoch));
         return NoContent();
     }
 
     async Task<IdentityUserDocument?> CurrentUserAsync(CancellationToken cancellationToken)
     {
-        var userId = await SessionUser.IdOfAsync(HttpContext);
-        return userId is null ? null : await _account.FindAsync(userId.Value, cancellationToken);
+        var userId = await SessionUser.IdOf(HttpContext);
+        return userId is null ? null : await _account.Find(userId.Value, cancellationToken);
     }
 
     string Language()
     {
-        return EmailLanguage.Choose(Request.Headers.AcceptLanguage.ToString());
+        return _languages.Choose(Request.Headers.AcceptLanguage.ToString());
     }
 
     string ClientAddress()

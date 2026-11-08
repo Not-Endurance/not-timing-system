@@ -1,12 +1,21 @@
 namespace NC.Server.Authentication.Email;
 
-/// <summary>Picks the language of a code email or a passkey notice from the Accept-Language header. English is the fallback.</summary>
-public static class EmailLanguage
+/// <summary>
+/// Picks the language of a code email or a passkey notice from the Accept-Language header. The languages are the ones the
+/// host ships resources for. English is the fallback.
+/// </summary>
+public sealed class EmailLanguage
 {
-    static readonly string[] Supported = ["en", "bg", "tr"];
     public const string English = "en";
 
-    public static string Choose(string? acceptLanguage)
+    readonly string[] _supported;
+
+    public EmailLanguage(IEnumerable<string> supported)
+    {
+        _supported = [.. supported];
+    }
+
+    public string Choose(string? acceptLanguage)
     {
         if (string.IsNullOrWhiteSpace(acceptLanguage))
         {
@@ -19,7 +28,7 @@ public static class EmailLanguage
         {
             var pieces = part.Trim().Split(';');
             var tag = pieces[0].Trim().Split('-')[0].ToLowerInvariant();
-            if (!Supported.Contains(tag))
+            if (!_supported.Contains(tag))
             {
                 continue;
             }

@@ -937,4 +937,22 @@
   <data name="Last_passkey_string" xml:space="preserve">
     <value>Bu son geçiş anahtarınız. Kaldırmadan önce bir tane daha ekleyin.</value>
   </data>
+  <data name="Your_sign_in_code_string" xml:space="preserve">
+    <value>Giriş kodunuz</value>
+  </data>
+  <data name="Your_sign_in_code_is_0_string" xml:space="preserve">
+    <value>Giriş kodunuz: '{0}'. Kod 10 dakika geçerlidir ve yalnızca bir kez kullanılabilir. Bunu siz istemediyseniz bu e-postayı yok sayın.</value>
+  </data>
+  <data name="Your_registration_code_string" xml:space="preserve">
+    <value>Kayıt kodunuz</value>
+  </data>
+  <data name="Your_registration_code_is_0_string" xml:space="preserve">
+    <value>Kayıt kodunuz: '{0}'. Kod 10 dakika geçerlidir ve yalnızca bir kez kullanılabilir. Kayıt olmadıysanız bu e-postayı yok sayın.</value>
+  </data>
+  <data name="A_passkey_was_added_to_your_account_string" xml:space="preserve">
+    <value>Hesabınıza yeni bir geçiş anahtarı eklendi</value>
+  </data>
+  <data name="A_passkey_named_1_was_added_to_your_account_on_0_string" xml:space="preserve">
+    <value>'{0}' tarihinde hesabınıza '{1}' adlı bir geçiş anahtarı eklendi. Bunu siz eklemediyseniz oturum açıp anahtarı kaldırın.</value>
+  </data>
 </root>

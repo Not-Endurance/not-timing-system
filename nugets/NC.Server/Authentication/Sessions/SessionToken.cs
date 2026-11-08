@@ -3,7 +3,7 @@ using System.Text;
 
 namespace NC.Server.Authentication.Sessions;
 
-public static class SessionToken
+internal static class SessionToken
 {
     /// <summary>256 bits from the system generator, in lower case hex, so the token is safe in a cookie value.</summary>
     public static IssuedSessionToken Issue()

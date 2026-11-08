@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using Microsoft.Extensions.Logging;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Identity;
 
 namespace NC.Server.Authentication.Adoption;
 
@@ -11,25 +11,25 @@ namespace NC.Server.Authentication.Adoption;
 /// <see cref="ILegacyUserAdoption"/>, and nothing else depends on it, so it is removed by deleting this class and its
 /// registration.
 /// </summary>
-public sealed class LegacyUserAdoption : ILegacyUserAdoption
+internal sealed class LegacyUserAdoption : ILegacyUserAdoption
 {
-    readonly IdentityUserStore _users;
+    readonly IIdentityUserRepository _users;
     readonly ILogger<LegacyUserAdoption> _logger;
 
-    public LegacyUserAdoption(IdentityUserStore users, ILogger<LegacyUserAdoption> logger)
+    public LegacyUserAdoption(IIdentityUserRepository users, ILogger<LegacyUserAdoption> logger)
     {
         _users = users;
         _logger = logger;
     }
 
-    public async Task<IdentityUserDocument?> AdoptAsync(
+    public async Task<IdentityUserDocument?> Adopt(
         IdentityUserDocument legacy,
         DateTimeOffset now,
         CancellationToken cancellationToken
     )
     {
-        legacy.Email = Identity.EmailAddress.Normalize(legacy.Email ?? string.Empty);
-        legacy.ProvedAt = now.UtcDateTime;
+        legacy.Email = EmailAddress.Normalize(legacy.Email ?? string.Empty);
+        legacy.ProvedAtUtc = now.UtcDateTime;
         legacy.UserHandle ??= RandomNumberGenerator.GetBytes(32);
         legacy.SecurityStamp ??= Guid.NewGuid().ToString("N");
 
@@ -43,14 +43,4 @@ public sealed class LegacyUserAdoption : ILegacyUserAdoption
         _logger.LogInformation("A legacy user {UserId} proved the address by code and was adopted.", legacy.Id);
         return legacy;
     }
-}
-
-/// <summary>Adopts a legacy user row when its address is proved. Several implementations may be registered; the first to adopt wins.</summary>
-public interface ILegacyUserAdoption
-{
-    Task<IdentityUserDocument?> AdoptAsync(
-        IdentityUserDocument legacy,
-        DateTimeOffset now,
-        CancellationToken cancellationToken
-    );
 }

@@ -7,7 +7,7 @@ using NC.Server.Authentication.Email;
 using NC.Server.Authentication.Passkeys;
 using NC.Server.Authentication.Requests;
 using NC.Server.Authentication.Sessions;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Settings;
 
 namespace NoTiming.Api.Controllers;
 
@@ -19,21 +19,28 @@ public sealed class PasskeyController : ControllerBase
 {
     const int MAX_NAME_LENGTH = 60;
 
-    readonly PasskeyService _passkeys;
+    readonly IPasskeyService _passkeys;
     readonly AccountService _account;
+    readonly EmailLanguage _languages;
     readonly IOptions<AuthenticationSettings> _settings;
 
-    public PasskeyController(PasskeyService passkeys, AccountService account, IOptions<AuthenticationSettings> settings)
+    public PasskeyController(
+        IPasskeyService passkeys,
+        AccountService account,
+        EmailLanguage languages,
+        IOptions<AuthenticationSettings> settings
+    )
     {
         _passkeys = passkeys;
         _account = account;
+        _languages = languages;
         _settings = settings;
     }
 
     [HttpPost("sign-in/passkey/options")]
     public async Task<IActionResult> SignInOptions()
     {
-        return Content(await _passkeys.RequestOptionsAsync(), "application/json");
+        return Content(await _passkeys.RequestOptions(), "application/json");
     }
 
     /// <summary>Every failure gets the same answer, as a code check does.</summary>
@@ -48,7 +55,7 @@ public sealed class PasskeyController : ControllerBase
             return Unauthorized(new { error = "passkey-not-accepted" });
         }
 
-        var signIn = await _passkeys.SignInAsync(credential.GetRawText(), cancellationToken);
+        var signIn = await _passkeys.SignIn(credential.GetRawText(), cancellationToken);
         if (signIn is null)
         {
             return Unauthorized(new { error = "passkey-not-accepted" });
@@ -59,33 +66,33 @@ public sealed class PasskeyController : ControllerBase
             signIn.SessionToken,
             SessionCookie.Options(signIn.ExpiresAtUtc)
         );
-        var user = await _account.FindAsync(signIn.UserId, cancellationToken);
+        var user = await _account.Find(signIn.UserId, cancellationToken);
         return Ok(user is null ? MeResponse.Anonymous() : MeResponse.For(user));
     }
 
     [HttpPost("me/passkey/options")]
     public async Task<IActionResult> EnrolOptions(CancellationToken cancellationToken)
     {
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
         }
 
-        var options = await _passkeys.CreationOptionsAsync(userId.Value, cancellationToken);
+        var options = await _passkeys.CreationOptions(userId.Value, cancellationToken);
         return options is null ? Conflict(new { error = "try-again" }) : Content(options, "application/json");
     }
 
     [HttpGet("me/passkeys")]
     public async Task<IActionResult> List(CancellationToken cancellationToken)
     {
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
         }
 
-        var passkeys = await _passkeys.ListAsync(userId.Value, cancellationToken);
+        var passkeys = await _passkeys.ListPasskeys(userId.Value, cancellationToken);
         return Ok(
             passkeys.Select(x => new PasskeyItem
             {
@@ -99,7 +106,7 @@ public sealed class PasskeyController : ControllerBase
     [HttpPost("me/passkeys")]
     public async Task<IActionResult> Enrol([FromBody] EnrolPasskeyRequest request, CancellationToken cancellationToken)
     {
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
@@ -110,8 +117,8 @@ public sealed class PasskeyController : ControllerBase
             return BadRequest(new { error = "invalid-passkey" });
         }
 
-        var language = EmailLanguage.Choose(Request.Headers.AcceptLanguage.ToString());
-        var outcome = await _passkeys.EnrolAsync(
+        var language = _languages.Choose(Request.Headers.AcceptLanguage.ToString());
+        var outcome = await _passkeys.Enrol(
             userId.Value,
             request.Credential.GetRawText(),
             request.Name,
@@ -130,7 +137,7 @@ public sealed class PasskeyController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
@@ -146,7 +153,7 @@ public sealed class PasskeyController : ControllerBase
             return BadRequest(new { error = "invalid-name" });
         }
 
-        var outcome = await _passkeys.RenameAsync(userId.Value, credentialId, request.Name!, cancellationToken);
+        var outcome = await _passkeys.Rename(userId.Value, credentialId, request.Name!, cancellationToken);
         return outcome.Kind switch
         {
             PasskeyOutcomeKind.Done => NoContent(),
@@ -158,7 +165,7 @@ public sealed class PasskeyController : ControllerBase
     [HttpDelete("me/passkeys/{id}")]
     public async Task<IActionResult> Remove(string id, CancellationToken cancellationToken)
     {
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
@@ -169,7 +176,7 @@ public sealed class PasskeyController : ControllerBase
             return NotFound();
         }
 
-        var outcome = await _passkeys.RemoveAsync(userId.Value, credentialId, cancellationToken);
+        var outcome = await _passkeys.Remove(userId.Value, credentialId, cancellationToken);
         return outcome.Kind switch
         {
             PasskeyOutcomeKind.Done => NoContent(),

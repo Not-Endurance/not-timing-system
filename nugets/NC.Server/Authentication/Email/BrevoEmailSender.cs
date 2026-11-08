@@ -1,11 +1,11 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.Options;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Settings;
 
 namespace NC.Server.Authentication.Email;
 
 /// <summary>Sends through Brevo. Used in staging and production.</summary>
-public sealed class BrevoEmailSender : IEmailSender
+internal sealed class BrevoEmailSender : IEmailSender
 {
     const string ENDPOINT = "https://api.brevo.com/v3/smtp/email";
 
@@ -18,7 +18,7 @@ public sealed class BrevoEmailSender : IEmailSender
         _settings = settings;
     }
 
-    public async Task SendAsync(EmailMessage message, CancellationToken cancellationToken)
+    public async Task Send(EmailMessage message, CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, ENDPOINT);
         request.Headers.Add("api-key", _settings.Value.BrevoApiKey);

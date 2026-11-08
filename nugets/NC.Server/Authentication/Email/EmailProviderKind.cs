@@ -1,8 +1,8 @@
 namespace NC.Server.Authentication.Email;
 
-public enum EmailProviderKind
+internal enum EmailProviderKind
 {
-    Brevo,
-    Console,
-    Outbox,
+    Brevo = 1,
+    Console = 2,
+    Outbox = 3,
 }

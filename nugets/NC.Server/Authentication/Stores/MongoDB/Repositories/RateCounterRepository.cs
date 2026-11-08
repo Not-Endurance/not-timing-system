@@ -1,15 +1,16 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.RateLimits;
+using NC.Server.Authentication.Settings;
 using NC.Storage.Mongo;
 
-namespace NC.Server.Authentication.RateLimits;
+namespace NC.Server.Authentication.Stores.MongoDB.Repositories;
 
-public sealed class RateCounterStore
+internal sealed class RateCounterRepository : IRateCounterRepository
 {
     readonly IMongoCollection<RateCounterDocument> _counters;
 
-    public RateCounterStore(IMongoContext context, IOptions<AuthenticationSettings> options)
+    public RateCounterRepository(IMongoContext context, IOptions<AuthenticationSettings> options)
     {
         var settings = options.Value;
         _counters = context
@@ -17,7 +18,7 @@ public sealed class RateCounterStore
             .GetCollection<RateCounterDocument>(settings.RateCountersCollection);
     }
 
-    public async Task<int> CountAsync(
+    public async Task<int> Count(
         string scope,
         string key,
         DateTimeOffset hourStart,
@@ -30,7 +31,7 @@ public sealed class RateCounterStore
         return counter?.Count ?? 0;
     }
 
-    public Task IncrementAsync(
+    public Task Increment(
         string scope,
         string key,
         DateTimeOffset hourStart,
@@ -41,7 +42,7 @@ public sealed class RateCounterStore
             x => x.Key == Name(scope, key, hourStart),
             Builders<RateCounterDocument>.Update.Combine(
                 Builders<RateCounterDocument>.Update.Inc(x => x.Count, 1),
-                Builders<RateCounterDocument>.Update.SetOnInsert(x => x.ExpiresAt, hourStart.AddHours(2).UtcDateTime)
+                Builders<RateCounterDocument>.Update.SetOnInsert(x => x.ExpiresAtUtc, hourStart.AddHours(2).UtcDateTime)
             ),
             new UpdateOptions { IsUpsert = true },
             cancellationToken

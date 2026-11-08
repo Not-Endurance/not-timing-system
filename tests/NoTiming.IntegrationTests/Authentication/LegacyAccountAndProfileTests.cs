@@ -91,7 +91,7 @@ public sealed class LegacyAccountAndProfileTests : IClassFixture<NoTimingIntegra
         var row = await _mongo.ReadUserAsync(id);
         Assert.NotNull(row);
         Assert.Equal(address, row!["Email"].AsString);
-        Assert.True(row.Contains("ProvedAt"));
+        Assert.True(row.Contains("ProvedAtUtc"));
         Assert.Equal("Official", row["Roles"].AsBsonArray[0].AsString);
     }
 

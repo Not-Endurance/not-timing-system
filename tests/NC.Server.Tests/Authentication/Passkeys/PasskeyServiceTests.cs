@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Abstractions;
 using NC.Server.Authentication.Email;
+using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.Passkeys;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Sessions;
 using Xunit;
 
 namespace NC.Server.Tests.Authentication.Passkeys;
@@ -13,7 +14,7 @@ public sealed class PasskeyServiceTests
     static readonly byte[] Credential = [1, 2, 3, 4];
 
     [Fact]
-    public async Task EnrolAsync_WhenAttestationIsAccepted_ShouldStorePasskeyOnTheUser()
+    public async Task Enrol_WhenAttestationIsAccepted_ShouldStorePasskeyOnTheUser()
     {
         var users = new FakeUsers(
             new IdentityUserDocument
@@ -25,7 +26,7 @@ public sealed class PasskeyServiceTests
         );
         var service = CreateService(users, attestation: Passkey(Credential));
 
-        var outcome = await service.EnrolAsync(7, "{}", "Phone", "en", CancellationToken.None);
+        var outcome = await service.Enrol(7, "{}", "Phone", "en", CancellationToken.None);
 
         Assert.Equal(PasskeyOutcomeKind.Done, outcome.Kind);
         var stored = Assert.Single(users.Stored(7).Passkeys!);
@@ -33,7 +34,7 @@ public sealed class PasskeyServiceTests
     }
 
     [Fact]
-    public async Task EnrolAsync_WhenAttestationIsRejected_ShouldRefuseAndStoreNothing()
+    public async Task Enrol_WhenAttestationIsRejected_ShouldRefuseAndStoreNothing()
     {
         var users = new FakeUsers(
             new IdentityUserDocument
@@ -45,32 +46,32 @@ public sealed class PasskeyServiceTests
         );
         var service = CreateService(users, attestation: null);
 
-        var outcome = await service.EnrolAsync(7, "{}", "Phone", "en", CancellationToken.None);
+        var outcome = await service.Enrol(7, "{}", "Phone", "en", CancellationToken.None);
 
         Assert.Equal(PasskeyOutcomeKind.Refused, outcome.Kind);
         Assert.True(users.Stored(7).Passkeys is null or { Count: 0 });
     }
 
     [Fact]
-    public async Task RemoveAsync_WhenItIsTheLastPasskey_ShouldRefuseAndKeepIt()
+    public async Task Remove_WhenItIsTheLastPasskey_ShouldRefuseAndKeepIt()
     {
         var users = new FakeUsers(UserWithPasskeys(7, Credential));
         var service = CreateService(users);
 
-        var outcome = await service.RemoveAsync(7, Credential, CancellationToken.None);
+        var outcome = await service.Remove(7, Credential, CancellationToken.None);
 
         Assert.Equal(PasskeyOutcomeKind.LastPasskey, outcome.Kind);
         Assert.Single(users.Stored(7).Passkeys!);
     }
 
     [Fact]
-    public async Task RemoveAsync_WhenAnotherPasskeyRemains_ShouldRemoveIt()
+    public async Task Remove_WhenAnotherPasskeyRemains_ShouldRemoveIt()
     {
         var other = new byte[] { 9, 9 };
         var users = new FakeUsers(UserWithPasskeys(7, Credential, other));
         var service = CreateService(users);
 
-        var outcome = await service.RemoveAsync(7, Credential, CancellationToken.None);
+        var outcome = await service.Remove(7, Credential, CancellationToken.None);
 
         Assert.Equal(PasskeyOutcomeKind.Done, outcome.Kind);
         var remaining = Assert.Single(users.Stored(7).Passkeys!);
@@ -112,7 +113,7 @@ public sealed class PasskeyServiceTests
                     CredentialId = x,
                     PublicKey = [1],
                     Name = "Phone",
-                    CreatedAt = Now.UtcDateTime,
+                    CreatedAtUtc = Now.UtcDateTime,
                 })
                 .ToList(),
         };
@@ -124,7 +125,7 @@ public sealed class PasskeyServiceTests
         {
             Id = user.Id,
             Email = user.Email,
-            ProvedAt = user.ProvedAt,
+            ProvedAtUtc = user.ProvedAtUtc,
             UserHandle = user.UserHandle,
             SecurityStamp = user.SecurityStamp,
             ConcurrencyStamp = user.ConcurrencyStamp,
@@ -137,7 +138,7 @@ public sealed class PasskeyServiceTests
                     CredentialId = x.CredentialId,
                     PublicKey = x.PublicKey,
                     Name = x.Name,
-                    CreatedAt = x.CreatedAt,
+                    CreatedAtUtc = x.CreatedAtUtc,
                 })
                 .ToList(),
         };
@@ -149,36 +150,56 @@ public sealed class PasskeyServiceTests
 
         public PasskeyAssertion? Assertion { get; init; }
 
-        public Task<string> MakeRequestOptionsAsync()
+        public Task<string> MakeRequestOptions()
         {
             return Task.FromResult("{}");
         }
 
-        public Task<string> MakeCreationOptionsAsync(Microsoft.AspNetCore.Identity.PasskeyUserEntity user)
+        public Task<string> MakeCreationOptions(PasskeyUserEntity user)
         {
             return Task.FromResult("{}");
         }
 
-        public Task<UserPasskeyInfo?> PerformAttestationAsync(string credentialJson)
+        public Task<UserPasskeyInfo?> PerformAttestation(string credentialJson)
         {
             return Task.FromResult(Attestation);
         }
 
-        public Task<PasskeyAssertion?> PerformAssertionAsync(string credentialJson)
+        public Task<PasskeyAssertion?> PerformAssertion(string credentialJson)
         {
             return Task.FromResult(Assertion);
         }
     }
 
-    sealed class FakeSessions : IPasskeySessionStore
+    sealed class FakeSessions : ISessionRepository
     {
-        public Task CreateAsync(
+        public Task<SessionDocument?> FindLive(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<SessionDocument?>(null);
+        }
+
+        public Task Create(
             string tokenHash,
             int userId,
             string securityStamp,
             DateTimeOffset now,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken = default
         )
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task Extend(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task Remove(string tokenHash, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task RemoveAllForUser(int userId, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }
@@ -213,12 +234,12 @@ public sealed class PasskeyServiceTests
             return _stored[userId];
         }
 
-        public Task<IdentityUserDocument?> FindByUserIdAsync(int userId, CancellationToken cancellationToken)
+        public Task<IdentityUserDocument?> FindByUserId(int userId, CancellationToken cancellationToken)
         {
             return Task.FromResult(_stored.TryGetValue(userId, out var user) ? Copy(user) : null);
         }
 
-        public Task<IdentityResult> ChangeAsync(
+        public Task<IdentityResult> Change(
             int userId,
             Func<IdentityUserDocument, Task<IdentityResult>> change,
             CancellationToken cancellationToken = default
@@ -247,7 +268,7 @@ public sealed class PasskeyServiceTests
                     CredentialId = passkey.CredentialId,
                     PublicKey = passkey.PublicKey,
                     Name = passkey.Name,
-                    CreatedAt = passkey.CreatedAt.UtcDateTime,
+                    CreatedAtUtc = passkey.CreatedAt.UtcDateTime,
                 }
             );
             return Task.CompletedTask;
@@ -262,7 +283,7 @@ public sealed class PasskeyServiceTests
                 .Select(x => new UserPasskeyInfo(
                     x.CredentialId,
                     x.PublicKey,
-                    new DateTimeOffset(x.CreatedAt, TimeSpan.Zero),
+                    new DateTimeOffset(x.CreatedAtUtc, TimeSpan.Zero),
                     0,
                     [],
                     true,
@@ -278,7 +299,7 @@ public sealed class PasskeyServiceTests
             return Task.FromResult(passkeys);
         }
 
-        public Task<bool> RemovePasskeyWhileAnotherRemainsAsync(
+        public Task<bool> RemovePasskeyWhileAnotherRemains(
             int userId,
             byte[] credentialId,
             CancellationToken cancellationToken = default

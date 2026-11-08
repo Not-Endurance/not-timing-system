@@ -3,10 +3,10 @@ using Microsoft.Extensions.Options;
 using NC.Server.Authentication.Email;
 using NC.Server.Authentication.Identity;
 
-namespace NC.Server.Authentication.Store;
+namespace NC.Server.Authentication.Settings;
 
 /// <summary>Refuses to start with a configuration that would make sign-in unsafe in this environment.</summary>
-public sealed class AuthenticationSettingsValidator : IValidateOptions<AuthenticationSettings>
+internal sealed class AuthenticationSettingsValidator : IValidateOptions<AuthenticationSettings>
 {
     readonly IHostEnvironment _environment;
 

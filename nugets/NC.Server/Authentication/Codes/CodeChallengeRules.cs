@@ -4,7 +4,7 @@ namespace NC.Server.Authentication.Codes;
 /// The rules of a one-time code: ten minutes, five checks and single use. A check spends an attempt before the code is
 /// compared, so a correct fifth code is accepted and a correct sixth one is not.
 /// </summary>
-public static class CodeChallengeRules
+internal static class CodeChallengeRules
 {
     public static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(10);
     public static readonly int MaxAttempts = 5;

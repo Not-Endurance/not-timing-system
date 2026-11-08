@@ -4,7 +4,7 @@ namespace NC.Server.Authentication.Codes;
 /// The limits on sending codes: sixty seconds between codes to one address, and five per address, ten per IP address
 /// and one hundred overall in each hour. Limits count the hour bucket, so a refusal lasts until the next hour begins.
 /// </summary>
-public static class CodeSendLimits
+internal static class CodeSendLimits
 {
     public static readonly TimeSpan Cooldown = TimeSpan.FromSeconds(60);
     public static readonly int PerAddressPerHour = 5;

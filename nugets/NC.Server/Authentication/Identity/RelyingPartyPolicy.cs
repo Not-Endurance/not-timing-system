@@ -4,7 +4,7 @@ namespace NC.Server.Authentication.Identity;
 /// Checks the passkey relying-party ID against the app origin at startup. The app origin must be a subdomain of the ID,
 /// and production must not use a non-production ID.
 /// </summary>
-public static class RelyingPartyPolicy
+internal static class RelyingPartyPolicy
 {
     public static string? Problem(string relyingPartyId, string appOrigin, bool production)
     {

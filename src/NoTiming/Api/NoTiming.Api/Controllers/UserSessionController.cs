@@ -39,7 +39,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Create));
 
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
@@ -64,7 +64,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
@@ -95,7 +95,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Delete));
 
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
@@ -118,7 +118,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(DeleteForEvent));
 
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
@@ -142,7 +142,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Read));
 
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
@@ -165,7 +165,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(ReadByUserIdentifier));
 
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();
@@ -188,7 +188,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(ReadByUserIdentifierAndEvent));
 
-        var userId = await SessionUser.IdOfAsync(HttpContext);
+        var userId = await SessionUser.IdOf(HttpContext);
         if (userId is null)
         {
             return Unauthorized();

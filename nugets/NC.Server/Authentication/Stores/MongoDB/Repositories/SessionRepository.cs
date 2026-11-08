@@ -1,16 +1,16 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using NC.Server.Authentication.Passkeys;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Sessions;
+using NC.Server.Authentication.Settings;
 using NC.Storage.Mongo;
 
-namespace NC.Server.Authentication.Sessions;
+namespace NC.Server.Authentication.Stores.MongoDB.Repositories;
 
-public sealed class SessionStore : IPasskeySessionStore
+internal sealed class SessionRepository : ISessionRepository
 {
     readonly IMongoCollection<SessionDocument> _sessions;
 
-    public SessionStore(IMongoContext context, IOptions<AuthenticationSettings> options)
+    public SessionRepository(IMongoContext context, IOptions<AuthenticationSettings> options)
     {
         var settings = options.Value;
         _sessions = context
@@ -18,18 +18,14 @@ public sealed class SessionStore : IPasskeySessionStore
             .GetCollection<SessionDocument>(settings.SessionsCollection);
     }
 
-    public Task<SessionDocument?> FindLiveAsync(
-        string tokenHash,
-        DateTimeOffset now,
-        CancellationToken cancellationToken = default
-    )
+    public Task<SessionDocument?> FindLive(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken = default)
     {
         return _sessions
-            .Find(x => x.TokenHash == tokenHash && x.ExpiresAt > now.UtcDateTime)
+            .Find(x => x.TokenHash == tokenHash && x.ExpiresAtUtc > now.UtcDateTime)
             .FirstOrDefaultAsync(cancellationToken)!;
     }
 
-    public Task CreateAsync(
+    public Task Create(
         string tokenHash,
         int userId,
         string securityStamp,
@@ -43,33 +39,33 @@ public sealed class SessionStore : IPasskeySessionStore
                 TokenHash = tokenHash,
                 UserId = userId,
                 SecurityStamp = securityStamp,
-                CreatedAt = now.UtcDateTime,
-                LastExtendedAt = now.UtcDateTime,
-                ExpiresAt = SessionRules.ExpiresAt(now).UtcDateTime,
+                CreatedAtUtc = now.UtcDateTime,
+                LastExtendedAtUtc = now.UtcDateTime,
+                ExpiresAtUtc = SessionRules.ExpiresAt(now).UtcDateTime,
             },
             cancellationToken: cancellationToken
         );
     }
 
     /// <summary>Extends the session from now. Without an upsert, a session revoked meanwhile stays revoked.</summary>
-    public Task ExtendAsync(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken = default)
+    public Task Extend(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken = default)
     {
         return _sessions.UpdateOneAsync(
             x => x.TokenHash == tokenHash,
             Builders<SessionDocument>
-                .Update.Set(x => x.LastExtendedAt, now.UtcDateTime)
-                .Set(x => x.ExpiresAt, SessionRules.ExpiresAt(now).UtcDateTime),
+                .Update.Set(x => x.LastExtendedAtUtc, now.UtcDateTime)
+                .Set(x => x.ExpiresAtUtc, SessionRules.ExpiresAt(now).UtcDateTime),
             cancellationToken: cancellationToken
         );
     }
 
-    public Task RemoveAsync(string tokenHash, CancellationToken cancellationToken = default)
+    public Task Remove(string tokenHash, CancellationToken cancellationToken = default)
     {
         return _sessions.DeleteOneAsync(x => x.TokenHash == tokenHash, cancellationToken);
     }
 
     /// <summary>Ends every session of a user. The security stamp rotation calls this.</summary>
-    public Task RemoveAllForUserAsync(int userId, CancellationToken cancellationToken = default)
+    public Task RemoveAllForUser(int userId, CancellationToken cancellationToken = default)
     {
         return _sessions.DeleteManyAsync(x => x.UserId == userId, cancellationToken);
     }

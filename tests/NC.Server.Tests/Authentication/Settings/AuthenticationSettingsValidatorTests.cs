@@ -1,9 +1,9 @@
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Settings;
 using Xunit;
 
-namespace NC.Server.Tests.Authentication.Store;
+namespace NC.Server.Tests.Authentication.Settings;
 
 public sealed class AuthenticationSettingsValidatorTests
 {

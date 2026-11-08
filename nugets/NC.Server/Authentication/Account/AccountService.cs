@@ -1,27 +1,27 @@
+using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.Sessions;
-using NC.Server.Authentication.Store;
 
 namespace NC.Server.Authentication.Account;
 
 /// <summary>The signed-in user's own state: who they are, their profile and ending their session.</summary>
 public sealed class AccountService
 {
-    readonly IdentityUserStore _users;
-    readonly SessionStore _sessions;
+    readonly IIdentityUserRepository _users;
+    readonly ISessionRepository _sessions;
 
-    public AccountService(IdentityUserStore users, SessionStore sessions)
+    public AccountService(IIdentityUserRepository users, ISessionRepository sessions)
     {
         _users = users;
         _sessions = sessions;
     }
 
-    public Task<IdentityUserDocument?> FindAsync(int userId, CancellationToken cancellationToken)
+    public Task<IdentityUserDocument?> Find(int userId, CancellationToken cancellationToken)
     {
-        return _users.FindByUserIdAsync(userId, cancellationToken);
+        return _users.FindByUserId(userId, cancellationToken);
     }
 
     /// <summary>Returns false when the required details are missing: the country and both names.</summary>
-    public async Task<bool> UpdateProfileAsync(int userId, ProfileChanges changes, CancellationToken cancellationToken)
+    public async Task<bool> UpdateProfile(int userId, ProfileChanges changes, CancellationToken cancellationToken)
     {
         if (
             string.IsNullOrWhiteSpace(changes.CountryRegion)
@@ -32,7 +32,7 @@ public sealed class AccountService
             return false;
         }
 
-        await _users.UpdateProfileAsync(
+        await _users.UpdateProfile(
             userId,
             changes.GivenName.Trim(),
             changes.MiddleName?.Trim(),
@@ -45,10 +45,10 @@ public sealed class AccountService
         return true;
     }
 
-    public Task SignOutAsync(string? sessionToken, CancellationToken cancellationToken)
+    public Task SignOut(string? sessionToken, CancellationToken cancellationToken)
     {
         return string.IsNullOrEmpty(sessionToken)
             ? Task.CompletedTask
-            : _sessions.RemoveAsync(SessionToken.HashOf(sessionToken), cancellationToken);
+            : _sessions.Remove(SessionToken.HashOf(sessionToken), cancellationToken);
     }
 }

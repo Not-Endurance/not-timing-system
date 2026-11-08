@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace NC.Server.Authentication.Email;
 
-public sealed class EmailDispatchService : BackgroundService
+internal sealed class EmailDispatchService : BackgroundService
 {
     readonly EmailDispatchQueue _queue;
     readonly IEmailSender _sender;
@@ -22,7 +22,7 @@ public sealed class EmailDispatchService : BackgroundService
         {
             try
             {
-                await _sender.SendAsync(message, stoppingToken);
+                await _sender.Send(message, stoppingToken);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {

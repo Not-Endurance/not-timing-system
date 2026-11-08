@@ -3,18 +3,21 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NC.Random;
+using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.Passkeys;
+using NC.Server.Authentication.Settings;
 using NC.Storage.Mongo;
 
-namespace NC.Server.Authentication.Store;
+namespace NC.Server.Authentication.Stores.MongoDB.Repositories;
 
 /// <summary>
 /// ASP.NET Core Identity over the <c>users</c> collection. It reads and writes only the identity fields of
 /// <see cref="IdentityUserDocument"/>, so the application's own fields of a user document are preserved. An update
 /// names the concurrency stamp it was based on and fails when another request changed the user in between.
 /// </summary>
-public sealed class IdentityUserStore
-    : IUserStore<IdentityUserDocument>,
+internal sealed class IdentityUserRepository
+    : IIdentityUserRepository,
+        IUserStore<IdentityUserDocument>,
         IUserEmailStore<IdentityUserDocument>,
         IUserSecurityStampStore<IdentityUserDocument>,
         IUserLockoutStore<IdentityUserDocument>,
@@ -26,7 +29,7 @@ public sealed class IdentityUserStore
     readonly IMongoCollection<IdentityUserDocument> _users;
     readonly IdentityErrorDescriber _describer = new();
 
-    public IdentityUserStore(IMongoContext context, IOptions<AuthenticationSettings> options)
+    public IdentityUserRepository(IMongoContext context, IOptions<AuthenticationSettings> options)
     {
         var settings = options.Value;
         _users = context
@@ -96,10 +99,12 @@ public sealed class IdentityUserStore
             .Set(x => x.AccessFailedCount, user.AccessFailedCount);
 
         // Absent fields are removed rather than set to null: the partial unique index counts a null as present.
-        update = user.ProvedAt is null ? update.Unset(x => x.ProvedAt) : update.Set(x => x.ProvedAt, user.ProvedAt);
-        update = user.LockoutEnd is null
-            ? update.Unset(x => x.LockoutEnd)
-            : update.Set(x => x.LockoutEnd, user.LockoutEnd);
+        update = user.ProvedAtUtc is null
+            ? update.Unset(x => x.ProvedAtUtc)
+            : update.Set(x => x.ProvedAtUtc, user.ProvedAtUtc);
+        update = user.LockoutEndUtc is null
+            ? update.Unset(x => x.LockoutEndUtc)
+            : update.Set(x => x.LockoutEndUtc, user.LockoutEndUtc);
         update = user.SecurityStamp is null
             ? update.Unset(x => x.SecurityStamp)
             : update.Set(x => x.SecurityStamp, user.SecurityStamp);
@@ -175,7 +180,7 @@ public sealed class IdentityUserStore
         CancellationToken cancellationToken
     )
     {
-        var matches = await FindAllByEmailAsync(normalizedEmail, cancellationToken);
+        var matches = await FindAllByEmail(normalizedEmail, cancellationToken);
         return matches.Count == 1 ? matches[0] : null;
     }
 
@@ -197,7 +202,7 @@ public sealed class IdentityUserStore
 
     public Task SetEmailConfirmedAsync(IdentityUserDocument user, bool confirmed, CancellationToken cancellationToken)
     {
-        user.ProvedAt = confirmed ? user.ProvedAt ?? DateTime.UtcNow : null;
+        user.ProvedAtUtc = confirmed ? user.ProvedAtUtc ?? DateTime.UtcNow : null;
         return Task.CompletedTask;
     }
 
@@ -230,7 +235,9 @@ public sealed class IdentityUserStore
     public Task<DateTimeOffset?> GetLockoutEndDateAsync(IdentityUserDocument user, CancellationToken cancellationToken)
     {
         return Task.FromResult(
-            user.LockoutEnd.HasValue ? new DateTimeOffset(user.LockoutEnd.Value, TimeSpan.Zero) : (DateTimeOffset?)null
+            user.LockoutEndUtc.HasValue
+                ? new DateTimeOffset(user.LockoutEndUtc.Value, TimeSpan.Zero)
+                : (DateTimeOffset?)null
         );
     }
 
@@ -240,7 +247,7 @@ public sealed class IdentityUserStore
         CancellationToken cancellationToken
     )
     {
-        user.LockoutEnd = lockoutEnd?.UtcDateTime;
+        user.LockoutEndUtc = lockoutEnd?.UtcDateTime;
         return Task.CompletedTask;
     }
 
@@ -332,7 +339,7 @@ public sealed class IdentityUserStore
     /// Changes a user by id, starting again from what is stored when another request changed the same user in between.
     /// Two passkeys enrolled at once, for example, both end up stored.
     /// </summary>
-    public async Task<IdentityResult> ChangeAsync(
+    public async Task<IdentityResult> Change(
         int userId,
         Func<IdentityUserDocument, Task<IdentityResult>> change,
         CancellationToken cancellationToken = default
@@ -341,7 +348,7 @@ public sealed class IdentityUserStore
         var result = IdentityResult.Failed(_describer.ConcurrencyFailure());
         for (var attempt = 0; attempt < ChangeAttempts; attempt++)
         {
-            var user = await FindByUserIdAsync(userId, cancellationToken);
+            var user = await FindByUserId(userId, cancellationToken);
             if (user is null)
             {
                 return IdentityResult.Failed(
@@ -363,7 +370,7 @@ public sealed class IdentityUserStore
     /// Removes one passkey as a single update, and only while another passkey remains. The condition is part of the
     /// update, so two removals at once cannot leave a user with none.
     /// </summary>
-    public async Task<bool> RemovePasskeyWhileAnotherRemainsAsync(
+    public async Task<bool> RemovePasskeyWhileAnotherRemains(
         int userId,
         byte[] credentialId,
         CancellationToken cancellationToken = default
@@ -383,7 +390,7 @@ public sealed class IdentityUserStore
     }
 
     /// <summary>Every row with the address, case-insensitively, up to two. Two is enough to tell a duplicate apart.</summary>
-    public async Task<List<IdentityUserDocument>> FindAllByEmailAsync(
+    public async Task<List<IdentityUserDocument>> FindAllByEmail(
         string normalizedEmail,
         CancellationToken cancellationToken
     )
@@ -397,13 +404,13 @@ public sealed class IdentityUserStore
             .ToListAsync(cancellationToken);
     }
 
-    public Task<IdentityUserDocument?> FindByUserIdAsync(int userId, CancellationToken cancellationToken = default)
+    public Task<IdentityUserDocument?> FindByUserId(int userId, CancellationToken cancellationToken = default)
     {
         return _users.Find(x => x.Id == userId).FirstOrDefaultAsync(cancellationToken)!;
     }
 
     /// <summary>Creates a user whose address was proved by a code. Its registration details are kept on the row.</summary>
-    public async Task<IdentityUserDocument> CreateProvedUserAsync(
+    public async Task<IdentityUserDocument> CreateProvedUser(
         string email,
         string givenName,
         string surname,
@@ -416,7 +423,7 @@ public sealed class IdentityUserStore
         {
             Id = RandomHelper.GenerateUniqueInteger(),
             Email = email,
-            ProvedAt = now.UtcDateTime,
+            ProvedAtUtc = now.UtcDateTime,
             SecurityStamp = NewStamp(),
             ConcurrencyStamp = NewStamp(),
             GivenName = givenName,
@@ -432,7 +439,7 @@ public sealed class IdentityUserStore
     }
 
     /// <summary>Changes the profile fields only; the rest of the document, its roles included, is left as it is.</summary>
-    public Task UpdateProfileAsync(
+    public Task UpdateProfile(
         int userId,
         string givenName,
         string? middleName,
@@ -478,7 +485,7 @@ public sealed class IdentityUserStore
             CredentialId = passkey.CredentialId,
             PublicKey = passkey.PublicKey,
             Name = passkey.Name,
-            CreatedAt = passkey.CreatedAt.UtcDateTime,
+            CreatedAtUtc = passkey.CreatedAt.UtcDateTime,
             SignCount = passkey.SignCount,
             Transports = passkey.Transports ?? [],
             IsUserVerified = passkey.IsUserVerified,
@@ -494,7 +501,7 @@ public sealed class IdentityUserStore
         return new UserPasskeyInfo(
             passkey.CredentialId,
             passkey.PublicKey,
-            new DateTimeOffset(passkey.CreatedAt, TimeSpan.Zero),
+            new DateTimeOffset(passkey.CreatedAtUtc, TimeSpan.Zero),
             (uint)passkey.SignCount,
             passkey.Transports,
             passkey.IsUserVerified,

@@ -1,6 +1,6 @@
 namespace NC.Server.Authentication.Email;
 
-public static class EmailProviderPolicy
+internal static class EmailProviderPolicy
 {
     /// <summary>Production never prints or stores codes, so the console and outbox senders are refused there.</summary>
     public static string? Problem(EmailProviderKind provider, bool production)

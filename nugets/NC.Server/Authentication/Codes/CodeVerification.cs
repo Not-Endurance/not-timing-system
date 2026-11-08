@@ -1,6 +1,6 @@
 namespace NC.Server.Authentication.Codes;
 
-public sealed record CodeVerification
+internal sealed record CodeVerification
 {
     public bool Accepted { get; init; }
 

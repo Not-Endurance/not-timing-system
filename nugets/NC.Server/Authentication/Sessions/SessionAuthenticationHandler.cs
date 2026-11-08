@@ -3,7 +3,8 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Identity;
+using NC.Server.Authentication.Settings;
 
 namespace NC.Server.Authentication.Sessions;
 
@@ -11,12 +12,12 @@ namespace NC.Server.Authentication.Sessions;
 /// Reads the session cookie on every request, including the hub negotiation and connection, and signs the user in when
 /// the session is live and its user's security stamp has not changed. The cookie is extended at most once an hour.
 /// </summary>
-public sealed class SessionAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+internal sealed class SessionAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public const string SCHEME = "NoTimingSession";
 
-    readonly SessionStore _sessions;
-    readonly IdentityUserStore _users;
+    readonly ISessionRepository _sessions;
+    readonly IIdentityUserRepository _users;
     readonly IOptions<AuthenticationSettings> _settings;
     readonly TimeProvider _time;
 
@@ -24,8 +25,8 @@ public sealed class SessionAuthenticationHandler : AuthenticationHandler<Authent
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory loggerFactory,
         UrlEncoder encoder,
-        SessionStore sessions,
-        IdentityUserStore users,
+        ISessionRepository sessions,
+        IIdentityUserRepository users,
         IOptions<AuthenticationSettings> settings,
         TimeProvider time
     )
@@ -47,22 +48,22 @@ public sealed class SessionAuthenticationHandler : AuthenticationHandler<Authent
 
         var now = _time.GetUtcNow();
         var hash = SessionToken.HashOf(token);
-        var session = await _sessions.FindLiveAsync(hash, now);
+        var session = await _sessions.FindLive(hash, now);
         if (session is null)
         {
             return AuthenticateResult.NoResult();
         }
 
-        var user = await _users.FindByUserIdAsync(session.UserId);
+        var user = await _users.FindByUserId(session.UserId);
         if (user is null || user.SecurityStamp != session.SecurityStamp)
         {
-            await _sessions.RemoveAsync(hash);
+            await _sessions.Remove(hash);
             return AuthenticateResult.NoResult();
         }
 
-        if (SessionRules.ShouldExtend(session.LastExtendedAt, now))
+        if (SessionRules.ShouldExtend(session.LastExtendedAtUtc, now))
         {
-            await _sessions.ExtendAsync(hash, now);
+            await _sessions.Extend(hash, now);
             if (!Response.HasStarted)
             {
                 Response.Cookies.Append(cookieName, token, SessionCookie.Options(SessionRules.ExpiresAt(now)));

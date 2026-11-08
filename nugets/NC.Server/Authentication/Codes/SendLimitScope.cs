@@ -2,8 +2,8 @@ namespace NC.Server.Authentication.Codes;
 
 public enum SendLimitScope
 {
-    Cooldown,
-    Address,
-    IpAddress,
-    Overall,
+    Cooldown = 1,
+    Address = 2,
+    IpAddress = 3,
+    Overall = 4,
 }

@@ -1,6 +1,6 @@
 namespace NC.Server.Authentication.Identity;
 
-public static class EmailAddress
+internal static class EmailAddress
 {
     /// <summary>The form every address is stored and matched in: trimmed and lower case.</summary>
     public static string Normalize(string email)

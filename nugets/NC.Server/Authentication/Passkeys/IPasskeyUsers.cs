@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Identity;
-using NC.Server.Authentication.Store;
+using NC.Server.Authentication.Identity;
 
 namespace NC.Server.Authentication.Passkeys;
 
-/// <summary>The stored users a passkey needs. The identity user store implements it.</summary>
-public interface IPasskeyUsers
+/// <summary>The stored users a passkey needs. The identity user repository implements it.</summary>
+internal interface IPasskeyUsers
 {
-    Task<IdentityUserDocument?> FindByUserIdAsync(int userId, CancellationToken cancellationToken);
+    Task<IdentityUserDocument?> FindByUserId(int userId, CancellationToken cancellationToken);
 
-    Task<IdentityResult> ChangeAsync(
+    Task<IdentityResult> Change(
         int userId,
         Func<IdentityUserDocument, Task<IdentityResult>> change,
         CancellationToken cancellationToken = default
@@ -24,7 +24,7 @@ public interface IPasskeyUsers
 
     Task<IList<UserPasskeyInfo>> GetPasskeysAsync(IdentityUserDocument user, CancellationToken cancellationToken);
 
-    Task<bool> RemovePasskeyWhileAnotherRemainsAsync(
+    Task<bool> RemovePasskeyWhileAnotherRemains(
         int userId,
         byte[] credentialId,
         CancellationToken cancellationToken = default
