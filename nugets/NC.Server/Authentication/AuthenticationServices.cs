@@ -49,7 +49,9 @@ public static class AuthenticationServices
         services.TryAddSingleton(TimeProvider.System);
 
         services.AddSingleton<IdentityUserRepository>();
-        services.AddSingleton<IIdentityUserRepository>(provider => provider.GetRequiredService<IdentityUserRepository>());
+        services.AddSingleton<IIdentityUserRepository>(provider =>
+            provider.GetRequiredService<IdentityUserRepository>()
+        );
         services.AddSingleton<IPasskeyUsers>(provider => provider.GetRequiredService<IdentityUserRepository>());
         services.AddIdentityCore<IdentityUserDocument>().AddUserStore<IdentityUserRepository>().AddSignInManager();
         services.AddHttpContextAccessor();

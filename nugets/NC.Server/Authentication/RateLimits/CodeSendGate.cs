@@ -40,7 +40,12 @@ public sealed class CodeSendGate
         return CodeSendLimits.Decide(history, now);
     }
 
-    public async Task Record(string email, string clientAddress, DateTimeOffset now, CancellationToken cancellationToken)
+    public async Task Record(
+        string email,
+        string clientAddress,
+        DateTimeOffset now,
+        CancellationToken cancellationToken
+    )
     {
         var hour = HourStart(now);
         await _counters.Increment(ADDRESS_SCOPE, email, hour, cancellationToken);

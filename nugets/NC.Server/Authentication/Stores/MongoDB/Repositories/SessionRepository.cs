@@ -18,7 +18,11 @@ internal sealed class SessionRepository : ISessionRepository
             .GetCollection<SessionDocument>(settings.SessionsCollection);
     }
 
-    public Task<SessionDocument?> FindLive(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken = default)
+    public Task<SessionDocument?> FindLive(
+        string tokenHash,
+        DateTimeOffset now,
+        CancellationToken cancellationToken = default
+    )
     {
         return _sessions
             .Find(x => x.TokenHash == tokenHash && x.ExpiresAtUtc > now.UtcDateTime)

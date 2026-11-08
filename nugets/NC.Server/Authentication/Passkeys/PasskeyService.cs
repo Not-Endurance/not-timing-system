@@ -177,7 +177,12 @@ internal sealed class PasskeyService : IPasskeyService
     }
 
     /// <summary>Renames one of the user's passkeys. The name is what the user sees on the Passkeys page to tell them apart.</summary>
-    public async Task<PasskeyOutcome> Rename(int userId, byte[] credentialId, string name, CancellationToken cancellationToken)
+    public async Task<PasskeyOutcome> Rename(
+        int userId,
+        byte[] credentialId,
+        string name,
+        CancellationToken cancellationToken
+    )
     {
         var found = false;
         var result = await _users.Change(

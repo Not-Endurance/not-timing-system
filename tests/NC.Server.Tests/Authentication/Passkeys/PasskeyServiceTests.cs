@@ -173,7 +173,11 @@ public sealed class PasskeyServiceTests
 
     sealed class FakeSessions : ISessionRepository
     {
-        public Task<SessionDocument?> FindLive(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken = default)
+        public Task<SessionDocument?> FindLive(
+            string tokenHash,
+            DateTimeOffset now,
+            CancellationToken cancellationToken = default
+        )
         {
             return Task.FromResult<SessionDocument?>(null);
         }

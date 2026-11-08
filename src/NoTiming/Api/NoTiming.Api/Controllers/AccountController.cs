@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NC.Server.Authentication.Account;
 using NC.Server.Authentication.Email;
+using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.Requests;
 using NC.Server.Authentication.Sessions;
-using NC.Server.Authentication.SignIn;
-using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.Settings;
+using NC.Server.Authentication.SignIn;
 
 namespace NoTiming.Api.Controllers;
 
@@ -98,12 +98,7 @@ public sealed class AccountController : ControllerBase
             return BadRequest(new { error = "invalid-email" });
         }
 
-        var outcome = await _signIn.RequestSignInCode(
-            request.Email!,
-            Language(),
-            ClientAddress(),
-            cancellationToken
-        );
+        var outcome = await _signIn.RequestSignInCode(request.Email!, Language(), ClientAddress(), cancellationToken);
         return CodeRequestAnswer(outcome);
     }
 

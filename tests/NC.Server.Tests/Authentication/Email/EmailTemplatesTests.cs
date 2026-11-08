@@ -52,8 +52,7 @@ public sealed class EmailTemplatesTests : IDisposable
     /// <summary>Answers each key with its name and the culture it was read in, so a test can see which language was used.</summary>
     sealed class KeyAndCultureLocalizer : IStringLocalizer
     {
-        public LocalizedString this[string name] =>
-            new(name, $"{name}|{CultureInfo.CurrentUICulture.Name}");
+        public LocalizedString this[string name] => new(name, $"{name}|{CultureInfo.CurrentUICulture.Name}");
         public LocalizedString this[string name, params object[] arguments] => this[name];
 
         public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
