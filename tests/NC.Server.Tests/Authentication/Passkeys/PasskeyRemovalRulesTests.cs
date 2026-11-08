@@ -1,7 +1,7 @@
 using NC.Server.Authentication.Passkeys;
 using Xunit;
 
-namespace NC.Tests.Authentication.Passkeys;
+namespace NC.Server.Tests.Authentication.Passkeys;
 
 public sealed class PasskeyRemovalRulesTests
 {

@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="NC.Tests" />
+    <InternalsVisibleTo Include="NC.Server.Tests" />
   </ItemGroup>
 
   <ItemGroup>

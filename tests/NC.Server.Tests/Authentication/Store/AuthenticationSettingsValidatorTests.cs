@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using NC.Server.Authentication.Store;
 using Xunit;
 
-namespace NC.Tests.Authentication.Store;
+namespace NC.Server.Tests.Authentication.Store;
 
 public sealed class AuthenticationSettingsValidatorTests
 {

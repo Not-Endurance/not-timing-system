@@ -2,7 +2,7 @@ using System.Text;
 using NC.Server.Authentication.Codes;
 using Xunit;
 
-namespace NC.Tests.Authentication.Codes;
+namespace NC.Server.Tests.Authentication.Codes;
 
 public sealed class CodeMacTests
 {

@@ -1,7 +1,7 @@
 using NC.Server.Authentication.Email;
 using Xunit;
 
-namespace NC.Tests.Authentication.Email;
+namespace NC.Server.Tests.Authentication.Email;
 
 public sealed class EmailProviderPolicyTests
 {

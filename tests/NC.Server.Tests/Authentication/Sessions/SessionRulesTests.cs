@@ -1,7 +1,7 @@
 using NC.Server.Authentication.Sessions;
 using Xunit;
 
-namespace NC.Tests.Authentication.Sessions;
+namespace NC.Server.Tests.Authentication.Sessions;
 
 public sealed class SessionRulesTests
 {

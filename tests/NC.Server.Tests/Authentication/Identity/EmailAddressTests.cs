@@ -1,7 +1,7 @@
 using NC.Server.Authentication.Identity;
 using Xunit;
 
-namespace NC.Tests.Authentication.Identity;
+namespace NC.Server.Tests.Authentication.Identity;
 
 public sealed class EmailAddressTests
 {

@@ -5,7 +5,7 @@ using NC.Server.Authentication.Passkeys;
 using NC.Server.Authentication.Store;
 using Xunit;
 
-namespace NC.Tests.Authentication.Passkeys;
+namespace NC.Server.Tests.Authentication.Passkeys;
 
 public sealed class PasskeyServiceTests
 {

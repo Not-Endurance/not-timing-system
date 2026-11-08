@@ -1,6 +1,6 @@
 ## Context
 - Primary sln file is src/not-timing-system.sln (production code only)
-- Test solution is tests/NoTiming.Tests.sln (unit test projects, Integration tests, NC.Tests)
+- Test solution is tests/NoTiming.Tests.sln (unit test projects, Integration tests, NC.Tests, NC.Server.Tests)
 
 ## Rules
 1. Don't execute commands that would create, delete or modify files outside of this working directory. Exceptions of this rule are commands which could cause side effects scoped to the utility that owns the command:
