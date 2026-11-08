@@ -28,7 +28,9 @@ internal static class AuthenticationStrings
     {
         if (!IsConfigured)
         {
-            throw new InvalidOperationException($"The localizer is not configured, so the email text '{key}' cannot be read.");
+            throw new InvalidOperationException(
+                $"The localizer is not configured, so the email text '{key}' cannot be read."
+            );
         }
 
         return LocalizeString(key);

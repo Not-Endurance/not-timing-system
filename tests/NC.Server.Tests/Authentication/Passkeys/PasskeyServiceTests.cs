@@ -253,7 +253,10 @@ public sealed class PasskeyServiceTests : IDisposable
         }
 
         // Sign-in and profile paths, which the passkey service never calls.
-        public Task<List<IdentityUserDocument>> FindAllByEmail(string normalizedEmail, CancellationToken cancellationToken)
+        public Task<List<IdentityUserDocument>> FindAllByEmail(
+            string normalizedEmail,
+            CancellationToken cancellationToken
+        )
         {
             throw new NotSupportedException();
         }

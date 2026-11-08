@@ -32,9 +32,7 @@ public sealed class EmailTemplatesTests : IDisposable
     {
         LocalizationHelper.Clear();
 
-        Assert.Throws<InvalidOperationException>(() =>
-            EmailTemplates.SignInCode("person@example.com", "bg", "123456")
-        );
+        Assert.Throws<InvalidOperationException>(() => EmailTemplates.SignInCode("person@example.com", "bg", "123456"));
     }
 
     [Fact]
