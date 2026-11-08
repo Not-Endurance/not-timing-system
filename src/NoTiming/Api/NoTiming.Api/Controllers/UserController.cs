@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using NoTiming.Api.Application.Authentication.Sessions;
+using NC.Server.Authentication.Sessions;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Mongo.Repositories;
 using NoTiming.Api.Application.Telemetry;

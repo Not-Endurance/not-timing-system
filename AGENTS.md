@@ -10,6 +10,11 @@
 3. Run dotnet `test` with minimal output `-v:m`.
 4. Domain logic is unit tested in the test project that mirrors its source project (for example NoTiming.Domain.Core.Tests and NoTiming.Domain.Setup.Tests). See Testing below.
 5. Don't concern yourself with code formatting. CSharpier formats code via CI, so don't run or check formatting locally.
+6. One top-level type per file, and the file is named after the type. A file may hold more than one type only when:
+   - the types share the same name, such as partial classes;
+   - a class and its I-prefixed interface share a name, and the interface is a simple abstraction that exists mainly for mocking; or
+   - the other classes are defined inside the main class as its subclasses.
+   Group related files in a directory named after the feature (for example `Codes/` or `Sessions/`) instead of putting several types in one large file.
 
 ## Verification
 - After individual atomic changes build and run the unit test project that mirrors the changed source project, for example `dotnet build tests/NoTiming.Tests.sln -v:q` followed by `dotnet test tests/NoTiming.Domain.Core.Tests/NoTiming.Domain.Core.Tests.csproj -v:m`.

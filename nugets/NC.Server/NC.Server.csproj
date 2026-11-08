@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NC.Application\NC.Application.csproj" />
+    <ProjectReference Include="..\NC.Storage\NC.Storage.csproj" />
   </ItemGroup>
 
   <ItemGroup>

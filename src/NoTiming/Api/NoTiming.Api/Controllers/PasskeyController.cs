@@ -2,12 +2,12 @@ using System.Buffers.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using NoTiming.Api.Application.Authentication.Account;
-using NoTiming.Api.Application.Authentication.Email;
-using NoTiming.Api.Application.Authentication.Passkeys;
-using NoTiming.Api.Application.Authentication.Requests;
-using NoTiming.Api.Application.Authentication.Sessions;
-using NoTiming.Api.Application.Authentication.Store;
+using NC.Server.Authentication.Account;
+using NC.Server.Authentication.Email;
+using NC.Server.Authentication.Passkeys;
+using NC.Server.Authentication.Requests;
+using NC.Server.Authentication.Sessions;
+using NC.Server.Authentication.Store;
 
 namespace NoTiming.Api.Controllers;
 
