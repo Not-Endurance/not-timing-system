@@ -27,8 +27,8 @@ public sealed class EmailLanguage
         foreach (var part in acceptLanguage.Split(','))
         {
             var pieces = part.Trim().Split(';');
-            var tag = pieces[0].Trim().Split('-')[0].ToLowerInvariant();
-            if (!_supported.Contains(tag))
+            var match = Match(pieces[0].Trim());
+            if (match is null)
             {
                 continue;
             }
@@ -36,12 +36,39 @@ public sealed class EmailLanguage
             var quality = ParseQuality(pieces);
             if (quality > bestQuality)
             {
-                best = tag;
+                best = match;
                 bestQuality = quality;
             }
         }
 
         return best ?? English;
+    }
+
+    /// <summary>
+    /// The packaged language for one requested tag. The whole tag is tried first, then each shorter form of it, so
+    /// <c>zh-Hans-CN</c> finds <c>zh-Hans</c>. A tag never matches a different script or region of the same language.
+    /// </summary>
+    string? Match(string tag)
+    {
+        var candidate = tag;
+        while (candidate.Length > 0)
+        {
+            var found = _supported.FirstOrDefault(x => string.Equals(x, candidate, StringComparison.OrdinalIgnoreCase));
+            if (found is not null)
+            {
+                return found;
+            }
+
+            var cut = candidate.LastIndexOf('-');
+            if (cut < 0)
+            {
+                break;
+            }
+
+            candidate = candidate[..cut];
+        }
+
+        return null;
     }
 
     static double ParseQuality(string[] pieces)

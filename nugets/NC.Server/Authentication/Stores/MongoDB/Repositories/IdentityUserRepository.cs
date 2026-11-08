@@ -21,8 +21,7 @@ internal sealed class IdentityUserRepository
         IUserEmailStore<IdentityUserDocument>,
         IUserSecurityStampStore<IdentityUserDocument>,
         IUserLockoutStore<IdentityUserDocument>,
-        IUserPasskeyStore<IdentityUserDocument>,
-        IPasskeyUsers
+        IUserPasskeyStore<IdentityUserDocument>
 {
     const int ChangeAttempts = 4;
 

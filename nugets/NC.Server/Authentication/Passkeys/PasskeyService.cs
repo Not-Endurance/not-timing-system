@@ -14,7 +14,7 @@ namespace NC.Server.Authentication.Passkeys;
 internal sealed class PasskeyService : IPasskeyService
 {
     readonly IPasskeyCeremony _ceremony;
-    readonly IPasskeyUsers _users;
+    readonly IIdentityUserRepository _users;
     readonly ISessionRepository _sessions;
     readonly EmailDispatchQueue _mail;
     readonly TimeProvider _time;
@@ -22,7 +22,7 @@ internal sealed class PasskeyService : IPasskeyService
 
     public PasskeyService(
         IPasskeyCeremony ceremony,
-        IPasskeyUsers users,
+        IIdentityUserRepository users,
         ISessionRepository sessions,
         EmailDispatchQueue mail,
         TimeProvider time,

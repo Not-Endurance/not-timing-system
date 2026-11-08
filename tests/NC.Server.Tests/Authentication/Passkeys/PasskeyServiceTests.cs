@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Abstractions;
+using NC.Localization;
+using NC.Localization.Localizers;
 using NC.Server.Authentication.Email;
 using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.Passkeys;
@@ -8,10 +10,22 @@ using Xunit;
 
 namespace NC.Server.Tests.Authentication.Passkeys;
 
-public sealed class PasskeyServiceTests
+// Shares a collection with the email tests, because both set the localizer, which is static.
+[Collection("Localization")]
+public sealed class PasskeyServiceTests : IDisposable
 {
     static readonly DateTimeOffset Now = new(2026, 11, 5, 10, 0, 0, TimeSpan.Zero);
     static readonly byte[] Credential = [1, 2, 3, 4];
+
+    public PasskeyServiceTests()
+    {
+        LocalizationHelper.Configure(new DummyLocalizer());
+    }
+
+    public void Dispose()
+    {
+        LocalizationHelper.Clear();
+    }
 
     [Fact]
     public async Task Enrol_WhenAttestationIsAccepted_ShouldStorePasskeyOnTheUser()
@@ -221,7 +235,7 @@ public sealed class PasskeyServiceTests
     /// Holds users the way the store does: a change works on a copy, and the copy reaches the store only through an update.
     /// A passkey change that is never updated is therefore lost, as it would be in production.
     /// </summary>
-    sealed class FakeUsers : IPasskeyUsers
+    sealed class FakeUsers : IIdentityUserRepository
     {
         readonly Dictionary<int, IdentityUserDocument> _stored = [];
 
@@ -236,6 +250,38 @@ public sealed class PasskeyServiceTests
         public IdentityUserDocument Stored(int userId)
         {
             return _stored[userId];
+        }
+
+        // Sign-in and profile paths, which the passkey service never calls.
+        public Task<List<IdentityUserDocument>> FindAllByEmail(string normalizedEmail, CancellationToken cancellationToken)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<IdentityUserDocument> CreateProvedUser(
+            string email,
+            string givenName,
+            string surname,
+            string countryRegion,
+            DateTimeOffset now,
+            CancellationToken cancellationToken
+        )
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task UpdateProfile(
+            int userId,
+            string givenName,
+            string? middleName,
+            string surname,
+            string countryRegion,
+            string? club,
+            string? feiId,
+            CancellationToken cancellationToken
+        )
+        {
+            throw new NotSupportedException();
         }
 
         public Task<IdentityUserDocument?> FindByUserId(int userId, CancellationToken cancellationToken)

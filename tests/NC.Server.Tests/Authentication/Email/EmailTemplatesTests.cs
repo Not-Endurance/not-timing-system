@@ -6,6 +6,7 @@ using Xunit;
 
 namespace NC.Server.Tests.Authentication.Email;
 
+[Collection("Localization")]
 public sealed class EmailTemplatesTests : IDisposable
 {
     public EmailTemplatesTests()
@@ -24,6 +25,16 @@ public sealed class EmailTemplatesTests : IDisposable
         var message = EmailTemplates.SignInCode("person@example.com", "bg", "123456");
 
         Assert.Equal("Your_sign_in_code_string|bg", message.Subject);
+    }
+
+    [Fact]
+    public void SignInCode_WhenLocalizerIsNotConfigured_ShouldThrow()
+    {
+        LocalizationHelper.Clear();
+
+        Assert.Throws<InvalidOperationException>(() =>
+            EmailTemplates.SignInCode("person@example.com", "bg", "123456")
+        );
     }
 
     [Fact]

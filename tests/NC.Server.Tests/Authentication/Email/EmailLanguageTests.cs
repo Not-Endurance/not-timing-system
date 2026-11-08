@@ -43,6 +43,30 @@ public sealed class EmailLanguageTests
         Assert.Equal("en", languages.Choose("tr-TR"));
     }
 
+    [Fact]
+    public void Choose_WhenScriptTagIsPackaged_ShouldReturnThatTag()
+    {
+        Assert.Equal("zh-Hans", new EmailLanguage(["en", "zh-Hans"]).Choose("zh-Hans"));
+    }
+
+    [Fact]
+    public void Choose_WhenRegionIsAddedToPackagedScript_ShouldReturnTheScriptTag()
+    {
+        Assert.Equal("zh-Hans", new EmailLanguage(["en", "zh-Hans"]).Choose("zh-Hans-CN"));
+    }
+
+    [Fact]
+    public void Choose_WhenTagDiffersOnlyInCase_ShouldReturnThePackagedSpelling()
+    {
+        Assert.Equal("zh-Hans", new EmailLanguage(["en", "zh-Hans"]).Choose("ZH-hans"));
+    }
+
+    [Fact]
+    public void Choose_WhenOnlyAnotherScriptIsPackaged_ShouldReturnEnglish()
+    {
+        Assert.Equal("en", new EmailLanguage(["en", "zh-Hant"]).Choose("zh-Hans"));
+    }
+
     static EmailLanguage Packaged()
     {
         return new EmailLanguage(["en", "bg", "tr"]);

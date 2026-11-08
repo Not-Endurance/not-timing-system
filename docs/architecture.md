@@ -32,3 +32,6 @@ Component rules
 - Component behinds should expose only *Safe* methods - a method is safe if it's wrapped with a `try-catch` that users `NComponentHandle` or if its name is suffixed with `Safe`. The latter should only be used if the method is passed to a Safe component parameter (also suffixed by safe).
 - Base classes for internal use should be suffixed with `Base` - example `Event : EventBase`. Base classes that are intended to be implemented by the user don't have to follow that rule - example `KrudShell`
 - Base classes and interfaces should be in `Abstractions`zw
+
+## Naming
+- Methods don't carry an `Async` suffix. The exception is a member that implements a framework interface, which keeps that interface's name so the implementation matches it. In the authentication module these are the ASP.NET Identity store members of `IdentityUserRepository`: `UpdateAsync`, `AddOrUpdatePasskeyAsync` and `GetPasskeysAsync`.

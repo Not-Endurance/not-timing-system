@@ -2,7 +2,10 @@ using Microsoft.AspNetCore.Identity;
 
 namespace NC.Server.Authentication.Identity;
 
-/// <summary>The users sign-in reads and changes. The Identity store implements it over the <c>users</c> collection.</summary>
+/// <summary>
+/// The users sign-in reads and changes, and the passkeys they hold. The Identity store implements it over the <c>users</c>
+/// collection.
+/// </summary>
 public interface IIdentityUserRepository
 {
     Task<IdentityUserDocument?> FindByUserId(int userId, CancellationToken cancellationToken = default);
@@ -36,4 +39,18 @@ public interface IIdentityUserRepository
     );
 
     Task<IdentityResult> UpdateAsync(IdentityUserDocument user, CancellationToken cancellationToken);
+
+    Task AddOrUpdatePasskeyAsync(
+        IdentityUserDocument user,
+        UserPasskeyInfo passkey,
+        CancellationToken cancellationToken
+    );
+
+    Task<IList<UserPasskeyInfo>> GetPasskeysAsync(IdentityUserDocument user, CancellationToken cancellationToken);
+
+    Task<bool> RemovePasskeyWhileAnotherRemains(
+        int userId,
+        byte[] credentialId,
+        CancellationToken cancellationToken = default
+    );
 }
