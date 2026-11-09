@@ -9,7 +9,11 @@ internal sealed class FakeSessionRepository : ISessionRepository
 
     public List<string> Removed { get; } = [];
 
-    public Task<SessionDocument?> FindLive(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken = default)
+    public Task<SessionDocument?> FindLive(
+        string tokenHash,
+        DateTimeOffset now,
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.FromResult<SessionDocument?>(null);
     }

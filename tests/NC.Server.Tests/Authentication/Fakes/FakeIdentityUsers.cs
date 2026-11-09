@@ -145,9 +145,7 @@ internal sealed class FakeIdentityUsers : IIdentityUserRepository
             return Task.FromResult(false);
         }
 
-        return Task.FromResult(
-            user.Passkeys.RemoveAll(x => x.CredentialId.AsSpan().SequenceEqual(credentialId)) > 0
-        );
+        return Task.FromResult(user.Passkeys.RemoveAll(x => x.CredentialId.AsSpan().SequenceEqual(credentialId)) > 0);
     }
 
     static IdentityUserDocument Copy(IdentityUserDocument user)

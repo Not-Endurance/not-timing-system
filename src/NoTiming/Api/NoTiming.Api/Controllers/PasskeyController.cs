@@ -42,11 +42,7 @@ public sealed class PasskeyController : ControllerBase
             return Unauthorized(new { error = "passkey-not-accepted" });
         }
 
-        var outcome = await _authentication.SignInWithPasskey(
-            HttpContext,
-            credential.GetRawText(),
-            cancellationToken
-        );
+        var outcome = await _authentication.SignInWithPasskey(HttpContext, credential.GetRawText(), cancellationToken);
         return outcome.SignedIn && outcome.User is not null
             ? Ok(MeResponse.For(outcome.User))
             : Unauthorized(new { error = "passkey-not-accepted" });
