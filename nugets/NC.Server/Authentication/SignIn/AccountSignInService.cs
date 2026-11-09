@@ -8,20 +8,18 @@ using NC.Server.Authentication.Codes;
 using NC.Server.Authentication.Email;
 using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.RateLimits;
-using NC.Server.Authentication.Sessions;
 using NC.Server.Authentication.Settings;
 
 namespace NC.Server.Authentication.SignIn;
 
 /// <summary>
 /// Sign-in and registration by a one-time code. A request makes a challenge whether or not the address has an account,
-/// and sends mail only when there is an account (sign-in) or a registration (register). A check proves the address,
-/// then branches on the users that match it.
+/// and sends mail only when there is an account (sign-in) or a registration (register). A check proves the address and
+/// returns the user it belongs to. Starting the session is the caller's job, so every sign-in path shares it.
 /// </summary>
-public sealed class AccountSignInService
+internal sealed class AccountSignInService
 {
     readonly IIdentityUserRepository _users;
-    readonly ISessionRepository _sessions;
     readonly ICodeChallengeRepository _challenges;
     readonly CodeSendGate _gate;
     readonly EmailDispatchQueue _mail;
@@ -32,7 +30,6 @@ public sealed class AccountSignInService
 
     public AccountSignInService(
         IIdentityUserRepository users,
-        ISessionRepository sessions,
         ICodeChallengeRepository challenges,
         CodeSendGate gate,
         EmailDispatchQueue mail,
@@ -43,7 +40,6 @@ public sealed class AccountSignInService
     )
     {
         _users = users;
-        _sessions = sessions;
         _challenges = challenges;
         _gate = gate;
         _mail = mail;
@@ -112,7 +108,8 @@ public sealed class AccountSignInService
         return Accepted();
     }
 
-    public async Task<VerificationOutcome> VerifyCode(string email, string code, CancellationToken cancellationToken)
+    /// <summary>Checks a code. Returns the user it signs in, or null when the code is not accepted or no user can be found.</summary>
+    public async Task<IdentityUserDocument?> VerifyCode(string email, string code, CancellationToken cancellationToken)
     {
         var address = EmailAddress.Normalize(email);
         var now = _time.GetUtcNow();
@@ -121,7 +118,7 @@ public sealed class AccountSignInService
         var spent = await _challenges.SpendAttempt(address, now, cancellationToken);
         if (spent is null)
         {
-            return Refused();
+            return null;
         }
 
         var matches = CryptographicOperations.FixedTimeEquals(CodeMac.Compute(Secret(), address, code), spent.Mac);
@@ -134,32 +131,16 @@ public sealed class AccountSignInService
         if (!CodeChallengeRules.Verify(before, matches, now).Accepted)
         {
             _logger.LogInformation("A sign-in code was refused.");
-            return Refused();
+            return null;
         }
 
         // A correct code is deleted atomically, so it signs in once even if two requests check it together.
         if (!await _challenges.Consume(address, spent.Mac, cancellationToken))
         {
-            return Refused();
+            return null;
         }
 
-        var user = await ResolveUser(address, spent, now, cancellationToken);
-        if (user is null)
-        {
-            return Refused();
-        }
-
-        var issued = SessionToken.Issue();
-        await _sessions.Create(issued.TokenHash, user.Id, user.SecurityStamp!, now, cancellationToken);
-        _logger.LogInformation("User {UserId} signed in by code.", user.Id);
-
-        return new VerificationOutcome
-        {
-            SignedIn = true,
-            UserId = user.Id,
-            SessionToken = issued.Token,
-            ExpiresAtUtc = SessionRules.ExpiresAt(now),
-        };
+        return await ResolveUser(address, spent, now, cancellationToken);
     }
 
     async Task<IdentityUserDocument?> ResolveUser(
@@ -219,7 +200,11 @@ public sealed class AccountSignInService
         return null;
     }
 
-    async Task<IdentityUserDocument> EnsureStamp(IdentityUserDocument user, CancellationToken cancellationToken)
+    /// <summary>
+    /// Gives a user without a stamp one. When the stamp cannot be saved the sign-in is refused: the session would be bound
+    /// to a stamp that the stored user does not have, and the session would end on its next request.
+    /// </summary>
+    async Task<IdentityUserDocument?> EnsureStamp(IdentityUserDocument user, CancellationToken cancellationToken)
     {
         if (user.SecurityStamp is not null)
         {
@@ -227,7 +212,13 @@ public sealed class AccountSignInService
         }
 
         user.SecurityStamp = Guid.NewGuid().ToString("N");
-        await _users.UpdateAsync(user, cancellationToken);
+        var saved = await _users.UpdateAsync(user, cancellationToken);
+        if (!saved.Succeeded)
+        {
+            _logger.LogWarning("A sign-in was refused: the security stamp could not be saved.");
+            return null;
+        }
+
         return user;
     }
 
@@ -269,10 +260,5 @@ public sealed class AccountSignInService
     static CodeRequestOutcome Refused(TimeSpan retryAfter = default)
     {
         return new CodeRequestOutcome { Accepted = false, RetryAfter = retryAfter };
-    }
-
-    static VerificationOutcome Refused()
-    {
-        return new VerificationOutcome { SignedIn = false };
     }
 }

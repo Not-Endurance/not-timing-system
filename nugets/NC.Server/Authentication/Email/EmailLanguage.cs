@@ -4,7 +4,7 @@ namespace NC.Server.Authentication.Email;
 /// Picks the language of a code email or a passkey notice from the Accept-Language header. The languages are the ones the
 /// host ships resources for. English is the fallback.
 /// </summary>
-public sealed class EmailLanguage
+internal sealed class EmailLanguage
 {
     public const string English = "en";
 

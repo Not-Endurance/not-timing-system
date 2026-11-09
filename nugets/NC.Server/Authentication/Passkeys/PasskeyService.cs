@@ -1,9 +1,9 @@
 using System.Buffers.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using NC.Server.Authentication.Email;
 using NC.Server.Authentication.Identity;
-using NC.Server.Authentication.Sessions;
 
 namespace NC.Server.Authentication.Passkeys;
 
@@ -11,34 +11,34 @@ namespace NC.Server.Authentication.Passkeys;
 /// Passkeys on top of ASP.NET Core Identity's passkey handler: the options for creating and using one, the check of the
 /// browser's answer, and the management of the passkeys a user has. Every change goes through a concurrency-checked update.
 /// </summary>
-internal sealed class PasskeyService : IPasskeyService
+internal sealed class PasskeyService : IPasskeyManagement
 {
     readonly IPasskeyCeremony _ceremony;
     readonly IIdentityUserRepository _users;
-    readonly ISessionRepository _sessions;
     readonly EmailDispatchQueue _mail;
+    readonly EmailLanguage _languages;
     readonly TimeProvider _time;
     readonly ILogger<PasskeyService> _logger;
 
     public PasskeyService(
         IPasskeyCeremony ceremony,
         IIdentityUserRepository users,
-        ISessionRepository sessions,
         EmailDispatchQueue mail,
+        EmailLanguage languages,
         TimeProvider time,
         ILogger<PasskeyService> logger
     )
     {
         _ceremony = ceremony;
         _users = users;
-        _sessions = sessions;
         _mail = mail;
+        _languages = languages;
         _time = time;
         _logger = logger;
     }
 
     /// <summary>Options for a passkey sign-in. They name no user, so the authenticator offers the passkeys it holds.</summary>
-    public Task<string> RequestOptions()
+    public Task<string> SignInOptions()
     {
         return _ceremony.MakeRequestOptions();
     }
@@ -81,12 +81,15 @@ internal sealed class PasskeyService : IPasskeyService
         );
     }
 
-    /// <summary>Stores the passkey the browser created for the signed-in user, and tells them by email.</summary>
+    /// <summary>
+    /// Stores the passkey the browser created for the signed-in user, and tells them by email. The request sets the
+    /// language of the email.
+    /// </summary>
     public async Task<PasskeyOutcome> Enrol(
+        HttpContext httpContext,
         int userId,
         string credentialJson,
         string? name,
-        string language,
         CancellationToken cancellationToken
     )
     {
@@ -116,6 +119,7 @@ internal sealed class PasskeyService : IPasskeyService
         var user = await _users.FindByUserId(userId, cancellationToken);
         if (user?.Email != null)
         {
+            var language = _languages.Choose(httpContext.Request.Headers.AcceptLanguage.ToString());
             _mail.Enqueue(EmailTemplates.PasskeyAdded(user.Email, language, passkey.Name!, now));
         }
 
@@ -123,8 +127,11 @@ internal sealed class PasskeyService : IPasskeyService
         return new PasskeyOutcome { Kind = PasskeyOutcomeKind.Done, Name = passkey.Name };
     }
 
-    /// <summary>Checks a passkey sign-in and starts a session for its user. Null when the answer is not accepted.</summary>
-    public async Task<PasskeySignIn?> SignIn(string credentialJson, CancellationToken cancellationToken)
+    /// <summary>
+    /// Checks a passkey sign-in and returns its user, with the passkey's sign count recorded. Null when the answer is not
+    /// accepted, or when the user has no security stamp: a session is bound to the stamp.
+    /// </summary>
+    public async Task<IdentityUserDocument?> VerifySignIn(string credentialJson, CancellationToken cancellationToken)
     {
         var assertion = await TryCeremony(() => _ceremony.PerformAssertion(credentialJson));
         if (assertion is null)
@@ -147,25 +154,14 @@ internal sealed class PasskeyService : IPasskeyService
         var user = await _users.FindByUserId(userId, cancellationToken) ?? assertion.User;
         if (user.SecurityStamp is null)
         {
-            // A session is bound to the stamp, so a user without one cannot be given a session.
             _logger.LogWarning("A passkey sign-in was refused: the user has no security stamp.");
             return null;
         }
 
-        var now = _time.GetUtcNow();
-        var issued = SessionToken.Issue();
-        await _sessions.Create(issued.TokenHash, user.Id, user.SecurityStamp, now, cancellationToken);
-        _logger.LogInformation("User {UserId} signed in with a passkey.", user.Id);
-
-        return new PasskeySignIn
-        {
-            UserId = user.Id,
-            SessionToken = issued.Token,
-            ExpiresAtUtc = SessionRules.ExpiresAt(now),
-        };
+        return user;
     }
 
-    public async Task<IReadOnlyList<UserPasskeyInfo>> ListPasskeys(int userId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<PasskeyInfo>> ListPasskeys(int userId, CancellationToken cancellationToken)
     {
         var user = await _users.FindByUserId(userId, cancellationToken);
         if (user is null)
@@ -173,7 +169,17 @@ internal sealed class PasskeyService : IPasskeyService
             return [];
         }
 
-        return [.. (await _users.GetPasskeysAsync(user, cancellationToken)).OrderBy(x => x.CreatedAt)];
+        return
+        [
+            .. (await _users.GetPasskeysAsync(user, cancellationToken))
+                .OrderBy(x => x.CreatedAt)
+                .Select(x => new PasskeyInfo
+                {
+                    CredentialId = x.CredentialId,
+                    Name = x.Name,
+                    CreatedAt = x.CreatedAt,
+                }),
+        ];
     }
 
     /// <summary>Renames one of the user's passkeys. The name is what the user sees on the Passkeys page to tell them apart.</summary>
@@ -192,7 +198,7 @@ internal sealed class PasskeyService : IPasskeyService
                 var passkey = changed.Passkeys?.Find(x => x.CredentialId.AsSpan().SequenceEqual(credentialId));
                 if (passkey is null)
                 {
-                    return Task.FromResult(IdentityResult.Failed());
+                    return Task.FromResult(Microsoft.AspNetCore.Identity.IdentityResult.Failed());
                 }
 
                 found = true;

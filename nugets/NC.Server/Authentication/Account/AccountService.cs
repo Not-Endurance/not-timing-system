@@ -4,7 +4,7 @@ using NC.Server.Authentication.Sessions;
 namespace NC.Server.Authentication.Account;
 
 /// <summary>The signed-in user's own state: who they are, their profile and ending their session.</summary>
-public sealed class AccountService
+internal sealed class AccountService
 {
     readonly IIdentityUserRepository _users;
     readonly ISessionRepository _sessions;

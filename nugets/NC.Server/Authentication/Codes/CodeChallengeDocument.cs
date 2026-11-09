@@ -1,7 +1,7 @@
 namespace NC.Server.Authentication.Codes;
 
 /// <summary>One challenge per normalized address. It holds the MAC of the code, never the code.</summary>
-public sealed class CodeChallengeDocument
+internal sealed class CodeChallengeDocument
 {
     /// <summary>The normalized address.</summary>
     public string Email { get; set; } = string.Empty;

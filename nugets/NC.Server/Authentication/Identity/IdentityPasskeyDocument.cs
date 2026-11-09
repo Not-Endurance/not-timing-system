@@ -1,7 +1,7 @@
 namespace NC.Server.Authentication.Identity;
 
 /// <summary>A passkey, embedded in its user's document with the fields Identity needs to check an assertion.</summary>
-public sealed class IdentityPasskeyDocument
+internal sealed class IdentityPasskeyDocument
 {
     public byte[] CredentialId { get; set; } = [];
 

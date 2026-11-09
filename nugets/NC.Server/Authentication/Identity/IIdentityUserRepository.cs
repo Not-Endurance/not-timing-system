@@ -6,7 +6,7 @@ namespace NC.Server.Authentication.Identity;
 /// The users sign-in reads and changes, and the passkeys they hold. The Identity store implements it over the <c>users</c>
 /// collection.
 /// </summary>
-public interface IIdentityUserRepository
+internal interface IIdentityUserRepository
 {
     Task<IdentityUserDocument?> FindByUserId(int userId, CancellationToken cancellationToken = default);
 

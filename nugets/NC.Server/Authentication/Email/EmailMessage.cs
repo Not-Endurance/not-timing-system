@@ -1,6 +1,6 @@
 namespace NC.Server.Authentication.Email;
 
-public sealed class EmailMessage
+internal sealed class EmailMessage
 {
     public string To { get; init; } = string.Empty;
 

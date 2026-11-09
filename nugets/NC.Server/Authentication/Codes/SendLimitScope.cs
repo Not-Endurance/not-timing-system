@@ -1,6 +1,6 @@
 namespace NC.Server.Authentication.Codes;
 
-public enum SendLimitScope
+internal enum SendLimitScope
 {
     Cooldown = 1,
     Address = 2,

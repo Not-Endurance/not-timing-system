@@ -1,13 +1,9 @@
 using System.Buffers.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using NC.Server.Authentication.Account;
-using NC.Server.Authentication.Email;
+using NC.Server.Authentication;
 using NC.Server.Authentication.Passkeys;
 using NC.Server.Authentication.Requests;
-using NC.Server.Authentication.Sessions;
-using NC.Server.Authentication.Settings;
 
 namespace NoTiming.Api.Controllers;
 
@@ -19,28 +15,19 @@ public sealed class PasskeyController : ControllerBase
 {
     const int MAX_NAME_LENGTH = 60;
 
-    readonly IPasskeyService _passkeys;
-    readonly AccountService _account;
-    readonly EmailLanguage _languages;
-    readonly IOptions<AuthenticationSettings> _settings;
+    readonly IAuthentication _authentication;
+    readonly IPasskeyManagement _passkeys;
 
-    public PasskeyController(
-        IPasskeyService passkeys,
-        AccountService account,
-        EmailLanguage languages,
-        IOptions<AuthenticationSettings> settings
-    )
+    public PasskeyController(IAuthentication authentication, IPasskeyManagement passkeys)
     {
+        _authentication = authentication;
         _passkeys = passkeys;
-        _account = account;
-        _languages = languages;
-        _settings = settings;
     }
 
     [HttpPost("sign-in/passkey/options")]
-    public async Task<IActionResult> SignInOptions()
+    public async Task<IActionResult> SignInOptions(CancellationToken cancellationToken)
     {
-        return Content(await _passkeys.RequestOptions(), "application/json");
+        return Content(await _authentication.PasskeySignInOptions(cancellationToken), "application/json");
     }
 
     /// <summary>Every failure gets the same answer, as a code check does.</summary>
@@ -55,25 +42,20 @@ public sealed class PasskeyController : ControllerBase
             return Unauthorized(new { error = "passkey-not-accepted" });
         }
 
-        var signIn = await _passkeys.SignIn(credential.GetRawText(), cancellationToken);
-        if (signIn is null)
-        {
-            return Unauthorized(new { error = "passkey-not-accepted" });
-        }
-
-        Response.Cookies.Append(
-            _settings.Value.CookieName,
-            signIn.SessionToken,
-            SessionCookie.Options(signIn.ExpiresAtUtc)
+        var outcome = await _authentication.SignInWithPasskey(
+            HttpContext,
+            credential.GetRawText(),
+            cancellationToken
         );
-        var user = await _account.Find(signIn.UserId, cancellationToken);
-        return Ok(user is null ? MeResponse.Anonymous() : MeResponse.For(user));
+        return outcome.SignedIn && outcome.User is not null
+            ? Ok(MeResponse.For(outcome.User))
+            : Unauthorized(new { error = "passkey-not-accepted" });
     }
 
     [HttpPost("me/passkey/options")]
     public async Task<IActionResult> EnrolOptions(CancellationToken cancellationToken)
     {
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, cancellationToken);
         if (userId is null)
         {
             return Unauthorized();
@@ -86,7 +68,7 @@ public sealed class PasskeyController : ControllerBase
     [HttpGet("me/passkeys")]
     public async Task<IActionResult> List(CancellationToken cancellationToken)
     {
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, cancellationToken);
         if (userId is null)
         {
             return Unauthorized();
@@ -106,7 +88,7 @@ public sealed class PasskeyController : ControllerBase
     [HttpPost("me/passkeys")]
     public async Task<IActionResult> Enrol([FromBody] EnrolPasskeyRequest request, CancellationToken cancellationToken)
     {
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, cancellationToken);
         if (userId is null)
         {
             return Unauthorized();
@@ -117,12 +99,11 @@ public sealed class PasskeyController : ControllerBase
             return BadRequest(new { error = "invalid-passkey" });
         }
 
-        var language = _languages.Choose(Request.Headers.AcceptLanguage.ToString());
         var outcome = await _passkeys.Enrol(
+            HttpContext,
             userId.Value,
             request.Credential.GetRawText(),
             request.Name,
-            language,
             cancellationToken
         );
         return outcome.Kind == PasskeyOutcomeKind.Done
@@ -137,7 +118,7 @@ public sealed class PasskeyController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, cancellationToken);
         if (userId is null)
         {
             return Unauthorized();
@@ -165,7 +146,7 @@ public sealed class PasskeyController : ControllerBase
     [HttpDelete("me/passkeys/{id}")]
     public async Task<IActionResult> Remove(string id, CancellationToken cancellationToken)
     {
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, cancellationToken);
         if (userId is null)
         {
             return Unauthorized();

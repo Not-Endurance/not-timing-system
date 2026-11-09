@@ -5,7 +5,7 @@ namespace NC.Server.Authentication.Identity;
 /// the repository writes only the fields below, by name, so the application's own fields (names, club, roles, event
 /// roles that reference the integer <see cref="Id"/>) are neither read into writes nor lost. Unknown fields are ignored.
 /// </summary>
-public sealed class IdentityUserDocument
+internal sealed class IdentityUserDocument
 {
     public int Id { get; set; }
 

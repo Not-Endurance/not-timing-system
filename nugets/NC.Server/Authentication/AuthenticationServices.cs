@@ -99,7 +99,10 @@ public static class AuthenticationServices
         services.AddSingleton<CodeSendGate>();
         services.AddSingleton<AccountSignInService>();
         services.AddSingleton<AccountService>();
-        services.AddScoped<IPasskeyService, PasskeyService>();
+        services.AddSingleton<SignInCompletion>();
+        services.AddScoped<PasskeyService>();
+        services.AddScoped<IPasskeyManagement>(provider => provider.GetRequiredService<PasskeyService>());
+        services.AddScoped<IAuthentication, AuthenticationService>();
         services.AddScoped<IPasskeyCeremony, SignInManagerPasskeyCeremony>();
         services.AddSingleton<ILegacyUserAdoption, LegacyUserAdoption>();
         services.AddScoped<StateChangeGuard>();

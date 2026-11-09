@@ -1,7 +1,7 @@
 namespace NC.Server.Authentication.Sessions;
 
 /// <summary>A server-side session. Only the hash of the token is stored, so a copy of the database cannot be replayed.</summary>
-public sealed class SessionDocument
+internal sealed class SessionDocument
 {
     public string TokenHash { get; set; } = string.Empty;
 

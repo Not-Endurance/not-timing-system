@@ -3,7 +3,7 @@ using NC.Server.Authentication.Codes;
 namespace NC.Server.Authentication.RateLimits;
 
 /// <summary>Reads the counters and the last send for an address, and records a send once it is allowed.</summary>
-public sealed class CodeSendGate
+internal sealed class CodeSendGate
 {
     const string ADDRESS_SCOPE = "address";
     const string IP_SCOPE = "ip";

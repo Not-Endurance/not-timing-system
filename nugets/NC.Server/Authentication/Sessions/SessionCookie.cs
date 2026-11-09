@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 namespace NC.Server.Authentication.Sessions;
 
 /// <summary>The one shape of the session cookie: host-only, Secure, HttpOnly, SameSite=Lax, at path /, expiring with the session.</summary>
-public static class SessionCookie
+internal static class SessionCookie
 {
     public static CookieOptions Options(DateTimeOffset expiresUtc)
     {

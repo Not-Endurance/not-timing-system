@@ -1,7 +1,7 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NC.Server.Authentication.Sessions;
+using NC.Server.Authentication;
 using NC.Storage.Mongo;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Telemetry;
@@ -19,16 +19,19 @@ namespace NoTiming.Api.Controllers;
 public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel>
 {
     readonly INoTimingUserSessionRepository _sessions;
+    readonly IAuthentication _authentication;
 
     public UserSessionController(
         IFunctionLogger<UserSessionController> logger,
         INoTimingUserSessionRepository sessions,
         IMongoRepository<NoTimingUserSessionModel> mongoSessions,
+        IAuthentication authentication,
         ITelemetryService telemetry
     )
         : base(logger, mongoSessions, telemetry)
     {
         _sessions = sessions;
+        _authentication = authentication;
     }
 
     [HttpPost("user-sessions")]
@@ -39,7 +42,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Create));
 
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
         if (userId is null)
         {
             return Unauthorized();
@@ -64,7 +67,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
         if (userId is null)
         {
             return Unauthorized();
@@ -95,7 +98,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Delete));
 
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
         if (userId is null)
         {
             return Unauthorized();
@@ -118,7 +121,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(DeleteForEvent));
 
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
         if (userId is null)
         {
             return Unauthorized();
@@ -142,7 +145,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Read));
 
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
         if (userId is null)
         {
             return Unauthorized();
@@ -165,7 +168,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(ReadByUserIdentifier));
 
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
         if (userId is null)
         {
             return Unauthorized();
@@ -188,7 +191,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(ReadByUserIdentifierAndEvent));
 
-        var userId = await SessionUser.IdOf(HttpContext);
+        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
         if (userId is null)
         {
             return Unauthorized();

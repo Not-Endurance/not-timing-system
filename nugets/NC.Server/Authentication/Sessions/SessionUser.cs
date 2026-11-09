@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 namespace NC.Server.Authentication.Sessions;
 
 /// <summary>Reads the signed-in user from the session cookie, through the session scheme, whatever the default scheme is.</summary>
-public static class SessionUser
+internal static class SessionUser
 {
     public static async Task<int?> IdOf(HttpContext context)
     {

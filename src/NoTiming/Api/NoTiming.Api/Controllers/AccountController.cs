@@ -1,13 +1,7 @@
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+using NC.Server.Authentication;
 using NC.Server.Authentication.Account;
-using NC.Server.Authentication.Email;
-using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.Requests;
-using NC.Server.Authentication.Sessions;
-using NC.Server.Authentication.Settings;
 using NC.Server.Authentication.SignIn;
 
 namespace NoTiming.Api.Controllers;
@@ -18,28 +12,17 @@ namespace NoTiming.Api.Controllers;
 [ServiceFilter(typeof(StateChangeGuard))]
 public sealed class AccountController : ControllerBase
 {
-    readonly AccountSignInService _signIn;
-    readonly AccountService _account;
-    readonly EmailLanguage _languages;
-    readonly IOptions<AuthenticationSettings> _settings;
+    readonly IAuthentication _authentication;
 
-    public AccountController(
-        AccountSignInService signIn,
-        AccountService account,
-        EmailLanguage languages,
-        IOptions<AuthenticationSettings> settings
-    )
+    public AccountController(IAuthentication authentication)
     {
-        _signIn = signIn;
-        _account = account;
-        _languages = languages;
-        _settings = settings;
+        _authentication = authentication;
     }
 
     [HttpGet("me")]
     public async Task<IActionResult> Me(CancellationToken cancellationToken)
     {
-        var user = await CurrentUserAsync(cancellationToken);
+        var user = await _authentication.CurrentUser(HttpContext, cancellationToken);
         return Ok(user is null ? MeResponse.Anonymous() : MeResponse.For(user));
     }
 
@@ -47,7 +30,7 @@ public sealed class AccountController : ControllerBase
     [HttpGet("me/profile")]
     public async Task<IActionResult> Profile(CancellationToken cancellationToken)
     {
-        var user = await CurrentUserAsync(cancellationToken);
+        var user = await _authentication.CurrentUser(HttpContext, cancellationToken);
         if (user is null)
         {
             return Unauthorized();
@@ -77,14 +60,13 @@ public sealed class AccountController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        var userId = await SessionUser.IdOf(HttpContext);
-        if (userId is null)
+        var outcome = await _authentication.UpdateProfile(HttpContext, request.ToChanges(), cancellationToken);
+        return outcome switch
         {
-            return Unauthorized();
-        }
-
-        var saved = await _account.UpdateProfile(userId.Value, request.ToChanges(), cancellationToken);
-        return saved ? NoContent() : BadRequest(new { error = "missing-details" });
+            ProfileUpdateOutcome.Saved => NoContent(),
+            ProfileUpdateOutcome.NotSignedIn => Unauthorized(),
+            _ => BadRequest(new { error = "missing-details" }),
+        };
     }
 
     [HttpPost("sign-in/code")]
@@ -98,7 +80,7 @@ public sealed class AccountController : ControllerBase
             return BadRequest(new { error = "invalid-email" });
         }
 
-        var outcome = await _signIn.RequestSignInCode(request.Email!, Language(), ClientAddress(), cancellationToken);
+        var outcome = await _authentication.SendSignInCode(HttpContext, request.Email!, cancellationToken);
         return CodeRequestAnswer(outcome);
     }
 
@@ -127,11 +109,10 @@ public sealed class AccountController : ControllerBase
             Surname = request.Surname!,
             CountryRegion = request.CountryRegion!,
         };
-        var outcome = await _signIn.RequestRegistrationCode(
+        var outcome = await _authentication.RequestRegistrationCode(
+            HttpContext,
             request.Email!,
             details,
-            Language(),
-            ClientAddress(),
             cancellationToken
         );
         return CodeRequestAnswer(outcome);
@@ -141,48 +122,22 @@ public sealed class AccountController : ControllerBase
     [HttpPost("sign-in/verify")]
     public async Task<IActionResult> VerifyCode([FromBody] VerifyRequest request, CancellationToken cancellationToken)
     {
-        var outcome = await _signIn.VerifyCode(
+        var outcome = await _authentication.SignInWithCode(
+            HttpContext,
             request.Email ?? string.Empty,
             request.Code ?? string.Empty,
             cancellationToken
         );
-        if (!outcome.SignedIn || outcome.SessionToken is null)
-        {
-            return Unauthorized(new { error = "code-not-accepted" });
-        }
-
-        Response.Cookies.Append(
-            _settings.Value.CookieName,
-            outcome.SessionToken,
-            SessionCookie.Options(outcome.ExpiresAtUtc)
-        );
-        var user = await _account.Find(outcome.UserId, cancellationToken);
-        return Ok(user is null ? MeResponse.Anonymous() : MeResponse.For(user));
+        return outcome.SignedIn && outcome.User is not null
+            ? Ok(MeResponse.For(outcome.User))
+            : Unauthorized(new { error = "code-not-accepted" });
     }
 
     [HttpPost("sign-out")]
     public async Task<IActionResult> SignOut(CancellationToken cancellationToken)
     {
-        var name = _settings.Value.CookieName;
-        await _account.SignOut(Request.Cookies[name], cancellationToken);
-        Response.Cookies.Append(name, string.Empty, SessionCookie.Options(DateTimeOffset.UnixEpoch));
+        await _authentication.SignOut(HttpContext, cancellationToken);
         return NoContent();
-    }
-
-    async Task<IdentityUserDocument?> CurrentUserAsync(CancellationToken cancellationToken)
-    {
-        var userId = await SessionUser.IdOf(HttpContext);
-        return userId is null ? null : await _account.Find(userId.Value, cancellationToken);
-    }
-
-    string Language()
-    {
-        return _languages.Choose(Request.Headers.AcceptLanguage.ToString());
-    }
-
-    string ClientAddress()
-    {
-        return HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
     }
 
     IActionResult CodeRequestAnswer(CodeRequestOutcome outcome)
@@ -296,13 +251,13 @@ public sealed class MeResponse
         return new MeResponse { SignedIn = false };
     }
 
-    public static MeResponse For(IdentityUserDocument user)
+    public static MeResponse For(AuthenticatedUser user)
     {
         return new MeResponse
         {
             SignedIn = true,
             DisplayName = user.DisplayName ?? user.Name ?? user.Email,
-            HasPasskey = user.Passkeys is { Count: > 0 },
+            HasPasskey = user.HasPasskey,
         };
     }
 

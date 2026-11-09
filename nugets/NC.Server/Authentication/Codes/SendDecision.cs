@@ -1,6 +1,6 @@
 namespace NC.Server.Authentication.Codes;
 
-public sealed record SendDecision
+internal sealed record SendDecision
 {
     public bool Allowed { get; init; }
 

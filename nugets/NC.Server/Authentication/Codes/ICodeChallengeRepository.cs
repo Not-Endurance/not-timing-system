@@ -1,7 +1,7 @@
 namespace NC.Server.Authentication.Codes;
 
 /// <summary>The one open code challenge per address. It holds the MAC of the code, never the code.</summary>
-public interface ICodeChallengeRepository
+internal interface ICodeChallengeRepository
 {
     Task<CodeChallengeDocument?> Find(string email, CancellationToken cancellationToken = default);
 

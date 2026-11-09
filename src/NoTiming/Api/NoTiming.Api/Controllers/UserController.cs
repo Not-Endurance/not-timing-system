@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using NC.Server.Authentication.Sessions;
+using NC.Server.Authentication;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Mongo.Repositories;
 using NoTiming.Api.Application.Telemetry;
@@ -14,11 +14,18 @@ namespace NoTiming.Api.Controllers;
 public class UserController : ApiControllerBase
 {
     readonly IUserRepository _users;
+    readonly IAuthentication _authentication;
 
-    public UserController(IFunctionLogger<UserController> logger, IUserRepository users, ITelemetryService telemetry)
+    public UserController(
+        IFunctionLogger<UserController> logger,
+        IUserRepository users,
+        IAuthentication authentication,
+        ITelemetryService telemetry
+    )
         : base(logger, telemetry)
     {
         _users = users;
+        _authentication = authentication;
     }
 
     [HttpGet("users")]
@@ -29,7 +36,7 @@ public class UserController : ApiControllerBase
         TagRequest(request);
         LogInformation(request, nameof(ReadMany));
 
-        if (await SessionUser.IdOf(HttpContext) is null)
+        if (await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted) is null)
         {
             return Unauthorized();
         }
