@@ -19,8 +19,8 @@ using NC.Server.Authentication.Sessions;
 using NC.Server.Authentication.Settings;
 using NC.Server.Authentication.SignIn;
 using NC.Server.Authentication.Stores.MongoDB.Indexes;
-using NC.Server.Authentication.Stores.MongoDB.Migration;
 using NC.Server.Authentication.Stores.MongoDB.Mapping;
+using NC.Server.Authentication.Stores.MongoDB.Migration;
 using NC.Server.Authentication.Stores.MongoDB.Repositories;
 
 namespace NC.Server.Authentication.Interface;

@@ -1,7 +1,7 @@
-using Xunit;
 using MongoDB.Bson;
 using NC.Server.Authentication.Profiles;
 using NC.Server.Tests.Authentication.Fakes;
+using Xunit;
 
 namespace NC.Server.Tests.Authentication.Profiles;
 
@@ -44,11 +44,7 @@ public sealed class ProfileDocumentTests
     [Fact]
     public void ToBson_WhenValuesHaveSpaces_ShouldTrimThem()
     {
-        var profile = new TestProfile
-        {
-            Club = "  SC Ruse ",
-            CountryIsoCode = " BG",
-        };
+        var profile = new TestProfile { Club = "  SC Ruse ", CountryIsoCode = " BG" };
 
         var document = ProfileDocument.ToBson(profile);
 

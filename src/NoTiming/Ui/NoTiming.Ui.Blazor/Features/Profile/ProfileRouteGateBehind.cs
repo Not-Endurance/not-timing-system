@@ -23,7 +23,11 @@ public class ProfileRouteGateBehind : NComponent
         {
             await ProfileContext.Load();
             var relativePath = Navigator.ToBaseRelativePath(Navigator.Uri);
-            IsRedirecting = UiProfileRoutePolicy.ShouldRedirectToProfile(ProfileContext.User, ProfileContext.Profile, relativePath);
+            IsRedirecting = UiProfileRoutePolicy.ShouldRedirectToProfile(
+                ProfileContext.User,
+                ProfileContext.Profile,
+                relativePath
+            );
             if (IsRedirecting)
             {
                 Navigator.NavigateTo(Routes.PROFILE_PAGE, replace: true);

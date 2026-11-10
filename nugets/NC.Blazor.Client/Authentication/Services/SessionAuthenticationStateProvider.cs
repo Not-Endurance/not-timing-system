@@ -69,9 +69,6 @@ public sealed class SessionProfile
 
     public string? Surname { get; set; }
 
-
-
-
     public string[] Roles { get; set; } = [];
 
     public ClaimsIdentity ToIdentity()

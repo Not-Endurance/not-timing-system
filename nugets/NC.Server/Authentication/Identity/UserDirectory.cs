@@ -13,9 +13,7 @@ internal sealed class UserDirectory<TProfile> : IUserDirectory<TProfile>
         _users = users;
     }
 
-    public async Task<IReadOnlyList<AuthenticatedUser<TProfile>>> ReadAll(
-        CancellationToken cancellationToken = default
-    )
+    public async Task<IReadOnlyList<AuthenticatedUser<TProfile>>> ReadAll(CancellationToken cancellationToken = default)
     {
         var users = await _users.FindAll(cancellationToken);
         return [.. users.Select(AuthenticatedUser<TProfile>.From)];

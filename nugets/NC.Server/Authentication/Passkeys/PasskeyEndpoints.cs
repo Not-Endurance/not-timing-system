@@ -56,11 +56,7 @@ internal static class PasskeyEndpoints<TProfile>
             return Results.Json(new { error = "passkey-not-accepted" }, statusCode: StatusCodes.Status401Unauthorized);
         }
 
-        var outcome = await authentication.SignInWithPasskey(
-            httpContext,
-            credential.GetRawText(),
-            cancellationToken
-        );
+        var outcome = await authentication.SignInWithPasskey(httpContext, credential.GetRawText(), cancellationToken);
         return outcome.SignedIn && outcome.User is not null
             ? Results.Ok(MeResponse.For(outcome.User))
             : Results.Json(new { error = "passkey-not-accepted" }, statusCode: StatusCodes.Status401Unauthorized);

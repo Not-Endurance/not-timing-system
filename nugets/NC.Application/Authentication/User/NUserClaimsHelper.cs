@@ -19,14 +19,7 @@ public static class NUserClaimsHelper
         var displayName = ResolveDisplayName(principal);
         var name = ResolveName(givenName, middleName, surname);
 
-        return new NUserRegistration(
-            email,
-            name,
-            givenName,
-            surname,
-            middleName,
-            displayName
-        );
+        return new NUserRegistration(email, name, givenName, surname, middleName, displayName);
     }
 
     public static string? ResolveUserIdentifier(ClaimsPrincipal? principal)

@@ -2,11 +2,11 @@ using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NC.Server.Authentication.Interface;
-using NoTiming.Application.Contracts.Account;
 using NC.Storage.Mongo;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Telemetry;
 using NoTiming.Api.Base;
+using NoTiming.Application.Contracts.Account;
 using NoTiming.Application.Contracts.Watcher.Models;
 using NoTiming.Application.UserSession;
 

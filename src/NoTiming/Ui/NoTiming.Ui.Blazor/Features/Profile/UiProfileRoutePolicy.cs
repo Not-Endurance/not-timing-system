@@ -9,9 +9,7 @@ public static class UiProfileRoutePolicy
 {
     public static bool ShouldRedirectToProfile(NUserModel? user, NoTimingProfile? profile, string relativePath)
     {
-        return user != null
-            && !UiProfilePolicy.IsComplete(user, profile)
-            && !IsProfileGateBypassRoute(relativePath);
+        return user != null && !UiProfilePolicy.IsComplete(user, profile) && !IsProfileGateBypassRoute(relativePath);
     }
 
     public static bool IsProfileGateBypassRoute(string relativePath)

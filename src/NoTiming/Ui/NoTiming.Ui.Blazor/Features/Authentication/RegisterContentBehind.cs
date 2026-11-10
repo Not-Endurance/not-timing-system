@@ -1,7 +1,7 @@
-using NoTiming.Application.Contracts.Account;
 using Microsoft.AspNetCore.Components;
 using NC.Blazor.Client.Authentication.Services;
 using NC.Blazor.Components.Abstractions;
+using NoTiming.Application.Contracts.Account;
 using NoTiming.Ui.Contracts.Features.Account;
 
 namespace NoTiming.Ui.Blazor.Features.Authentication;

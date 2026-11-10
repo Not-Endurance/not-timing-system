@@ -1,6 +1,6 @@
-using Xunit;
 using MongoDB.Bson;
 using NC.Server.Authentication.Profiles;
+using Xunit;
 
 namespace NC.Server.Tests.Authentication.Profiles;
 
