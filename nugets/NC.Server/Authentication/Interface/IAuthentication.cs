@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using NC.Server.Authentication.Account;
 using NC.Server.Authentication.SignIn;
 
-namespace NC.Server.Authentication;
+namespace NC.Server.Authentication.Interface;
 
 /// <summary>
 /// Sign-in, sign-out and the signed-in user, as the app sees them. A method that reads or writes the request or its

@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using NC.Server.Authentication.Settings;
 
@@ -11,7 +9,7 @@ namespace NC.Server.Authentication.Requests;
 /// header, which a browser sends cross-origin only after a preflight, and it must not be marked cross-site or come from
 /// an origin other than the app's. SameSite alone does not stop a sibling subdomain, which counts as same-site.
 /// </summary>
-public sealed class StateChangeGuard : IAsyncActionFilter
+internal sealed class StateChangeGuard : IEndpointFilter
 {
     public const string REQUEST_HEADER = "X-NTS-Request";
 
@@ -22,7 +20,7 @@ public sealed class StateChangeGuard : IAsyncActionFilter
         _settings = settings;
     }
 
-    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
         var request = context.HttpContext.Request;
         if (
@@ -31,18 +29,16 @@ public sealed class StateChangeGuard : IAsyncActionFilter
             || HttpMethods.IsOptions(request.Method)
         )
         {
-            await next();
-            return;
+            return await next(context);
         }
 
         var refusal = Refusal(request);
         if (refusal != null)
         {
-            context.Result = new ObjectResult(new { error = refusal }) { StatusCode = StatusCodes.Status403Forbidden };
-            return;
+            return Results.Json(new { error = refusal }, statusCode: StatusCodes.Status403Forbidden);
         }
 
-        await next();
+        return await next(context);
     }
 
     string? Refusal(HttpRequest request)

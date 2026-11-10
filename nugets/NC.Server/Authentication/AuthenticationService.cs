@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using NC.Server.Authentication.Account;
 using NC.Server.Authentication.Email;
+using NC.Server.Authentication.Interface;
 using NC.Server.Authentication.Passkeys;
 using NC.Server.Authentication.Sessions;
 using NC.Server.Authentication.Settings;

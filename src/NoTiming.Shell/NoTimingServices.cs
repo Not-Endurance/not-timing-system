@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NC.Application.UdpHandshake;
+using NC.Server.Authentication.Interface;
 using NC.Server.Authentication;
 using NoTiming.Api;
 using NoTiming.Api.Application;

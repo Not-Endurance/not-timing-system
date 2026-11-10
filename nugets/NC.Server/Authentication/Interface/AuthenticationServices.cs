@@ -13,7 +13,6 @@ using NC.Server.Authentication.Email.Outbox;
 using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.Passkeys;
 using NC.Server.Authentication.RateLimits;
-using NC.Server.Authentication.Requests;
 using NC.Server.Authentication.Sessions;
 using NC.Server.Authentication.Settings;
 using NC.Server.Authentication.SignIn;
@@ -21,7 +20,7 @@ using NC.Server.Authentication.Stores.MongoDB.Indexes;
 using NC.Server.Authentication.Stores.MongoDB.Mapping;
 using NC.Server.Authentication.Stores.MongoDB.Repositories;
 
-namespace NC.Server.Authentication;
+namespace NC.Server.Authentication.Interface;
 
 public static class AuthenticationServices
 {
@@ -101,11 +100,10 @@ public static class AuthenticationServices
         services.AddSingleton<AccountService>();
         services.AddSingleton<SignInCompletion>();
         services.AddScoped<PasskeyService>();
-        services.AddScoped<IPasskeyManagement>(provider => provider.GetRequiredService<PasskeyService>());
+        services.AddScoped<IPasskeyManager>(provider => provider.GetRequiredService<PasskeyService>());
         services.AddScoped<IAuthentication, AuthenticationService>();
         services.AddScoped<IPasskeyCeremony, SignInManagerPasskeyCeremony>();
         services.AddSingleton<ILegacyUserAdoption, LegacyUserAdoption>();
-        services.AddScoped<StateChangeGuard>();
 
         services.AddSingleton<EmailDispatchQueue>();
         services.AddHostedService<EmailDispatchService>();

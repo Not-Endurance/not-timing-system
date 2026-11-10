@@ -14,6 +14,14 @@ Notes:
 - Service registration - services in NC* should be registered manually, using the `N*Builder` pattern (see `NApplicationBuilder`) for example
 - Components defined in `NC.Blazor` should begin with `N` - `NTable`, `NNotifier`, `NTextField` etc
 
+### NC module interface
+An NC module exposes its entry points through an `Interface/` directory at the module root, for example `nugets/NC.Server/Authentication/Interface`. The namespace follows the folder, for example `NC.Server.Authentication.Interface`.
+- `Interface/` holds only the components the caller invokes as entry points, such as the service interface the caller injects. A type the caller doesn't invoke stays out of it.
+- Argument and return models stay in their own subdirectories and may be public. Being used by an entry point doesn't move them into `Interface/`.
+- Module wiring goes in `Interface/` too: the registration and endpoint mapping methods, such as `AddNoTimingAuthentication` and `MapNoTimingAuthentication`, so the host takes what it depends on from one folder. Configuration the host binds stays in its own folder.
+- Everything else in the module is internal. Interface members never expose internal types, storage documents or BSON shapes.
+- Modules that predate this rule keep their current layout and are not changed by it.
+
 # NoTiming* projects
 NoTiming (formerly NTS) is the brand of the current product - an affordable alternative to full-fledged Endurance timing systems.
 - Domain Model - hardcode business logic and validation is contained within the `NoTiming.Domain.*` namespace, which holds the domain model. It has to be as pure as reasonably possible.
@@ -35,4 +43,4 @@ Component rules
 ## Naming
 - Methods don't carry an `Async` suffix. The exception is a member that implements a framework interface, which keeps that interface's name so the implementation matches it. In the authentication module these are the ASP.NET Identity store members of `IdentityUserRepository`: `UpdateAsync`, `AddOrUpdatePasskeyAsync` and `GetPasskeysAsync`.
 - Base classes for internal use should be suffixed with `Base` - example `Event : EventBase`. Base classes that are intended to be implemented by the user don't have to follow that rule - example `KrudShell`
-- Base classes and interfaces should be in `Abstractions`
+- Base classes and interfaces that are not part of a module's public entry points should be in `Abstractions`. A module's entry points go in `Interface` (see NC module interface)

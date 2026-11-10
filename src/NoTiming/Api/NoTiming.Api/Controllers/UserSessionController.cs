@@ -1,12 +1,10 @@
 using System.Globalization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NC.Server.Authentication;
+using NC.Server.Authentication.Interface;
 using NC.Storage.Mongo;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Telemetry;
 using NoTiming.Api.Base;
-using NoTiming.Application.Contracts.Watcher;
 using NoTiming.Application.Contracts.Watcher.Models;
 using NoTiming.Application.UserSession;
 

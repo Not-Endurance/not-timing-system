@@ -2,6 +2,8 @@ using Microsoft.Extensions.Localization;
 using NC.Application.Configurations;
 using NC.Application.Environments;
 using NC.Localization;
+using NC.Server.Authentication.Interface;
+using NC.Server.Authentication;
 using NC.Startup;
 using NoTiming.Application.Contracts;
 using NoTiming.ConnectionDiagnostics;
@@ -110,6 +112,7 @@ public static class NoTimingHost
                 )
         );
         app.MapNoTimingEventBus(NoTimingServices.CORS_POLICY_NAME);
+        app.MapNoTimingAuthentication();
         app.MapControllers();
 
         LocalizationHelper.Configure(app.Services.GetRequiredService<IStringLocalizer>());

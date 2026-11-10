@@ -11,7 +11,7 @@ namespace NC.Server.Authentication.Passkeys;
 /// Passkeys on top of ASP.NET Core Identity's passkey handler: the options for creating and using one, the check of the
 /// browser's answer, and the management of the passkeys a user has. Every change goes through a concurrency-checked update.
 /// </summary>
-internal sealed class PasskeyService : IPasskeyManagement
+internal sealed class PasskeyService : IPasskeyManager
 {
     /// <summary>A user keeps at least one passkey, so the last one is never removed.</summary>
     const int MinimumPasskeys = 1;
@@ -164,7 +164,7 @@ internal sealed class PasskeyService : IPasskeyManagement
         return user;
     }
 
-    public async Task<IReadOnlyList<PasskeyInfo>> ListPasskeys(int userId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<PasskeyInfo>> List(int userId, CancellationToken cancellationToken)
     {
         var user = await _users.FindByUserId(userId, cancellationToken);
         if (user is null)
