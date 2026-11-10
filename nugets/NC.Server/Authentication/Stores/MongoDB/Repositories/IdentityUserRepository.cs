@@ -1,6 +1,7 @@
 using System.Buffers.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using NC.Random;
 using NC.Server.Authentication.Identity;
@@ -432,6 +433,12 @@ internal sealed class IdentityUserRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <summary>Every user row, for the app's user directory.</summary>
+    public async Task<List<IdentityUserDocument>> FindAll(CancellationToken cancellationToken)
+    {
+        return await _users.Find(_ => true).ToListAsync(cancellationToken);
+    }
+
     public Task<IdentityUserDocument?> FindByUserId(int userId, CancellationToken cancellationToken = default)
     {
         return _users.Find(x => x.Id == userId).FirstOrDefaultAsync(cancellationToken)!;
@@ -442,7 +449,7 @@ internal sealed class IdentityUserRepository
         string email,
         string givenName,
         string surname,
-        string countryRegion,
+        BsonDocument? profile,
         DateTimeOffset now,
         CancellationToken cancellationToken
     )
@@ -456,7 +463,7 @@ internal sealed class IdentityUserRepository
             ConcurrencyStamp = NewStamp(),
             GivenName = givenName,
             Surname = surname,
-            CountryRegion = countryRegion,
+            Profile = profile,
             Name = BuildName(givenName, null, surname),
             TenantId = "nts",
             Roles = [],
@@ -466,15 +473,16 @@ internal sealed class IdentityUserRepository
         return user;
     }
 
-    /// <summary>Changes the profile fields only; the rest of the document, its roles included, is left as it is.</summary>
+    /// <summary>
+    /// Changes the names and the app's profile. The rest of the document, its roles and passkeys included, is left as it
+    /// is. The profile is replaced as a whole: the app sends all of it.
+    /// </summary>
     public Task UpdateProfile(
         int userId,
         string givenName,
         string? middleName,
         string surname,
-        string countryRegion,
-        string? club,
-        string? feiId,
+        BsonDocument profile,
         CancellationToken cancellationToken
     )
     {
@@ -483,9 +491,7 @@ internal sealed class IdentityUserRepository
             .Set(x => x.MiddleName, middleName)
             .Set(x => x.Surname, surname)
             .Set(x => x.Name, BuildName(givenName, middleName, surname))
-            .Set(x => x.CountryRegion, countryRegion)
-            .Set(x => x.Club, club)
-            .Set(x => x.FeiId, feiId);
+            .Set(x => x.Profile, profile);
 
         return _users.UpdateOneAsync(x => x.Id == userId, update, cancellationToken: cancellationToken);
     }

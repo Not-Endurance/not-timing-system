@@ -35,19 +35,19 @@ internal sealed class NoTimingApiDriver : IDisposable
     /// Makes the person's account the way a pre-identity row would be: seeded with the profile exactly as given, then
     /// proved by a code at sign-in, which adopts the row and keeps its id. Returns the signed-in person's profile.
     /// </summary>
-    public async Task<NUserModel> RegisterUser(IntegrationUser user)
+    public async Task<OwnProfile> RegisterUser(IntegrationUser user)
     {
         var mongo = new MongoAccess(_fixture.MongoConnectionString);
         if (!await mongo.UserExistsAsync(user.Email))
         {
-            await mongo.SeedLegacyUserAsync(
+            await mongo.SeedPreIdentityUserAsync(
                 AccountTestData.NewId(),
                 user.Email,
                 user.Name,
                 user.GivenName,
                 user.MiddleName,
                 user.Surname,
-                user.CountryRegion,
+                user.CountryIsoCode,
                 user.Club,
                 user.FeiId,
                 user.DisplayName
@@ -58,10 +58,10 @@ internal sealed class NoTimingApiDriver : IDisposable
         return await ReadOwnProfile(cookie);
     }
 
-    public async Task<NUserModel> ReadOwnProfile(string cookie)
+    public async Task<OwnProfile> ReadOwnProfile(string cookie)
     {
         var json = await SendSignedIn(HttpMethod.Get, "api/me/profile", payload: null, cookie);
-        return json.FromJson<NUserModel>();
+        return json.FromJson<OwnProfile>();
     }
 
     public Task UpdateOwnProfile(string cookie, UpdateUserProfilePayload payload)

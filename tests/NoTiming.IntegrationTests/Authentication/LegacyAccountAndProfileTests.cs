@@ -58,7 +58,7 @@ public sealed class LegacyAccountAndProfileTests : IClassFixture<NoTimingIntegra
             {
                 givenName = "Ana",
                 surname = "Ivanova",
-                countryRegion = "",
+                profile = new { countryIsoCode = "" },
             }
         );
         var saved = await _client.UpdateProfileAsync(
@@ -67,7 +67,7 @@ public sealed class LegacyAccountAndProfileTests : IClassFixture<NoTimingIntegra
             {
                 givenName = "Ana",
                 surname = "Ivanova",
-                countryRegion = "BG",
+                profile = new { countryIsoCode = "BG" },
             }
         );
 

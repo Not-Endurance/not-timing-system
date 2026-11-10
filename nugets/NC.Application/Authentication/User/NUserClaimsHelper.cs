@@ -16,8 +16,6 @@ public static class NUserClaimsHelper
         var givenName = ResolveGivenName(principal);
         var middleName = ResolveMiddleName(principal);
         var surname = ResolveSurname(principal);
-        var club = ResolveClub(principal);
-        var feiId = ResolveFeiId(principal);
         var displayName = ResolveDisplayName(principal);
         var name = ResolveName(givenName, middleName, surname);
 
@@ -26,10 +24,7 @@ public static class NUserClaimsHelper
             name,
             givenName,
             surname,
-            ResolveCountryRegion(principal),
             middleName,
-            club,
-            feiId,
             displayName
         );
     }
@@ -103,23 +98,6 @@ public static class NUserClaimsHelper
     public static string? ResolveMiddleName(ClaimsPrincipal? principal)
     {
         return ResolveClaimValue(principal, "middle_name", "middleName", "middle");
-    }
-
-    public static string? ResolveCountryRegion(ClaimsPrincipal? principal)
-    {
-        return ResolveClaimValue(principal, ClaimTypes.Country, "country", "country_region", "country/region", "ctry");
-    }
-
-    public static string? ResolveClub(ClaimsPrincipal? principal)
-    {
-        return ResolveClaimValue(principal, "club", "club_name", "clubName")
-            ?? ResolveClaimValueBySuffix(principal, "club", "club_name", "clubName");
-    }
-
-    public static string? ResolveFeiId(ClaimsPrincipal? principal)
-    {
-        return ResolveClaimValue(principal, "feiId", "fei_id", "feiid", "FeiId")
-            ?? ResolveClaimValueBySuffix(principal, "feiId", "fei_id", "feiid");
     }
 
     static string? ResolveName(string? givenName, string? middleName, string? surname)

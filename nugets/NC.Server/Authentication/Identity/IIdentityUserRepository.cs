@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson;
 
 namespace NC.Server.Authentication.Identity;
 
@@ -10,13 +11,15 @@ internal interface IIdentityUserRepository
 {
     Task<IdentityUserDocument?> FindByUserId(int userId, CancellationToken cancellationToken = default);
 
+    Task<List<IdentityUserDocument>> FindAll(CancellationToken cancellationToken);
+
     Task<List<IdentityUserDocument>> FindAllByEmail(string normalizedEmail, CancellationToken cancellationToken);
 
     Task<IdentityUserDocument> CreateProvedUser(
         string email,
         string givenName,
         string surname,
-        string countryRegion,
+        BsonDocument? profile,
         DateTimeOffset now,
         CancellationToken cancellationToken
     );
@@ -26,9 +29,7 @@ internal interface IIdentityUserRepository
         string givenName,
         string? middleName,
         string surname,
-        string countryRegion,
-        string? club,
-        string? feiId,
+        BsonDocument profile,
         CancellationToken cancellationToken
     );
 

@@ -31,7 +31,7 @@ internal sealed class SignInCompletion
     }
 
     /// <summary>Starts a session for a verified user, and writes its cookie. A user without a security stamp is refused.</summary>
-    public async Task<SignInOutcome> CompleteAsync(
+    public async Task<bool> CompleteAsync(
         HttpContext httpContext,
         IdentityUserDocument user,
         CancellationToken cancellationToken
@@ -39,7 +39,7 @@ internal sealed class SignInCompletion
     {
         if (user.SecurityStamp is null)
         {
-            return new SignInOutcome { SignedIn = false };
+            return false;
         }
 
         var now = _time.GetUtcNow();
@@ -52,6 +52,6 @@ internal sealed class SignInCompletion
         );
         _logger.LogInformation("User {UserId} signed in.", user.Id);
 
-        return new SignInOutcome { SignedIn = true, User = AuthenticatedUser.From(user) };
+        return true;
     }
 }

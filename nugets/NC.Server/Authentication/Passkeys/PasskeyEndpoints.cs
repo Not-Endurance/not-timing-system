@@ -1,16 +1,18 @@
 using System.Buffers.Text;
+using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using NC.Server.Authentication.Requests;
 using NC.Server.Authentication.Account;
 using NC.Server.Authentication.Interface;
+using NC.Server.Authentication.Requests;
 
 namespace NC.Server.Authentication.Passkeys;
 
 /// <summary>Passkey sign-in, and the passkeys of the signed-in user: enrolling, listing, renaming and removing.</summary>
-internal static class PasskeyEndpoints
+internal static class PasskeyEndpoints<TProfile>
+    where TProfile : class, new()
 {
     const int MAX_NAME_LENGTH = 60;
 
@@ -18,14 +20,25 @@ internal static class PasskeyEndpoints
     {
         api.MapPost("/sign-in/passkey/options", SignInOptions).AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/sign-in/passkey/verify", SignInVerify).AddEndpointFilter<StateChangeGuard>();
-        api.MapPost("/me/passkey/options", EnrolOptions).AddEndpointFilter<StateChangeGuard>();
-        api.MapGet("/me/passkeys", ListPasskeys);
-        api.MapPost("/me/passkeys", Enrol).AddEndpointFilter<StateChangeGuard>();
-        api.MapPatch("/me/passkeys/{id}", Rename).AddEndpointFilter<StateChangeGuard>();
-        api.MapDelete("/me/passkeys/{id}", Remove).AddEndpointFilter<StateChangeGuard>();
+        api.MapPost("/me/passkey/options", EnrolOptions)
+            .RequireAuthorization(AuthenticationPolicies.SIGNED_IN)
+            .AddEndpointFilter<StateChangeGuard>();
+        api.MapGet("/me/passkeys", ListPasskeys).RequireAuthorization(AuthenticationPolicies.SIGNED_IN);
+        api.MapPost("/me/passkeys", Enrol)
+            .RequireAuthorization(AuthenticationPolicies.SIGNED_IN)
+            .AddEndpointFilter<StateChangeGuard>();
+        api.MapPatch("/me/passkeys/{id}", Rename)
+            .RequireAuthorization(AuthenticationPolicies.SIGNED_IN)
+            .AddEndpointFilter<StateChangeGuard>();
+        api.MapDelete("/me/passkeys/{id}", Remove)
+            .RequireAuthorization(AuthenticationPolicies.SIGNED_IN)
+            .AddEndpointFilter<StateChangeGuard>();
     }
 
-    static async Task<IResult> SignInOptions(IAuthentication authentication, CancellationToken cancellationToken)
+    static async Task<IResult> SignInOptions(
+        IAuthentication<TProfile> authentication,
+        CancellationToken cancellationToken
+    )
     {
         return Results.Content(await authentication.PasskeySignInOptions(cancellationToken), "application/json");
     }
@@ -34,7 +47,7 @@ internal static class PasskeyEndpoints
     static async Task<IResult> SignInVerify(
         JsonElement credential,
         HttpContext httpContext,
-        IAuthentication authentication,
+        IAuthentication<TProfile> authentication,
         CancellationToken cancellationToken
     )
     {
@@ -49,18 +62,17 @@ internal static class PasskeyEndpoints
             cancellationToken
         );
         return outcome.SignedIn && outcome.User is not null
-            ? Results.Ok(AccountEndpoints.MeResponse.For(outcome.User))
+            ? Results.Ok(MeResponse.For(outcome.User))
             : Results.Json(new { error = "passkey-not-accepted" }, statusCode: StatusCodes.Status401Unauthorized);
     }
 
     static async Task<IResult> EnrolOptions(
-        HttpContext httpContext,
-        IAuthentication authentication,
+        ClaimsPrincipal principal,
         IPasskeyManager passkeys,
         CancellationToken cancellationToken
     )
     {
-        var userId = await authentication.SignedInUserId(httpContext, cancellationToken);
+        var userId = principal.GetSignedInUserId();
         if (userId is null)
         {
             return Results.Unauthorized();
@@ -73,13 +85,12 @@ internal static class PasskeyEndpoints
     }
 
     static async Task<IResult> ListPasskeys(
-        HttpContext httpContext,
-        IAuthentication authentication,
+        ClaimsPrincipal principal,
         IPasskeyManager passkeys,
         CancellationToken cancellationToken
     )
     {
-        var userId = await authentication.SignedInUserId(httpContext, cancellationToken);
+        var userId = principal.GetSignedInUserId();
         if (userId is null)
         {
             return Results.Unauthorized();
@@ -99,12 +110,12 @@ internal static class PasskeyEndpoints
     static async Task<IResult> Enrol(
         EnrolPasskeyRequest request,
         HttpContext httpContext,
-        IAuthentication authentication,
+        ClaimsPrincipal principal,
         IPasskeyManager passkeys,
         CancellationToken cancellationToken
     )
     {
-        var userId = await authentication.SignedInUserId(httpContext, cancellationToken);
+        var userId = principal.GetSignedInUserId();
         if (userId is null)
         {
             return Results.Unauthorized();
@@ -130,13 +141,12 @@ internal static class PasskeyEndpoints
     static async Task<IResult> Rename(
         string id,
         RenamePasskeyRequest request,
-        HttpContext httpContext,
-        IAuthentication authentication,
+        ClaimsPrincipal principal,
         IPasskeyManager passkeys,
         CancellationToken cancellationToken
     )
     {
-        var userId = await authentication.SignedInUserId(httpContext, cancellationToken);
+        var userId = principal.GetSignedInUserId();
         if (userId is null)
         {
             return Results.Unauthorized();
@@ -163,13 +173,12 @@ internal static class PasskeyEndpoints
 
     static async Task<IResult> Remove(
         string id,
-        HttpContext httpContext,
-        IAuthentication authentication,
+        ClaimsPrincipal principal,
         IPasskeyManager passkeys,
         CancellationToken cancellationToken
     )
     {
-        var userId = await authentication.SignedInUserId(httpContext, cancellationToken);
+        var userId = principal.GetSignedInUserId();
         if (userId is null)
         {
             return Results.Unauthorized();

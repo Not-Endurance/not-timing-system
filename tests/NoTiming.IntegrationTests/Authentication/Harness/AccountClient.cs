@@ -69,7 +69,7 @@ internal sealed class AccountClient : IDisposable
                 email,
                 givenName,
                 surname,
-                countryRegion = country,
+                profile = new { countryIsoCode = country },
                 website,
             }
         );
@@ -83,6 +83,11 @@ internal sealed class AccountClient : IDisposable
     public Task<HttpResponseMessage> SignOutAsync(string cookie, bool crossSite = false)
     {
         return SendAsync(HttpMethod.Post, "api/sign-out", body: null, cookie, crossSite);
+    }
+
+    public Task<HttpResponseMessage> ProfileAsync(string cookie)
+    {
+        return SendAsync(HttpMethod.Get, "api/me/profile", body: null, cookie);
     }
 
     public Task<HttpResponseMessage> UpdateProfileAsync(string cookie, object body)

@@ -9,12 +9,14 @@ public static class AuthenticationEndpoints
 {
     /// <summary>
     /// Maps the sign-in, registration, session, profile and passkey routes under <c>/api</c>. The host maps these routes and
-    /// defines none of them. Every state-changing route is guarded against cross-site requests.
+    /// defines none of them. Every state-changing route is guarded against cross-site requests. The app's profile type is
+    /// given as <typeparamref name="TProfile"/>, the same type the module was registered with.
     /// </summary>
-    public static void MapNoTimingAuthentication(this IEndpointRouteBuilder endpoints)
+    public static void MapNoTimingAuthentication<TProfile>(this IEndpointRouteBuilder endpoints)
+        where TProfile : class, new()
     {
         var api = endpoints.MapGroup("/api");
-        AccountEndpoints.Map(api);
-        PasskeyEndpoints.Map(api);
+        AccountEndpoints<TProfile>.Map(api);
+        PasskeyEndpoints<TProfile>.Map(api);
     }
 }

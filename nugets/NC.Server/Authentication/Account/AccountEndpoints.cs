@@ -1,20 +1,24 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using NC.Server.Authentication.Requests;
 using NC.Server.Authentication.Interface;
+using NC.Server.Authentication.Requests;
 using NC.Server.Authentication.SignIn;
 
 namespace NC.Server.Authentication.Account;
 
 /// <summary>The anonymous and signed-in routes of sign-in, registration, the session and the profile.</summary>
-internal static class AccountEndpoints
+internal static class AccountEndpoints<TProfile>
+    where TProfile : class, new()
 {
     internal static void Map(RouteGroupBuilder api)
     {
         api.MapGet("/me", Me);
-        api.MapGet("/me/profile", Profile);
-        api.MapPatch("/me", UpdateProfile).AddEndpointFilter<StateChangeGuard>();
+        api.MapGet("/me/profile", Profile).RequireAuthorization(AuthenticationPolicies.SIGNED_IN);
+        api.MapPatch("/me", UpdateProfile)
+            .RequireAuthorization(AuthenticationPolicies.SIGNED_IN)
+            .AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/sign-in/code", RequestSignInCode).AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/register", Register).AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/sign-in/verify", VerifyCode).AddEndpointFilter<StateChangeGuard>();
@@ -22,23 +26,25 @@ internal static class AccountEndpoints
     }
 
     static async Task<IResult> Me(
-        HttpContext httpContext,
-        IAuthentication authentication,
+        ClaimsPrincipal principal,
+        AccountProfiles<TProfile> profiles,
         CancellationToken cancellationToken
     )
     {
-        var user = await authentication.CurrentUser(httpContext, cancellationToken);
+        var userId = principal.GetSignedInUserId();
+        var user = userId is null ? null : await profiles.Find(userId.Value, cancellationToken);
         return Results.Ok(user is null ? MeResponse.Anonymous() : MeResponse.For(user));
     }
 
-    /// <summary>The signed-in user's identity for the Ui. Private: the anonymous /me answers only the signed-in state.</summary>
+    /// <summary>The signed-in user's identity and profile for the Ui.</summary>
     static async Task<IResult> Profile(
-        HttpContext httpContext,
-        IAuthentication authentication,
+        ClaimsPrincipal principal,
+        AccountProfiles<TProfile> profiles,
         CancellationToken cancellationToken
     )
     {
-        var user = await authentication.CurrentUser(httpContext, cancellationToken);
+        var userId = principal.GetSignedInUserId();
+        var user = userId is null ? null : await profiles.Find(userId.Value, cancellationToken);
         if (user is null)
         {
             return Results.Unauthorized();
@@ -54,34 +60,41 @@ internal static class AccountEndpoints
                 GivenName = user.GivenName,
                 MiddleName = user.MiddleName,
                 Surname = user.Surname,
-                CountryRegion = user.CountryRegion,
-                Club = user.Club,
-                FeiId = user.FeiId,
                 Roles = user.Roles,
+                Profile = user.Profile,
             }
         );
     }
 
     static async Task<IResult> UpdateProfile(
         ProfileRequest request,
-        HttpContext httpContext,
-        IAuthentication authentication,
+        ClaimsPrincipal principal,
+        AccountProfiles<TProfile> profiles,
+        IProfileValidator<TProfile> validator,
         CancellationToken cancellationToken
     )
     {
-        var outcome = await authentication.UpdateProfile(httpContext, request.ToChanges(), cancellationToken);
-        return outcome switch
+        var userId = principal.GetSignedInUserId();
+        if (userId is null)
         {
-            ProfileUpdateOutcome.Saved => Results.NoContent(),
-            ProfileUpdateOutcome.NotSignedIn => Results.Unauthorized(),
-            _ => Results.BadRequest(new { error = "missing-details" }),
-        };
+            return Results.Unauthorized();
+        }
+
+        if (request.Profile is null || !validator.Accepts(request.Profile))
+        {
+            return Results.BadRequest(new { error = "missing-details" });
+        }
+
+        var outcome = await profiles.Update(userId.Value, request.ToChanges(), cancellationToken);
+        return outcome == ProfileUpdateOutcome.Saved
+            ? Results.NoContent()
+            : Results.BadRequest(new { error = "missing-details" });
     }
 
     static async Task<IResult> RequestSignInCode(
         EmailRequest request,
         HttpContext httpContext,
-        IAuthentication authentication,
+        IAuthentication<TProfile> authentication,
         CancellationToken cancellationToken
     )
     {
@@ -98,7 +111,8 @@ internal static class AccountEndpoints
     static async Task<IResult> Register(
         RegisterRequest request,
         HttpContext httpContext,
-        IAuthentication authentication,
+        IAuthentication<TProfile> authentication,
+        IProfileValidator<TProfile> validator,
         CancellationToken cancellationToken
     )
     {
@@ -111,17 +125,18 @@ internal static class AccountEndpoints
             !IsPlausibleEmail(request.Email)
             || string.IsNullOrWhiteSpace(request.GivenName)
             || string.IsNullOrWhiteSpace(request.Surname)
-            || string.IsNullOrWhiteSpace(request.CountryRegion)
+            || request.Profile is null
+            || !validator.Accepts(request.Profile)
         )
         {
             return Results.BadRequest(new { error = "missing-details" });
         }
 
-        var details = new RegistrationDetails
+        var details = new RegistrationDetails<TProfile>
         {
             GivenName = request.GivenName!,
             Surname = request.Surname!,
-            CountryRegion = request.CountryRegion!,
+            Profile = request.Profile,
         };
         var outcome = await authentication.RequestRegistrationCode(
             httpContext,
@@ -136,7 +151,7 @@ internal static class AccountEndpoints
     static async Task<IResult> VerifyCode(
         VerifyRequest request,
         HttpContext httpContext,
-        IAuthentication authentication,
+        IAuthentication<TProfile> authentication,
         CancellationToken cancellationToken
     )
     {
@@ -153,7 +168,7 @@ internal static class AccountEndpoints
 
     static async Task<IResult> SignOut(
         HttpContext httpContext,
-        IAuthentication authentication,
+        IAuthentication<TProfile> authentication,
         CancellationToken cancellationToken
     )
     {
@@ -198,10 +213,11 @@ internal static class AccountEndpoints
 
         public string? Surname { get; init; }
 
-        public string? CountryRegion { get; init; }
-
         /// <summary>A field no person fills in. A bot does, and gets the normal answer and nothing else.</summary>
         public string? Website { get; init; }
+
+        /// <summary>The app's profile. The app's validator decides which of its fields are required.</summary>
+        public TProfile Profile { get; init; } = new();
     }
 
     internal sealed class VerifyRequest
@@ -219,22 +235,16 @@ internal static class AccountEndpoints
 
         public string? Surname { get; init; }
 
-        public string? CountryRegion { get; init; }
+        public TProfile Profile { get; init; } = new();
 
-        public string? Club { get; init; }
-
-        public string? FeiId { get; init; }
-
-        public ProfileChanges ToChanges()
+        public ProfileChanges<TProfile> ToChanges()
         {
-            return new ProfileChanges
+            return new ProfileChanges<TProfile>
             {
                 GivenName = GivenName ?? string.Empty,
                 MiddleName = MiddleName,
                 Surname = Surname ?? string.Empty,
-                CountryRegion = CountryRegion ?? string.Empty,
-                Club = Club,
-                FeiId = FeiId,
+                Profile = Profile,
             };
         }
     }
@@ -255,36 +265,8 @@ internal static class AccountEndpoints
 
         public string? Surname { get; init; }
 
-        public string? CountryRegion { get; init; }
-
-        public string? Club { get; init; }
-
-        public string? FeiId { get; init; }
-
         public string[] Roles { get; init; } = [];
-    }
 
-    internal sealed class MeResponse
-    {
-        public static MeResponse Anonymous()
-        {
-            return new MeResponse { SignedIn = false };
-        }
-
-        public static MeResponse For(AuthenticatedUser user)
-        {
-            return new MeResponse
-            {
-                SignedIn = true,
-                DisplayName = user.DisplayName ?? user.Name ?? user.Email,
-                HasPasskey = user.HasPasskey,
-            };
-        }
-
-        public bool SignedIn { get; init; }
-
-        public string? DisplayName { get; init; }
-
-        public bool HasPasskey { get; init; }
+        public TProfile Profile { get; init; } = new();
     }
 }

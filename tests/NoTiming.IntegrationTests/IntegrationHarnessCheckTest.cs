@@ -698,9 +698,9 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         Assert.Equal("Petra Profile", persisted.Name);
         Assert.Equal("Petra", persisted.GivenName);
         Assert.Equal("Profile", persisted.Surname);
-        Assert.Equal("Bulgaria", persisted.CountryRegion);
-        Assert.Equal("Konarche", persisted.Club);
-        Assert.Equal("20202020", persisted.FeiId);
+        Assert.Equal("Bulgaria", persisted.Profile.CountryIsoCode);
+        Assert.Equal("Konarche", persisted.Profile.Club);
+        Assert.Equal("20202020", persisted.Profile.FeiId);
     }
 
     static SetupConfigureEvent CreateOperatorSetupEvent(
@@ -771,7 +771,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         );
     }
 
-    static SetupUser ToSetupUser(NUserModel user)
+    static SetupUser ToSetupUser(OwnProfile user)
     {
         return new SetupUser(
             user.Email,
@@ -781,9 +781,9 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
             user.GivenName,
             user.MiddleName,
             user.Surname,
-            user.CountryRegion,
-            user.Club,
-            user.FeiId,
+            user.Profile.CountryIsoCode,
+            user.Profile.Club,
+            user.Profile.FeiId,
             user.DisplayName
         );
     }

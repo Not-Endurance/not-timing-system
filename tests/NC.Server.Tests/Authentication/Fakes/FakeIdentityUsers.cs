@@ -44,7 +44,7 @@ internal sealed class FakeIdentityUsers : IIdentityUserRepository
         string email,
         string givenName,
         string surname,
-        string countryRegion,
+        MongoDB.Bson.BsonDocument? profile,
         DateTimeOffset now,
         CancellationToken cancellationToken
     )
@@ -52,14 +52,17 @@ internal sealed class FakeIdentityUsers : IIdentityUserRepository
         throw new NotSupportedException();
     }
 
+    public Task<List<IdentityUserDocument>> FindAll(CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_stored.Values.Select(Copy).ToList());
+    }
+
     public Task UpdateProfile(
         int userId,
         string givenName,
         string? middleName,
         string surname,
-        string countryRegion,
-        string? club,
-        string? feiId,
+        MongoDB.Bson.BsonDocument profile,
         CancellationToken cancellationToken
     )
     {
@@ -183,9 +186,7 @@ internal sealed class FakeIdentityUsers : IIdentityUserRepository
             GivenName = user.GivenName,
             MiddleName = user.MiddleName,
             Surname = user.Surname,
-            CountryRegion = user.CountryRegion,
-            Club = user.Club,
-            FeiId = user.FeiId,
+            Profile = user.Profile,
             Roles = user.Roles,
             Passkeys = user
                 .Passkeys?.Select(x => new IdentityPasskeyDocument

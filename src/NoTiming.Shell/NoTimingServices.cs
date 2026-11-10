@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NC.Application.UdpHandshake;
 using NC.Server.Authentication.Interface;
+using NoTiming.Api.Application.Account;
+using NoTiming.Application.Contracts.Account;
 using NC.Server.Authentication;
 using NoTiming.Api;
 using NoTiming.Api.Application;
@@ -38,7 +40,8 @@ internal static class NoTimingServices
         services.ConfigureNoTimingApplication(configuration, Assembly.GetCallingAssembly());
         services.AddNoTiming(configuration);
         services.AddNoTimingApiApplication(configuration);
-        services.AddNoTimingAuthentication(configuration, NoTimingCommonServices.SupportedLanguages);
+        services.AddSingleton<IProfileValidator<NoTimingProfile>, NoTimingProfileValidator>();
+        services.AddNoTimingAuthentication<NoTimingProfile>(configuration, NoTimingCommonServices.SupportedLanguages);
 
         // The app sits behind the App Service front end, which appends the caller's address. Trust exactly one hop, so the
         // per-IP limit counts clients and cannot be spoofed by a client-supplied header.

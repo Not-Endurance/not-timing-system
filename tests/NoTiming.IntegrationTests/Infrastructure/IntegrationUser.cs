@@ -9,7 +9,7 @@ internal sealed record IntegrationUser
         string? givenName = null,
         string? middleName = null,
         string? surname = null,
-        string? countryRegion = null,
+        string? countryIsoCode = null,
         string? club = null,
         string? feiId = null,
         string? displayName = null
@@ -22,7 +22,7 @@ internal sealed record IntegrationUser
         GivenName = givenName;
         MiddleName = middleName;
         Surname = surname;
-        CountryRegion = countryRegion;
+        CountryIsoCode = countryIsoCode;
         Club = club;
         FeiId = feiId;
     }
@@ -34,7 +34,7 @@ internal sealed record IntegrationUser
     public string? GivenName { get; }
     public string? MiddleName { get; }
     public string? Surname { get; }
-    public string? CountryRegion { get; }
+    public string? CountryIsoCode { get; }
     public string? Club { get; }
     public string? FeiId { get; }
 }

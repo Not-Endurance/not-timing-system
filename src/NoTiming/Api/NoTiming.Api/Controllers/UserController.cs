@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NC.Server.Authentication.Interface;
+using NoTiming.Api.Application.Account;
 using NoTiming.Api.Application.Logging;
-using NoTiming.Api.Application.Mongo.Repositories;
 using NoTiming.Api.Application.Telemetry;
 using NoTiming.Api.Base;
+using NoTiming.Application.Contracts.Account;
 
 namespace NoTiming.Api.Controllers;
 
@@ -11,21 +13,19 @@ namespace NoTiming.Api.Controllers;
 /// The directory of users, which Judge searches. It answers only a signed-in person: an anonymous caller cannot query
 /// it. A person's own profile is read and changed through the session routes, not here.
 /// </summary>
+[Authorize(Policy = AuthenticationPolicies.SIGNED_IN)]
 public class UserController : ApiControllerBase
 {
-    readonly IUserRepository _users;
-    readonly IAuthentication _authentication;
+    readonly IUserDirectory<NoTimingProfile> _users;
 
     public UserController(
         IFunctionLogger<UserController> logger,
-        IUserRepository users,
-        IAuthentication authentication,
+        IUserDirectory<NoTimingProfile> users,
         ITelemetryService telemetry
     )
         : base(logger, telemetry)
     {
         _users = users;
-        _authentication = authentication;
     }
 
     [HttpGet("users")]
@@ -36,11 +36,12 @@ public class UserController : ApiControllerBase
         TagRequest(request);
         LogInformation(request, nameof(ReadMany));
 
-        if (await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted) is null)
+        if (User.GetSignedInUserId() is null)
         {
             return Unauthorized();
         }
 
-        return Ok(await _users.ReadMany() ?? []);
+        var users = await _users.ReadAll(HttpContext.RequestAborted);
+        return Ok(users.Select(UserModels.From).ToArray());
     }
 }

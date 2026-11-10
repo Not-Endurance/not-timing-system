@@ -35,17 +35,17 @@ internal sealed class MongoAccess
     }
 
     /// <summary>
-    /// A user row as it was before identity, with each profile field exactly as given (absent fields stay absent). Sign-in
-    /// adopts such a row when its address is proved, keeping its id and profile.
+    /// A user row as it was before identity, with its profile stored as the profile document. Sign-in adopts such a row when
+    /// its address is proved, keeping its id and profile.
     /// </summary>
-    public Task SeedLegacyUserAsync(
+    public Task SeedPreIdentityUserAsync(
         int id,
         string email,
         string? name,
         string? givenName,
         string? middleName,
         string? surname,
-        string? countryRegion,
+        string? countryIsoCode,
         string? club,
         string? feiId,
         string? displayName
@@ -59,10 +59,43 @@ internal sealed class MongoAccess
             { "GivenName", BsonValueOrNull(givenName) },
             { "MiddleName", BsonValueOrNull(middleName) },
             { "Surname", BsonValueOrNull(surname) },
+            { "DisplayName", BsonValueOrNull(displayName) },
+            {
+                "profile",
+                new BsonDocument
+                {
+                    { "club", BsonValueOrNull(club) },
+                    { "feiId", BsonValueOrNull(feiId) },
+                    { "countryIsoCode", BsonValueOrNull(countryIsoCode) },
+                }
+            },
+            { "Roles", new BsonArray() },
+            { "TenantId", "nts" },
+        };
+
+        return _database.GetCollection<BsonDocument>("users").InsertOneAsync(document);
+    }
+
+    /// <summary>A row written before the profile moved into its document: the profile fields sit at the top level.</summary>
+    public Task SeedLegacyFieldsUserAsync(
+        int id,
+        string email,
+        string? givenName,
+        string? surname,
+        string? countryRegion,
+        string? club,
+        string? feiId
+    )
+    {
+        var document = new BsonDocument
+        {
+            { "_id", id },
+            { "Email", email },
+            { "GivenName", BsonValueOrNull(givenName) },
+            { "Surname", BsonValueOrNull(surname) },
             { "CountryRegion", BsonValueOrNull(countryRegion) },
             { "Club", BsonValueOrNull(club) },
             { "FeiId", BsonValueOrNull(feiId) },
-            { "DisplayName", BsonValueOrNull(displayName) },
             { "Roles", new BsonArray() },
             { "TenantId", "nts" },
         };

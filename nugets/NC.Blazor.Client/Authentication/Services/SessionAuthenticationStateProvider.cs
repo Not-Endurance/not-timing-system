@@ -69,11 +69,8 @@ public sealed class SessionProfile
 
     public string? Surname { get; set; }
 
-    public string? CountryRegion { get; set; }
 
-    public string? Club { get; set; }
 
-    public string? FeiId { get; set; }
 
     public string[] Roles { get; set; } = [];
 

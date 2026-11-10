@@ -1,6 +1,8 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NC.Server.Authentication.Interface;
+using NoTiming.Application.Contracts.Account;
 using NC.Storage.Mongo;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Telemetry;
@@ -14,22 +16,20 @@ namespace NoTiming.Api.Controllers;
 /// A person's own event session. Every route needs a session, and a route that names or changes another person's
 /// session is refused, so the Ui reads and writes only what the person who is signed in owns.
 /// </summary>
+[Authorize(Policy = AuthenticationPolicies.SIGNED_IN)]
 public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel>
 {
     readonly INoTimingUserSessionRepository _sessions;
-    readonly IAuthentication _authentication;
 
     public UserSessionController(
         IFunctionLogger<UserSessionController> logger,
         INoTimingUserSessionRepository sessions,
         IMongoRepository<NoTimingUserSessionModel> mongoSessions,
-        IAuthentication authentication,
         ITelemetryService telemetry
     )
         : base(logger, mongoSessions, telemetry)
     {
         _sessions = sessions;
-        _authentication = authentication;
     }
 
     [HttpPost("user-sessions")]
@@ -40,7 +40,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Create));
 
-        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
+        var userId = User.GetSignedInUserId();
         if (userId is null)
         {
             return Unauthorized();
@@ -65,7 +65,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
-        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
+        var userId = User.GetSignedInUserId();
         if (userId is null)
         {
             return Unauthorized();
@@ -96,7 +96,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Delete));
 
-        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
+        var userId = User.GetSignedInUserId();
         if (userId is null)
         {
             return Unauthorized();
@@ -119,7 +119,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(DeleteForEvent));
 
-        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
+        var userId = User.GetSignedInUserId();
         if (userId is null)
         {
             return Unauthorized();
@@ -143,7 +143,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Read));
 
-        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
+        var userId = User.GetSignedInUserId();
         if (userId is null)
         {
             return Unauthorized();
@@ -166,7 +166,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(ReadByUserIdentifier));
 
-        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
+        var userId = User.GetSignedInUserId();
         if (userId is null)
         {
             return Unauthorized();
@@ -189,7 +189,7 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(ReadByUserIdentifierAndEvent));
 
-        var userId = await _authentication.SignedInUserId(HttpContext, HttpContext.RequestAborted);
+        var userId = User.GetSignedInUserId();
         if (userId is null)
         {
             return Unauthorized();

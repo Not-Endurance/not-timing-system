@@ -13,7 +13,7 @@
                 <NTextField @bind-Value="Email" For="() => Email" Label="@Email_string" Required />
                 <NTextField @bind-Value="GivenName" For="() => GivenName" Label="@First_name_string" Required />
                 <NTextField @bind-Value="Surname" For="() => Surname" Label="@Last_name_string" Required />
-                <NTextField @bind-Value="CountryRegion" For="() => CountryRegion" Label="@Country_code_string" Required />
+                <NTextField @bind-Value="CountryIsoCode" For="() => CountryIsoCode" Label="@Country_code_string" Required />
 
                 @* A field no person fills in: a bot does, and gets the normal answer and nothing else. *@
                 <input type="text" name="website" autocomplete="off" tabindex="-1" aria-hidden="true"

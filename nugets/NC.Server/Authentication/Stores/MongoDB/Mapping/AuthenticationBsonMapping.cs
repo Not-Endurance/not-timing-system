@@ -42,6 +42,7 @@ internal static class AuthenticationBsonMapping
             map.MapIdMember(x => x.Id);
             map.MapMember(x => x.ProvedAtUtc).SetSerializer(NullableUtc());
             map.MapMember(x => x.LockoutEndUtc).SetSerializer(NullableUtc());
+            map.MapMember(x => x.Profile).SetElementName("profile");
         });
 
         Map<SessionDocument>(map =>

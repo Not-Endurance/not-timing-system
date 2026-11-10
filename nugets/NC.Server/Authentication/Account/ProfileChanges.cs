@@ -1,6 +1,8 @@
 namespace NC.Server.Authentication.Account;
 
-public sealed class ProfileChanges
+/// <summary>A change to the signed-in user's profile. The module requires the two names; the app checks the rest of the profile.</summary>
+public sealed class ProfileChanges<TProfile>
+    where TProfile : class, new()
 {
     public string GivenName { get; init; } = string.Empty;
 
@@ -8,9 +10,5 @@ public sealed class ProfileChanges
 
     public string Surname { get; init; } = string.Empty;
 
-    public string CountryRegion { get; init; } = string.Empty;
-
-    public string? Club { get; init; }
-
-    public string? FeiId { get; init; }
+    public TProfile Profile { get; init; } = new();
 }

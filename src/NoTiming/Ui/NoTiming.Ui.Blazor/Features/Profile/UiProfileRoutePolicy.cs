@@ -1,14 +1,17 @@
 using NC.Application.Authentication.User;
 using NC.Blazor.Client.Authentication;
+using NoTiming.Application.Contracts.Account;
 using NoTiming.Ui.Contracts.Features.Profile;
 
 namespace NoTiming.Ui.Blazor.Features.Profile;
 
 public static class UiProfileRoutePolicy
 {
-    public static bool ShouldRedirectToProfile(NUserModel? user, string relativePath)
+    public static bool ShouldRedirectToProfile(NUserModel? user, NoTimingProfile? profile, string relativePath)
     {
-        return user != null && !UiProfilePolicy.IsComplete(user) && !IsProfileGateBypassRoute(relativePath);
+        return user != null
+            && !UiProfilePolicy.IsComplete(user, profile)
+            && !IsProfileGateBypassRoute(relativePath);
     }
 
     public static bool IsProfileGateBypassRoute(string relativePath)

@@ -66,7 +66,7 @@ public sealed class NoTimingIntegrationFixture : IAsyncLifetime
             user.Email,
             givenName: user.GivenName ?? "Integration",
             surname: user.Surname ?? "Witness",
-            country: user.CountryRegion is { Length: 2 } code ? code : "BG"
+            country: user.CountryIsoCode is { Length: 2 } code ? code : "BG"
         );
     }
 }

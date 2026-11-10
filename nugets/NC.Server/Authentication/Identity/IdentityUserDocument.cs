@@ -1,9 +1,11 @@
+using MongoDB.Bson;
+
 namespace NC.Server.Authentication.Identity;
 
 /// <summary>
-/// The identity fields of a row in the <c>users</c> collection. Identity extends the existing user documents in place:
-/// the repository writes only the fields below, by name, so the application's own fields (names, club, roles, event
-/// roles that reference the integer <see cref="Id"/>) are neither read into writes nor lost. Unknown fields are ignored.
+/// The identity fields of a row in the <c>users</c> collection, and the app's profile, which the module stores whole. The
+/// repository writes only the fields below, by name, so the application's own fields (names, roles, event roles that
+/// reference the integer <see cref="Id"/>) are neither read into writes nor lost. Unknown fields are ignored.
 /// </summary>
 internal sealed class IdentityUserDocument
 {
@@ -45,11 +47,8 @@ internal sealed class IdentityUserDocument
 
     public string? Surname { get; set; }
 
-    public string? CountryRegion { get; set; }
-
-    public string? Club { get; set; }
-
-    public string? FeiId { get; set; }
+    /// <summary>The app's profile. The module does not know its fields; read it through <c>ProfileDocument</c>.</summary>
+    public BsonDocument? Profile { get; set; }
 
     public string[] Roles { get; set; } = [];
 

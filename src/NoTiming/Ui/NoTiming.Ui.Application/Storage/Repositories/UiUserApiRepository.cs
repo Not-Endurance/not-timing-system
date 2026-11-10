@@ -5,12 +5,14 @@ using NC.Application.HTTP;
 using NC.Notify;
 using NC.Serialization.JSON;
 using NC.Structures;
+using NoTiming.Application.Contracts.Account;
 using NoTiming.Ui.Application.Features.Profile;
 using NoTiming.Ui.Contracts.API;
+using NoTiming.Ui.Contracts.Features.Profile;
 
 namespace NoTiming.Ui.Application.Storage.Repositories;
 
-/// <summary>The signed-in person's own profile, read and changed through the session. There is no lookup by address.</summary>
+/// <summary>The profile of the signed-in person, read and changed through the session. There is no lookup by address.</summary>
 public class UiUserApiRepository : IUserRegister, IUiUserProfileRepository
 {
     const string PROFILE_ENDPOINT = "me/profile";
@@ -52,26 +54,55 @@ public class UiUserApiRepository : IUserRegister, IUiUserProfileRepository
         }
     }
 
-    public async Task<Result<NUserModel>> UpdateProfile(string email, UpdateUserProfilePayload payload)
+    public async Task<Result<UiSignedInProfile>> Read(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
         {
-            return Result.Cancel<NUserModel>();
+            return Result.Cancel<UiSignedInProfile>();
+        }
+
+        try
+        {
+            var json = (await _client.GetJson(PROFILE_ENDPOINT)).Data!;
+            var profile = json.FromJson<SignedInProfile>();
+            if (!string.Equals(profile.Email, email, StringComparison.OrdinalIgnoreCase))
+            {
+                return Result.Failure<UiSignedInProfile>("The signed-in profile belongs to another address.");
+            }
+
+            return Result.Success(new UiSignedInProfile(profile.ToModel(), profile.Profile ?? new NoTimingProfile()));
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            return Result.Failure<UiSignedInProfile>("The session has ended.");
+        }
+        catch (Exception ex)
+        {
+            NotificationHelper.Current?.Error(ex);
+            return Result.Failure<UiSignedInProfile>(ex.Message);
+        }
+    }
+
+    public async Task<Result<UiSignedInProfile>> UpdateProfile(string email, UpdateUserProfilePayload payload)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return Result.Cancel<UiSignedInProfile>();
         }
 
         try
         {
             await _client.PatchJson(PROFILE_UPDATE_ENDPOINT, payload.ToJson());
-            return await Get(email);
+            return await Read(email);
         }
         catch (Exception ex)
         {
             NotificationHelper.Current?.Error(ex);
-            return Result.Failure<NUserModel>(ex.Message);
+            return Result.Failure<UiSignedInProfile>(ex.Message);
         }
     }
 
-    /// <summary>The identity the server returns from the profile route.</summary>
+    /// <summary>The identity and profile the server returns from the profile route.</summary>
     sealed class SignedInProfile
     {
         public int Id { get; set; }
@@ -86,13 +117,9 @@ public class UiUserApiRepository : IUserRegister, IUiUserProfileRepository
 
         public string? Surname { get; set; }
 
-        public string? CountryRegion { get; set; }
-
-        public string? Club { get; set; }
-
-        public string? FeiId { get; set; }
-
         public string[] Roles { get; set; } = [];
+
+        public NoTimingProfile? Profile { get; set; }
 
         public NUserModel ToModel()
         {
@@ -102,9 +129,6 @@ public class UiUserApiRepository : IUserRegister, IUiUserProfileRepository
                 GivenName = GivenName,
                 MiddleName = MiddleName,
                 Surname = Surname,
-                CountryRegion = CountryRegion,
-                Club = Club,
-                FeiId = FeiId,
             };
         }
     }

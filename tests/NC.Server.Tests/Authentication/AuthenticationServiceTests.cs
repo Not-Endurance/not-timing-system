@@ -139,7 +139,7 @@ public sealed class AuthenticationServiceTests
         Assert.Equal(SessionToken.HashOf("session-token"), Assert.Single(sessions.Removed));
     }
 
-    static AuthenticationService CreateService(
+    static AuthenticationService<TestProfile> CreateService(
         FakeIdentityUsers users,
         FakeSessionRepository sessions,
         FakePasskeyCeremony? ceremony = null,
@@ -171,7 +171,7 @@ public sealed class AuthenticationServiceTests
             NullLogger<AccountSignInService>.Instance
         );
         var completion = new SignInCompletion(sessions, settings, time, NullLogger<SignInCompletion>.Instance);
-        return new AuthenticationService(
+        return new AuthenticationService<TestProfile>(
             passkeys,
             signIn,
             new AccountService(users, sessions),

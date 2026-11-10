@@ -1,3 +1,4 @@
+using NoTiming.Application.Contracts.Account;
 using Microsoft.AspNetCore.Components;
 using NC.Blazor.Client.Authentication.Services;
 using NC.Blazor.Components.Abstractions;
@@ -22,7 +23,7 @@ public class RegisterContentBehind : NComponent
 
     protected string Surname { get; set; } = string.Empty;
 
-    protected string CountryRegion { get; set; } = string.Empty;
+    protected string CountryIsoCode { get; set; } = string.Empty;
 
     protected string Website { get; set; } = string.Empty;
 
@@ -43,7 +44,7 @@ public class RegisterContentBehind : NComponent
                     Email = Email,
                     GivenName = GivenName,
                     Surname = Surname,
-                    CountryRegion = CountryRegion,
+                    Profile = new NoTimingProfile { CountryIsoCode = CountryIsoCode },
                     Website = Website,
                 }
             );

@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using NC.Server.Authentication.Adoption;
 using NC.Server.Authentication.Codes;
@@ -80,7 +81,9 @@ internal sealed class AccountSignInService
 
     public async Task<CodeRequestOutcome> RequestRegistrationCode(
         string email,
-        RegistrationDetails details,
+        string givenName,
+        string surname,
+        BsonDocument? profile,
         string language,
         string clientAddress,
         CancellationToken cancellationToken
@@ -97,9 +100,9 @@ internal sealed class AccountSignInService
         var code = OneTimeCodes.Generate();
         var registration = new RegistrationDetailsDocument
         {
-            GivenName = details.GivenName.Trim(),
-            Surname = details.Surname.Trim(),
-            CountryRegion = details.CountryRegion.Trim(),
+            GivenName = givenName.Trim(),
+            Surname = surname.Trim(),
+            Profile = profile,
         };
         await StoreChallenge(address, CodeChallengePurpose.REGISTER, registration, code, now, cancellationToken);
         await _gate.Record(address, clientAddress, now, cancellationToken);
@@ -185,7 +188,7 @@ internal sealed class AccountSignInService
                     address,
                     details.GivenName,
                     details.Surname,
-                    details.CountryRegion,
+                    details.Profile,
                     now,
                     cancellationToken
                 );

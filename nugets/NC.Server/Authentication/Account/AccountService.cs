@@ -1,3 +1,4 @@
+using MongoDB.Bson;
 using NC.Server.Authentication.Identity;
 using NC.Server.Authentication.Sessions;
 
@@ -20,26 +21,27 @@ internal sealed class AccountService
         return _users.FindByUserId(userId, cancellationToken);
     }
 
-    /// <summary>Returns false when the required details are missing: the country and both names.</summary>
-    public async Task<bool> UpdateProfile(int userId, ProfileChanges changes, CancellationToken cancellationToken)
+    /// <summary>Returns false when the required details are missing: both names. The profile is the app's to check.</summary>
+    public async Task<bool> UpdateProfile(
+        int userId,
+        string givenName,
+        string? middleName,
+        string surname,
+        BsonDocument profile,
+        CancellationToken cancellationToken
+    )
     {
-        if (
-            string.IsNullOrWhiteSpace(changes.CountryRegion)
-            || string.IsNullOrWhiteSpace(changes.GivenName)
-            || string.IsNullOrWhiteSpace(changes.Surname)
-        )
+        if (string.IsNullOrWhiteSpace(givenName) || string.IsNullOrWhiteSpace(surname))
         {
             return false;
         }
 
         await _users.UpdateProfile(
             userId,
-            changes.GivenName.Trim(),
-            changes.MiddleName?.Trim(),
-            changes.Surname.Trim(),
-            changes.CountryRegion.Trim(),
-            changes.Club?.Trim(),
-            changes.FeiId?.Trim(),
+            givenName.Trim(),
+            middleName?.Trim(),
+            surname.Trim(),
+            profile,
             cancellationToken
         );
         return true;
