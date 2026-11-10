@@ -133,19 +133,39 @@ internal sealed class FakeIdentityUsers : IIdentityUserRepository
         return Task.FromResult(passkeys);
     }
 
-    public Task<bool> RemovePasskeyWhileAnotherRemains(
+    public Task<bool> RemovePasskeyKeepingAtLeast(
         int userId,
         byte[] credentialId,
+        int minimumRemaining,
         CancellationToken cancellationToken = default
     )
     {
-        var user = _stored[userId];
-        if (user.Passkeys is not { Count: > 1 })
+        var passkeys = _stored[userId].Passkeys ?? [];
+        var index = passkeys.FindIndex(x => x.CredentialId.AsSpan().SequenceEqual(credentialId));
+        if (index < 0 || passkeys.Count - 1 < minimumRemaining)
         {
             return Task.FromResult(false);
         }
 
-        return Task.FromResult(user.Passkeys.RemoveAll(x => x.CredentialId.AsSpan().SequenceEqual(credentialId)) > 0);
+        passkeys.RemoveAt(index);
+        return Task.FromResult(true);
+    }
+
+    public Task<bool> RenamePasskey(
+        int userId,
+        byte[] credentialId,
+        string name,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var passkey = _stored[userId].Passkeys?.Find(x => x.CredentialId.AsSpan().SequenceEqual(credentialId));
+        if (passkey is null)
+        {
+            return Task.FromResult(false);
+        }
+
+        passkey.Name = name;
+        return Task.FromResult(true);
     }
 
     static IdentityUserDocument Copy(IdentityUserDocument user)

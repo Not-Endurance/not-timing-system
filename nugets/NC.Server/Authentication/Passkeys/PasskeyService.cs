@@ -13,6 +13,9 @@ namespace NC.Server.Authentication.Passkeys;
 /// </summary>
 internal sealed class PasskeyService : IPasskeyManagement
 {
+    /// <summary>A user keeps at least one passkey, so the last one is never removed.</summary>
+    const int MinimumPasskeys = 1;
+
     readonly IPasskeyCeremony _ceremony;
     readonly IIdentityUserRepository _users;
     readonly EmailDispatchQueue _mail;
@@ -190,51 +193,25 @@ internal sealed class PasskeyService : IPasskeyManagement
         CancellationToken cancellationToken
     )
     {
-        var found = false;
-        var result = await _users.Change(
-            userId,
-            changed =>
-            {
-                var passkey = changed.Passkeys?.Find(x => x.CredentialId.AsSpan().SequenceEqual(credentialId));
-                if (passkey is null)
-                {
-                    return Task.FromResult(Microsoft.AspNetCore.Identity.IdentityResult.Failed());
-                }
-
-                found = true;
-                passkey.Name = name.Trim();
-                return _users.UpdateAsync(changed, cancellationToken);
-            },
-            cancellationToken
-        );
-
-        if (!found)
-        {
-            return new PasskeyOutcome { Kind = PasskeyOutcomeKind.NotFound };
-        }
-
-        return result.Succeeded
-            ? new PasskeyOutcome { Kind = PasskeyOutcomeKind.Done, Name = name.Trim() }
-            : new PasskeyOutcome { Kind = PasskeyOutcomeKind.Refused };
+        var trimmed = name.Trim();
+        var renamed = await _users.RenamePasskey(userId, credentialId, trimmed, cancellationToken);
+        return renamed
+            ? new PasskeyOutcome { Kind = PasskeyOutcomeKind.Done, Name = trimmed }
+            : new PasskeyOutcome { Kind = PasskeyOutcomeKind.NotFound };
     }
 
-    /// <summary>Removes a passkey, but never the user's last one.</summary>
+    /// <summary>Removes a passkey, but never the user's last one. The repository keeps that minimum in the same update.</summary>
     public async Task<PasskeyOutcome> Remove(int userId, byte[] credentialId, CancellationToken cancellationToken)
     {
+        if (await _users.RemovePasskeyKeepingAtLeast(userId, credentialId, MinimumPasskeys, cancellationToken))
+        {
+            return new PasskeyOutcome { Kind = PasskeyOutcomeKind.Done };
+        }
+
+        // Refused either because the passkey is not the user's or because it is their last. Reading again tells them apart.
         var user = await _users.FindByUserId(userId, cancellationToken);
-        var passkeys = user?.Passkeys ?? [];
-        if (!passkeys.Any(x => x.CredentialId.AsSpan().SequenceEqual(credentialId)))
-        {
-            return new PasskeyOutcome { Kind = PasskeyOutcomeKind.NotFound };
-        }
-
-        if (!PasskeyRemovalRules.CanRemove(passkeys.Count))
-        {
-            return new PasskeyOutcome { Kind = PasskeyOutcomeKind.LastPasskey };
-        }
-
-        var removed = await _users.RemovePasskeyWhileAnotherRemains(userId, credentialId, cancellationToken);
-        return new PasskeyOutcome { Kind = removed ? PasskeyOutcomeKind.Done : PasskeyOutcomeKind.LastPasskey };
+        var stillHeld = user?.Passkeys?.Any(x => x.CredentialId.AsSpan().SequenceEqual(credentialId)) ?? false;
+        return new PasskeyOutcome { Kind = stillHeld ? PasskeyOutcomeKind.LastPasskey : PasskeyOutcomeKind.NotFound };
     }
 
     /// <summary>An answer that cannot be checked is refused the same way whatever the reason. Cancellation is not.</summary>

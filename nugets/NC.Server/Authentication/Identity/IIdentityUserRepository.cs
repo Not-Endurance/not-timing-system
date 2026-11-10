@@ -48,9 +48,22 @@ internal interface IIdentityUserRepository
 
     Task<IList<UserPasskeyInfo>> GetPasskeysAsync(IdentityUserDocument user, CancellationToken cancellationToken);
 
-    Task<bool> RemovePasskeyWhileAnotherRemains(
+    /// <summary>
+    /// Removes one passkey only while at least <paramref name="minimumRemaining"/> would remain. False when it did not
+    /// remove the passkey, whether because it is not the user's or because the minimum would be broken.
+    /// </summary>
+    Task<bool> RemovePasskeyKeepingAtLeast(
         int userId,
         byte[] credentialId,
+        int minimumRemaining,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>Renames one of the user's passkeys. False when the user has no passkey with that id.</summary>
+    Task<bool> RenamePasskey(
+        int userId,
+        byte[] credentialId,
+        string name,
         CancellationToken cancellationToken = default
     );
 }

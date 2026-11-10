@@ -93,6 +93,43 @@ public sealed class PasskeyServiceTests : IDisposable
         Assert.Equal(other, remaining.CredentialId);
     }
 
+    [Fact]
+    public async Task Remove_WhenTheUserHasNoSuchPasskey_ShouldAnswerNotFound()
+    {
+        var users = new FakeIdentityUsers(UserWithPasskeys(7, Credential, new byte[] { 9, 9 }));
+        var service = CreateService(users);
+
+        var outcome = await service.Remove(7, new byte[] { 0, 0 }, CancellationToken.None);
+
+        Assert.Equal(PasskeyOutcomeKind.NotFound, outcome.Kind);
+        Assert.Equal(2, users.Stored(7).Passkeys!.Count);
+    }
+
+    [Fact]
+    public async Task Rename_WhenThePasskeyExists_ShouldRenameIt()
+    {
+        var users = new FakeIdentityUsers(UserWithPasskeys(7, Credential));
+        var service = CreateService(users);
+
+        var outcome = await service.Rename(7, Credential, "  Work phone  ", CancellationToken.None);
+
+        Assert.Equal(PasskeyOutcomeKind.Done, outcome.Kind);
+        Assert.Equal("Work phone", outcome.Name);
+        Assert.Equal("Work phone", Assert.Single(users.Stored(7).Passkeys!).Name);
+    }
+
+    [Fact]
+    public async Task Rename_WhenTheUserHasNoSuchPasskey_ShouldAnswerNotFound()
+    {
+        var users = new FakeIdentityUsers(UserWithPasskeys(7, Credential));
+        var service = CreateService(users);
+
+        var outcome = await service.Rename(7, new byte[] { 0, 0 }, "Work phone", CancellationToken.None);
+
+        Assert.Equal(PasskeyOutcomeKind.NotFound, outcome.Kind);
+        Assert.Equal("Phone", Assert.Single(users.Stored(7).Passkeys!).Name);
+    }
+
     static PasskeyService CreateService(FakeIdentityUsers users, UserPasskeyInfo? attestation = null)
     {
         var ceremony = new FakePasskeyCeremony { Attestation = attestation };

@@ -366,26 +366,57 @@ internal sealed class IdentityUserRepository
     }
 
     /// <summary>
-    /// Removes one passkey as a single update, and only while another passkey remains. The condition is part of the
-    /// update, so two removals at once cannot leave a user with none.
+    /// Removes one passkey as a single update, and only while at least <paramref name="minimumRemaining"/> would remain.
+    /// The condition is part of the update, so two removals at once cannot take a user below the minimum. The stamp
+    /// moves, so a change based on the array from before the removal starts again instead of putting the passkey back.
     /// </summary>
-    public async Task<bool> RemovePasskeyWhileAnotherRemains(
+    public async Task<bool> RemovePasskeyKeepingAtLeast(
         int userId,
         byte[] credentialId,
+        int minimumRemaining,
+        CancellationToken cancellationToken = default
+    )
+    {
+        // "Passkeys.n" exists only when there are more than n passkeys, so it holds exactly when removing one would
+        // leave at least n.
+        var result = await _users.UpdateOneAsync(
+            Builders<IdentityUserDocument>.Filter.And(
+                Builders<IdentityUserDocument>.Filter.Eq(x => x.Id, userId),
+                Builders<IdentityUserDocument>.Filter.ElemMatch(x => x.Passkeys, x => x.CredentialId == credentialId),
+                Builders<IdentityUserDocument>.Filter.Exists($"Passkeys.{minimumRemaining}")
+            ),
+            Builders<IdentityUserDocument>.Update
+                .PullFilter(x => x.Passkeys, x => x.CredentialId == credentialId)
+                .Set(x => x.ConcurrencyStamp, NewStamp()),
+            cancellationToken: cancellationToken
+        );
+
+        return result.MatchedCount == 1;
+    }
+
+    /// <summary>
+    /// Renames one passkey in place, as a positional update of that element, so it cannot overwrite another passkey
+    /// changed at the same time. The stamp moves, so a change based on the earlier name starts again.
+    /// </summary>
+    public async Task<bool> RenamePasskey(
+        int userId,
+        byte[] credentialId,
+        string name,
         CancellationToken cancellationToken = default
     )
     {
         var result = await _users.UpdateOneAsync(
             Builders<IdentityUserDocument>.Filter.And(
                 Builders<IdentityUserDocument>.Filter.Eq(x => x.Id, userId),
-                Builders<IdentityUserDocument>.Filter.ElemMatch(x => x.Passkeys, x => x.CredentialId == credentialId),
-                Builders<IdentityUserDocument>.Filter.Exists("Passkeys.1")
+                Builders<IdentityUserDocument>.Filter.ElemMatch(x => x.Passkeys, x => x.CredentialId == credentialId)
             ),
-            Builders<IdentityUserDocument>.Update.PullFilter(x => x.Passkeys, x => x.CredentialId == credentialId),
+            Builders<IdentityUserDocument>.Update
+                .Set("Passkeys.$.Name", name)
+                .Set(x => x.ConcurrencyStamp, NewStamp()),
             cancellationToken: cancellationToken
         );
 
-        return result.ModifiedCount == 1;
+        return result.MatchedCount == 1;
     }
 
     /// <summary>Every row with the address, case-insensitively, up to two. Two is enough to tell a duplicate apart.</summary>
