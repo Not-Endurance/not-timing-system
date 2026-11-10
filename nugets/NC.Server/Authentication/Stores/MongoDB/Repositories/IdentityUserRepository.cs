@@ -385,8 +385,8 @@ internal sealed class IdentityUserRepository
                 Builders<IdentityUserDocument>.Filter.ElemMatch(x => x.Passkeys, x => x.CredentialId == credentialId),
                 Builders<IdentityUserDocument>.Filter.Exists($"Passkeys.{minimumRemaining}")
             ),
-            Builders<IdentityUserDocument>.Update
-                .PullFilter(x => x.Passkeys, x => x.CredentialId == credentialId)
+            Builders<IdentityUserDocument>
+                .Update.PullFilter(x => x.Passkeys, x => x.CredentialId == credentialId)
                 .Set(x => x.ConcurrencyStamp, NewStamp()),
             cancellationToken: cancellationToken
         );
@@ -410,9 +410,7 @@ internal sealed class IdentityUserRepository
                 Builders<IdentityUserDocument>.Filter.Eq(x => x.Id, userId),
                 Builders<IdentityUserDocument>.Filter.ElemMatch(x => x.Passkeys, x => x.CredentialId == credentialId)
             ),
-            Builders<IdentityUserDocument>.Update
-                .Set("Passkeys.$.Name", name)
-                .Set(x => x.ConcurrencyStamp, NewStamp()),
+            Builders<IdentityUserDocument>.Update.Set("Passkeys.$.Name", name).Set(x => x.ConcurrencyStamp, NewStamp()),
             cancellationToken: cancellationToken
         );
 
