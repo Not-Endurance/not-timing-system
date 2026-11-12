@@ -20,7 +20,6 @@ using NC.Server.Authentication.Settings;
 using NC.Server.Authentication.SignIn;
 using NC.Server.Authentication.Stores.MongoDB.Indexes;
 using NC.Server.Authentication.Stores.MongoDB.Mapping;
-using NC.Server.Authentication.Stores.MongoDB.Migration;
 using NC.Server.Authentication.Stores.MongoDB.Repositories;
 
 namespace NC.Server.Authentication.Interface;
@@ -58,7 +57,6 @@ public static class AuthenticationServices
         services.AddIdentityCore<IdentityUserDocument>().AddUserStore<IdentityUserRepository>().AddSignInManager();
         services.AddHttpContextAccessor();
         services.AddHostedService<AuthenticationIndexes>();
-        services.AddHostedService<UserProfileMigration>();
 
         // The passkey handler's options: one relying party, discoverable keys, user verification, and no attestation.
         services

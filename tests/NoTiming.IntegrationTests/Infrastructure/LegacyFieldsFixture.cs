@@ -4,8 +4,8 @@ using Testcontainers.MongoDb;
 namespace NoTiming.IntegrationTests.Infrastructure;
 
 /// <summary>
-/// Starts Mongo, writes a row with the legacy top-level profile fields, and only then starts the host, so the host's startup
-/// migration is the step that moves those fields into the profile.
+/// Starts Mongo and writes a row with the legacy top-level profile fields. It then runs the migrate-mongo migration, as CD
+/// does, and only then starts the host, so the host reads the migrated profile.
 /// </summary>
 public sealed class LegacyFieldsFixture : IAsyncLifetime
 {
@@ -37,6 +37,7 @@ public sealed class LegacyFieldsFixture : IAsyncLifetime
             "Konarche",
             "20202020"
         );
+        await MigrateMongo.UpAsync(paths, MongoConnectionString);
 
         _noTiming = new NoTimingProcess(paths, PortAllocator.GetFreeTcpPort(), MongoConnectionString);
         await _noTiming.Start();
