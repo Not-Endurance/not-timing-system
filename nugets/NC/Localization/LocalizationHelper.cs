@@ -51,6 +51,9 @@ public static class LocalizationHelper
 
     static IStringLocalizer? _localizer;
 
+    /// <summary>True once a localizer is configured. Until then <see cref="LocalizeString"/> returns the key itself.</summary>
+    public static bool IsConfigured => _localizer != null;
+
     static string Localize(string resource)
     {
         return _localizer != null ? _localizer[resource] : resource;

@@ -4,7 +4,7 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using NoTiming.Ui.Blazor.Layout
 @using NoTiming.Ui.Blazor.Features.Profile
-@using NC.Blazor.Client.Authentication.Components
+@using NoTiming.Ui.Blazor.Features.Authentication
 
 @inherits UiBlazorRootBehind
 
@@ -18,7 +18,7 @@
                     <ProfileRouteGate RouteData="@routeData">
                         <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                             <NotAuthorized>
-                                <AuthenticateContent />
+                                <SignInRedirect />
                             </NotAuthorized>
                         </AuthorizeRouteView>
                     </ProfileRouteGate>

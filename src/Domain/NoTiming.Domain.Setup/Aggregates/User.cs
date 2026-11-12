@@ -10,7 +10,7 @@ public class User : Aggregate
         string? givenName = null,
         string? middleName = null,
         string? surname = null,
-        string? countryRegion = null,
+        string? countryIsoCode = null,
         string? club = null,
         string? feiId = null,
         string? displayName = null
@@ -23,7 +23,7 @@ public class User : Aggregate
         Surname = Normalize(surname);
         Name = BuildName(GivenName, MiddleName, Surname) ?? Normalize(name) ?? Email;
         DisplayName = Normalize(displayName);
-        CountryRegion = Normalize(countryRegion);
+        CountryIsoCode = Normalize(countryIsoCode);
         Club = Normalize(club);
         FeiId = Normalize(feiId);
         Roles =
@@ -40,7 +40,7 @@ public class User : Aggregate
     public string? GivenName { get; }
     public string? MiddleName { get; }
     public string? Surname { get; }
-    public string? CountryRegion { get; }
+    public string? CountryIsoCode { get; }
     public string? Club { get; }
     public string? FeiId { get; }
     public IReadOnlyList<string> Roles { get; }

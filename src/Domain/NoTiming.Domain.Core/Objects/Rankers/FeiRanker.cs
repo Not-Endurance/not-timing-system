@@ -7,7 +7,13 @@ internal class FeiRanker : Ranker
     public override List<ParticipationResult> Rank(IEnumerable<ParticipationResult> entries)
     {
         return OrderByNotEliminatedAndRanked(entries)
-            .ThenBy(x => x.Participation.Phases.LastOrDefault(x => x.ArriveTime != null)?.ArriveTime)
+            .ThenBy(x => LastArriveTime(x) == null)
+            .ThenBy(x => LastArriveTime(x))
             .ToList();
+    }
+
+    static DateTimeOffset? LastArriveTime(ParticipationResult entry)
+    {
+        return entry.Participation.Phases.LastOrDefault(x => x.ArriveTime != null)?.ArriveTime;
     }
 }

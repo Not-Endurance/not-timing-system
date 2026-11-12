@@ -1,10 +1,11 @@
 using MudBlazor;
-using NC.Application.Authentication.Abstractions;
+using NC.Blazor.Client.Authentication.Services;
 using NC.Blazor.Components.Abstractions;
 using NoTiming.Application.Contracts.Socket;
 using NoTiming.Blazor.Components.SelectEvents;
 using NoTiming.Ui.Blazor.Features;
 using NoTiming.Ui.Contracts.Features.Access;
+using NoTiming.Ui.Contracts.Features.Account;
 using NoTiming.Ui.Contracts.Features.Profile;
 
 namespace NoTiming.Ui.Blazor.Layout.Drawer;
@@ -15,7 +16,10 @@ public class NavMenuBehind : NStatefulComponent
     IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    INAuthentication Authentication { get; set; } = default!;
+    IUiAccountService Account { get; set; } = default!;
+
+    [Inject]
+    SessionAuthenticationStateProvider Session { get; set; } = default!;
 
     [Inject]
     IUiAccessContext AccessState { get; set; } = default!;
@@ -46,7 +50,8 @@ public class NavMenuBehind : NStatefulComponent
     {
         try
         {
-            await Authentication.Signout();
+            await Account.SignOutAsync();
+            Session.Refresh();
             await SocketService.Disconnect();
             await CloseResponsiveDrawerSafe();
         }

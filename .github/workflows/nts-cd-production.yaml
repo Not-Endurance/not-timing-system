@@ -6,6 +6,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: cd-production
+  cancel-in-progress: false
+
 env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 10.0.x
@@ -19,8 +23,34 @@ jobs:
   unit-tests:
     uses: ./.github/workflows/nts-unit-tests.yaml
 
-  deploy-message-bus:
+  migrate-mongo:
     needs: unit-tests
+    runs-on: ubuntu-latest
+    name: Production - Mongo migrations
+    environment: production
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+        cache-dependency-path: database/package-lock.json
+
+    - name: Install migration tooling
+      working-directory: database
+      run: npm ci
+
+    - name: Apply pending migrations
+      working-directory: database
+      env:
+        MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+      run: npm run migrate:up
+
+  deploy-message-bus:
+    needs: [unit-tests, migrate-mongo]
     runs-on: ubuntu-latest
     name: Production - MessageBus
     steps:

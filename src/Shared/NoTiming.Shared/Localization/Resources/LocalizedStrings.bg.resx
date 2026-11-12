@@ -1053,4 +1053,109 @@
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
   </data>
+  <data name="Code_not_right_or_expired_string" xml:space="preserve">
+    <value>Кодът не е верен или е изтекъл. Поискайте нов.</value>
+  </data>
+  <data name="Too_many_codes_requested_string" xml:space="preserve">
+    <value>Заявени са твърде много кодове. Опитайте отново по-късно.</value>
+  </data>
+  <data name="Request_could_not_be_checked_string" xml:space="preserve">
+    <value>Заявката не можа да бъде проверена. Презаредете страницата и опитайте отново.</value>
+  </data>
+  <data name="Sign_in_string" xml:space="preserve">
+    <value>Вход</value>
+  </data>
+  <data name="Sign_in_with_passkey_string" xml:space="preserve">
+    <value>Вход с ключ за достъп</value>
+  </data>
+  <data name="Or_sign_in_with_code_string" xml:space="preserve">
+    <value>Или влезте с код, изпратен на имейла ви.</value>
+  </data>
+  <data name="Email_string" xml:space="preserve">
+    <value>Имейл</value>
+  </data>
+  <data name="Send_me_a_code_string" xml:space="preserve">
+    <value>Изпратете ми код</value>
+  </data>
+  <data name="Create_an_account_string" xml:space="preserve">
+    <value>Създаване на акаунт</value>
+  </data>
+  <data name="Enter_six_digit_code_string" xml:space="preserve">
+    <value>Въведете шестцифрения код, който изпратихме на имейла ви.</value>
+  </data>
+  <data name="Code_string" xml:space="preserve">
+    <value>Код</value>
+  </data>
+  <data name="Browser_cannot_use_passkeys_sign_in_with_code_string" xml:space="preserve">
+    <value>Този браузър не може да използва ключове за достъп. Влезте с код.</value>
+  </data>
+  <data name="Passkey_not_used_string" xml:space="preserve">
+    <value>Ключът за достъп не беше използван. Опитайте отново или влезте с код.</value>
+  </data>
+  <data name="Passkey_not_accepted_string" xml:space="preserve">
+    <value>Този ключ за достъп не беше приет. Влезте с код.</value>
+  </data>
+  <data name="Create_account_string" xml:space="preserve">
+    <value>Създай акаунт</value>
+  </data>
+  <data name="Country_code_string" xml:space="preserve">
+    <value>Код на държава</value>
+  </data>
+  <data name="Privacy_email_use_string" xml:space="preserve">
+    <value>Имейла ви използваме само за вход в профила и за изпращане на известия за събития.</value>
+  </data>
+  <data name="I_already_have_an_account_string" xml:space="preserve">
+    <value>Вече имам акаунт</value>
+  </data>
+  <data name="Passkeys_string" xml:space="preserve">
+    <value>Ключове за достъп</value>
+  </data>
+  <data name="Sign_in_to_manage_passkeys_string" xml:space="preserve">
+    <value>Влезте, за да управлявате ключовете си за достъп.</value>
+  </data>
+  <data name="Passkey_explanation_string" xml:space="preserve">
+    <value>Ключът за достъп ви позволява да влизате с биометричната проверка на това устройство. Добавете по един за всяко устройство, което ползвате.</value>
+  </data>
+  <data name="Rename_string" xml:space="preserve">
+    <value>Преименувай</value>
+  </data>
+  <data name="Remove_string" xml:space="preserve">
+    <value>Премахни</value>
+  </data>
+  <data name="Added_on_string" xml:space="preserve">
+    <value>добавен на {0}</value>
+  </data>
+  <data name="Name_for_new_passkey_string" xml:space="preserve">
+    <value>Име за нов ключ за достъп</value>
+  </data>
+  <data name="Add_passkey_to_device_string" xml:space="preserve">
+    <value>Добавете ключ за достъп към това устройство</value>
+  </data>
+  <data name="Browser_cannot_use_passkeys_string" xml:space="preserve">
+    <value>Този браузър не може да използва ключове за достъп.</value>
+  </data>
+  <data name="Passkey_not_added_string" xml:space="preserve">
+    <value>Ключът за достъп не беше добавен. Опитайте отново.</value>
+  </data>
+  <data name="Last_passkey_string" xml:space="preserve">
+    <value>Това е последният ви ключ за достъп. Добавете друг, преди да премахнете този.</value>
+  </data>
+  <data name="Your_sign_in_code_string" xml:space="preserve">
+    <value>Вашият код за вход</value>
+  </data>
+  <data name="Your_sign_in_code_is_0_string" xml:space="preserve">
+    <value>Вашият код за вход е '{0}'. Важи 10 минути и може да се използва само веднъж. Ако не сте го поискали, игнорирайте този имейл.</value>
+  </data>
+  <data name="Your_registration_code_string" xml:space="preserve">
+    <value>Вашият код за регистрация</value>
+  </data>
+  <data name="Your_registration_code_is_0_string" xml:space="preserve">
+    <value>Вашият код за регистрация е '{0}'. Важи 10 минути и може да се използва само веднъж. Ако не сте се регистрирали, игнорирайте този имейл.</value>
+  </data>
+  <data name="A_passkey_was_added_to_your_account_string" xml:space="preserve">
+    <value>Добавен е нов ключ за достъп</value>
+  </data>
+  <data name="A_passkey_named_1_was_added_to_your_account_on_0_string" xml:space="preserve">
+    <value>На '{0}' към профила ви беше добавен ключ за достъп: '{1}'. Ако не сте го добавили вие, влезте и го премахнете.</value>
+  </data>
 </root>

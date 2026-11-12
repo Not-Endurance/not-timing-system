@@ -1,9 +1,6 @@
-## Overview
-This project employs a Domain Driven Design architecture with strict layer and boundary separations. The codebase consists of two parts:
-- NC* "nugets", located in /nugets
-- NoTiming* - the product, formerly NTS (No Timing System).
+# Glossary
 
-You can see a clear corelation between NC and NoTiming projects and they are layered identically. 
+The domain terms used in this repo. Architecture and layering conventions are in [docs/architecture.md](docs/architecture.md).
 
 ## Applications
 Deployable hosts and the capabilities they are built from.
@@ -13,28 +10,16 @@ Deployable hosts and the capabilities they are built from.
 - **Ui** - the Blazor WebAssembly client served by NoTiming. Replaces the former **Witness** web app.
 - **Judge** - the MAUI app. Talks to Api over REST and to EventBus over SignalR. Not changed by the rebrand.
 
-## NC* projects
-They are separated by function - Blazor, Storage, Application. etcs. *NC* is shared amongs them. These are intended to packaged up and used in other projects to bootsrap functionality, ensure consistent behavior and allow for easier maintenance. Elements of Not should be completely stripped of business logic and should provide a streamlined, generic API striving for a ballance between strict, conssitent behavior and enough configurability to be multi-purposed.
-Notes:
-- Notable exception is `NC.Krud` - as of now this is a standalone framework designed to streamline CRUD operations of complex Domain aggregates. It allows each aggregate entity to be editable individualy via simple `IRepository<T>` interface without it's Aggregate root yielding the final control.
-- Service registration - services in NC* should be registered manually, using the `N*Builder` pattern (see `NApplicationBuilder`) for example
-- Components defined in `NC.Blazor` should begin with `N` - `NTable`, `NNotifier`, `NTextField` etc
+## Sign-in
+- **Session** - a server-side sign-in. The cookie holds the token; the database holds only its hash.
+- **Security stamp** - a value on the user that each session is bound to. Changing it ends every session of the user.
+- **Passkey** - a WebAuthn credential registered to a user. It signs the user in without a code.
+- **Code challenge** - the pending one-time code for an address. It holds the MAC of the code, never the code, the attempts left and its expiry. There is one per address, and a new request replaces it.
+- **Send limit** - the rule that caps code emails: a cooldown per address, and a maximum per address, per IP address and overall in each hour.
+- **Proved address** - an email address confirmed by a code. The user's `ProvedAtUtc` is set. Only a proved address is unique.
+- **Legacy user** - a user row from before identity, with no proved address. It is adopted in place when a code for its address is verified.
+- **Outbox** - the non-production email provider. It stores each message in a collection, so a test can read the code.
 
-# NoTiming* projects
-NoTiming (formerly NTS) stands for *No Timing System*, the brand of the current product - a cheap alternative to full-fledged Endurance timing systems.
-- Domain Model - hardcode business logic and validation is contained within the `NoTiming.Domain.*` namespace, which holds the domain model. It has to be as pure as reasonably possible. Some "pollution" is acceptable - like coupling with `MediatR.INotification` or `NC.Krud` framework, however there are no references to repositories or other infrastructure.
-- Secondary business logic - contained in `NoTiming.Application`, `NoTiming.Judge`, the **Ui** application or the so-called applicaiton level. It handles interactions between domain boundaries and infrastructure. The key component here and entry point should be the Service. Services should be suffixed with `*Service` and usually implement multiple segregated interfaces (conforms to Interface segregation principle)
-- Storage - contains operations related to storing something. All of the storage should be conform to the `IRepository<T>` abstraction.
-- Blazor - the layout is composed of a Header, Drawer and Main content. Components that are navigated to via Router should be suffixed with `*Content.razor`.
-- Service registration - services in NoTiming projects should be registed to the container via the `ITransient`, `IScoped` and `ISingleton` marker interfaces. Those interfaces shouldn't be inherited by other interfaces, but implemented by the classes implementing those interfaces. Services should not be registered manually
-- *Exceptions*: `NoTiming.Application` - we need to keep service registraiton manual for NoTiming.Application as it's also being used by the **NoTiming** shell in order to share RPC contracts. 
-
-## Blazor
-Component rules
-- Components should inherit from `NComponent` or one of it's derivatives almost always. Exceptions can be made for example if exteding an external component such as `ErrorBoundary` or `MudTextField`. 
-- Component `.razor` files should not contain code-behind, instead they should *inherit* from a `Behind.cs` class of the same name - i.e `Component.razor` inherits `ComponentBehind.cs`. Components shouldn't use `partial` code behinds as this inheritance offers a better control on what to expose to the razor file. 
-- Component behinds should never expose services directly, as exception in service execution leads to poor Blazor experience - `ErrorBoundaries` cannot handle some async exceptions gracefully in my experience. Instead `NComponent` defines a `Handle(Exception ex)` method which is used to that end. 
-- Component behinds should expose only properties and not fields 
-- Component behinds should expose only *Safe* methods - a method is safe if it's wrapped with a `try-catch` that users `NComponentHandle` or if its name is suffixed with `Safe`. The latter should only be used if the method is passed to a Safe component parameter (also suffixed by safe).
-- Base classes for internal use should be suffixed with `Base` - example `Event : EventBase`. Base classes that are intended to be implemented by the user don't have to follow that rule - example `KrudShell`
-- Base classes and interfaces should be in `Abstractions`zw
+## Persistence
+- **Repository** - a class that reads and writes one collection. Services depend on its interface, so the store behind it can change with minimal change to them. Named `*Repository`, not `*Store`.
+- **Document** - the shape of a row as stored in MongoDB. It carries no database attributes; how it is stored is set by a class map in `Stores/MongoDB/Mapping`.

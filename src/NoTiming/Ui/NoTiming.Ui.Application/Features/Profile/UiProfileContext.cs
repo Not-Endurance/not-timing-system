@@ -3,6 +3,7 @@ using NC.Application.Authentication.User;
 using NC.Application.Behinds.Adapters;
 using NC.Application.CRUD.Ports;
 using NC.Injection;
+using NoTiming.Application.Contracts.Account;
 using NoTiming.Application.Contracts.Watcher.Models;
 using NoTiming.Domain.Aggregates;
 using NoTiming.Ui.Contracts.Features.Profile;
@@ -28,26 +29,30 @@ public class UiProfileContext : NStatefulService, IUiProfileContext, IScoped
     }
 
     public NUserModel? User { get; private set; }
-    public bool RequiresProfileCompletion => User != null && !UiProfilePolicy.IsComplete(User);
+    public NoTimingProfile? Profile { get; private set; }
+    public bool RequiresProfileCompletion => User != null && !UiProfilePolicy.IsComplete(User, Profile);
     public string WelcomeName => UiProfilePolicy.ResolveWelcomeName(User);
 
     protected override async Task<bool> InitializeState()
     {
         var session = await _userSession.GetCurrent<NoTimingUserSessionStateModel>();
         User = session?.User;
+        Profile = null;
         if (User == null)
         {
             _countryList = [];
             return true;
         }
 
+        var signedIn = await _profiles.Read(User.Email);
+        Profile = signedIn.Data?.Profile;
         _countryList = (await _countries.ReadMany()).OrderBy(country => country.Name).ToArray();
         return true;
     }
 
     public UiProfileFormModel CreateFormModel()
     {
-        return UiProfileFormModel.From(User, ResolveCountry(User?.CountryRegion));
+        return UiProfileFormModel.From(User, Profile, ResolveCountry(Profile?.CountryIsoCode));
     }
 
     public Task<IEnumerable<Country>> SearchCountries(string term, CancellationToken ct)
@@ -88,22 +93,23 @@ public class UiProfileContext : NStatefulService, IUiProfileContext, IScoped
             throw new ApplicationException(string.Join(Environment.NewLine, errors));
         }
 
-        User = result.Data;
+        User = result.Data.User;
+        Profile = result.Data.Profile;
         EmitChanged();
         return User;
     }
 
-    Country? ResolveCountry(string? countryRegion)
+    Country? ResolveCountry(string? countryIsoCode)
     {
-        if (string.IsNullOrWhiteSpace(countryRegion))
+        if (string.IsNullOrWhiteSpace(countryIsoCode))
         {
             return null;
         }
 
         return _countryList.FirstOrDefault(country =>
-            string.Equals(country.Name, countryRegion, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(country.IsoCode, countryRegion, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(country.NfCode, countryRegion, StringComparison.OrdinalIgnoreCase)
+            string.Equals(country.Name, countryIsoCode, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(country.IsoCode, countryIsoCode, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(country.NfCode, countryIsoCode, StringComparison.OrdinalIgnoreCase)
         );
     }
 

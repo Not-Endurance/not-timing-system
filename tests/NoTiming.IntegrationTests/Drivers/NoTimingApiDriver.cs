@@ -6,6 +6,7 @@ using NC.Structures;
 using NoTiming.Application.Contracts.Core.Models;
 using NoTiming.Application.Contracts.Watcher.Models;
 using NoTiming.Domain.Core.Aggregates;
+using NoTiming.IntegrationTests.Authentication.Harness;
 using NoTiming.IntegrationTests.Infrastructure;
 using NoTiming.Ui.Contracts.API;
 using SetupAthlete = NoTiming.Domain.Setup.Aggregates.Athlete;
@@ -22,51 +23,55 @@ namespace NoTiming.IntegrationTests.Drivers;
 internal sealed class NoTimingApiDriver : IDisposable
 {
     readonly HttpClient _client;
+    readonly NoTimingIntegrationFixture _fixture;
 
-    public NoTimingApiDriver(Uri baseUrl)
+    public NoTimingApiDriver(NoTimingIntegrationFixture fixture)
     {
-        _client = new HttpClient { BaseAddress = baseUrl };
+        _fixture = fixture;
+        _client = new HttpClient { BaseAddress = fixture.NoTimingBaseUrl };
     }
 
-    public Task<NUserModel> RegisterUser(IntegrationUser user)
+    /// <summary>
+    /// Makes the person's account the way a pre-identity row would be: seeded with the profile exactly as given, then
+    /// proved by a code at sign-in, which adopts the row and keeps its id. Returns the signed-in person's profile.
+    /// </summary>
+    public async Task<OwnProfile> RegisterUser(IntegrationUser user)
     {
-        return Send<NUserModel>(
-            HttpMethod.Post,
-            "api/users/register",
-            new RegisterUserPayload(
+        var mongo = new MongoAccess(_fixture.MongoConnectionString);
+        if (!await mongo.UserExistsAsync(user.Email))
+        {
+            await mongo.SeedPreIdentityUserAsync(
+                AccountTestData.NewId(),
                 user.Email,
                 user.Name,
                 user.GivenName,
-                user.Surname,
-                user.CountryRegion,
                 user.MiddleName,
+                user.Surname,
+                user.CountryIsoCode,
                 user.Club,
                 user.FeiId,
                 user.DisplayName
-            )
-        );
+            );
+        }
+
+        var cookie = await _fixture.SignInAsync(user);
+        return await ReadOwnProfile(cookie);
     }
 
-    public Task<NUserModel?> ReadUser(string email)
+    public async Task<OwnProfile> ReadOwnProfile(string cookie)
     {
-        var encodedEmail = Uri.EscapeDataString(email);
-        return SendNullable<NUserModel>(HttpMethod.Get, $"api/users/{encodedEmail}");
+        var json = await SendSignedIn(HttpMethod.Get, "api/me/profile", payload: null, cookie);
+        return json.FromJson<OwnProfile>();
     }
 
-    public Task<NUserModel> UpdateUserProfile(string email, UpdateUserProfilePayload payload)
+    public Task UpdateOwnProfile(string cookie, UpdateUserProfilePayload payload)
     {
-        var encodedEmail = Uri.EscapeDataString(email);
-        return Send<NUserModel>(HttpMethod.Patch, $"api/users/{encodedEmail}/profile", payload);
+        return SendSignedIn(HttpMethod.Patch, "api/me", payload, cookie);
     }
 
     public Task Create(EventInformation eventInformation)
     {
         return Send(HttpMethod.Post, "api/event", EventInformationModel.From(eventInformation));
-    }
-
-    public Task Update(EventInformation eventInformation)
-    {
-        return Send(HttpMethod.Patch, "api/event", EventInformationModel.From(eventInformation));
     }
 
     public Task Create(Participation participation)
@@ -224,13 +229,22 @@ internal sealed class NoTimingApiDriver : IDisposable
         return models.ToArray();
     }
 
-    public Task<NoTimingUserSessionModel?> ReadUserSession(string userIdentifier, int eventId)
+    public async Task<NoTimingUserSessionModel?> ReadUserSession(string userIdentifier, int eventId, string cookie)
     {
         var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
-        return SendNullable<NoTimingUserSessionModel>(
+        var json = await SendSignedIn(
             HttpMethod.Get,
-            $"api/user-sessions/{eventId}/by-user-identifier/{encodedUserIdentifier}"
+            $"api/user-sessions/{eventId}/by-user-identifier/{encodedUserIdentifier}",
+            payload: null,
+            cookie
         );
+        var result = json.FromJson<Result<NoTimingUserSessionModel>>();
+        if (!result.IsSuccess)
+        {
+            throw new InvalidOperationException(string.Join(Environment.NewLine, result.Errors));
+        }
+
+        return result.Data;
     }
 
     public async Task<IReadOnlyList<SetupClub>> ReadSetupClubs()
@@ -266,6 +280,25 @@ internal sealed class NoTimingApiDriver : IDisposable
     public void Dispose()
     {
         _client.Dispose();
+    }
+
+    async Task<string> SendSignedIn(HttpMethod method, string endpoint, object? payload, string cookie)
+    {
+        using var request = new HttpRequestMessage(method, endpoint);
+        if (payload != null)
+        {
+            request.Content = new StringContent(payload.ToJson(), Encoding.UTF8, "application/json");
+        }
+
+        request.Headers.Add("Cookie", cookie);
+        if (method != HttpMethod.Get)
+        {
+            request.Headers.Add("X-NTS-Request", "1");
+        }
+
+        using var response = await _client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync();
     }
 
     async Task Send(HttpMethod method, string endpoint, object? payload = null)

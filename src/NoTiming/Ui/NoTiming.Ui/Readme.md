@@ -1,12 +1,9 @@
-## Authentication - Microsoft Entra ID (WASM)
-Configuration keys:
-- `NClientAuthenticationSettings` for Ui sign-in and protected server access tokens
+## Authentication - sign-in by code, over a session cookie
+The sign-in and registration pages are `/authentication` and `/register`. A one-time code is sent by email, and the host sets an HttpOnly session cookie when it is entered correctly.
 
-`NClientAuthenticationSettings` uses `ResourceClientId` for the target protected API app registration.
-`NClientAuthenticationSettings.SessionLifetime` controls how long the device can reuse a successful login; it defaults to 24 hours.
+The browser keeps no token and no sign-in state in storage. The signed-in state comes from `api/me/profile`, which answers 401 when there is no session. Anonymous visitors use the public pages as before.
 
-`NoTiming.Ui` is now a client-side Blazor WebAssembly app. It does not use confidential client secrets.
-The app uses the normal Entra sign-in entrypoint for External ID sign-up/sign-in. Entra decides whether the user signs in or is taken through sign-up for the configured user flow.
+Passkey sign-in and enrolment are served by the host; their browser page is not built yet.
 
 Environment configuration files are loaded from:
 - `wwwroot/appsettings.json`

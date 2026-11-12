@@ -1,3 +1,5 @@
+using NoTiming.Application.Contracts.Account;
+
 namespace NoTiming.Ui.Contracts.API;
 
 public record UpdateUserProfilePayload
@@ -5,7 +7,7 @@ public record UpdateUserProfilePayload
     public UpdateUserProfilePayload(
         string? givenName,
         string? surname,
-        string? countryRegion,
+        string? countryIsoCode,
         string? middleName = null,
         string? club = null,
         string? feiId = null
@@ -14,9 +16,12 @@ public record UpdateUserProfilePayload
         GivenName = Normalize(givenName);
         MiddleName = Normalize(middleName);
         Surname = Normalize(surname);
-        CountryRegion = Normalize(countryRegion);
-        Club = Normalize(club);
-        FeiId = Normalize(feiId);
+        Profile = new NoTimingProfile
+        {
+            Club = Normalize(club),
+            FeiId = Normalize(feiId),
+            CountryIsoCode = Normalize(countryIsoCode),
+        };
         Name = BuildName(GivenName, MiddleName, Surname);
     }
 
@@ -24,15 +29,13 @@ public record UpdateUserProfilePayload
     public string? GivenName { get; }
     public string? MiddleName { get; }
     public string? Surname { get; }
-    public string? CountryRegion { get; }
-    public string? Club { get; }
-    public string? FeiId { get; }
+    public NoTimingProfile Profile { get; }
 
     public bool HasRequiredProfile()
     {
         return !string.IsNullOrWhiteSpace(GivenName)
             && !string.IsNullOrWhiteSpace(Surname)
-            && !string.IsNullOrWhiteSpace(CountryRegion);
+            && !string.IsNullOrWhiteSpace(Profile.CountryIsoCode);
     }
 
     static string? BuildName(params string?[] parts)

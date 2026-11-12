@@ -14,6 +14,24 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
+## Closing issues from commits
+
+When a commit completes an issue, end the commit message body with `Closes #<IssueNumber>` on its own line, followed by a blank line and then the `Co-Authored-By` trailer:
+
+```
+Short summary of the change
+
+Body of the change.
+
+Closes #690
+
+Co-Authored-By: Claude Haiku 5.5 <noreply@anthropic.com>
+```
+
+- Use only the issue that the commit completes. Leave out follow-up issues mentioned in the body.
+- GitHub closes the issue only when the commit reaches the default branch (`master`). Work on `v2` or `develop` leaves the issue open until it is merged into `master`.
+- Commits that are already pushed are not rewritten to add the line. Add the `Closes #<IssueNumber>` line to the pull request description instead.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_

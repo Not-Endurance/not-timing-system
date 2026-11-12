@@ -31,7 +31,7 @@ public class UserModel : IDocument, IKrudModel<User>
     public string? GivenName { get; set; }
     public string? MiddleName { get; set; }
     public string? Surname { get; set; }
-    public string? CountryRegion { get; set; }
+    public string? CountryIsoCode { get; set; }
     public string? Club { get; set; }
     public string? FeiId { get; set; }
     public string[] Roles { get; set; } = [];
@@ -45,7 +45,7 @@ public class UserModel : IDocument, IKrudModel<User>
         GivenName = user.GivenName;
         MiddleName = user.MiddleName;
         Surname = user.Surname;
-        CountryRegion = user.CountryRegion;
+        CountryIsoCode = user.CountryIsoCode;
         Club = user.Club;
         FeiId = user.FeiId;
         Roles = user.Roles.ToArray();
@@ -61,7 +61,7 @@ public class UserModel : IDocument, IKrudModel<User>
             GivenName,
             MiddleName,
             Surname,
-            CountryRegion,
+            CountryIsoCode,
             Club,
             FeiId,
             DisplayName

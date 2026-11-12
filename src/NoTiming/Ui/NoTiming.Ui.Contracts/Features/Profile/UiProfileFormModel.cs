@@ -1,4 +1,5 @@
 using NC.Application.Authentication.User;
+using NoTiming.Application.Contracts.Account;
 using NoTiming.Domain.Aggregates;
 using NoTiming.Ui.Contracts.API;
 
@@ -6,7 +7,7 @@ namespace NoTiming.Ui.Contracts.Features.Profile;
 
 public class UiProfileFormModel
 {
-    public static UiProfileFormModel From(NUserModel? user, Country? country)
+    public static UiProfileFormModel From(NUserModel? user, NoTimingProfile? profile, Country? country)
     {
         return new UiProfileFormModel
         {
@@ -14,8 +15,8 @@ public class UiProfileFormModel
             MiddleName = user?.MiddleName,
             Surname = user?.Surname,
             Country = country,
-            Club = user?.Club,
-            FeiId = user?.FeiId,
+            Club = profile?.Club,
+            FeiId = profile?.FeiId,
         };
     }
 

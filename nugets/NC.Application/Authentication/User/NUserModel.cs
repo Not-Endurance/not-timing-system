@@ -26,10 +26,7 @@ public class NUserModel : IIdentifiable, IEquatable<NUserModel>
     public string? DisplayName { get; set; }
     public string? GivenName { get; set; }
     public string? Surname { get; set; }
-    public string? CountryRegion { get; set; }
     public string? MiddleName { get; set; }
-    public string? Club { get; set; }
-    public string? FeiId { get; set; }
 
     public override bool Equals(object? other)
     {

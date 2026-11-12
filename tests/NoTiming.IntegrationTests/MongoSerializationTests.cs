@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using NC.Serialization.JSON;
+using NC.Storage.Mongo;
 using Newtonsoft.Json;
-using NoTiming.Application.Mongo;
 
 namespace NoTiming.IntegrationTests;
 
@@ -17,9 +17,9 @@ public sealed class MongoSerializationTests
     }
 
     [Fact]
-    public void Configure_OmitsNullAndDefaultValues()
+    public void Register_OmitsNullAndDefaultValues()
     {
-        NoTimingMongoSerialization.Configure();
+        MongoConventions.Register();
 
         var document = new SerializationSample { Name = "Saved" }.ToBsonDocument();
 

@@ -1,10 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Conventions;
-using MongoDB.Bson.Serialization.Serializers;
 using NC.Application;
 using NC.Injection;
 using NC.Storage.Mongo;
@@ -24,13 +20,7 @@ public class NStorageBuilder
 
     public NStorageBuilder AddMongoStorage(string connectionString, Assembly assembly)
     {
-        var pack = new ConventionPack
-        {
-            new IgnoreExtraElementsConvention(true), // TODO: Remove after existing data set is normalized
-            new EnumRepresentationConvention(BsonType.String),
-        };
-        ConventionRegistry.Register("DefaultConventions", pack, t => true);
-        BsonSerializer.RegisterSerializer(typeof(DateTimeOffset), new DateTimeOffsetSerializer(BsonType.DateTime));
+        MongoConventions.Register();
 
         _services.AddSingleton<IMongoContext, MongoContext>(x => new MongoContext(connectionString));
         _services.AddAsInterfaces(typeof(MongoRepository<>), ServiceLifetime.Transient, assembly);
