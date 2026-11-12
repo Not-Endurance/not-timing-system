@@ -37,9 +37,24 @@ public sealed class EventFinalizationJob : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var delay = NextRun(_clock.GetUtcNow()) - _clock.GetUtcNow();
+            var delay = TryNextDelay(stoppingToken);
             await Task.Delay(delay, _clock, stoppingToken);
             await FinalizeDueEvents(stoppingToken);
+        }
+    }
+
+    // A failure here (for example, a time zone database missing on the host) must not stop the API. It is retried in an hour.
+    TimeSpan TryNextDelay(CancellationToken stoppingToken)
+    {
+        try
+        {
+            var now = _clock.GetUtcNow();
+            return NextRun(now) - now;
+        }
+        catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
+        {
+            _logger.LogError(ex, "Could not work out the next finalization run. It will be tried in an hour.");
+            return TimeSpan.FromHours(1);
         }
     }
 

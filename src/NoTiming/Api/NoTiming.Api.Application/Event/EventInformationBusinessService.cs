@@ -136,9 +136,22 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         var now = _clock.GetUtcNow();
         var ended = await _eventInformation.ReadMany(x => x.EndDay < now) ?? [];
         var due = ended.Where(x => !x.IsFinalized).ToList();
+        var failures = new List<Exception>();
         foreach (var eventInformation in due)
         {
-            await Finalize(eventInformation.Id);
+            // One event that can't be placed must not stop the others. It is retried at the next run.
+            try
+            {
+                await Finalize(eventInformation.Id);
+            }
+            catch (Exception ex)
+            {
+                failures.Add(ex);
+            }
+        }
+        if (failures.Count > 0)
+        {
+            throw new AggregateException("Some events could not be finalized.", failures);
         }
     }
 
