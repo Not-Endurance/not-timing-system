@@ -1,6 +1,7 @@
 ﻿using NC.DateAndTime;
 using NC.Domain.Exceptions;
 using NC.Krud.Models;
+using NoTiming.Domain.Objects;
 using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions;
@@ -8,8 +9,6 @@ namespace NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions;
 public record CompetitionFormModel : KrudFormModel<Competition>
 {
     int? _requiredInspectionCompulsoryThreshold;
-    double? _minSpeedRestriction;
-    double? _maxSpeedRestriction;
 
     public CompetitionFormModel()
     {
@@ -30,18 +29,14 @@ public record CompetitionFormModel : KrudFormModel<Competition>
         get => UseCompulsoryThreshold ? _requiredInspectionCompulsoryThreshold : null;
         set => _requiredInspectionCompulsoryThreshold = value;
     }
-    public bool UseMinSpeedRestriction { get; set; }
-    public double? MinSpeedRestriction
-    {
-        get => UseMinSpeedRestriction ? _minSpeedRestriction : null;
-        set => _minSpeedRestriction = value;
-    }
-    public bool UseMaxSpeedRestriction { get; set; }
-    public double? MaxSpeedRestriction
-    {
-        get => UseMaxSpeedRestriction ? _maxSpeedRestriction : null;
-        set => _maxSpeedRestriction = value;
-    }
+    public double? LoopSpeedMin { get; set; }
+    public double? LoopSpeedMax { get; set; }
+    public double? PhaseSpeedMin { get; set; }
+    public double? PhaseSpeedMax { get; set; }
+    public double? LoopAverageSpeedMin { get; set; }
+    public double? LoopAverageSpeedMax { get; set; }
+    public double? PhaseAverageSpeedMin { get; set; }
+    public double? PhaseAverageSpeedMax { get; set; }
     public string? FeiEventId { get; set; }
     public string? FeiEventCode { get; set; }
     public string? FeiCompetitionId { get; set; }
@@ -59,8 +54,16 @@ public record CompetitionFormModel : KrudFormModel<Competition>
             EnglishNames,
             startTime,
             compulsoryThreshold,
-            MinSpeedRestriction,
-            MaxSpeedRestriction,
+            new SpeedRestrictions(
+                LoopSpeedMin,
+                LoopSpeedMax,
+                PhaseSpeedMin,
+                PhaseSpeedMax,
+                LoopAverageSpeedMin,
+                LoopAverageSpeedMax,
+                PhaseAverageSpeedMin,
+                PhaseAverageSpeedMax
+            ),
             FeiEventId,
             FeiEventCode,
             FeiCompetitionId,
@@ -83,10 +86,15 @@ public record CompetitionFormModel : KrudFormModel<Competition>
         Participations = competition.Participations;
         CompulsoryThresholdMinutes = competition.CompulsoryThresholdSpan?.Minutes;
         UseCompulsoryThreshold = competition.CompulsoryThresholdSpan != null;
-        MinSpeedRestriction = competition.MinSpeedRestriction;
-        UseMinSpeedRestriction = competition.MinSpeedRestriction != null;
-        MaxSpeedRestriction = competition.MaxSpeedRestriction;
-        UseMaxSpeedRestriction = competition.MaxSpeedRestriction != null;
+        var restrictions = competition.Restrictions;
+        LoopSpeedMin = restrictions.LoopSpeedMin;
+        LoopSpeedMax = restrictions.LoopSpeedMax;
+        PhaseSpeedMin = restrictions.PhaseSpeedMin;
+        PhaseSpeedMax = restrictions.PhaseSpeedMax;
+        LoopAverageSpeedMin = restrictions.LoopAverageSpeedMin;
+        LoopAverageSpeedMax = restrictions.LoopAverageSpeedMax;
+        PhaseAverageSpeedMin = restrictions.PhaseAverageSpeedMin;
+        PhaseAverageSpeedMax = restrictions.PhaseAverageSpeedMax;
         FeiEventId = competition.FeiEventId;
         FeiEventCode = competition.FeiEventCode;
         FeiCompetitionId = competition.FeiCompetitionId;

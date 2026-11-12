@@ -6,6 +6,7 @@ using NoTiming.Application.Contracts.Core.Models;
 using NoTiming.Blazor.Components.ParticipationTable.Phases;
 using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Domain.Objects;
 
 namespace NoTiming.Blazor.Components.ParticipationTable;
 
@@ -31,6 +32,9 @@ public class ParticipationTableBehind : NComponent
 
     [Parameter]
     public int? Number { get; set; }
+
+    [Parameter]
+    public SpeedRestrictions? Restrictions { get; set; }
 
     [Parameter]
     public bool Editable { get; set; }
@@ -137,8 +141,38 @@ public class ParticipationTableBehind : NComponent
         rows.Add(CreateRow(Recovery_string, phases, x => x.GetRecoveryInterval()));
         rows.Add(CreateRow(Loop_T_string, phases, x => x.GetLoopInterval()));
         rows.Add(CreateRow(Phase_T_string, phases, x => x.GetPhaseInterval()));
-        rows.Add(CreateRow(Loop_S_string, phases, x => x.GetAverageLoopSpeed()));
-        rows.Add(CreateRow(Phase_S_string, phases, x => x.GetAveragePhaseSpeed()));
+        rows.Add(
+            CreateSpeedRow(
+                Loop_S_string,
+                phases,
+                index => phases[index].GetAverageLoopSpeed()?.ToDouble(),
+                x => (x.LoopSpeedMin, x.LoopSpeedMax)
+            )
+        );
+        rows.Add(
+            CreateSpeedRow(
+                Phase_S_string,
+                phases,
+                index => phases[index].GetAveragePhaseSpeed()?.ToDouble(),
+                x => (x.PhaseSpeedMin, x.PhaseSpeedMax)
+            )
+        );
+        rows.Add(
+            CreateSpeedRow(
+                Loop_average_S_string,
+                phases,
+                index => SpeedAverages.Loop(phases.Take(index + 1)),
+                x => (x.LoopAverageSpeedMin, x.LoopAverageSpeedMax)
+            )
+        );
+        rows.Add(
+            CreateSpeedRow(
+                Phase_average_S_string,
+                phases,
+                index => SpeedAverages.Phase(phases.Take(index + 1)),
+                x => (x.PhaseAverageSpeedMin, x.PhaseAverageSpeedMax)
+            )
+        );
 
         return rows;
     }
@@ -148,6 +182,27 @@ public class ParticipationTableBehind : NComponent
         return new ParticipationTableRow(label, phases.Select(x => FormatValue(selector(x))).ToArray());
     }
 
+    // A speed that is below its minimum is marked with a down arrow, and one above its maximum with an up arrow.
+    // The row is highlighted when any of its speeds break a limit.
+    ParticipationTableRow CreateSpeedRow(
+        string label,
+        IReadOnlyList<Phase> phases,
+        Func<int, double?> speed,
+        Func<SpeedRestrictions, (double? Min, double? Max)> limits
+    )
+    {
+        var (min, max) = limits(Restrictions ?? SpeedRestrictions.None);
+        var values = new string[phases.Count];
+        var breaches = new bool[phases.Count];
+        for (var index = 0; index < phases.Count; index++)
+        {
+            var value = speed(index);
+            values[index] = FormatSpeed(value, min, max);
+            breaches[index] = value != null && (value < min || value > max);
+        }
+        return new ParticipationTableRow(label, values, breaches);
+    }
+
     static IReadOnlyList<ParticipationTableRow> BuildPhaseRows(
         IReadOnlyList<Phase> phases,
         IReadOnlyList<ParticipationTableRow> rows
@@ -155,7 +210,11 @@ public class ParticipationTableBehind : NComponent
     {
         return phases
             .Select(
-                (phase, index) => new ParticipationTableRow(phase.Gate, rows.Select(row => row.Values[index]).ToArray())
+                (phase, index) => new ParticipationTableRow(
+                    phase.Gate,
+                    rows.Select(row => row.Values[index]).ToArray(),
+                    rows.Select(row => row.Breaches[index]).ToArray()
+                )
             )
             .ToArray();
     }
@@ -165,15 +224,35 @@ public class ParticipationTableBehind : NComponent
         return value?.ToString() ?? "-";
     }
 
+    static string FormatSpeed(double? value, double? min, double? max)
+    {
+        if (value == null)
+        {
+            return "-";
+        }
+        if (value < min)
+        {
+            return $"{value:0.00} ▼";
+        }
+        if (value > max)
+        {
+            return $"{value:0.00} ▲";
+        }
+        return $"{value:0.00}";
+    }
+
     protected sealed record ParticipationTableRow
     {
-        public ParticipationTableRow(string label, IReadOnlyList<string> values)
+        public ParticipationTableRow(string label, IReadOnlyList<string> values, IReadOnlyList<bool>? breaches = null)
         {
             Label = label;
             Values = values;
+            Breaches = breaches ?? new bool[values.Count];
         }
 
         public string Label { get; }
         public IReadOnlyList<string> Values { get; }
+        public IReadOnlyList<bool> Breaches { get; }
+        public bool HasBreach => Breaches.Any(x => x);
     }
 }

@@ -416,8 +416,7 @@ public sealed class CoreFeatureEndToEndTests
             exportHorse,
             source.Combination.Club,
             source.Combination.Distance,
-            source.Combination.MinAverageSpeed,
-            source.Combination.MaxAverageSpeed,
+            source.Combination.Restrictions,
             source.Combination.Id
         );
 

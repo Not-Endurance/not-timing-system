@@ -753,14 +753,12 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
             ParticipationCategory.Senior,
             null,
             null,
-            null,
             eventId + 15
         );
         var competition = new SetupCompetition(
             "Operator Access Competition",
             false,
             DateTimeOffset.UtcNow.Date.AddHours(8),
-            null,
             null,
             null,
             null,

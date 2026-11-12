@@ -62,7 +62,7 @@ public sealed class ResultTests
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
         var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
         var horse = new Horse($"Horse {number}", null, null, number);
-        var combination = new Combination(number, athlete, horse, null, "20", null, null, number);
+        var combination = new Combination(number, athlete, horse, null, "20", null, number);
 
         return new Participation(
             ParticipationCategory.Senior,

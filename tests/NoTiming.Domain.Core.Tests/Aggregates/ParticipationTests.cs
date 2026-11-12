@@ -93,7 +93,7 @@ public sealed class ParticipationTests
         var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");
         var athlete = new Athlete("Athlete", null, country, null, null, number);
         var horse = new Horse("Horse", null, null, number);
-        var combination = new Combination(number, athlete, horse, null, "20", null, null, number);
+        var combination = new Combination(number, athlete, horse, null, "20", null, number);
         var phaseList = phases.Length == 0 ? [CreatePhase(start)] : phases;
 
         return new Participation(

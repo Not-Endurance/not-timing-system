@@ -181,6 +181,15 @@ namespace NoTiming.Shared.Localization
         public static string Athlete_string => LocalizeString(nameof(Athlete_string));
         public static string Horse_string => LocalizeString(nameof(Horse_string));
         public static string Operator_string => LocalizeString(nameof(Operator_string));
+        public static string Loop_speed_min_string => LocalizeString(nameof(Loop_speed_min_string));
+        public static string Loop_speed_max_string => LocalizeString(nameof(Loop_speed_max_string));
+        public static string Phase_speed_min_string => LocalizeString(nameof(Phase_speed_min_string));
+        public static string Phase_speed_max_string => LocalizeString(nameof(Phase_speed_max_string));
+        public static string Loop_average_speed_min_string => LocalizeString(nameof(Loop_average_speed_min_string));
+        public static string Loop_average_speed_max_string => LocalizeString(nameof(Loop_average_speed_max_string));
+        public static string Phase_average_speed_min_string => LocalizeString(nameof(Phase_average_speed_min_string));
+        public static string Phase_average_speed_max_string => LocalizeString(nameof(Phase_average_speed_max_string));
+        public static string Speed_limits_combine_helper_string => LocalizeString(nameof(Speed_limits_combine_helper_string));
         public static string English_names_string => LocalizeString(nameof(English_names_string));
         public static string Automatic_CRI_string => LocalizeString(nameof(Automatic_CRI_string));
         public static string Require_Compulsory_Inspection_string =>
@@ -289,6 +298,8 @@ namespace NoTiming.Shared.Localization
         public static string CRI_Time_string => LocalizeString(nameof(CRI_Time_string));
         public static string Loop_T_string => LocalizeString(nameof(Loop_T_string));
         public static string Phase_T_string => LocalizeString(nameof(Phase_T_string));
+        public static string Loop_average_S_string => LocalizeString(nameof(Loop_average_S_string));
+        public static string Phase_average_S_string => LocalizeString(nameof(Phase_average_S_string));
         public static string Loop_S_string => LocalizeString(nameof(Loop_S_string));
         public static string Phase_S_string => LocalizeString(nameof(Phase_S_string));
         public static string Start_In_string => LocalizeString(nameof(Start_In_string));

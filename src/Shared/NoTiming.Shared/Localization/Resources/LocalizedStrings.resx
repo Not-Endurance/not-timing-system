@@ -1053,4 +1053,37 @@
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Are you sure you want to delete '{0}'?</value>
   </data>
+  <data name="Loop_speed_min_string" xml:space="preserve">
+    <value>Loop speed min</value>
+  </data>
+  <data name="Loop_speed_max_string" xml:space="preserve">
+    <value>Loop speed max</value>
+  </data>
+  <data name="Phase_speed_min_string" xml:space="preserve">
+    <value>Phase speed min</value>
+  </data>
+  <data name="Phase_speed_max_string" xml:space="preserve">
+    <value>Phase speed max</value>
+  </data>
+  <data name="Loop_average_speed_min_string" xml:space="preserve">
+    <value>Loop average speed min</value>
+  </data>
+  <data name="Loop_average_speed_max_string" xml:space="preserve">
+    <value>Loop average speed max</value>
+  </data>
+  <data name="Phase_average_speed_min_string" xml:space="preserve">
+    <value>Phase average speed min</value>
+  </data>
+  <data name="Phase_average_speed_max_string" xml:space="preserve">
+    <value>Phase average speed max</value>
+  </data>
+  <data name="Speed_limits_combine_helper_string" xml:space="preserve">
+    <value>Combined with the competition limits. The stricter limit applies.</value>
+  </data>
+  <data name="Loop_average_S_string" xml:space="preserve">
+    <value>Loop avg. speed</value>
+  </data>
+  <data name="Phase_average_S_string" xml:space="preserve">
+    <value>Phase avg. speed</value>
+  </data>
 </root>

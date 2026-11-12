@@ -1,5 +1,6 @@
 using NC.Domain.Krud;
 using NoTiming.Domain.Extensions;
+using NoTiming.Domain.Objects;
 
 namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
@@ -13,8 +14,7 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
         bool englishNames,
         DateTimeOffset? start,
         TimeSpan? compulsoryThresholdSpan,
-        double? minSpeedRestriction,
-        double? maxSpeedRestriction,
+        SpeedRestrictions? speedRestrictions,
         string? feiEventId,
         string? feiEventCode,
         string? feiCompetitionId,
@@ -32,8 +32,7 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
         EnglishNames = englishNames;
         Start = Required(nameof(Start), start);
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
-        MinSpeedRestriction = minSpeedRestriction;
-        MaxSpeedRestriction = maxSpeedRestriction;
+        Restrictions = speedRestrictions ?? SpeedRestrictions.None;
         FeiEventId = feiEventId;
         FeiEventCode = feiEventCode;
         FeiCompetitionId = feiCompetitionId;
@@ -48,8 +47,7 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
     public bool EnglishNames { get; }
     public DateTimeOffset Start { get; }
     public TimeSpan? CompulsoryThresholdSpan { get; }
-    public double? MinSpeedRestriction { get; }
-    public double? MaxSpeedRestriction { get; }
+    public SpeedRestrictions Restrictions { get; }
     public string? FeiEventId { get; }
     public string? FeiEventCode { get; }
     public string? FeiCompetitionId { get; }

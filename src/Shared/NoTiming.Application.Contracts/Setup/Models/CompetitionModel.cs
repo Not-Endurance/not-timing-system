@@ -17,8 +17,7 @@ public class CompetitionModel
             EnglishNames = competition.EnglishNames,
             Start = competition.Start,
             CompulsoryThreshold = competition.CompulsoryThresholdSpan,
-            MinSpeedRestriction = competition.MinSpeedRestriction,
-            MaxSpeedRestriction = competition.MaxSpeedRestriction,
+            Restrictions = SpeedRestrictionsModel.From(competition.Restrictions),
             FeiEventId = competition.FeiEventId,
             FeiEventCode = competition.FeiEventCode,
             FeiCompetitionId = competition.FeiCompetitionId,
@@ -34,8 +33,7 @@ public class CompetitionModel
     public bool EnglishNames { get; init; }
     public DateTimeOffset? Start { get; init; }
     public TimeSpan? CompulsoryThreshold { get; init; }
-    public double? MinSpeedRestriction { get; init; }
-    public double? MaxSpeedRestriction { get; init; }
+    public SpeedRestrictionsModel Restrictions { get; init; } = new();
     public string? FeiEventId { get; init; }
     public string? FeiEventCode { get; init; }
     public string? FeiCompetitionId { get; init; }
@@ -53,8 +51,7 @@ public class CompetitionModel
             EnglishNames,
             Start,
             CompulsoryThreshold,
-            MinSpeedRestriction,
-            MaxSpeedRestriction,
+            Restrictions.ToDomain(),
             FeiEventId,
             FeiEventCode,
             FeiCompetitionId,

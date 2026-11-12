@@ -850,4 +850,37 @@
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>'{0}' öğesini silmek istediğinizden emin misiniz?</value>
   </data>
+  <data name="Loop_speed_min_string" xml:space="preserve">
+    <value>Tur hızı min</value>
+  </data>
+  <data name="Loop_speed_max_string" xml:space="preserve">
+    <value>Tur hızı maks</value>
+  </data>
+  <data name="Phase_speed_min_string" xml:space="preserve">
+    <value>Etap hızı min</value>
+  </data>
+  <data name="Phase_speed_max_string" xml:space="preserve">
+    <value>Etap hızı maks</value>
+  </data>
+  <data name="Loop_average_speed_min_string" xml:space="preserve">
+    <value>Tur ortalama hızı min</value>
+  </data>
+  <data name="Loop_average_speed_max_string" xml:space="preserve">
+    <value>Tur ortalama hızı maks</value>
+  </data>
+  <data name="Phase_average_speed_min_string" xml:space="preserve">
+    <value>Etap ortalama hızı min</value>
+  </data>
+  <data name="Phase_average_speed_max_string" xml:space="preserve">
+    <value>Etap ortalama hızı maks</value>
+  </data>
+  <data name="Speed_limits_combine_helper_string" xml:space="preserve">
+    <value>Yarışma sınırlarıyla birleştirilir. Daha sıkı sınır uygulanır.</value>
+  </data>
+  <data name="Loop_average_S_string" xml:space="preserve">
+    <value>Tur ort. hızı</value>
+  </data>
+  <data name="Phase_average_S_string" xml:space="preserve">
+    <value>Etap ort. hızı</value>
+  </data>
 </root>

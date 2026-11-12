@@ -11,8 +11,7 @@
     "_id": 1000649529,
     "Number": 76,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": null,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": null },
     "Athlete": {
       "_id": 366937524,
       "Names": [
@@ -154,8 +153,7 @@
     "_id": 868875140,
     "Number": 50,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1620154576,
       "Names": [
@@ -280,8 +278,7 @@
     "_id": 1912975737,
     "Number": 44,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 469022959,
       "Names": [
@@ -406,8 +403,7 @@
     "_id": 621581842,
     "Number": 80,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1513951826,
       "Names": [
@@ -532,8 +528,7 @@
     "_id": 621445191,
     "Number": 2,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 278618377,
       "Names": [
@@ -660,8 +655,7 @@
     "_id": 442221356,
     "Number": 72,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1424823491,
       "Names": [
@@ -786,8 +780,7 @@
     "_id": 195979988,
     "Number": 45,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1285793646,
       "Names": [
@@ -914,8 +907,7 @@
     "_id": 433552815,
     "Number": 22,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1076449614,
       "Names": [
@@ -1040,8 +1032,7 @@
     "_id": 1682878006,
     "Number": 40,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 855380255,
       "Names": [
@@ -1168,8 +1159,7 @@
     "_id": 485219756,
     "Number": 54,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1644090398,
       "Names": [
@@ -1294,8 +1284,7 @@
     "_id": 1423537438,
     "Number": 64,
     "Distance": "62",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 476285420,
       "Names": [
@@ -1395,8 +1384,7 @@
     "_id": 1158636416,
     "Number": 38,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1531980220,
       "Names": [
@@ -1496,8 +1484,7 @@
     "_id": 227987334,
     "Number": 51,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1017005199,
       "Names": [
@@ -1597,8 +1584,7 @@
     "_id": 2124980372,
     "Number": 68,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 2061694513,
       "Names": [
@@ -1698,8 +1684,7 @@
     "_id": 1346286463,
     "Number": 36,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1805728072,
       "Names": [
@@ -1799,8 +1784,7 @@
     "_id": 449671187,
     "Number": 57,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1664792569,
       "Names": [
@@ -1900,8 +1884,7 @@
     "_id": 1262474185,
     "Number": 59,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1663041866,
       "Names": [
@@ -2001,8 +1984,7 @@
     "_id": 992737684,
     "Number": 67,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 115752921,
       "Names": [
@@ -2127,8 +2109,7 @@
     "_id": 542881568,
     "Number": 28,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 431979132,
       "Names": [
@@ -2228,8 +2209,7 @@
     "_id": 778290182,
     "Number": 78,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 523856865,
       "Names": [
@@ -2329,8 +2309,7 @@
     "_id": 1082398365,
     "Number": 19,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1526569693,
       "Names": [
@@ -2430,8 +2409,7 @@
     "_id": 261757742,
     "Number": 77,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 683635597,
       "Names": [
@@ -2531,8 +2509,7 @@
     "_id": 301607551,
     "Number": 52,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 569018213,
       "Names": [
@@ -2632,8 +2609,7 @@
     "_id": 2022591792,
     "Number": 56,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1133004815,
       "Names": [
@@ -2733,8 +2709,7 @@
     "_id": 2095370197,
     "Number": 23,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 2014371187,
       "Names": [
@@ -2834,8 +2809,7 @@
     "_id": 346556309,
     "Number": 39,
     "Distance": "62",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 718815615,
       "Names": [

@@ -22,19 +22,14 @@
             <NNumberField @bind-Value="Model.CompulsoryThresholdMinutes" For="() => Model.CompulsoryThresholdMinutes" />
         }
 
-        <NSwitch @bind-Value="Model.UseMinSpeedRestriction" For="() => Model.UseMinSpeedRestriction" Label="@Min_Speed_Restriction_string" />
-
-        @if (Model.UseMinSpeedRestriction)
-        {
-            <NNumberField @bind-Value="Model.MinSpeedRestriction" For="() => Model.MinSpeedRestriction" Label="@Min_Speed_Restriction_string" HelperText="@Applies_to_all_Participations_added_to_the_competition_when_set_string" />
-        }
-
-        <NSwitch @bind-Value="Model.UseMaxSpeedRestriction" For="() => Model.UseMaxSpeedRestriction" Label="@Max_Speed_Restriction_string" />
-
-        @if (Model.UseMaxSpeedRestriction)
-        {
-            <NNumberField @bind-Value="Model.MaxSpeedRestriction" For="() => Model.MaxSpeedRestriction" Label="@Max_Speed_Restriction_string" HelperText="@Applies_to_all_Participations_added_to_the_competition_when_set_string" />
-        }
+        <NNumberField @bind-Value="Model.LoopSpeedMin" For="() => Model.LoopSpeedMin" Label="@Loop_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.LoopSpeedMax" For="() => Model.LoopSpeedMax" Label="@Loop_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.PhaseSpeedMin" For="() => Model.PhaseSpeedMin" Label="@Phase_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.PhaseSpeedMax" For="() => Model.PhaseSpeedMax" Label="@Phase_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.LoopAverageSpeedMin" For="() => Model.LoopAverageSpeedMin" Label="@Loop_average_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.LoopAverageSpeedMax" For="() => Model.LoopAverageSpeedMax" Label="@Loop_average_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.PhaseAverageSpeedMin" For="() => Model.PhaseAverageSpeedMin" Label="@Phase_average_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.PhaseAverageSpeedMax" For="() => Model.PhaseAverageSpeedMax" Label="@Phase_average_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
 
         <NParagraph Content="@Locate_FEI_Show_data_instructions_string" Class="mt-8 mb-2" />
 

@@ -1,6 +1,7 @@
 using NoTiming.Domain.Core.Aggregates;
 using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 using NoTiming.Domain.Core.Aggregates.Participations.Objects;
+using NoTiming.Domain.Objects;
 
 namespace NoTiming.Domain.Core.Objects.Arrivelists;
 
@@ -32,17 +33,23 @@ public record Arrivelist : ValueObject
         var completedPhases = participation.Phases.Take(phaseIndex).Where(x => x.IsComplete()).ToList();
         var completedDistance = completedPhases.Sum(x => x.Length);
         var completedInterval = ResolveCompletedInterval(completedPhases);
-        var maxAverageSpeed = ToEstimateSpeed(participation.Combination.MaxAverageSpeed);
-        var minAverageSpeed = ToEstimateSpeed(participation.Combination.MinAverageSpeed);
+        var completedLoopInterval = ResolveCompletedLoopInterval(completedPhases);
         var averageSpeed = ResolveAverageSpeed(completedDistance, completedInterval);
+        var window = ResolveWindow(
+            phase,
+            completedDistance,
+            completedLoopInterval,
+            completedInterval,
+            participation.Combination.Restrictions
+        );
 
         return new ArrivelistEntry(
             participation.Combination.Number,
             participation.Combination.Athlete.GetDisplayName(participation.Competition.EnglishNames),
             participation.Combination.Horse.GetDisplayName(participation.Competition.EnglishNames),
-            EstimateArrival(phase.StartTime!, completedDistance, completedInterval, phase.Length, maxAverageSpeed),
+            window.Fast,
             EstimateArrival(phase.StartTime!, completedDistance, completedInterval, phase.Length, averageSpeed),
-            EstimateArrival(phase.StartTime!, completedDistance, completedInterval, phase.Length, minAverageSpeed)
+            window.Slow
         );
     }
 
@@ -72,6 +79,11 @@ public record Arrivelist : ValueObject
         return completedPhases.Count == 0 ? TimeSpan.Zero : new Total(completedPhases).Interval.ToTimeSpan();
     }
 
+    static TimeSpan ResolveCompletedLoopInterval(IEnumerable<Phase> completedPhases)
+    {
+        return completedPhases.Aggregate(TimeSpan.Zero, (sum, phase) => sum + (phase.GetLoopInterval()?.ToTimeSpan() ?? TimeSpan.Zero));
+    }
+
     static double? ResolveAverageSpeed(double completedDistance, TimeSpan completedInterval)
     {
         if (completedDistance <= 0 || completedInterval <= TimeSpan.Zero)
@@ -82,10 +94,72 @@ public record Arrivelist : ValueObject
         return completedDistance / completedInterval.TotalHours;
     }
 
-    static double? ToEstimateSpeed(Speed? speed)
+    // The arrival window at the end of the current phase. Fast is the latest of the earliest bounds set by the
+    // maximum limits. Slow is the earliest of the latest bounds set by the minimum limits. Phase-based limits
+    // include recovery, which isn't known yet: it lies between zero and the phase's maximum recovery. Fast takes
+    // the maximum recovery and Slow takes zero, so the window covers every possible recovery.
+    static (Timestamp? Fast, Timestamp? Slow) ResolveWindow(
+        Phase phase,
+        double completedDistance,
+        TimeSpan completedLoopInterval,
+        TimeSpan completedPhaseInterval,
+        SpeedRestrictions restrictions
+    )
     {
-        var value = speed?.ToDouble();
-        return value > 0 ? value : null;
+        var start = phase.StartTime!;
+        var totalDistance = completedDistance + phase.Length;
+        var fastRecovery = phase.IsFinal ? TimeSpan.Zero : TimeSpan.FromMinutes(phase.MaxRecovery);
+
+        var earliest = new List<TimeSpan>();
+        var latest = new List<TimeSpan>();
+
+        if (Limit(restrictions.LoopSpeedMax) is { } loopMax)
+        {
+            earliest.Add(TimeSpanFromSpeed(phase.Length, loopMax));
+        }
+        if (Limit(restrictions.LoopSpeedMin) is { } loopMin)
+        {
+            latest.Add(TimeSpanFromSpeed(phase.Length, loopMin));
+        }
+        if (Limit(restrictions.PhaseSpeedMax) is { } phaseMax)
+        {
+            earliest.Add(TimeSpanFromSpeed(phase.Length, phaseMax) - fastRecovery);
+        }
+        if (Limit(restrictions.PhaseSpeedMin) is { } phaseMin)
+        {
+            latest.Add(TimeSpanFromSpeed(phase.Length, phaseMin));
+        }
+        if (Limit(restrictions.LoopAverageSpeedMax) is { } loopAverageMax)
+        {
+            earliest.Add(TimeSpanFromSpeed(totalDistance, loopAverageMax) - completedLoopInterval);
+        }
+        if (Limit(restrictions.LoopAverageSpeedMin) is { } loopAverageMin)
+        {
+            latest.Add(TimeSpanFromSpeed(totalDistance, loopAverageMin) - completedLoopInterval);
+        }
+        if (Limit(restrictions.PhaseAverageSpeedMax) is { } phaseAverageMax)
+        {
+            earliest.Add(TimeSpanFromSpeed(totalDistance, phaseAverageMax) - completedPhaseInterval - fastRecovery);
+        }
+        if (Limit(restrictions.PhaseAverageSpeedMin) is { } phaseAverageMin)
+        {
+            latest.Add(TimeSpanFromSpeed(totalDistance, phaseAverageMin) - completedPhaseInterval);
+        }
+
+        var fast = earliest.Count == 0 ? (Timestamp?)null : start.Add(earliest.Max());
+        var slow = latest.Count == 0 ? (Timestamp?)null : start.Add(latest.Min());
+        return (fast, slow);
+    }
+
+    // A limit of zero or less is not a limit. Dividing by it would never arrive.
+    static double? Limit(double? speed)
+    {
+        return speed > 0 ? speed : null;
+    }
+
+    static TimeSpan TimeSpanFromSpeed(double distance, double speed)
+    {
+        return TimeSpan.FromHours(distance / speed);
     }
 
     static Timestamp? EstimateArrival(

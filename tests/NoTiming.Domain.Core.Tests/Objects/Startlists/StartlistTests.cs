@@ -71,7 +71,7 @@ public sealed class StartlistTests
         var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
         var horse = new Horse($"Horse {number}", null, null, number);
         var totalDistance = phases.Sum(x => x.Length);
-        var combination = new Combination(number, athlete, horse, null, $"{totalDistance:0.##}", null, null, number);
+        var combination = new Combination(number, athlete, horse, null, $"{totalDistance:0.##}", null, number);
 
         return new Participation(
             ParticipationCategory.Senior,
@@ -90,7 +90,7 @@ public sealed class StartlistTests
         var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
         var horse = new Horse($"Horse {number}", null, null, number);
         var totalDistance = phaseList.Sum(x => x.Length);
-        var combination = new Combination(number, athlete, horse, null, $"{totalDistance:0.##}", null, null, number);
+        var combination = new Combination(number, athlete, horse, null, $"{totalDistance:0.##}", null, number);
 
         return new Participation(
             ParticipationCategory.Senior,

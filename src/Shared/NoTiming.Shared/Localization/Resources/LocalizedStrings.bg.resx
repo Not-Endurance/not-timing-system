@@ -1053,4 +1053,37 @@
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
   </data>
+  <data name="Loop_speed_min_string" xml:space="preserve">
+    <value>Минимална скорост на обиколка</value>
+  </data>
+  <data name="Loop_speed_max_string" xml:space="preserve">
+    <value>Максимална скорост на обиколка</value>
+  </data>
+  <data name="Phase_speed_min_string" xml:space="preserve">
+    <value>Минимална скорост на етап</value>
+  </data>
+  <data name="Phase_speed_max_string" xml:space="preserve">
+    <value>Максимална скорост на етап</value>
+  </data>
+  <data name="Loop_average_speed_min_string" xml:space="preserve">
+    <value>Минимална средна скорост на обиколките</value>
+  </data>
+  <data name="Loop_average_speed_max_string" xml:space="preserve">
+    <value>Максимална средна скорост на обиколките</value>
+  </data>
+  <data name="Phase_average_speed_min_string" xml:space="preserve">
+    <value>Минимална средна скорост на етапите</value>
+  </data>
+  <data name="Phase_average_speed_max_string" xml:space="preserve">
+    <value>Максимална средна скорост на етапите</value>
+  </data>
+  <data name="Speed_limits_combine_helper_string" xml:space="preserve">
+    <value>Комбинира се с ограниченията на състезанието. Прилага се по-строгото.</value>
+  </data>
+  <data name="Loop_average_S_string" xml:space="preserve">
+    <value>Ср. скорост (обиколки)</value>
+  </data>
+  <data name="Phase_average_S_string" xml:space="preserve">
+    <value>Ср. скорост (етапи)</value>
+  </data>
 </root>

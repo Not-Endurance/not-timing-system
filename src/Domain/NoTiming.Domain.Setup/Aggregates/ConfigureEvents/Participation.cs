@@ -1,4 +1,5 @@
 ﻿using NC.Domain.Krud;
+using NoTiming.Domain.Objects;
 
 namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
@@ -9,8 +10,7 @@ public class Participation : Entity, IKurdMirror<Combination>
         Combination? combination,
         ParticipationCategory? category,
         DateTimeOffset? startTimeOverride,
-        double? maxSpeedOverride,
-        double? minSpeedOverride,
+        SpeedRestrictions? restrictions,
         int? id = null
     )
         : base(id)
@@ -19,16 +19,14 @@ public class Participation : Entity, IKurdMirror<Combination>
         IsNotRanked = isNotRanked ?? false;
         Combination = Required(nameof(Combination), combination);
         Category = Required(nameof(Category), category);
-        MaxSpeedOverride = maxSpeedOverride;
-        MinSpeedOverride = minSpeedOverride;
+        Restrictions = restrictions ?? SpeedRestrictions.None;
     }
 
     public Combination Combination { get; private set; }
     public bool IsNotRanked { get; }
     public ParticipationCategory Category { get; }
     public DateTimeOffset? StartTimeOverride { get; }
-    public double? MaxSpeedOverride { get; }
-    public double? MinSpeedOverride { get; }
+    public SpeedRestrictions Restrictions { get; }
 
     public override string ToString()
     {

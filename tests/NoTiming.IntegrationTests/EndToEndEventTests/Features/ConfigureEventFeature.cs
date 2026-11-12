@@ -468,10 +468,14 @@ internal class ConfigureEventFeature
                 competition.CompulsoryThresholdSpan == null
                     ? null
                     : (int)competition.CompulsoryThresholdSpan.Value.TotalMinutes,
-            UseMinSpeedRestriction = competition.MinSpeedRestriction != null,
-            MinSpeedRestriction = competition.MinSpeedRestriction,
-            UseMaxSpeedRestriction = competition.MaxSpeedRestriction != null,
-            MaxSpeedRestriction = competition.MaxSpeedRestriction,
+            LoopSpeedMin = competition.Restrictions.LoopSpeedMin,
+            LoopSpeedMax = competition.Restrictions.LoopSpeedMax,
+            PhaseSpeedMin = competition.Restrictions.PhaseSpeedMin,
+            PhaseSpeedMax = competition.Restrictions.PhaseSpeedMax,
+            LoopAverageSpeedMin = competition.Restrictions.LoopAverageSpeedMin,
+            LoopAverageSpeedMax = competition.Restrictions.LoopAverageSpeedMax,
+            PhaseAverageSpeedMin = competition.Restrictions.PhaseAverageSpeedMin,
+            PhaseAverageSpeedMax = competition.Restrictions.PhaseAverageSpeedMax,
             FeiEventId = competition.FeiEventId,
             FeiEventCode = competition.FeiEventCode,
             FeiCompetitionId = competition.FeiCompetitionId,
@@ -493,10 +497,14 @@ internal class ConfigureEventFeature
             Combination = createdCombinations[participation.Combination.Id],
             IsStartTimeOverriden = participation.StartTimeOverride != null,
             StartTimeOverride = localStart?.TimeOfDay,
-            IsMaxSpeedOverriden = participation.MaxSpeedOverride != null,
-            MaxSpeedOverride = participation.MaxSpeedOverride,
-            IsMinSpeedOverriden = participation.MinSpeedOverride != null,
-            MinSpeedOverride = participation.MinSpeedOverride,
+            LoopSpeedMin = participation.Restrictions.LoopSpeedMin,
+            LoopSpeedMax = participation.Restrictions.LoopSpeedMax,
+            PhaseSpeedMin = participation.Restrictions.PhaseSpeedMin,
+            PhaseSpeedMax = participation.Restrictions.PhaseSpeedMax,
+            LoopAverageSpeedMin = participation.Restrictions.LoopAverageSpeedMin,
+            LoopAverageSpeedMax = participation.Restrictions.LoopAverageSpeedMax,
+            PhaseAverageSpeedMin = participation.Restrictions.PhaseAverageSpeedMin,
+            PhaseAverageSpeedMax = participation.Restrictions.PhaseAverageSpeedMax,
         };
     }
 

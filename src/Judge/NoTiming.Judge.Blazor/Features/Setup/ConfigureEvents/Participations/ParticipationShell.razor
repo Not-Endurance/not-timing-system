@@ -21,19 +21,14 @@
             <NTimePicker @bind-Time="Model.StartTimeOverride" For="() => Model.StartTimeOverride" ShowToolbar="false" Label="@Start_Time_string" Editable="true" Mask="TimeMask" />
         }
 
-        <NSwitch @bind-Value="Model.IsMaxSpeedOverriden" For="() => Model.IsMaxSpeedOverriden" Label="@Max_Speed_Override_string" />
-
-        @if (Model.IsMaxSpeedOverriden)
-        {
-            <NNumberField @bind-Value="Model.MaxSpeedOverride" For="() => Model.MaxSpeedOverride" Label="@Max_Speed_Override_string" Variant="Variant.Text" /> // TODO: is necessary?
-        }
-
-        <NSwitch @bind-Value="Model.IsMinSpeedOverriden" For="() => Model.IsMinSpeedOverriden" Label="@Min_Speed_Override_string" />
-
-        @if (Model.IsMinSpeedOverriden)
-        {
-            <NNumberField @bind-Value="Model.MinSpeedOverride" For="() => Model.MinSpeedOverride" Label="@Min_Speed_Override_string" />
-        }
+        <NNumberField @bind-Value="Model.LoopSpeedMin" For="() => Model.LoopSpeedMin" Label="@Loop_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.LoopSpeedMax" For="() => Model.LoopSpeedMax" Label="@Loop_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.PhaseSpeedMin" For="() => Model.PhaseSpeedMin" Label="@Phase_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.PhaseSpeedMax" For="() => Model.PhaseSpeedMax" Label="@Phase_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.LoopAverageSpeedMin" For="() => Model.LoopAverageSpeedMin" Label="@Loop_average_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.LoopAverageSpeedMax" For="() => Model.LoopAverageSpeedMax" Label="@Loop_average_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.PhaseAverageSpeedMin" For="() => Model.PhaseAverageSpeedMin" Label="@Phase_average_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
+        <NNumberField @bind-Value="Model.PhaseAverageSpeedMax" For="() => Model.PhaseAverageSpeedMax" Label="@Phase_average_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
     </FormFields>
 </KrudForm>
 
