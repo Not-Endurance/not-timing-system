@@ -198,7 +198,7 @@ public class ParticipationTableBehind : NComponent
         {
             var value = speed(index);
             values[index] = FormatSpeed(value, min, max);
-            breaches[index] = value != null && (value < min || value > max);
+            breaches[index] = Breaks(value, min, max);
         }
         return new ParticipationTableRow(label, values, breaches);
     }
@@ -224,21 +224,29 @@ public class ParticipationTableBehind : NComponent
         return value?.ToString() ?? "-";
     }
 
+    // Limits are compared at the precision the speed is shown with, so a value that displays as the limit is not marked.
+    static bool Breaks(double? value, double? min, double? max)
+    {
+        var shown = value == null ? (double?)null : Math.Round(value.Value, 2);
+        return shown < min || shown > max;
+    }
+
     static string FormatSpeed(double? value, double? min, double? max)
     {
         if (value == null)
         {
             return "-";
         }
-        if (value < min)
+        var shown = Math.Round(value.Value, 2);
+        if (shown < min)
         {
-            return $"{value:0.00} ▼";
+            return $"{shown:0.00} ▼";
         }
-        if (value > max)
+        if (shown > max)
         {
-            return $"{value:0.00} ▲";
+            return $"{shown:0.00} ▲";
         }
-        return $"{value:0.00}";
+        return $"{shown:0.00}";
     }
 
     protected sealed record ParticipationTableRow
