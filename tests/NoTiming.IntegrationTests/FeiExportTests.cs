@@ -107,7 +107,7 @@ public sealed class FeiExportTests
             country,
             "Integration FEI Show",
             "Sofia",
-            new EventSpan(start, start.AddDays(1)),
+            new EventSpan(start, start.AddDays(1), "Europe/Sofia"),
             "FEI-SHOW-1",
             1001
         );

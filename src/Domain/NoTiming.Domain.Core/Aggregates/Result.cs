@@ -58,7 +58,16 @@ public class Result : Aggregate, IEventScoped
 
     static List<ParticipationResult> RankIfRequired(List<ParticipationResult> entries, CompetitionRuleset ruleset)
     {
-        return entries.Count > 1 ? Rank(entries, ruleset) : entries;
+        if (entries.Count <= 1)
+        {
+            return entries;
+        }
+        return IsFinal(entries) ? entries.OrderBy(x => x.Rank).ToList() : Rank(entries, ruleset);
+    }
+
+    static bool IsFinal(List<ParticipationResult> entries)
+    {
+        return entries.All(x => x.Rank != null);
     }
 
     static List<ParticipationResult> Rank(IReadOnlyCollection<ParticipationResult> entries, CompetitionRuleset ruleset)

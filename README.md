@@ -46,3 +46,11 @@ MAUI Blazor hybrid apps use MS's WebView2 in order to run natively. This might n
   - `Core` - service the event
   - `Watcher` - is not yet implemented and is supposed to encompass the timing modules - RFID tags, AI cameras, Ui app etc
 5. `NTS.Persistence` - handles state and storage. As of now the "database" is a simple json file, as the day-to-day nature of the integrated app does not require an actual database at this point.
+
+# Database migrations
+MongoDB schema and data changes live in [database](database/README.md) and run with [migrate-mongo](https://github.com/seppevs/migrate-mongo). Each migration is a script in `database/migrations` that exports `up(db)` and `down(db)`.
+
+- The CD workflows run `npm run migrate:up` in a `migrate-mongo` job before the web app deploys. The job runs in the `staging` or `production` GitHub environment and reads the `MONGO_CONNECTION_STRING` secret from it.
+- Applied migrations are recorded in the `changelog` collection, so running `migrate:up` again is safe.
+- To add one, run `npx --prefix database migrate-mongo create <short-description>` and ship it with the change that needs it.
+- Don't point local runs at production unless you mean to change production.

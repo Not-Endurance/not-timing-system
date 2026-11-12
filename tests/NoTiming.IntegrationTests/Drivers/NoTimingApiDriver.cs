@@ -74,11 +74,6 @@ internal sealed class NoTimingApiDriver : IDisposable
         return Send(HttpMethod.Post, "api/event", EventInformationModel.From(eventInformation));
     }
 
-    public Task Update(EventInformation eventInformation)
-    {
-        return Send(HttpMethod.Patch, "api/event", EventInformationModel.From(eventInformation));
-    }
-
     public Task Create(Participation participation)
     {
         return Send(HttpMethod.Post, "api/participations", ParticipationModel.MapFrom(participation));
