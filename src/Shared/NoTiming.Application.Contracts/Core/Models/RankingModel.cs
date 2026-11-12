@@ -59,7 +59,8 @@ public class RankingModel : PersistedModel, IEventScoped, ISoftDeletableDocument
             FeiScheduleNumber,
             entries,
             EventId,
-            Id, storedDomainVersion: DomainVersion
+            Id,
+            storedDomainVersion: DomainVersion
         );
     }
 }

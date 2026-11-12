@@ -65,7 +65,8 @@ public class UserModel : PersistedModel, IDocument, IKrudModel<User>
             CountryRegion,
             Club,
             FeiId,
-            DisplayName, storedDomainVersion: DomainVersion
+            DisplayName,
+            storedDomainVersion: DomainVersion
         );
     }
 

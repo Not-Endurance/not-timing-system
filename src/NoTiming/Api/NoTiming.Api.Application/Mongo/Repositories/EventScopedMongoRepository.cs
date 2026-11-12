@@ -53,9 +53,9 @@ public abstract class EventScopedMongoRepository<T> : MongoRepository<T>, IEvent
 
     async Task EnsureEventNotFinalized(int eventId)
     {
-        var events = _context.Client.GetDatabase(_db).GetCollection<EventInformationModel>(
-            MongoConstants.EVENT_INFORMATION_COLLECTION
-        );
+        var events = _context
+            .Client.GetDatabase(_db)
+            .GetCollection<EventInformationModel>(MongoConstants.EVENT_INFORMATION_COLLECTION);
         var isFinalized = await events.Find(x => x.Id == eventId && x.IsFinalized).AnyAsync();
         if (isFinalized)
         {

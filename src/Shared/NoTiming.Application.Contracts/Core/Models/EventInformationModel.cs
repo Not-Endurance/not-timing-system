@@ -51,6 +51,16 @@ public class EventInformationModel : PersistedModel, IIdentifiable, ISoftDeletab
     {
         var country = Country.MapToEntity();
         var span = new EventSpan(StartDay, EndDay, TimeZoneId ?? EventTimeZone.ForCountry(country));
-        return new EventInformation(country, Name, Location, span, FeiShowId, Id, IsActive, IsFinalized, storedDomainVersion: DomainVersion);
+        return new EventInformation(
+            country,
+            Name,
+            Location,
+            span,
+            FeiShowId,
+            Id,
+            IsActive,
+            IsFinalized,
+            storedDomainVersion: DomainVersion
+        );
     }
 }

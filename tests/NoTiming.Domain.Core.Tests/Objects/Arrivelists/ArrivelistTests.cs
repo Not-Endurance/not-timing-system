@@ -188,10 +188,7 @@ public sealed class ArrivelistTests
         var previousArrive = previousStart.AddMinutes(60);
         var participation = CreateParticipation(
             1,
-            [
-                CreatePhase(20, previousStart, previousArrive, previousArrive),
-                CreatePhase(20, Start, isFinal: true),
-            ],
+            [CreatePhase(20, previousStart, previousArrive, previousArrive), CreatePhase(20, Start, isFinal: true)],
             new SpeedRestrictions(null, null, null, null, null, 15, null, null)
         );
 
@@ -238,15 +235,7 @@ public sealed class ArrivelistTests
         var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
         var horse = new Horse($"Horse {number}", null, null, number);
         var totalDistance = phaseList.Sum(x => x.Length);
-        var combination = new Combination(
-            number,
-            athlete,
-            horse,
-            null,
-            $"{totalDistance:0.##}",
-            restrictions,
-            number
-        );
+        var combination = new Combination(number, athlete, horse, null, $"{totalDistance:0.##}", restrictions, number);
 
         return new Participation(
             ParticipationCategory.Senior,

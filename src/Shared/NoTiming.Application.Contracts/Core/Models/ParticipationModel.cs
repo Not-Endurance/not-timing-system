@@ -43,7 +43,16 @@ public class ParticipationModel : PersistedModel, IEventScoped, ISoftDeletableDo
         var combination = Combination.MapToEntity();
         var phases = Phases!.Select(x => x.MapToEntity());
         var eliminated = Eliminated?.MapToEntity();
-        return new Participation(Category, competition, combination, new(phases), eliminated, EventId, Id, storedDomainVersion: DomainVersion);
+        return new Participation(
+            Category,
+            competition,
+            combination,
+            new(phases),
+            eliminated,
+            EventId,
+            Id,
+            storedDomainVersion: DomainVersion
+        );
     }
 
     void IKrudModel<Participation>.MapFrom(Participation participation)

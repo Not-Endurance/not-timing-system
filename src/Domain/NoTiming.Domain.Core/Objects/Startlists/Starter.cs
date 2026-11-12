@@ -41,6 +41,11 @@ public record Starter : ValueObject
         var distance = Distance + km_string;
         var startTime = Start.ToTimeSpan();
         var start = FormattingHelper.Format(startTime);
-        return Combine(Number, NameRenderingHelper.Render(AthleteName, AthleteNameEnglish, EnglishNames), distance, start);
+        return Combine(
+            Number,
+            NameRenderingHelper.Render(AthleteName, AthleteNameEnglish, EnglishNames),
+            distance,
+            start
+        );
     }
 }

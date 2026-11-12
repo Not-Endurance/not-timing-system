@@ -1,5 +1,5 @@
 using NoTiming.Application.Contracts.Shared;
-﻿using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 

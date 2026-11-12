@@ -55,12 +55,16 @@ public sealed record SpeedRestrictions
     // A minimum is stricter when it is higher, so the higher of two minimums wins.
     static double? Higher(double? first, double? second)
     {
-        return first == null ? second : second == null ? first : Math.Max(first.Value, second.Value);
+        return first == null ? second
+            : second == null ? first
+            : Math.Max(first.Value, second.Value);
     }
 
     // A maximum is stricter when it is lower, so the lower of two maximums wins.
     static double? Lower(double? first, double? second)
     {
-        return first == null ? second : second == null ? first : Math.Min(first.Value, second.Value);
+        return first == null ? second
+            : second == null ? first
+            : Math.Min(first.Value, second.Value);
     }
 }

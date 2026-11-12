@@ -11,7 +11,12 @@ public class LoopModel : PersistedModel
 {
     public static LoopModel MapFrom(Loop loop)
     {
-        return new() { DomainVersion = loop.DomainVersion, Id = loop.Id, Distance = loop.Distance };
+        return new()
+        {
+            DomainVersion = loop.DomainVersion,
+            Id = loop.Id,
+            Distance = loop.Distance,
+        };
     }
 
     public int Id { get; init; }

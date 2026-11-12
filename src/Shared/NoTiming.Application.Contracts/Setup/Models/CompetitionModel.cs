@@ -60,7 +60,8 @@ public class CompetitionModel : PersistedModel
             FeiScheduleNumber,
             phases,
             participations,
-            Id, storedDomainVersion: DomainVersion
+            Id,
+            storedDomainVersion: DomainVersion
         );
     }
 }

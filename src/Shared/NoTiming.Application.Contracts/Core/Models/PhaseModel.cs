@@ -1,5 +1,5 @@
 using NoTiming.Application.Contracts.Shared;
-﻿using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
@@ -76,7 +76,8 @@ public class PhaseModel : PersistedModel
             IsReinspectionRequested,
             IsRequiredInspectionRequested,
             IsRequiredInspectionCompulsory,
-            Id, storedDomainVersion: DomainVersion
+            Id,
+            storedDomainVersion: DomainVersion
         );
     }
 }

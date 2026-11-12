@@ -39,7 +39,8 @@ public class ParticipationModel : PersistedModel
             Category,
             StartTimeOverride,
             Restrictions.ToDomain(),
-            Id, storedDomainVersion: DomainVersion
+            Id,
+            storedDomainVersion: DomainVersion
         );
     }
 }

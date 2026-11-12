@@ -81,7 +81,10 @@ public record Arrivelist : ValueObject
 
     static TimeSpan ResolveCompletedLoopInterval(IEnumerable<Phase> completedPhases)
     {
-        return completedPhases.Aggregate(TimeSpan.Zero, (sum, phase) => sum + (phase.GetLoopInterval()?.ToTimeSpan() ?? TimeSpan.Zero));
+        return completedPhases.Aggregate(
+            TimeSpan.Zero,
+            (sum, phase) => sum + (phase.GetLoopInterval()?.ToTimeSpan() ?? TimeSpan.Zero)
+        );
     }
 
     static double? ResolveAverageSpeed(double completedDistance, TimeSpan completedInterval)

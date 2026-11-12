@@ -46,7 +46,8 @@ public class ConfigureEventModel : PersistedModel, IDocument, IKrudModel<Configu
             loops,
             combinations,
             Id,
-            operators, storedDomainVersion: DomainVersion
+            operators,
+            storedDomainVersion: DomainVersion
         );
     }
 

@@ -1,7 +1,7 @@
+using NoTiming.Application.Contracts.Shared;
 using NoTiming.Application.Contracts.Shared.Models;
 using NoTiming.Domain.Enums;
 using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
-using NoTiming.Application.Contracts.Shared;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 

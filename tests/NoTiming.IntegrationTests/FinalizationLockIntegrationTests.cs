@@ -23,8 +23,8 @@ public sealed class FinalizationLockIntegrationTests : IClassFixture<NoTimingInt
         using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
         await api.Create(CreateEvent(eventId, isFinalized: true));
 
-        var exception = await Assert.ThrowsAnyAsync<Exception>(() =>
-            api.Create(IntegrationPayloadFactory.Official(eventId, null))
+        var exception = await Assert.ThrowsAnyAsync<Exception>(
+            () => api.Create(IntegrationPayloadFactory.Official(eventId, null))
         );
 
         Assert.Contains("finalized", exception.Message, StringComparison.OrdinalIgnoreCase);

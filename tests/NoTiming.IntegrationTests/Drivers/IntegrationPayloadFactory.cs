@@ -48,7 +48,16 @@ internal static class IntegrationPayloadFactory
             horse,
             club: null,
             distance: "40",
-            restrictions: new NoTiming.Domain.Objects.SpeedRestrictions(null, null, null, null, null, null, minAverageSpeed, maxAverageSpeed),
+            restrictions: new NoTiming.Domain.Objects.SpeedRestrictions(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                minAverageSpeed,
+                maxAverageSpeed
+            ),
             id: combinationId
         );
         var competition = new Competition("CEI 1*", true);

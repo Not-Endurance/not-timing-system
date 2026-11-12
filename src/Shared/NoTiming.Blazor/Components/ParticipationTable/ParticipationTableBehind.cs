@@ -210,11 +210,12 @@ public class ParticipationTableBehind : NComponent
     {
         return phases
             .Select(
-                (phase, index) => new ParticipationTableRow(
-                    phase.Gate,
-                    rows.Select(row => row.Values[index]).ToArray(),
-                    rows.Select(row => row.Breaches[index]).ToArray()
-                )
+                (phase, index) =>
+                    new ParticipationTableRow(
+                        phase.Gate,
+                        rows.Select(row => row.Values[index]).ToArray(),
+                        rows.Select(row => row.Breaches[index]).ToArray()
+                    )
             )
             .ToArray();
     }

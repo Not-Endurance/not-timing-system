@@ -86,7 +86,8 @@ public abstract class ApiControllerBase : ControllerBase
     {
         switch (payload)
         {
-            case null or string:
+            case null
+            or string:
                 return;
             case PersistedModel persisted:
                 persisted.DomainVersion = PersistedModel.CURRENT_DOMAIN_VERSION;

@@ -14,7 +14,7 @@ public class EventInformationMongoRepository : MongoRepository<EventInformationM
     {
         return Builders<EventInformationModel>
             .Update.Set(x => x.DomainVersion, document.DomainVersion)
-                .Set(x => x.Country, document.Country)
+            .Set(x => x.Country, document.Country)
             .Set(x => x.Name, document.Name)
             .Set(x => x.Location, document.Location)
             .Set(x => x.FeiShowId, document.FeiShowId)

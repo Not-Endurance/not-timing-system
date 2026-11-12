@@ -189,7 +189,8 @@ namespace NoTiming.Shared.Localization
         public static string Loop_average_speed_max_string => LocalizeString(nameof(Loop_average_speed_max_string));
         public static string Phase_average_speed_min_string => LocalizeString(nameof(Phase_average_speed_min_string));
         public static string Phase_average_speed_max_string => LocalizeString(nameof(Phase_average_speed_max_string));
-        public static string Speed_limits_combine_helper_string => LocalizeString(nameof(Speed_limits_combine_helper_string));
+        public static string Speed_limits_combine_helper_string =>
+            LocalizeString(nameof(Speed_limits_combine_helper_string));
         public static string English_names_string => LocalizeString(nameof(English_names_string));
         public static string Automatic_CRI_string => LocalizeString(nameof(Automatic_CRI_string));
         public static string Require_Compulsory_Inspection_string =>
