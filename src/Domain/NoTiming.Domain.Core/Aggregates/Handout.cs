@@ -9,7 +9,7 @@ public sealed class Handout : Result
             id,
             null,
             participation.Competition.Name,
-            participation.Competition.Ruleset,
+            participation.Competition.EnglishNames,
             participation.Category,
             [new ParticipationResult(participation)],
             participation.EventId

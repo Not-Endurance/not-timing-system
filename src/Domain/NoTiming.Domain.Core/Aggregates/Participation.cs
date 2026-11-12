@@ -59,7 +59,7 @@ public class Participation : Aggregate, IEventScoped
 
     public override string ToString()
     {
-        return Combine(Combination.GetDisplayName(Competition.Ruleset), Phases, Eliminated);
+        return Combine(Combination.GetDisplayName(Competition.EnglishNames), Phases, Eliminated);
     }
 
     //TODO rename to smthing better (including ISnapshotProcessor, IManualProcessor and other mentions..)

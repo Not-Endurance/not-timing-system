@@ -1,7 +1,6 @@
 ﻿using NC.DateAndTime;
 using NC.Domain.Exceptions;
 using NC.Krud.Models;
-using NoTiming.Domain.Enums;
 using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions;
@@ -22,7 +21,7 @@ public record CompetitionFormModel : KrudFormModel<Competition>
     }
 
     public string? Name { get; set; }
-    public CompetitionRuleset Ruleset { get; set; } = CompetitionRuleset.Regional;
+    public bool EnglishNames { get; set; }
     public DateTime? Date { get; set; } = DateTime.Now;
     public TimeSpan? Time { get; set; } = DateTime.Now.TimeOfDay;
     public bool UseCompulsoryThreshold { get; set; }
@@ -57,7 +56,7 @@ public record CompetitionFormModel : KrudFormModel<Competition>
         var compulsoryThreshold = ConvertMinutes(CompulsoryThresholdMinutes);
         return new Competition(
             Name,
-            Ruleset,
+            EnglishNames,
             startTime,
             compulsoryThreshold,
             MinSpeedRestriction,
@@ -79,7 +78,7 @@ public record CompetitionFormModel : KrudFormModel<Competition>
         Name = competition.Name;
         Date = competition.Start.ToLocalTime().DateTime.Date; // TODO: Create NComponent that's using DateTimeOffset and convert to DateTime correctly
         Time = competition.Start.ToLocalTime().DateTime.TimeOfDay;
-        Ruleset = competition.Ruleset;
+        EnglishNames = competition.EnglishNames;
         Phases = competition.Phases;
         Participations = competition.Participations;
         CompulsoryThresholdMinutes = competition.CompulsoryThresholdSpan?.Minutes;

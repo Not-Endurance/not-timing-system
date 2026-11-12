@@ -16,7 +16,7 @@ public sealed record ResultsDocument : Document, IIdentifiable
             results,
             new DocumentHeader(
                 results.Name,
-                results.Ruleset,
+                results.EnglishNames,
                 eventInformation.Country,
                 eventInformation.Location,
                 eventInformation.EventSpan,

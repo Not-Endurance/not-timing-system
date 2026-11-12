@@ -50,7 +50,7 @@ public sealed class RankingTests
     {
         return new Ranking(
             "Competition",
-            CompetitionRuleset.FEI,
+            true,
             ParticipationCategory.Senior,
             null,
             null,
@@ -72,7 +72,7 @@ public sealed class RankingTests
 
         return new Participation(
             ParticipationCategory.Senior,
-            new Competition("Competition", CompetitionRuleset.FEI),
+            new Competition("Competition", true),
             combination,
             new PhaseCollection([CreatePhase(START)]),
             null,
@@ -88,7 +88,6 @@ public sealed class RankingTests
             20,
             40,
             null,
-            CompetitionRuleset.FEI,
             true,
             null,
             Timestamp.Create(start),

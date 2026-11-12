@@ -305,7 +305,7 @@ internal class ConfigureEventFeature
             );
             Assert.Contains(
                 currentEvent.Competitions,
-                x => x.Id == competitionId && x.Name == competition.Name && x.Ruleset == competition.Ruleset
+                x => x.Id == competitionId && x.Name == competition.Name && x.EnglishNames == competition.EnglishNames
             );
 
             SelectCompetition(_judge, currentEvent, competitionId);
@@ -460,7 +460,7 @@ internal class ConfigureEventFeature
         return new CompetitionFormModel
         {
             Name = competition.Name,
-            Ruleset = competition.Ruleset,
+            EnglishNames = competition.EnglishNames,
             Date = localStart.Date,
             Time = localStart.TimeOfDay,
             UseCompulsoryThreshold = competition.CompulsoryThresholdSpan != null,

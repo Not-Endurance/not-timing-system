@@ -87,7 +87,7 @@ public sealed class ParticipationAndRankingFactoryTests
 
         return new SetupCompetition(
             name: "Speed defaults",
-            ruleset: CompetitionRuleset.Regional,
+            englishNames: false,
             start: new DateTimeOffset(2026, 5, 1, 8, 0, 0, TimeSpan.Zero),
             compulsoryThresholdSpan: null,
             minSpeedRestriction: minSpeedRestriction,

@@ -14,7 +14,7 @@
     {
       "_id": 834244819,
       "Name": "ДП млади ездачи и юноши до 18 г",
-      "Ruleset": "FEI",
+      "EnglishNames": true,
       "Start": {
         "$date": "2026-04-27T05:00:00.000Z"
       },
@@ -469,7 +469,7 @@
     {
       "_id": 1557344940,
       "Name": "ДП юноши до 14 години",
-      "Ruleset": "Regional",
+      "EnglishNames": false,
       "Start": {
         "$date": "2026-04-27T06:00:00.000Z"
       },
@@ -546,7 +546,7 @@
     {
       "_id": 1543847229,
       "Name": "ДП пони ездачи",
-      "Ruleset": "Regional",
+      "EnglishNames": false,
       "Start": {
         "$date": "2026-04-27T06:30:00.000Z"
       },
@@ -828,7 +828,7 @@
     {
       "_id": 1506827012,
       "Name": "Квалификационен турнир 80 км",
-      "Ruleset": "Regional",
+      "EnglishNames": false,
       "Start": {
         "$date": "2026-04-27T05:00:00.000Z"
       },
@@ -914,7 +914,7 @@
     {
       "_id": 896167378,
       "Name": "Квалификационен турнир 40 км",
-      "Ruleset": "Regional",
+      "EnglishNames": false,
       "Start": {
         "$date": "2026-04-27T06:00:00.000Z"
       },
@@ -1237,7 +1237,7 @@
     {
       "_id": 1076607645,
       "Name": "Квалификация 60 км",
-      "Ruleset": "Regional",
+      "EnglishNames": false,
       "Start": {
         "$date": "2026-04-27T05:00:00.000Z"
       },

@@ -206,7 +206,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
     {
         return new Ranking(
             setupCompetition.Name,
-            setupCompetition.Ruleset,
+            setupCompetition.EnglishNames,
             entriesByCategory.Key,
             setupCompetition.FeiEventId,
             setupCompetition.FeiEventCode,

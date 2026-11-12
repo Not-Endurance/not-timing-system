@@ -181,7 +181,7 @@ namespace NoTiming.Shared.Localization
         public static string Athlete_string => LocalizeString(nameof(Athlete_string));
         public static string Horse_string => LocalizeString(nameof(Horse_string));
         public static string Operator_string => LocalizeString(nameof(Operator_string));
-        public static string Competition_Ruleset_string => LocalizeString(nameof(Competition_Ruleset_string));
+        public static string English_names_string => LocalizeString(nameof(English_names_string));
         public static string Automatic_CRI_string => LocalizeString(nameof(Automatic_CRI_string));
         public static string Require_Compulsory_Inspection_string =>
             LocalizeString(nameof(Require_Compulsory_Inspection_string));

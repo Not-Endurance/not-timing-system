@@ -268,7 +268,7 @@ public sealed class PresentlistTests
 
         return new Participation(
             ParticipationCategory.Senior,
-            new Competition("Competition", CompetitionRuleset.Regional),
+            new Competition("Competition", false),
             combination,
             new PhaseCollection(phaseList),
             eliminated,
@@ -293,7 +293,6 @@ public sealed class PresentlistTests
             20,
             40,
             rest,
-            CompetitionRuleset.Regional,
             isFinal,
             null,
             Timestamp.Create(start),

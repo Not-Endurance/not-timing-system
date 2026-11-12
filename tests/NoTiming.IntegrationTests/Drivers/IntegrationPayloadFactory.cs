@@ -52,13 +52,12 @@ internal static class IntegrationPayloadFactory
             maxAverageSpeed: maxAverageSpeed,
             id: combinationId
         );
-        var competition = new Competition("CEI 1*", CompetitionRuleset.FEI);
+        var competition = new Competition("CEI 1*", true);
         var phase = new Phase(
             gate: "GATE1/40",
             length: 40,
             maxRecovery: 40,
             rest: null,
-            ruleset: CompetitionRuleset.FEI,
             isFinal: true,
             compulsoryThresholdSpan: null,
             startTime: new Timestamp(startTime ?? DateTimeOffset.UtcNow.Date.AddHours(8)),
@@ -103,13 +102,12 @@ internal static class IntegrationPayloadFactory
             maxAverageSpeed: null,
             id: id + 300
         );
-        var competition = new Competition("CEI 1*", CompetitionRuleset.FEI);
+        var competition = new Competition("CEI 1*", true);
         var firstPhase = new Phase(
             gate: "GATE1/20",
             length: 20,
             maxRecovery: 40,
             rest: 40,
-            ruleset: CompetitionRuleset.FEI,
             isFinal: false,
             compulsoryThresholdSpan: compulsoryThresholdSpan,
             startTime: new Timestamp(startTime ?? DateTimeOffset.UtcNow.Date.AddHours(8)),
@@ -126,7 +124,6 @@ internal static class IntegrationPayloadFactory
             length: 20,
             maxRecovery: 40,
             rest: null,
-            ruleset: CompetitionRuleset.FEI,
             isFinal: true,
             compulsoryThresholdSpan: null,
             startTime: null,
@@ -180,7 +177,7 @@ internal static class IntegrationPayloadFactory
 
         return new Ranking(
             name ?? "Integration Ranking",
-            CompetitionRuleset.FEI,
+            true,
             ParticipationCategory.Senior,
             null,
             null,

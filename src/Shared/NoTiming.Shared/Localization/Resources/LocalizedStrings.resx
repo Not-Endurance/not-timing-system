@@ -498,8 +498,8 @@
   <data name="Operator_string" xml:space="preserve">
     <value>Operator</value>
   </data>
-  <data name="Competition_Ruleset_string" xml:space="preserve">
-    <value>Ruleset</value>
+  <data name="English_names_string" xml:space="preserve">
+    <value>English names</value>
   </data>
   <data name="Automatic_CRI" xml:space="preserve">
     <value>Require compulsory inspection based on recovery</value>

@@ -75,7 +75,7 @@ public sealed class StartlistTests
 
         return new Participation(
             ParticipationCategory.Senior,
-            new Competition("Competition", CompetitionRuleset.Regional),
+            new Competition("Competition", false),
             combination,
             new PhaseCollection(phases),
             null,
@@ -94,7 +94,7 @@ public sealed class StartlistTests
 
         return new Participation(
             ParticipationCategory.Senior,
-            new Competition("Competition", CompetitionRuleset.Regional),
+            new Competition("Competition", false),
             combination,
             new PhaseCollection(phaseList),
             eliminated,
@@ -114,7 +114,6 @@ public sealed class StartlistTests
             20,
             40,
             isFinal ? null : 40,
-            CompetitionRuleset.Regional,
             isFinal,
             null,
             Timestamp.Create(start),

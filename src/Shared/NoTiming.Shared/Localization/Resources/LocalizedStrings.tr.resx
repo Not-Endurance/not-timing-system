@@ -499,8 +499,8 @@
   <data name="Operator_string" xml:space="preserve">
     <value>Operatör</value>
   </data>
-  <data name="Competition_Ruleset_string" xml:space="preserve">
-    <value>Kural seti</value>
+  <data name="English_names_string" xml:space="preserve">
+    <value>İngilizce isimler</value>
   </data>
   <data name="Automatic_CRI" xml:space="preserve">
     <value>Toparlanma süresine göre zorunlu inceleme</value>

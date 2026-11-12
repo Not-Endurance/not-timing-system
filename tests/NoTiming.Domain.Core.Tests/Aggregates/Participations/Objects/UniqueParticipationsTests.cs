@@ -70,7 +70,7 @@ public sealed class UniqueParticipationsTests
 
         return new Participation(
             ParticipationCategory.Senior,
-            new Competition("Competition", CompetitionRuleset.Regional),
+            new Competition("Competition", false),
             combination,
             new PhaseCollection([CreatePhase()]),
             null,
@@ -86,7 +86,6 @@ public sealed class UniqueParticipationsTests
             20,
             40,
             null,
-            CompetitionRuleset.Regional,
             true,
             null,
             Timestamp.Create(DateTimeOffset.Now),

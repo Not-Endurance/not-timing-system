@@ -34,7 +34,7 @@ public class PresentlistTableBehind : NStatefulComponent
 
     protected string FormatAthlete(PresentlistEntry entry)
     {
-        return NameRenderingHelper.Render(entry.AthleteName, entry.AthleteNameEnglish, entry.Ruleset);
+        return NameRenderingHelper.Render(entry.AthleteName, entry.AthleteNameEnglish, entry.EnglishNames);
     }
 
     protected string FormatTime(PresentlistEntry entry)

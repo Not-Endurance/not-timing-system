@@ -49,10 +49,10 @@ public class Combination : Entity, INoTimingDisplayable
         }
     }
 
-    public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    public string GetDisplayName(bool englishNames = false, CultureInfo? culture = null)
     {
         var speed = ToStringHelper.FormatSpeedRestrictions(MinAverageSpeed, MaxAverageSpeed);
-        return $"{hash_string}{Number}: {Athlete.GetDisplayName(ruleset, culture)}, {Horse.GetDisplayName(ruleset, culture)} {speed}";
+        return $"{hash_string}{Number}: {Athlete.GetDisplayName(englishNames, culture)}, {Horse.GetDisplayName(englishNames, culture)} {speed}";
     }
 
     public override string ToString()

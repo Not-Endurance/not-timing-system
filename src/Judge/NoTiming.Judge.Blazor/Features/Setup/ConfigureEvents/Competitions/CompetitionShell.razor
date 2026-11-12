@@ -9,7 +9,7 @@
     <FormFields>
         <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
 
-        <NSelect @bind-Value="Model.Ruleset" For="() => Model.Ruleset" Label="@Competition_Ruleset_string" />
+        <NSwitch @bind-Value="Model.EnglishNames" For="() => Model.EnglishNames" Label="@English_names_string" />
 
         <NDatePicker @bind-Date="Model.Date" For="() => Model.Date" Label="@Date_string" ImmediateText="true"/>
 

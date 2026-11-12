@@ -22,9 +22,9 @@ public class Athlete : Entity, INamed, INoTimingDisplayable
     public Club? Club { get; }
     public string? FeiId { get; }
 
-    public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    public string GetDisplayName(bool englishNames = false, CultureInfo? culture = null)
     {
-        return NameRenderingHelper.Render(Name, NameEnglish, ruleset, culture);
+        return NameRenderingHelper.Render(Name, NameEnglish, englishNames, culture);
     }
 
     public override string ToString()

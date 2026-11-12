@@ -74,7 +74,7 @@ public static class ParticipationAndRankingFactory
         );
         return new Participation(
             setupParticipation.Category,
-            new(setupCompetition.Name, setupCompetition.Ruleset),
+            new(setupCompetition.Name, setupCompetition.EnglishNames),
             combination,
             new(phases),
             null,
@@ -141,7 +141,6 @@ public static class ParticipationAndRankingFactory
                 setupPhase.Loop!.Distance,
                 setupPhase.Recovery,
                 setupPhase.Rest,
-                setupCompetition.Ruleset,
                 isFinal,
                 compulsoryThresholdSpan,
                 Timestamp.Create(startTime),

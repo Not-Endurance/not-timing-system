@@ -1,5 +1,4 @@
 ﻿using NoTiming.Domain.Core.Aggregates.Participations.Entities;
-using NoTiming.Domain.Enums;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
@@ -14,7 +13,6 @@ public class PhaseModel
             Length = phase.Length,
             MaxRecovery = phase.MaxRecovery,
             Rest = phase.Rest,
-            Ruleset = phase.Ruleset,
             IsFinal = phase.IsFinal,
             StartTime = phase.StartTime,
             ArriveTime = phase.ArriveTime,
@@ -41,7 +39,6 @@ public class PhaseModel
     public double Length { get; init; }
     public int MaxRecovery { get; init; }
     public int? Rest { get; init; }
-    public CompetitionRuleset Ruleset { get; init; }
     public bool IsFinal { get; init; }
     public DateTimeOffset? StartTime { get; init; }
     public DateTimeOffset? ArriveTime { get; init; }
@@ -68,7 +65,6 @@ public class PhaseModel
             Length,
             MaxRecovery,
             Rest,
-            Ruleset,
             IsFinal,
             CompulsoryThresholdInterval,
             StartTime,

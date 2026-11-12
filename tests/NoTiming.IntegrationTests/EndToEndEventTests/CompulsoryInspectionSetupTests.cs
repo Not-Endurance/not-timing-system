@@ -108,7 +108,7 @@ public sealed class CompulsoryInspectionSetupTests
             .ToArray();
         var competition = new SetupCompetition(
             "Compulsory inspection setup test",
-            CompetitionRuleset.Regional,
+            false,
             DateTimeOffset.UtcNow.Date.AddDays(30).AddHours(8),
             compulsoryThresholdSpan: TimeSpan.FromMinutes(10),
             minSpeedRestriction: null,

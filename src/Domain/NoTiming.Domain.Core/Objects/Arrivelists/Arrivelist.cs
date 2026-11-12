@@ -38,8 +38,8 @@ public record Arrivelist : ValueObject
 
         return new ArrivelistEntry(
             participation.Combination.Number,
-            participation.Combination.Athlete.GetDisplayName(participation.Competition.Ruleset),
-            participation.Combination.Horse.GetDisplayName(participation.Competition.Ruleset),
+            participation.Combination.Athlete.GetDisplayName(participation.Competition.EnglishNames),
+            participation.Combination.Horse.GetDisplayName(participation.Competition.EnglishNames),
             EstimateArrival(phase.StartTime!, completedDistance, completedInterval, phase.Length, maxAverageSpeed),
             EstimateArrival(phase.StartTime!, completedDistance, completedInterval, phase.Length, averageSpeed),
             EstimateArrival(phase.StartTime!, completedDistance, completedInterval, phase.Length, minAverageSpeed)

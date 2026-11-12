@@ -98,7 +98,7 @@ public sealed class ParticipationTests
 
         return new Participation(
             ParticipationCategory.Senior,
-            new Competition("Competition", CompetitionRuleset.Regional),
+            new Competition("Competition", false),
             combination,
             new PhaseCollection(phaseList),
             null,
@@ -119,7 +119,6 @@ public sealed class ParticipationTests
             20,
             40,
             40,
-            CompetitionRuleset.Regional,
             isFinal,
             null,
             new Timestamp(start),

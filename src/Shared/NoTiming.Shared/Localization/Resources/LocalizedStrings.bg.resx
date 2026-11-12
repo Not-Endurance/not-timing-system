@@ -498,8 +498,8 @@
   <data name="Operator_string" xml:space="preserve">
     <value>Оператор</value>
   </data>
-  <data name="Competition_Ruleset_string" xml:space="preserve">
-    <value>Правилник</value>
+  <data name="English_names_string" xml:space="preserve">
+    <value>Английски имена</value>
   </data>
   <data name="Automatic_CRI" xml:space="preserve">
     <value>Задължителна инспекция базирана на време на възстановяване</value>

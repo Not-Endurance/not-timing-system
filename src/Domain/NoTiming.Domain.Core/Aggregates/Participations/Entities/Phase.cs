@@ -1,6 +1,5 @@
 ﻿using NC.Domain.Exceptions;
 using NoTiming.Domain.Aggregates;
-using NoTiming.Domain.Core.StaticOptions;
 using static NoTiming.Domain.Core.Aggregates.SnapshotResultType;
 
 namespace NoTiming.Domain.Core.Aggregates.Participations.Entities;
@@ -15,7 +14,6 @@ public class Phase : Entity
         double length,
         int maxRecovery,
         int? rest,
-        CompetitionRuleset ruleset,
         bool isFinal,
         TimeSpan? compulsoryThresholdSpan,
         Timestamp? startTime,
@@ -33,7 +31,6 @@ public class Phase : Entity
         Length = length;
         MaxRecovery = maxRecovery;
         Rest = rest;
-        Ruleset = ruleset;
         IsFinal = isFinal;
         StartTime = startTime;
         ArriveTime = arriveTime;
@@ -51,7 +48,6 @@ public class Phase : Entity
     public double Length { get; }
     public int MaxRecovery { get; }
     public int? Rest { get; }
-    public CompetitionRuleset Ruleset { get; }
     public bool IsFinal { get; }
     public Timestamp? StartTime { get; internal set; } // TODO: does it have to be nullable?
     public Timestamp? ArriveTime { get; private set; }
@@ -233,10 +229,6 @@ public class Phase : Entity
 
     public Speed? GetAverageSpeed()
     {
-        if (StaticOption.ShouldOnlyUseAverageLoopSpeed(Ruleset))
-        {
-            return GetAverageLoopSpeed();
-        }
         return IsFinal ? GetAverageLoopSpeed() : GetAveragePhaseSpeed();
     }
 

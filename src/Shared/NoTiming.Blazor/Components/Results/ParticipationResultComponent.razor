@@ -5,7 +5,7 @@
 @{
     var participation = Entry.Participation;
     var combination = participation.Combination;
-    var ruleset = participation.Competition.Ruleset;
+    var englishNames = participation.Competition.EnglishNames;
     const Align align = Align.Center;
 }
 
@@ -32,11 +32,11 @@
             }
 
             <MudText Typo="Typo.button" Align="align" Class="results-row-identity-item">
-                @combination.Athlete.GetDisplayName(ruleset)
+                @combination.Athlete.GetDisplayName(englishNames)
             </MudText>
 
             <MudText Typo="Typo.button" Align="align" Class="results-row-identity-item">
-                @combination.Horse.GetDisplayName(ruleset)
+                @combination.Horse.GetDisplayName(englishNames)
             </MudText>
 
             @if (combination.Club != null)

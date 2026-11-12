@@ -7,7 +7,7 @@ public record DocumentHeader
 {
     public DocumentHeader(
         string eventInformation,
-        CompetitionRuleset ruleset,
+        bool englishNames,
         Country country,
         string location,
         EventSpan eventSpan,
@@ -15,7 +15,7 @@ public record DocumentHeader
     )
     {
         Title = eventInformation;
-        Ruleset = ruleset;
+        EnglishNames = englishNames;
         Country = country;
         Location = location;
         EventSpan = eventSpan;
@@ -30,7 +30,7 @@ public record DocumentHeader
     }
 
     public string Title { get; }
-    public CompetitionRuleset Ruleset { get; }
+    public bool EnglishNames { get; }
     public Country Country { get; }
     public string Location { get; }
     public EventSpan EventSpan { get; }

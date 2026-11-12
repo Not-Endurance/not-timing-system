@@ -21,15 +21,15 @@ public class Official : Entity, INamed, INoTimingDisplayable
     public OfficialRole Role { get; }
     public User? User { get; }
 
-    public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    public string GetDisplayName(bool englishNames = false, CultureInfo? culture = null)
     {
-        return NameRenderingHelper.Render(Name, NameEnglish, ruleset, culture);
+        return NameRenderingHelper.Render(Name, NameEnglish, englishNames, culture);
     }
 
-    public string GetDisplayLabel(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    public string GetDisplayLabel(bool englishNames = false, CultureInfo? culture = null)
     {
         var values = Role.GetDescription();
-        return Combine(values, GetDisplayName(ruleset, culture));
+        return Combine(values, GetDisplayName(englishNames, culture));
     }
 
     public override string ToString()

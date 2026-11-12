@@ -758,7 +758,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         );
         var competition = new SetupCompetition(
             "Operator Access Competition",
-            CompetitionRuleset.Regional,
+            false,
             DateTimeOffset.UtcNow.Date.AddHours(8),
             null,
             null,

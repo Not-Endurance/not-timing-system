@@ -10,7 +10,7 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
 
     public Competition(
         string? name,
-        CompetitionRuleset? ruleset,
+        bool englishNames,
         DateTimeOffset? start,
         TimeSpan? compulsoryThresholdSpan,
         double? minSpeedRestriction,
@@ -29,7 +29,7 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
         _phases = phases.ToList();
         _participations = participations.ToList();
         Name = Required(nameof(Name), name);
-        Ruleset = Required(nameof(Ruleset), ruleset);
+        EnglishNames = englishNames;
         Start = Required(nameof(Start), start);
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
         MinSpeedRestriction = minSpeedRestriction;
@@ -45,7 +45,7 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
     IReadOnlyList<Phase> IKrudParent<Phase>.Children => Phases;
 
     public string Name { get; }
-    public CompetitionRuleset Ruleset { get; }
+    public bool EnglishNames { get; }
     public DateTimeOffset Start { get; }
     public TimeSpan? CompulsoryThresholdSpan { get; }
     public double? MinSpeedRestriction { get; }

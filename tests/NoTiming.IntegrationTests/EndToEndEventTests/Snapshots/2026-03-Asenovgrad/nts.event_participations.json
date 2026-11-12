@@ -5,7 +5,7 @@
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
     "_id": 1000649529,
@@ -47,7 +47,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -83,7 +82,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-28T07:43:00.000Z"
@@ -111,7 +109,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -151,7 +148,7 @@
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
     "_id": 868875140,
@@ -193,7 +190,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -221,7 +217,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -247,7 +242,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -280,7 +274,7 @@
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
     "_id": 1912975737,
@@ -322,7 +316,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -350,7 +343,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -376,7 +368,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -409,7 +400,7 @@
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
     "_id": 621581842,
@@ -451,7 +442,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -479,7 +469,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -505,7 +494,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -538,7 +526,7 @@
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
     "_id": 621445191,
@@ -580,7 +568,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -610,7 +597,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -636,7 +622,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -669,7 +654,7 @@
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
     "_id": 442221356,
@@ -711,7 +696,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -739,7 +723,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -765,7 +748,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -798,7 +780,7 @@
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
     "_id": 195979988,
@@ -840,7 +822,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -870,7 +851,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -896,7 +876,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -929,7 +908,7 @@
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
     "_id": 433552815,
@@ -971,7 +950,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -999,7 +977,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -1025,7 +1002,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1058,7 +1034,7 @@
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
     "_id": 1682878006,
@@ -1100,7 +1076,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -1130,7 +1105,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -1156,7 +1130,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1189,7 +1162,7 @@
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
     "_id": 485219756,
@@ -1231,7 +1204,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -1259,7 +1231,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -1285,7 +1256,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1318,7 +1288,7 @@
   "Category": "Children",
   "Competition": {
     "Name": "ДП юноши до 14 години",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 1423537438,
@@ -1360,7 +1330,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -1388,7 +1357,6 @@
       "Length": 31,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1421,7 +1389,7 @@
   "Category": "Children",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 1158636416,
@@ -1463,7 +1431,6 @@
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -1491,7 +1458,6 @@
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1524,7 +1490,7 @@
   "Category": "Companion",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 227987334,
@@ -1566,7 +1532,6 @@
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -1594,7 +1559,6 @@
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1627,7 +1591,7 @@
   "Category": "Children",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 2124980372,
@@ -1669,7 +1633,6 @@
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -1697,7 +1660,6 @@
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1730,7 +1692,7 @@
   "Category": "Children",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 1346286463,
@@ -1772,7 +1734,6 @@
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -1800,7 +1761,6 @@
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1833,7 +1793,7 @@
   "Category": "Companion",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 449671187,
@@ -1875,7 +1835,6 @@
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -1903,7 +1862,6 @@
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1936,7 +1894,7 @@
   "Category": "Companion",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 1262474185,
@@ -1978,7 +1936,6 @@
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -2006,7 +1963,6 @@
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2039,7 +1995,7 @@
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 80 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 992737684,
@@ -2081,7 +2037,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -2109,7 +2064,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -2135,7 +2089,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2168,7 +2121,7 @@
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 542881568,
@@ -2210,7 +2163,6 @@
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2238,7 +2190,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2271,7 +2222,7 @@
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 778290182,
@@ -2313,7 +2264,6 @@
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2341,7 +2291,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2374,7 +2323,7 @@
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 1082398365,
@@ -2416,7 +2365,6 @@
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2444,7 +2392,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2477,7 +2424,7 @@
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 261757742,
@@ -2519,7 +2466,6 @@
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2547,7 +2493,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2580,7 +2525,7 @@
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 301607551,
@@ -2622,7 +2567,6 @@
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2650,7 +2594,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2683,7 +2626,7 @@
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 2022591792,
@@ -2725,7 +2668,6 @@
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2753,7 +2695,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2786,7 +2727,7 @@
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 2095370197,
@@ -2828,7 +2769,6 @@
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2856,7 +2796,6 @@
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2889,7 +2828,7 @@
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификация 60 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
     "_id": 346556309,
@@ -2931,7 +2870,6 @@
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -2959,7 +2897,6 @@
       "Length": 31,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
