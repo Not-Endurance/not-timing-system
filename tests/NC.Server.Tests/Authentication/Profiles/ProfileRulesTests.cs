@@ -18,10 +18,11 @@ public sealed class ProfileRulesTests
     public void Accepts_WhenOneValidatorRejects_ShouldReturnFalse()
     {
         var rules = new ProfileRules<TestProfile>(
-        [
-            new FakeProfileValidator(profile => true),
-            new FakeProfileValidator(profile => profile.CountryIsoCode is not null),
-        ]);
+            [
+                new FakeProfileValidator(profile => true),
+                new FakeProfileValidator(profile => profile.CountryIsoCode is not null),
+            ]
+        );
 
         Assert.False(rules.Accepts(new TestProfile()));
     }
@@ -30,10 +31,8 @@ public sealed class ProfileRulesTests
     public void Accepts_WhenEveryValidatorAccepts_ShouldReturnTrue()
     {
         var rules = new ProfileRules<TestProfile>(
-        [
-            new FakeProfileValidator(profile => true),
-            new FakeProfileValidator(profile => profile.Club is not null),
-        ]);
+            [new FakeProfileValidator(profile => true), new FakeProfileValidator(profile => profile.Club is not null)]
+        );
 
         Assert.True(rules.Accepts(new TestProfile { Club = "SC Ruse" }));
     }
