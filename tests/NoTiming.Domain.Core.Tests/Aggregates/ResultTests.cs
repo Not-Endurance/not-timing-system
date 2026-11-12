@@ -17,7 +17,9 @@ public sealed class ResultTests
     {
         var notArrived = CreateParticipation(1, arrive: null, present: null);
         var arrivedEarlier = CreateParticipation(2, START.AddHours(1), present: null);
-        var ranking = CreateRanking([new RankingEntry(notArrived, null, false), new RankingEntry(arrivedEarlier, null, false)]);
+        var ranking = CreateRanking(
+            [new RankingEntry(notArrived, null, false), new RankingEntry(arrivedEarlier, null, false)]
+        );
 
         var result = new Result(ranking);
 

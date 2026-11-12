@@ -19,8 +19,8 @@ public sealed class RankingTests
         var ranked = CreateParticipation(1);
         var unranked = CreateParticipation(2);
 
-        Assert.Throws<DomainException>(() =>
-            CreateRanking([new RankingEntry(ranked, 1, false), new RankingEntry(unranked, null, false)])
+        Assert.Throws<DomainException>(
+            () => CreateRanking([new RankingEntry(ranked, 1, false), new RankingEntry(unranked, null, false)])
         );
     }
 
