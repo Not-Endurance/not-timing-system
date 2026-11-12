@@ -39,7 +39,12 @@ public sealed class EventInformationModelTests
         return new EventInformationModel
         {
             Id = 1,
-            Country = new CountryModel { Id = 1, Name = "Country", IsoCode = isoCode },
+            Country = new CountryModel
+            {
+                Id = 1,
+                Name = "Country",
+                IsoCode = isoCode,
+            },
             Name = "Event",
             Location = "Location",
             StartDay = new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero),
