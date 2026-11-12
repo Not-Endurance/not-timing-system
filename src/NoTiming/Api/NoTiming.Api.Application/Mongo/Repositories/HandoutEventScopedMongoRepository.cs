@@ -27,7 +27,8 @@ public class HandoutEventScopedMongoRepository : EventScopedMongoRepository<Hand
         try
         {
             return Builders<HandoutModel>
-                .Update.Set(x => x.EventId, document.EventId)
+                .Update.Set(x => x.DomainVersion, document.DomainVersion)
+                .Set(x => x.EventId, document.EventId)
                 .Set(x => x.Participation, document.Participation);
         }
         catch (Exception ex)

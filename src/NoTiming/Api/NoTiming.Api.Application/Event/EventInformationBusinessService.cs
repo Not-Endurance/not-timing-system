@@ -134,7 +134,8 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
     public async Task FinalizeDueEvents()
     {
         var now = _clock.GetUtcNow();
-        var due = await _eventInformation.ReadMany(x => !x.IsFinalized && x.EndDay < now) ?? [];
+        var ended = await _eventInformation.ReadMany(x => x.EndDay < now) ?? [];
+        var due = ended.Where(x => !x.IsFinalized).ToList();
         foreach (var eventInformation in due)
         {
             await Finalize(eventInformation.Id);
