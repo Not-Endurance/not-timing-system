@@ -2,8 +2,8 @@ namespace NoTiming.Domain.Core.Aggregates;
 
 public class Operator : Aggregate, IEventScoped
 {
-    public Operator(int eventId, int? userId, OfficialRole? role = null, int? id = null)
-        : base(id)
+    public Operator(int eventId, int? userId, OfficialRole? role = null, int? id = null, int? storedDomainVersion = null)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         EventId = eventId;
         UserId = Required(nameof(UserId), userId);

@@ -16,9 +16,10 @@ public class Ranking : Aggregate, IEventScoped
         string? feiScheduleNumber,
         IEnumerable<RankingEntry> entries,
         int eventId,
-        int? id = null
+        int? id = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         EventId = eventId;
         Name = Required(nameof(Name), name);

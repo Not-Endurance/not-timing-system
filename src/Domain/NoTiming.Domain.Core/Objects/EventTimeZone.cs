@@ -9,7 +9,7 @@ public static class EventTimeZone
     {
         return country.IsoCode.ToUpperInvariant() switch
         {
-            "BG" or "BGR" => "Europe/Sofia",
+            "BG" or "BGR" or "BUL" => "Europe/Sofia",
             "TR" or "TUR" => "Europe/Istanbul",
             _ => throw new DomainException($"No time zone is configured for country {country.IsoCode}"),
         };

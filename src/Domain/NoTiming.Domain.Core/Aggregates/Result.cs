@@ -14,9 +14,10 @@ public class Result : Aggregate, IEventScoped
         bool englishNames,
         ParticipationCategory? category,
         IEnumerable<ParticipationResult> entries,
-        int eventId
+        int eventId,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         EventId = eventId;
         RankingId = rankingId;

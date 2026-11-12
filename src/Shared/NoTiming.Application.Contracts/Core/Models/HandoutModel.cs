@@ -4,7 +4,7 @@ using NoTiming.Domain.Core.Aggregates;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Handout>
+public class HandoutModel : PersistedModel, IEventScoped, ISoftDeletableDocument, IKrudModel<Handout>
 {
     public static HandoutModel From(Handout handout)
     {
@@ -22,6 +22,7 @@ public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Han
 
     public void MapFrom(Handout handout)
     {
+        DomainVersion = handout.DomainVersion;
         Id = handout.Id;
         EventId = handout.EventId;
         Participation = ParticipationModel.MapFrom(handout.Entries.Single().Participation);
@@ -29,6 +30,6 @@ public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Han
 
     public Handout MapToEntity()
     {
-        return new Handout(Participation.MapToEntity(), Id);
+        return new Handout(Participation.MapToEntity(), Id, storedDomainVersion: DomainVersion);
     }
 }

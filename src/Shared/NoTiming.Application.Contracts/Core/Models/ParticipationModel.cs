@@ -5,7 +5,7 @@ using NoTiming.Domain.Enums;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Participation>
+public class ParticipationModel : PersistedModel, IEventScoped, ISoftDeletableDocument, IKrudModel<Participation>
 {
     public static ParticipationModel MapFrom(Participation participation)
     {
@@ -13,6 +13,7 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
 
         return new ParticipationModel
         {
+            DomainVersion = participation.DomainVersion,
             Id = participation.Id,
             EventId = participation.EventId,
             Category = participation.Category,
@@ -42,11 +43,12 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
         var combination = Combination.MapToEntity();
         var phases = Phases!.Select(x => x.MapToEntity());
         var eliminated = Eliminated?.MapToEntity();
-        return new Participation(Category, competition, combination, new(phases), eliminated, EventId, Id);
+        return new Participation(Category, competition, combination, new(phases), eliminated, EventId, Id, storedDomainVersion: DomainVersion);
     }
 
     void IKrudModel<Participation>.MapFrom(Participation participation)
     {
+        DomainVersion = participation.DomainVersion;
         var total = participation.GetTotal();
 
         Id = participation.Id;

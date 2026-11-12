@@ -7,8 +7,8 @@ namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Official : Entity, INamed, INoTimingDisplayable
 {
-    public Official(string? name, string? nameEnglish, OfficialRole? role, int? id = null, User? user = null)
-        : base(id)
+    public Official(string? name, string? nameEnglish, OfficialRole? role, int? id = null, User? user = null, int? storedDomainVersion = null)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Role = Required(nameof(Role), role);
         Name = Required(nameof(Name), name);

@@ -8,12 +8,13 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class PhaseModel
+public class PhaseModel : PersistedModel
 {
     public static PhaseModel Create(Phase phase)
     {
         return new PhaseModel
         {
+            DomainVersion = phase.DomainVersion,
             Id = phase.Id,
             Loop = LoopModel.MapFrom(phase.Loop!),
             Recovery = phase.Recovery,
@@ -33,6 +34,6 @@ public class PhaseModel
     public Phase MapToEntity()
     {
         var loop = Loop.MapToEntity();
-        return new Phase(loop, Recovery, Rest, Id, IsCompulsoryInspectionRequired);
+        return new Phase(loop, Recovery, Rest, Id, IsCompulsoryInspectionRequired, storedDomainVersion: DomainVersion);
     }
 }

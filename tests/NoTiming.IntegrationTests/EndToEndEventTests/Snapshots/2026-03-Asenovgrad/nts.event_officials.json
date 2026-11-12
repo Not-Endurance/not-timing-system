@@ -1,4 +1,5 @@
 [{
+  "DomainVersion": 1,
   "_id": 1651587749,
   "TenantId": "nts",
   "EventId": 1324868821,
@@ -12,6 +13,7 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1736844825,
   "TenantId": "nts",
   "EventId": 1324868821,
@@ -25,6 +27,7 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 2142214481,
   "TenantId": "nts",
   "EventId": 1324868821,
@@ -38,6 +41,7 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 578319499,
   "TenantId": "nts",
   "EventId": 1324868821,
@@ -52,6 +56,7 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1703330148,
   "TenantId": "nts",
   "EventId": 1324868821,
@@ -66,6 +71,7 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1739615451,
   "TenantId": "nts",
   "EventId": 1324868821,

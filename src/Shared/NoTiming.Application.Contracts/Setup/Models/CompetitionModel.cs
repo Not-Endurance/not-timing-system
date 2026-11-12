@@ -6,12 +6,13 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class CompetitionModel
+public class CompetitionModel : PersistedModel
 {
     public static CompetitionModel MapFrom(Competition competition)
     {
         return new CompetitionModel
         {
+            DomainVersion = competition.DomainVersion,
             Id = competition.Id,
             Name = competition.Name,
             EnglishNames = competition.EnglishNames,
@@ -59,7 +60,7 @@ public class CompetitionModel
             FeiScheduleNumber,
             phases,
             participations,
-            Id
+            Id, storedDomainVersion: DomainVersion
         );
     }
 }

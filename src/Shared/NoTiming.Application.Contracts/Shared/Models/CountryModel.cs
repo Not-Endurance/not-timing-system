@@ -4,7 +4,7 @@ using NoTiming.Domain.Aggregates;
 
 namespace NoTiming.Application.Contracts.Shared.Models;
 
-public class CountryModel : IDocument, IKrudModel<Country>
+public class CountryModel : PersistedModel, IDocument, IKrudModel<Country>
 {
     public static CountryModel From(Country country)
     {
@@ -22,6 +22,7 @@ public class CountryModel : IDocument, IKrudModel<Country>
 
     public void MapFrom(Country country)
     {
+        DomainVersion = country.DomainVersion;
         Id = country.Id;
         Name = country.Name;
         IsoCode = country.IsoCode;
@@ -31,6 +32,6 @@ public class CountryModel : IDocument, IKrudModel<Country>
 
     public Country MapToEntity()
     {
-        return new Country(Id, Name, IsoCode, NfCode, Locale);
+        return new Country(Id, Name, IsoCode, NfCode, Locale, storedDomainVersion: DomainVersion);
     }
 }

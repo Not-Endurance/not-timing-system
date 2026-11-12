@@ -22,9 +22,10 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
         string? feiScheduleNumber,
         IEnumerable<Phase> phases,
         IEnumerable<Participation> participations,
-        int? id = null
+        int? id = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         _phases = phases.ToList();
         _participations = participations.ToList();

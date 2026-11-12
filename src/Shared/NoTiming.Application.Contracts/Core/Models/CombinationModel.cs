@@ -1,14 +1,16 @@
 ﻿using NoTiming.Application.Contracts.Shared.Models;
 using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Application.Contracts.Shared;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class CombinationModel
+public class CombinationModel : PersistedModel
 {
     public static CombinationModel MapFrom(Combination combination)
     {
         return new CombinationModel
         {
+            DomainVersion = combination.DomainVersion,
             Id = combination.Id,
             Number = combination.Number,
             Distance = combination.Distance,
@@ -29,6 +31,6 @@ public class CombinationModel
     {
         var athlete = Athlete.MapToEntity();
         var horse = Horse.MapToEntity();
-        return new Combination(Number, athlete, horse, athlete.Club, Distance!, Restrictions.ToDomain(), Id);
+        return new Combination(Number, athlete, horse, athlete.Club, Distance!, Restrictions.ToDomain(), Id, storedDomainVersion: DomainVersion);
     }
 }

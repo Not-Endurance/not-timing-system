@@ -4,8 +4,8 @@ namespace NoTiming.Domain.Aggregates;
 
 public class Country : Aggregate
 {
-    public Country(int id, string? name, string? isoCode, string? nfCode, string? locale)
-        : base(id)
+    public Country(int id, string? name, string? isoCode, string? nfCode, string? locale, int? storedDomainVersion = null)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Name = Required(nameof(Name), name);
         IsoCode = Required(nameof(IsoCode), isoCode);

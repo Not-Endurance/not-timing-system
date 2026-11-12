@@ -19,9 +19,10 @@ public class Participation : Aggregate, IEventScoped
         PhaseCollection phases,
         Eliminated? notQualified,
         int eventId,
-        int? id = null
+        int? id = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         EventId = eventId;
         Category = category;

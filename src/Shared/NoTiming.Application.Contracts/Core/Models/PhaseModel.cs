@@ -1,13 +1,15 @@
+using NoTiming.Application.Contracts.Shared;
 ﻿using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class PhaseModel
+public class PhaseModel : PersistedModel
 {
     public static PhaseModel MapFrom(Phase phase)
     {
         return new PhaseModel
         {
+            DomainVersion = phase.DomainVersion,
             Id = phase.Id,
             Gate = phase.Gate,
             Length = phase.Length,
@@ -74,7 +76,7 @@ public class PhaseModel
             IsReinspectionRequested,
             IsRequiredInspectionRequested,
             IsRequiredInspectionCompulsory,
-            Id
+            Id, storedDomainVersion: DomainVersion
         );
     }
 }

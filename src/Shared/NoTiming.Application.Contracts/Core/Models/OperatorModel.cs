@@ -5,11 +5,12 @@ using NoTiming.Domain.Enums;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class OperatorModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Operator>
+public class OperatorModel : PersistedModel, IEventScoped, ISoftDeletableDocument, IKrudModel<Operator>
 {
     public static OperatorModel MapFrom(Operator @operator)
     {
         var model = new OperatorModel();
+        model.DomainVersion = @operator.DomainVersion;
         ((IKrudModel<Operator>)model).MapFrom(@operator);
         return model;
     }
@@ -24,7 +25,7 @@ public class OperatorModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Op
 
     public Operator MapToEntity()
     {
-        return new Operator(EventId, UserId, Role, Id);
+        return new Operator(EventId, UserId, Role, Id, storedDomainVersion: DomainVersion);
     }
 
     void IKrudModel<Operator>.MapFrom(Operator @operator)

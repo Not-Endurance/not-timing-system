@@ -11,9 +11,10 @@ public class Official : Aggregate, IEventScoped, INamed, INoTimingDisplayable
         OfficialRole? role,
         int eventId,
         int? id = null,
-        int? userId = null
+        int? userId = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         EventId = eventId;
         Name = Required(nameof(Name), name);

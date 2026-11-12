@@ -20,9 +20,10 @@ public class Combination : Entity, INoTimingDisplayable
         Club? club,
         string distance,
         SpeedRestrictions? restrictions,
-        int id
+        int id,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Number = number;
         Athlete = athlete;

@@ -6,8 +6,8 @@ namespace NoTiming.Domain.Aggregates;
 
 public class Setting : Aggregate
 {
-    public Setting(Country? country, DetectionMode? detectionMode, int? id = null)
-        : base(id)
+    public Setting(Country? country, DetectionMode? detectionMode, int? id = null, int? storedDomainVersion = null)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Country = Required(nameof(Country), country);
         DetectionMode = detectionMode;

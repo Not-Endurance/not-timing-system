@@ -4,7 +4,7 @@ namespace NoTiming.Domain.Core.Aggregates;
 
 public sealed class Handout : Result
 {
-    public Handout(Participation participation, int? id = null)
+    public Handout(Participation participation, int? id = null, int? storedDomainVersion = null)
         : base(
             id,
             null,
@@ -12,6 +12,7 @@ public sealed class Handout : Result
             participation.Competition.EnglishNames,
             participation.Category,
             [new ParticipationResult(participation)],
-            participation.EventId
+            participation.EventId,
+            storedDomainVersion
         ) { }
 }

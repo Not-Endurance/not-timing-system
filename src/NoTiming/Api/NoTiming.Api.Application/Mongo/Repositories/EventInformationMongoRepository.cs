@@ -19,7 +19,8 @@ public class EventInformationMongoRepository : MongoRepository<EventInformationM
             .Set(x => x.FeiShowId, document.FeiShowId)
             .Set(x => x.StartDay, document.StartDay)
             .Set(x => x.EndDay, document.EndDay)
-            .Set(x => x.IsActive, document.IsActive);
+            .Set(x => x.IsActive, document.IsActive)
+            .Set(x => x.IsFinalized, document.IsFinalized);
     }
 
     public override async Task Create(EventInformationModel item)

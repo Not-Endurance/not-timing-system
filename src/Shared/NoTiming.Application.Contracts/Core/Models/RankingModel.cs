@@ -5,7 +5,7 @@ using NoTiming.Domain.Enums;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ranking>
+public class RankingModel : PersistedModel, IEventScoped, ISoftDeletableDocument, IKrudModel<Ranking>
 {
     public static RankingModel From(Ranking ranking)
     {
@@ -31,6 +31,7 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
 
     public void MapFrom(Ranking ranking)
     {
+        DomainVersion = ranking.DomainVersion;
         Id = ranking.Id;
         EventId = ranking.EventId;
         Name = ranking.Name;
@@ -58,7 +59,7 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
             FeiScheduleNumber,
             entries,
             EventId,
-            Id
+            Id, storedDomainVersion: DomainVersion
         );
     }
 }

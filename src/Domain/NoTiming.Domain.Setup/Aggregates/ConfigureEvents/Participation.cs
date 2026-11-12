@@ -11,9 +11,10 @@ public class Participation : Entity, IKurdMirror<Combination>
         ParticipationCategory? category,
         DateTimeOffset? startTimeOverride,
         SpeedRestrictions? restrictions,
-        int? id = null
+        int? id = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         StartTimeOverride = startTimeOverride;
         IsNotRanked = isNotRanked ?? false;

@@ -7,12 +7,13 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class ParticipationModel
+public class ParticipationModel : PersistedModel
 {
     public static ParticipationModel MapFrom(Participation participation)
     {
         return new ParticipationModel
         {
+            DomainVersion = participation.DomainVersion,
             Id = participation.Id,
             IsNotRanked = participation.IsNotRanked,
             Category = participation.Category,
@@ -38,7 +39,7 @@ public class ParticipationModel
             Category,
             StartTimeOverride,
             Restrictions.ToDomain(),
-            Id
+            Id, storedDomainVersion: DomainVersion
         );
     }
 }

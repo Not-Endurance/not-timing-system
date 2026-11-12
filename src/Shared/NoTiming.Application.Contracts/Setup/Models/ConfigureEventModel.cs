@@ -7,7 +7,7 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
+public class ConfigureEventModel : PersistedModel, IDocument, IKrudModel<ConfigureEvent>
 {
     public static ConfigureEventModel From(ConfigureEvent @event)
     {
@@ -46,12 +46,13 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
             loops,
             combinations,
             Id,
-            operators
+            operators, storedDomainVersion: DomainVersion
         );
     }
 
     public void MapFrom(ConfigureEvent @event)
     {
+        DomainVersion = @event.DomainVersion;
         Id = @event.Id;
         Name = @event.Name;
         Location = @event.Location;

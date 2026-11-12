@@ -5,6 +5,7 @@ using NC.Exceptions;
 using NC.Injection;
 using NoTiming.Application.Factories;
 using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Domain.Core.Aggregates.Results;
 using NoTiming.Domain.Enums;
 using NoTiming.Domain.Setup.Services.StartValidation;
 using static NC.Localization.NStrings;
@@ -24,6 +25,9 @@ public interface IEventInformationBusinessService
     Task<IEnumerable<CoreEventInformationModel>> ReadPast();
     Task<CoreEventInformationModel> Start(int configureEventId);
     Task Deactivate(int eventInformationId);
+    Task FinalizeDueEvents();
+    Task Finalize(int eventInformationId);
+    Task Reopen(int eventInformationId);
 }
 
 public class EventInformationBusinessService : IEventInformationBusinessService, ITransient
@@ -34,6 +38,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
     readonly IRepository<CoreOperatorModel> _operators;
     readonly IRepository<CoreParticipationModel> _participations;
     readonly IRepository<CoreRankingModel> _rankings;
+    readonly TimeProvider _clock;
 
     public EventInformationBusinessService(
         IRepository<SetupConfigureEventModel> configureEvents,
@@ -41,9 +46,11 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         IRepository<CoreOfficialModel> officials,
         IRepository<CoreOperatorModel> operators,
         IRepository<CoreParticipationModel> participations,
-        IRepository<CoreRankingModel> rankings
+        IRepository<CoreRankingModel> rankings,
+        TimeProvider clock
     )
     {
+        _clock = clock;
         _configureEvents = configureEvents;
         _eventInformation = eventInformation;
         _officials = officials;
@@ -100,7 +107,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
 
     public async Task<IEnumerable<CoreEventInformationModel>> ReadActive()
     {
-        var now = DateTimeOffset.UtcNow;
+        var now = _clock.GetUtcNow();
         await DeactivateExpiredActiveEvents(now);
         return await _eventInformation.ReadMany(x => x.IsActive && x.EndDay > now) ?? [];
     }
@@ -121,6 +128,63 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
 
         eventInformation.IsActive = false;
         await _eventInformation.Update(eventInformation);
+    }
+
+    // Finalizes every event whose last day has ended. Runs nightly. A finalized event is skipped, so running it twice is harmless.
+    public async Task FinalizeDueEvents()
+    {
+        var now = _clock.GetUtcNow();
+        var due = await _eventInformation.ReadMany(x => !x.IsFinalized && x.EndDay < now) ?? [];
+        foreach (var eventInformation in due)
+        {
+            await Finalize(eventInformation.Id);
+        }
+    }
+
+    public async Task Finalize(int eventInformationId)
+    {
+        var eventInformation = await _eventInformation.Read(eventInformationId);
+        if (eventInformation == null || eventInformation.IsFinalized)
+        {
+            return;
+        }
+
+        var rankings = await _rankings.ReadMany(x => x.EventId == eventInformationId) ?? [];
+        foreach (var ranking in rankings)
+        {
+            var placings = RankingFinalization.PlaceEntries(ranking.MapToEntity());
+            foreach (var entry in ranking.Entries)
+            {
+                entry.Rank = placings.TryGetValue(entry.Participation.Id, out var rank) ? rank : null;
+            }
+            await _rankings.Update(ranking);
+        }
+
+        eventInformation.IsFinalized = true;
+        await _eventInformation.Update(eventInformation);
+    }
+
+    // Reopens a finalized event and clears its placings, so they are placed again from the live results.
+    public async Task Reopen(int eventInformationId)
+    {
+        var eventInformation = await _eventInformation.Read(eventInformationId);
+        if (eventInformation == null || !eventInformation.IsFinalized)
+        {
+            return;
+        }
+
+        eventInformation.IsFinalized = false;
+        await _eventInformation.Update(eventInformation);
+
+        var rankings = await _rankings.ReadMany(x => x.EventId == eventInformationId) ?? [];
+        foreach (var ranking in rankings)
+        {
+            foreach (var entry in ranking.Entries)
+            {
+                entry.Rank = null;
+            }
+            await _rankings.Update(ranking);
+        }
     }
 
     async Task DeactivateExpiredActiveEvents(DateTimeOffset now)

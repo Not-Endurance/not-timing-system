@@ -1,15 +1,17 @@
 using NoTiming.Application.Contracts.Shared.Models;
 using NoTiming.Domain.Enums;
 using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
+using NoTiming.Application.Contracts.Shared;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class OfficialModel
+public class OfficialModel : PersistedModel
 {
     public static OfficialModel MapFrom(Official official)
     {
         return new OfficialModel
         {
+            DomainVersion = official.DomainVersion,
             Id = official.Id,
             Name = official.Name,
             NameEnglish = official.NameEnglish,
@@ -26,6 +28,6 @@ public class OfficialModel
 
     public Official MapToEntity()
     {
-        return new Official(Name, NameEnglish, Role, Id, User?.MapToEntity());
+        return new Official(Name, NameEnglish, Role, Id, User?.MapToEntity(), storedDomainVersion: DomainVersion);
     }
 }

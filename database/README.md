@@ -16,7 +16,24 @@ npm ci --prefix database
 npx --prefix database migrate-mongo create <short-description>
 ```
 
-Each migration exports `up(db)` and `down(db)`. A migration that changes stored data ships in the same change as the code that reads the new shape, and it runs before that code deploys. There is no version check yet: nothing stops old code from reading migrated data, which is why the deploy window is accepted.
+Each migration exports `up(db)` and `down(db)`. A migration that changes stored data ships in the same change as the code that reads the new shape, and it runs before that code deploys.
+
+Every persisted document carries a `DomainVersion`. The code refuses to load a document whose version is missing or different, so old code can't read migrated data and new code can't read unmigrated data. A migration that changes a persisted shape must stamp the new version on every document it touches.
+
+## The speed grid and finalization migration
+
+`20261112120000-speed-grid-finalization-domain-version.js` does four things:
+
+- Converts the old min and max speed values to the phase average limit, and replaces `Ruleset` with `EnglishNames`.
+- Stamps `DomainVersion` on every persisted document, including embedded ones.
+- Finalizes past events whose rankings already have every placing stored. Other past events are finalized by the nightly job once it has placed them.
+- Refuses to run while an event is live. Deactivate the event or wait until it ends first.
+
+Before production, take a backup and run the migration against a copy of it first. Set MIGRATION_DRY_RUN=1 to count what would change. The run then fails on purpose, so migrate-mongo doesn't record the migration as applied:
+
+```bash
+MIGRATION_DRY_RUN=1 npm run migrate:up --prefix database
+```
 
 ## Running against a database locally
 

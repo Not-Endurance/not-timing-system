@@ -23,9 +23,10 @@ public class Phase : Entity
         bool isRepresentationRequested,
         bool isRequiredInspectionRequested,
         bool isRequiredInspectionCompulsory,
-        int? id = null
+        int? id = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Gate = gate;
         Length = length;

@@ -7,7 +7,7 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class UserModel : IDocument, IKrudModel<User>
+public class UserModel : PersistedModel, IDocument, IKrudModel<User>
 {
     public static UserModel From(User user)
     {
@@ -38,6 +38,7 @@ public class UserModel : IDocument, IKrudModel<User>
 
     public void MapFrom(User user)
     {
+        DomainVersion = user.DomainVersion;
         Id = user.Id;
         Email = user.Email;
         Name = user.Name;
@@ -64,7 +65,7 @@ public class UserModel : IDocument, IKrudModel<User>
             CountryRegion,
             Club,
             FeiId,
-            DisplayName
+            DisplayName, storedDomainVersion: DomainVersion
         );
     }
 

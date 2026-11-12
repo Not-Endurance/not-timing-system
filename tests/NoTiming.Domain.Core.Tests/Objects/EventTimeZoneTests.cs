@@ -53,4 +53,12 @@ public sealed class EventTimeZoneTests
 
         Assert.Throws<DomainException>(() => EventTimeZone.ForCountry(country));
     }
+
+    [Fact]
+    public void ForCountry_WhenBulgariaUsesBulCode_ShouldReturnSofia()
+    {
+        var country = new Country(39, "Bulgaria", "BUL", "BUL", "bg-BG");
+
+        Assert.Equal("Europe/Sofia", EventTimeZone.ForCountry(country));
+    }
 }

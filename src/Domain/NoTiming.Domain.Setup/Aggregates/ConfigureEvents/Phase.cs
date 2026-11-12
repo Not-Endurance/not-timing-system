@@ -6,8 +6,8 @@ namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Phase : Entity, IKurdMirror<Loop>, IIdentifiable
 {
-    public Phase(Loop? loop, int? recovery, int? rest, int? id = null, bool isCompulsoryInspectionRequired = false)
-        : base(id)
+    public Phase(Loop? loop, int? recovery, int? rest, int? id = null, bool isCompulsoryInspectionRequired = false, int? storedDomainVersion = null)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Loop = Required(nameof(Loop), loop);
         Recovery = PositiveRecovery(recovery);

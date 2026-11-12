@@ -1,7 +1,9 @@
 {
+  "DomainVersion": 1,
   "_id": 1324868821,
   "TenantId": "nts",
   "Country": {
+    "DomainVersion": 1,
     "_id": 37,
     "TenantId": "nts",
     "Name": "Bulgaria",
@@ -12,6 +14,7 @@
   "FeiShowId": "FEI-SHOW-E2E",
   "Competitions": [
     {
+      "DomainVersion": 1,
       "_id": 834244819,
       "Name": "ДП млади ездачи и юноши до 18 г",
       "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": null, "PhaseAverageSpeedMax": null },
@@ -27,27 +30,33 @@
       "FeiScheduleNumber": null,
       "Phases": [
         {
+          "DomainVersion": 1,
           "_id": 1769878352,
           "Recovery": 15,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 465301733,
             "Distance": 31
           },
           "Rest": 40
         },
         {
+          "DomainVersion": 1,
           "_id": 1508156630,
           "Recovery": 15,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 465301733,
             "Distance": 31
           },
           "Rest": 40
         },
         {
+          "DomainVersion": 1,
           "_id": 1801563992,
           "Recovery": 20,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 1547166911,
             "Distance": 25
           },
@@ -56,6 +65,7 @@
       ],
       "Participations": [
         {
+          "DomainVersion": 1,
           "_id": 1644672613,
           "Category": "JuniorOrYoungAdult",
           "Combination": {
@@ -69,6 +79,7 @@
                 "Зашева"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -96,6 +107,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": null }
         },
         {
+          "DomainVersion": 1,
           "_id": 1065118095,
           "Category": "JuniorOrYoungAdult",
           "Combination": {
@@ -109,6 +121,7 @@
                 "Костанян"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -136,6 +149,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 233838947,
           "Category": "JuniorOrYoungAdult",
           "Combination": {
@@ -149,6 +163,7 @@
                 "Бакалова"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -176,6 +191,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 233998861,
           "Category": "JuniorOrYoungAdult",
           "Combination": {
@@ -189,6 +205,7 @@
                 "Петрова"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -216,6 +233,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 679980613,
           "Category": "JuniorOrYoungAdult",
           "Combination": {
@@ -229,6 +247,7 @@
                 "Георгиева"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -256,6 +275,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 1863036161,
           "Category": "JuniorOrYoungAdult",
           "Combination": {
@@ -269,6 +289,7 @@
                 "Козарова"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -296,6 +317,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 1487018003,
           "Category": "JuniorOrYoungAdult",
           "Combination": {
@@ -309,6 +331,7 @@
                 "Халибрям"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -336,6 +359,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 361685277,
           "Category": "JuniorOrYoungAdult",
           "Combination": {
@@ -349,6 +373,7 @@
                 "Кюмюрджийска"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -376,6 +401,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 141568528,
           "Category": "JuniorOrYoungAdult",
           "Combination": {
@@ -389,6 +415,7 @@
                 "Добрева"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -416,6 +443,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 1787502521,
           "Category": "JuniorOrYoungAdult",
           "Combination": {
@@ -429,6 +457,7 @@
                 "Гайдарова"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -458,6 +487,7 @@
       ]
     },
     {
+      "DomainVersion": 1,
       "_id": 1557344940,
       "Name": "ДП юноши до 14 години",
       "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": null, "PhaseAverageSpeedMax": null },
@@ -473,18 +503,22 @@
       "FeiScheduleNumber": null,
       "Phases": [
         {
+          "DomainVersion": 1,
           "_id": 228804746,
           "Recovery": 15,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 465301733,
             "Distance": 31
           },
           "Rest": 40
         },
         {
+          "DomainVersion": 1,
           "_id": 260796380,
           "Recovery": 20,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 465301733,
             "Distance": 31
           },
@@ -493,6 +527,7 @@
       ],
       "Participations": [
         {
+          "DomainVersion": 1,
           "_id": 212085556,
           "Category": "Children",
           "Combination": {
@@ -506,6 +541,7 @@
                 "Юруков"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -535,6 +571,7 @@
       ]
     },
     {
+      "DomainVersion": 1,
       "_id": 1543847229,
       "Name": "ДП пони ездачи",
       "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": null, "PhaseAverageSpeedMax": null },
@@ -550,18 +587,22 @@
       "FeiScheduleNumber": null,
       "Phases": [
         {
+          "DomainVersion": 1,
           "_id": 63853241,
           "Recovery": 15,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 1186929788,
             "Distance": 15
           },
           "Rest": 40
         },
         {
+          "DomainVersion": 1,
           "_id": 1325776437,
           "Recovery": 20,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 1186929788,
             "Distance": 15
           },
@@ -570,6 +611,7 @@
       ],
       "Participations": [
         {
+          "DomainVersion": 1,
           "_id": 1201532281,
           "Category": "Children",
           "Combination": {
@@ -583,6 +625,7 @@
                 "Панайотова"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -610,6 +653,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 681770676,
           "Category": "Companion",
           "Combination": {
@@ -623,6 +667,7 @@
                 "Кумчев"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -650,6 +695,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 133427800,
           "Category": "Children",
           "Combination": {
@@ -663,6 +709,7 @@
                 "Георгиева"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -690,6 +737,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 2039519853,
           "Category": "Children",
           "Combination": {
@@ -703,6 +751,7 @@
                 "Иванов"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -730,6 +779,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 987938828,
           "Category": "Companion",
           "Combination": {
@@ -743,6 +793,7 @@
                 "Колев"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -770,6 +821,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 757072013,
           "Category": "Companion",
           "Combination": {
@@ -783,6 +835,7 @@
                 "Миткова"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -812,6 +865,7 @@
       ]
     },
     {
+      "DomainVersion": 1,
       "_id": 1506827012,
       "Name": "Квалификационен турнир 80 км",
       "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": null, "PhaseAverageSpeedMax": null },
@@ -827,27 +881,33 @@
       "FeiScheduleNumber": null,
       "Phases": [
         {
+          "DomainVersion": 1,
           "_id": 202077460,
           "Recovery": 15,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 465301733,
             "Distance": 31
           },
           "Rest": 40
         },
         {
+          "DomainVersion": 1,
           "_id": 888724050,
           "Recovery": 15,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 465301733,
             "Distance": 31
           },
           "Rest": 40
         },
         {
+          "DomainVersion": 1,
           "_id": 336917009,
           "Recovery": 20,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 1547166911,
             "Distance": 25
           },
@@ -856,6 +916,7 @@
       ],
       "Participations": [
         {
+          "DomainVersion": 1,
           "_id": 1814405795,
           "Category": "Senior",
           "Combination": {
@@ -869,6 +930,7 @@
                 "Узунов"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -898,6 +960,7 @@
       ]
     },
     {
+      "DomainVersion": 1,
       "_id": 896167378,
       "Name": "Квалификационен турнир 40 км",
       "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": null, "PhaseAverageSpeedMax": null },
@@ -913,18 +976,22 @@
       "FeiScheduleNumber": null,
       "Phases": [
         {
+          "DomainVersion": 1,
           "_id": 695572892,
           "Recovery": 15,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 1547166911,
             "Distance": 25
           },
           "Rest": 40
         },
         {
+          "DomainVersion": 1,
           "_id": 547025098,
           "Recovery": 20,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 1547166911,
             "Distance": 25
           },
@@ -933,6 +1000,7 @@
       ],
       "Participations": [
         {
+          "DomainVersion": 1,
           "_id": 1418213704,
           "Category": "Senior",
           "Combination": {
@@ -946,6 +1014,7 @@
                 "Йорданова"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -973,6 +1042,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 574958789,
           "Category": "Senior",
           "Combination": {
@@ -986,6 +1056,7 @@
                 "Влайкова"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -1013,6 +1084,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 1923494944,
           "Category": "Senior",
           "Combination": {
@@ -1026,6 +1098,7 @@
                 "Николов"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -1053,6 +1126,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 822866788,
           "Category": "Senior",
           "Combination": {
@@ -1066,6 +1140,7 @@
                 "Фурлански"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -1093,6 +1168,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 1209714417,
           "Category": "Senior",
           "Combination": {
@@ -1106,6 +1182,7 @@
                 "Несторова"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -1133,6 +1210,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 1959171838,
           "Category": "Senior",
           "Combination": {
@@ -1146,6 +1224,7 @@
                 "Нардуци"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -1173,6 +1252,7 @@
           "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 }
         },
         {
+          "DomainVersion": 1,
           "_id": 1880189413,
           "Category": "Senior",
           "Combination": {
@@ -1186,6 +1266,7 @@
                 "Михайлов"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -1215,6 +1296,7 @@
       ]
     },
     {
+      "DomainVersion": 1,
       "_id": 1076607645,
       "Name": "Квалификация 60 км",
       "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": null, "PhaseAverageSpeedMax": null },
@@ -1230,18 +1312,22 @@
       "FeiScheduleNumber": null,
       "Phases": [
         {
+          "DomainVersion": 1,
           "_id": 632719763,
           "Recovery": 15,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 465301733,
             "Distance": 31
           },
           "Rest": 40
         },
         {
+          "DomainVersion": 1,
           "_id": 1370880776,
           "Recovery": 20,
           "Loop": {
+            "DomainVersion": 1,
             "_id": 465301733,
             "Distance": 31
           },
@@ -1250,6 +1336,7 @@
       ],
       "Participations": [
         {
+          "DomainVersion": 1,
           "_id": 1145671529,
           "Category": "Senior",
           "Combination": {
@@ -1263,6 +1350,7 @@
                 "Ходжа"
               ],
               "Country": {
+                "DomainVersion": 1,
                 "_id": 1395739409,
                 "TenantId": "nts",
                 "Name": "Bulgaria",
@@ -1294,6 +1382,7 @@
   ],
   "Officials": [
     {
+      "DomainVersion": 1,
       "_id": 1841013491,
       "Names": [
         "Теодора",
@@ -1301,6 +1390,7 @@
       ],
       "Role": "GroundJuryPresident",
       "User": {
+        "DomainVersion": 1,
         "_id": 1699297500,
         "TenantId": "nts",
         "GivenName": null,
@@ -1315,6 +1405,7 @@
       }
     },
     {
+      "DomainVersion": 1,
       "_id": 1888405305,
       "Names": [
         "Лилия",
@@ -1324,6 +1415,7 @@
       "User": null
     },
     {
+      "DomainVersion": 1,
       "_id": 1381476360,
       "Names": [
         "Витория",
@@ -1333,6 +1425,7 @@
       "User": null
     },
     {
+      "DomainVersion": 1,
       "_id": 336762204,
       "Names": [
         "Д-р",
@@ -1343,6 +1436,7 @@
       "User": null
     },
     {
+      "DomainVersion": 1,
       "_id": 281138971,
       "Names": [
         "Д-р",
@@ -1353,6 +1447,7 @@
       "User": null
     },
     {
+      "DomainVersion": 1,
       "_id": 996598463,
       "Names": [
         "Д-р",
@@ -1365,8 +1460,10 @@
   ],
   "Operators": [
     {
+      "DomainVersion": 1,
       "_id": 1800000001,
       "User": {
+        "DomainVersion": 1,
         "_id": 1699297600,
         "TenantId": "nts",
         "GivenName": "End",
@@ -1385,14 +1482,17 @@
   ],
   "Loops": [
     {
+      "DomainVersion": 1,
       "_id": 465301733,
       "Distance": 31
     },
     {
+      "DomainVersion": 1,
       "_id": 1547166911,
       "Distance": 20
     },
     {
+      "DomainVersion": 1,
       "_id": 1186929788,
       "Distance": 15
     }
@@ -1409,6 +1509,7 @@
           "Зашева"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1442,6 +1543,7 @@
           "Костанян"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1475,6 +1577,7 @@
           "Бакалова"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1508,6 +1611,7 @@
           "Петрова"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1541,6 +1645,7 @@
           "Георгиева"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1574,6 +1679,7 @@
           "Козарова"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1607,6 +1713,7 @@
           "Халибрям"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1640,6 +1747,7 @@
           "Ходжа"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1673,6 +1781,7 @@
           "Юруков"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1706,6 +1815,7 @@
           "Йорданова"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1739,6 +1849,7 @@
           "Влайкова"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1772,6 +1883,7 @@
           "Николов"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1805,6 +1917,7 @@
           "Фурлански"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1838,6 +1951,7 @@
           "Несторова"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1871,6 +1985,7 @@
           "Нардуци"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1904,6 +2019,7 @@
           "Михайлов"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1937,6 +2053,7 @@
           "Панайотова"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -1970,6 +2087,7 @@
           "Кумчев"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -2003,6 +2121,7 @@
           "Георгиева"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -2036,6 +2155,7 @@
           "Иванов"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -2069,6 +2189,7 @@
           "Колев"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -2102,6 +2223,7 @@
           "Миткова"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -2135,6 +2257,7 @@
           "Кюмюрджийска"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -2168,6 +2291,7 @@
           "Добрева"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -2201,6 +2325,7 @@
           "Гайдарова"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",
@@ -2234,6 +2359,7 @@
           "Узунов"
         ],
         "Country": {
+          "DomainVersion": 1,
           "_id": 1395739409,
           "TenantId": "nts",
           "Name": "Bulgaria",

@@ -5,7 +5,7 @@ using NoTiming.Domain.Enums;
 
 namespace NoTiming.Application.Contracts.Shared.Models;
 
-public class SettingModel : IDocument, IKrudModel<Setting>
+public class SettingModel : PersistedModel, IDocument, IKrudModel<Setting>
 {
     public static SettingModel From(Setting setting)
     {
@@ -22,11 +22,12 @@ public class SettingModel : IDocument, IKrudModel<Setting>
 
     public Setting MapToEntity()
     {
-        return new Setting(Country.MapToEntity(), DetectionMode, id: Id);
+        return new Setting(Country.MapToEntity(), DetectionMode, id: Id, storedDomainVersion: DomainVersion);
     }
 
     public void MapFrom(Setting setting)
     {
+        DomainVersion = setting.DomainVersion;
         Id = setting.Id;
         Country = CountryModel.From(setting.Country);
         DetectionMode = setting.DetectionMode;
