@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using NC.Server.Authentication.Interface;
+using NC.Server.Authentication.Profiles;
 using NC.Server.Authentication.Requests;
 using NC.Server.Authentication.SignIn;
 
@@ -70,7 +71,7 @@ internal static class AccountEndpoints<TProfile>
         ProfileRequest request,
         ClaimsPrincipal principal,
         AccountProfiles<TProfile> profiles,
-        IProfileValidator<TProfile> validator,
+        ProfileRules<TProfile> rules,
         CancellationToken cancellationToken
     )
     {
@@ -80,7 +81,7 @@ internal static class AccountEndpoints<TProfile>
             return Results.Unauthorized();
         }
 
-        if (request.Profile is null || !validator.Accepts(request.Profile))
+        if (request.Profile is null || !rules.Accepts(request.Profile))
         {
             return Results.BadRequest(new { error = "missing-details" });
         }
@@ -112,7 +113,7 @@ internal static class AccountEndpoints<TProfile>
         RegisterRequest request,
         HttpContext httpContext,
         IAuthentication<TProfile> authentication,
-        IProfileValidator<TProfile> validator,
+        ProfileRules<TProfile> rules,
         CancellationToken cancellationToken
     )
     {
@@ -126,7 +127,7 @@ internal static class AccountEndpoints<TProfile>
             || string.IsNullOrWhiteSpace(request.GivenName)
             || string.IsNullOrWhiteSpace(request.Surname)
             || request.Profile is null
-            || !validator.Accepts(request.Profile)
+            || !rules.Accepts(request.Profile)
         )
         {
             return Results.BadRequest(new { error = "missing-details" });

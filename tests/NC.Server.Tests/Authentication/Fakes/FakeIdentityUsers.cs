@@ -34,7 +34,6 @@ internal sealed class FakeIdentityUsers : IIdentityUserRepository
         [
             .. _stored
                 .Values.Where(x => string.Equals(x.Email, normalizedEmail, StringComparison.OrdinalIgnoreCase))
-                .Take(2)
                 .Select(Copy),
         ];
         return Task.FromResult(matches);

@@ -26,15 +26,26 @@ internal static class ProfileDocument
         return document;
     }
 
-    /// <summary>The profile stored in the document, or an empty profile when there is none.</summary>
-    public static TProfile FromBson<TProfile>(BsonDocument? document)
+    /// <summary>
+    /// The profile stored in the document. An empty profile when there is none, or when the stored value cannot be read as
+    /// the app's profile. The user keeps their identity, and the app asks for the profile again. One unreadable row does
+    /// not fail the read of the others.
+    /// </summary>
+    public static TProfile FromBson<TProfile>(BsonValue? value)
         where TProfile : class, new()
     {
-        if (document is null)
+        if (value is not BsonDocument document)
         {
             return new TProfile();
         }
 
-        return JsonSerializer.Deserialize<TProfile>(document.ToJson(), Options) ?? new TProfile();
+        try
+        {
+            return JsonSerializer.Deserialize<TProfile>(document.ToJson(), Options) ?? new TProfile();
+        }
+        catch (JsonException)
+        {
+            return new TProfile();
+        }
     }
 }

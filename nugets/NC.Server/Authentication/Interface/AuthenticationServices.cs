@@ -109,7 +109,7 @@ public static class AuthenticationServices
         services.AddScoped<IAuthentication<TProfile>, AuthenticationService<TProfile>>();
         services.AddScoped<AccountProfiles<TProfile>>();
         services.AddSingleton<IUserDirectory<TProfile>, UserDirectory<TProfile>>();
-        services.TryAddSingleton<IProfileValidator<TProfile>, AcceptAnyProfile<TProfile>>();
+        services.AddScoped<ProfileRules<TProfile>>();
         services.AddScoped<IPasskeyCeremony, SignInManagerPasskeyCeremony>();
         services.AddSingleton<ILegacyUserAdoption, LegacyUserAdoption>();
 

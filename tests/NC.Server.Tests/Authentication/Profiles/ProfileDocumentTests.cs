@@ -60,4 +60,24 @@ public sealed class ProfileDocumentTests
         Assert.NotNull(profile);
         Assert.Null(profile.Club);
     }
+
+    [Fact]
+    public void FromBson_WhenAFieldHasTheWrongType_ShouldReturnAnEmptyProfile()
+    {
+        var document = new BsonDocument { ["club"] = 5 };
+
+        var profile = ProfileDocument.FromBson<TestProfile>(document);
+
+        Assert.NotNull(profile);
+        Assert.Null(profile.Club);
+    }
+
+    [Fact]
+    public void FromBson_WhenTheValueIsNotADocument_ShouldReturnAnEmptyProfile()
+    {
+        var profile = ProfileDocument.FromBson<TestProfile>(new BsonString("SC Ruse"));
+
+        Assert.NotNull(profile);
+        Assert.Null(profile.Club);
+    }
 }

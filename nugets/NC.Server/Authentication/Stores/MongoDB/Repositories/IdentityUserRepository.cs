@@ -418,7 +418,10 @@ internal sealed class IdentityUserRepository
         return result.MatchedCount == 1;
     }
 
-    /// <summary>Every row with the address, case-insensitively, up to two. Two is enough to tell a duplicate apart.</summary>
+    /// <summary>
+    /// Every row with the address, case-insensitively, unlimited. A limit could leave out the proved row behind legacy
+    /// duplicates, and the proved row is the one that counts.
+    /// </summary>
     public async Task<List<IdentityUserDocument>> FindAllByEmail(
         string normalizedEmail,
         CancellationToken cancellationToken
@@ -429,7 +432,6 @@ internal sealed class IdentityUserRepository
                 Builders<IdentityUserDocument>.Filter.Eq(x => x.Email, normalizedEmail),
                 new FindOptions { Collation = EmailCollation.Value }
             )
-            .Limit(2)
             .ToListAsync(cancellationToken);
     }
 

@@ -9,6 +9,6 @@ public interface IUserDirectory<TProfile>
 {
     Task<IReadOnlyList<AuthenticatedUser<TProfile>>> ReadAll(CancellationToken cancellationToken = default);
 
-    /// <summary>The user with the address, or null when there is none or more than one.</summary>
+    /// <summary>The user whose row is proved for the address, or null when no row, or more than one, is proved.</summary>
     Task<AuthenticatedUser<TProfile>?> FindByEmail(string email, CancellationToken cancellationToken = default);
 }

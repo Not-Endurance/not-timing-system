@@ -24,7 +24,10 @@ internal sealed class UserDirectory<TProfile> : IUserDirectory<TProfile>
         CancellationToken cancellationToken = default
     )
     {
+        // Only the proved row is the person's own: the address has at most one (a unique index), so legacy rows beside it are
+        // ignored. No proved row, or more than one, is no answer.
         var matches = await _users.FindAllByEmail(EmailAddress.Normalize(email), cancellationToken);
-        return matches.Count == 1 ? AuthenticatedUser<TProfile>.From(matches[0]) : null;
+        var proved = matches.Where(x => x.IsProved).ToList();
+        return proved.Count == 1 ? AuthenticatedUser<TProfile>.From(proved[0]) : null;
     }
 }

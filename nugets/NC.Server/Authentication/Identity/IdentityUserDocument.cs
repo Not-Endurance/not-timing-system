@@ -47,8 +47,11 @@ internal sealed class IdentityUserDocument
 
     public string? Surname { get; set; }
 
-    /// <summary>The app's profile. The module does not know its fields; read it through <c>ProfileDocument</c>.</summary>
-    public BsonDocument? Profile { get; set; }
+    /// <summary>
+    /// The app's profile as the row holds it. The value is typed loosely, so a malformed profile reads as an empty one
+    /// instead of failing the read of every user. <c>ProfileDocument</c> does the reading.
+    /// </summary>
+    public BsonValue? Profile { get; set; }
 
     public string[] Roles { get; set; } = [];
 
