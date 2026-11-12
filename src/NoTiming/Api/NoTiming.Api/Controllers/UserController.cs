@@ -36,11 +36,6 @@ public class UserController : ApiControllerBase
         TagRequest(request);
         LogInformation(request, nameof(ReadMany));
 
-        if (User.GetSignedInUserId() is null)
-        {
-            return Unauthorized();
-        }
-
         var users = await _users.ReadAll(HttpContext.RequestAborted);
         return Ok(users.Select(UserModels.From).ToArray());
     }

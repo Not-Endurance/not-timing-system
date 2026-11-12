@@ -118,7 +118,7 @@ public static class AuthenticationServices
         services.AddHttpClient<BrevoEmailSender>();
         services.AddSingleton<ConsoleEmailSender>();
         services.AddSingleton<OutboxEmailSender>();
-        services.AddSingleton<IEmailSender>(provider => ChooseEmailSender(provider));
+        services.AddSingleton(ChooseEmailSender);
 
         // The session is the default scheme: the REST routes and the hubs read the same cookie the Ui signs in with.
         services
@@ -128,8 +128,15 @@ public static class AuthenticationServices
                 _ => { }
             );
 
+        // The policy admits only a principal that carries a user id, so an endpoint it guards can read the id without checking it.
         services.AddAuthorization(options =>
-            options.AddPolicy(AuthenticationPolicies.SIGNED_IN, policy => policy.RequireAuthenticatedUser())
+            options.AddPolicy(
+                AuthenticationPolicies.SIGNED_IN,
+                policy =>
+                    policy
+                        .RequireAuthenticatedUser()
+                        .RequireAssertion(context => context.User.GetSignedInUserId() is not null)
+            )
         );
         return services;
     }

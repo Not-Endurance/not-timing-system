@@ -68,13 +68,9 @@ internal static class PasskeyEndpoints<TProfile>
         CancellationToken cancellationToken
     )
     {
-        var userId = principal.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Results.Unauthorized();
-        }
+        var userId = principal.GetRequiredSignedInUserId();
 
-        var options = await passkeys.CreationOptions(userId.Value, cancellationToken);
+        var options = await passkeys.CreationOptions(userId, cancellationToken);
         return options is null
             ? Results.Conflict(new { error = "try-again" })
             : Results.Content(options, "application/json");
@@ -86,13 +82,9 @@ internal static class PasskeyEndpoints<TProfile>
         CancellationToken cancellationToken
     )
     {
-        var userId = principal.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Results.Unauthorized();
-        }
+        var userId = principal.GetRequiredSignedInUserId();
 
-        var listed = await passkeys.List(userId.Value, cancellationToken);
+        var listed = await passkeys.List(userId, cancellationToken);
         return Results.Ok(
             listed.Select(x => new PasskeyItem
             {
@@ -111,11 +103,7 @@ internal static class PasskeyEndpoints<TProfile>
         CancellationToken cancellationToken
     )
     {
-        var userId = principal.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Results.Unauthorized();
-        }
+        var userId = principal.GetRequiredSignedInUserId();
 
         if (request.Credential.ValueKind != JsonValueKind.Object || !IsValidName(request.Name, allowEmpty: true))
         {
@@ -124,7 +112,7 @@ internal static class PasskeyEndpoints<TProfile>
 
         var outcome = await passkeys.Enrol(
             httpContext,
-            userId.Value,
+            userId,
             request.Credential.GetRawText(),
             request.Name,
             cancellationToken
@@ -142,11 +130,7 @@ internal static class PasskeyEndpoints<TProfile>
         CancellationToken cancellationToken
     )
     {
-        var userId = principal.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Results.Unauthorized();
-        }
+        var userId = principal.GetRequiredSignedInUserId();
 
         if (!TryDecode(id, out var credentialId))
         {
@@ -158,7 +142,7 @@ internal static class PasskeyEndpoints<TProfile>
             return Results.BadRequest(new { error = "invalid-name" });
         }
 
-        var outcome = await passkeys.Rename(userId.Value, credentialId, request.Name!, cancellationToken);
+        var outcome = await passkeys.Rename(userId, credentialId, request.Name!, cancellationToken);
         return outcome.Kind switch
         {
             PasskeyOutcomeKind.Done => Results.NoContent(),
@@ -174,18 +158,14 @@ internal static class PasskeyEndpoints<TProfile>
         CancellationToken cancellationToken
     )
     {
-        var userId = principal.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Results.Unauthorized();
-        }
+        var userId = principal.GetRequiredSignedInUserId();
 
         if (!TryDecode(id, out var credentialId))
         {
             return Results.NotFound();
         }
 
-        var outcome = await passkeys.Remove(userId.Value, credentialId, cancellationToken);
+        var outcome = await passkeys.Remove(userId, credentialId, cancellationToken);
         return outcome.Kind switch
         {
             PasskeyOutcomeKind.Done => Results.NoContent(),

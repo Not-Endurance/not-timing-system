@@ -21,7 +21,7 @@ internal sealed class AccountProfiles<TProfile>
 
     public async Task<ProfileUpdateOutcome> Update(
         int userId,
-        ProfileChanges<TProfile> changes,
+        ProfileUpdateModel<TProfile> changes,
         CancellationToken cancellationToken
     )
     {

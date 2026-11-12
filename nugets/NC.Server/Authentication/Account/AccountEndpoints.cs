@@ -44,8 +44,7 @@ internal static class AccountEndpoints<TProfile>
         CancellationToken cancellationToken
     )
     {
-        var userId = principal.GetSignedInUserId();
-        var user = userId is null ? null : await profiles.Find(userId.Value, cancellationToken);
+        var user = await profiles.Find(principal.GetRequiredSignedInUserId(), cancellationToken);
         if (user is null)
         {
             return Results.Unauthorized();
@@ -75,18 +74,14 @@ internal static class AccountEndpoints<TProfile>
         CancellationToken cancellationToken
     )
     {
-        var userId = principal.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Results.Unauthorized();
-        }
+        var userId = principal.GetRequiredSignedInUserId();
 
         if (request.Profile is null || !rules.Accepts(request.Profile))
         {
             return Results.BadRequest(new { error = "missing-details" });
         }
 
-        var outcome = await profiles.Update(userId.Value, request.ToChanges(), cancellationToken);
+        var outcome = await profiles.Update(userId, request.ToChanges(), cancellationToken);
         return outcome == ProfileUpdateOutcome.Saved
             ? Results.NoContent()
             : Results.BadRequest(new { error = "missing-details" });
@@ -238,9 +233,9 @@ internal static class AccountEndpoints<TProfile>
 
         public TProfile Profile { get; init; } = new();
 
-        public ProfileChanges<TProfile> ToChanges()
+        public ProfileUpdateModel<TProfile> ToChanges()
         {
-            return new ProfileChanges<TProfile>
+            return new ProfileUpdateModel<TProfile>
             {
                 GivenName = GivenName ?? string.Empty,
                 MiddleName = MiddleName,

@@ -40,15 +40,11 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Create));
 
-        var userId = User.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = User.GetRequiredSignedInUserId();
 
         request.EnableBuffering();
         var payload = await ReadBody<NoTimingUserSessionModel>(request);
-        if (!IsOwnedBy(payload.UserIdentifier, userId.Value))
+        if (!IsOwnedBy(payload.UserIdentifier, userId))
         {
             return Forbidden();
         }
@@ -65,21 +61,17 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
-        var userId = User.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = User.GetRequiredSignedInUserId();
 
         request.EnableBuffering();
         var payload = await ReadBody<NoTimingUserSessionModel>(request);
         var stored = await Repository.Read(payload.Id);
-        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId.Value))
+        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId))
         {
             return Forbidden();
         }
 
-        if (!IsOwnedBy(payload.UserIdentifier, userId.Value))
+        if (!IsOwnedBy(payload.UserIdentifier, userId))
         {
             return Forbidden();
         }
@@ -96,14 +88,10 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Delete));
 
-        var userId = User.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = User.GetRequiredSignedInUserId();
 
         var stored = await Repository.Read(id);
-        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId.Value))
+        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId))
         {
             return Forbidden();
         }
@@ -119,14 +107,10 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(DeleteForEvent));
 
-        var userId = User.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = User.GetRequiredSignedInUserId();
 
         var stored = await Repository.Read(id);
-        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId.Value))
+        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId))
         {
             return Forbidden();
         }
@@ -143,14 +127,10 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(Read));
 
-        var userId = User.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = User.GetRequiredSignedInUserId();
 
         var stored = await Repository.Read(id);
-        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId.Value))
+        if (stored is not null && !IsOwnedBy(stored.UserIdentifier, userId))
         {
             return Forbidden();
         }
@@ -166,14 +146,10 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(ReadByUserIdentifier));
 
-        var userId = User.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = User.GetRequiredSignedInUserId();
 
         var identifier = Uri.UnescapeDataString(userIdentifier);
-        if (!IsOwnedBy(identifier, userId.Value))
+        if (!IsOwnedBy(identifier, userId))
         {
             return Forbidden();
         }
@@ -189,14 +165,10 @@ public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel
         TagRequest(request);
         LogInformation(request, nameof(ReadByUserIdentifierAndEvent));
 
-        var userId = User.GetSignedInUserId();
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = User.GetRequiredSignedInUserId();
 
         var identifier = Uri.UnescapeDataString(userIdentifier);
-        if (!IsOwnedBy(identifier, userId.Value))
+        if (!IsOwnedBy(identifier, userId))
         {
             return Forbidden();
         }
