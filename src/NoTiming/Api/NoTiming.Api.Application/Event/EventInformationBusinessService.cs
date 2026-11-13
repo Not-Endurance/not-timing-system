@@ -130,7 +130,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         await _eventInformation.Update(eventInformation);
     }
 
-    // Finalizes every event whose last day has ended. Runs nightly. A finalized event is skipped, so running it twice is harmless.
+    // Finalizes every event whose last day has ended. Runs twice a day. A finalized event is skipped, so running it twice is harmless.
     public async Task FinalizeDueEvents()
     {
         var now = _clock.GetUtcNow();

@@ -4,22 +4,24 @@ using Microsoft.Extensions.Logging;
 
 namespace NoTiming.Api.Application.Event;
 
-// Finalizes events whose last day has ended. It runs every night at 03:00 in Europe/Sofia, the time zone of the
-// Bulgarian events. The job is idempotent, so running it on more than one instance is harmless.
+// Finalizes events whose last day has ended. It runs at 03:00 and 15:00 UTC, so the afternoon run retries anything the
+// morning run could not finish. The job is idempotent, so running it on more than one instance is harmless.
 public sealed class EventFinalizationJob : BackgroundService
 {
-    static readonly TimeZoneInfo RunZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Sofia");
-    static readonly TimeSpan RunTime = TimeSpan.FromHours(3);
+    static readonly TimeSpan[] RunTimes = [TimeSpan.FromHours(3), TimeSpan.FromHours(15)];
 
     public static DateTimeOffset NextRun(DateTimeOffset now)
     {
-        var local = TimeZoneInfo.ConvertTime(now, RunZone);
-        var target = local.Date + RunTime;
-        if (local.DateTime >= target)
+        var today = now.UtcDateTime.Date;
+        foreach (var time in RunTimes)
         {
-            target = target.AddDays(1);
+            var run = new DateTimeOffset(today + time, TimeSpan.Zero);
+            if (run > now)
+            {
+                return run;
+            }
         }
-        return new DateTimeOffset(target, RunZone.GetUtcOffset(target));
+        return new DateTimeOffset(today.AddDays(1) + RunTimes[0], TimeSpan.Zero);
     }
 
     readonly IServiceScopeFactory _scopes;
@@ -37,24 +39,9 @@ public sealed class EventFinalizationJob : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var delay = TryNextDelay(stoppingToken);
-            await Task.Delay(delay, _clock, stoppingToken);
-            await FinalizeDueEvents(stoppingToken);
-        }
-    }
-
-    // A failure here (for example, a time zone database missing on the host) must not stop the API. It is retried in an hour.
-    TimeSpan TryNextDelay(CancellationToken stoppingToken)
-    {
-        try
-        {
             var now = _clock.GetUtcNow();
-            return NextRun(now) - now;
-        }
-        catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
-        {
-            _logger.LogError(ex, "Could not work out the next finalization run. It will be tried in an hour.");
-            return TimeSpan.FromHours(1);
+            await Task.Delay(NextRun(now) - now, _clock, stoppingToken);
+            await FinalizeDueEvents(stoppingToken);
         }
     }
 

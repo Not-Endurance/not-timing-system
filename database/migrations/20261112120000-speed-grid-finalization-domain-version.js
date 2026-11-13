@@ -4,8 +4,8 @@
 //   object. Competition, participation and combination values are all converted the same way, so live Arrivelist
 //   output keeps its meaning.
 // - Ruleset is removed. Each competition, ranking and snapshot gets EnglishNames: true for FEI, false otherwise.
-// - Past events are finalized when every entry already has a stored placing. The rest are finalized by the nightly
-//   job once they are placed, so nothing is placed here with the old rules.
+// - Past events are finalized when every entry already has a stored placing. The rest are finalized by the finalization
+//   job (03:00 and 15:00 UTC) once they are placed, so nothing is placed here with the old rules.
 // - Every persisted document gets DomainVersion. The code refuses to load a document without the current version.
 // - User sessions lose their Ruleset. They have no domain class, so they are only handled here.
 //

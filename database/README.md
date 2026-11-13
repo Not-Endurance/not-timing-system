@@ -26,7 +26,7 @@ Every persisted document carries a `DomainVersion`. The code refuses to load a d
 
 - Converts the old min and max speed values to the phase average limit, and replaces `Ruleset` with `EnglishNames`.
 - Stamps `DomainVersion` on every persisted document, including embedded ones.
-- Finalizes past events whose rankings already have every placing stored. Other past events are finalized by the nightly job once it has placed them.
+- Finalizes past events whose rankings already have every placing stored. Other past events are finalized by the finalization job (03:00 and 15:00 UTC) once it has placed them.
 - Refuses to run while an event is live. Deactivate the event or wait until it ends first.
 
 Before production, take a backup and run the migration against a copy of it first. Set MIGRATION_DRY_RUN=1 to count what would change. The run then fails on purpose, so migrate-mongo doesn't record the migration as applied:
