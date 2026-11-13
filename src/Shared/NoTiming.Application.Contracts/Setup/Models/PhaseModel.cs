@@ -8,7 +8,7 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class PhaseModel : PersistedModel
+public class PhaseModel
 {
     public static PhaseModel Create(Phase phase)
     {
@@ -22,6 +22,8 @@ public class PhaseModel : PersistedModel
             IsCompulsoryInspectionRequired = phase.IsCompulsoryInspectionRequired,
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; set; }
     public int Recovery { get; init; }

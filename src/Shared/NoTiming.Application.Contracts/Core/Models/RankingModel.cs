@@ -5,7 +5,7 @@ using NoTiming.Domain.Enums;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class RankingModel : PersistedModel, IEventScoped, ISoftDeletableDocument, IKrudModel<Ranking>
+public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ranking>
 {
     public static RankingModel From(Ranking ranking)
     {
@@ -13,6 +13,8 @@ public class RankingModel : PersistedModel, IEventScoped, ISoftDeletableDocument
         model.MapFrom(ranking);
         return model;
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;

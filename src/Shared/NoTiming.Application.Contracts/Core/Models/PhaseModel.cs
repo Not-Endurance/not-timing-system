@@ -3,7 +3,7 @@ using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class PhaseModel : PersistedModel
+public class PhaseModel
 {
     public static PhaseModel MapFrom(Phase phase)
     {
@@ -35,6 +35,8 @@ public class PhaseModel : PersistedModel
             IsComplete = phase.IsComplete(),
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; init; }
     public string Gate { get; init; } = default!;

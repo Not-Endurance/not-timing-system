@@ -6,7 +6,7 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class CompetitionModel : PersistedModel
+public class CompetitionModel
 {
     public static CompetitionModel MapFrom(Competition competition)
     {
@@ -28,6 +28,8 @@ public class CompetitionModel : PersistedModel
             Participations = competition.Participations.Select(ParticipationModel.MapFrom).ToArray(),
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; init; }
     public string Name { get; init; } = default!;

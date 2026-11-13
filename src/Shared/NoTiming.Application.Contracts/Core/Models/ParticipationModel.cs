@@ -5,7 +5,7 @@ using NoTiming.Domain.Enums;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class ParticipationModel : PersistedModel, IEventScoped, ISoftDeletableDocument, IKrudModel<Participation>
+public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Participation>
 {
     public static ParticipationModel MapFrom(Participation participation)
     {
@@ -24,6 +24,8 @@ public class ParticipationModel : PersistedModel, IEventScoped, ISoftDeletableDo
             Eliminated = participation.Eliminated == null ? null : EliminatedModel.MapFrom(participation.Eliminated),
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;

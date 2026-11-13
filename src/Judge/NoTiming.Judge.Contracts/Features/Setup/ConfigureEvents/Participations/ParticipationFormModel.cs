@@ -1,6 +1,7 @@
 ﻿using NC.DateAndTime;
 using NC.Domain.Exceptions;
 using NC.Krud.Models;
+using NoTiming.Application.Contracts.Shared.Models;
 using NoTiming.Domain.Enums;
 using NoTiming.Domain.Objects;
 using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
@@ -14,36 +15,13 @@ public record ParticipationFormModel : KrudFormModel<Participation>
     public ParticipationCategory? Category { get; set; }
     public bool IsStartTimeOverriden { get; set; }
     public TimeSpan? StartTimeOverride { get; set; }
-    public double? LoopSpeedMin { get; set; }
-    public double? LoopSpeedMax { get; set; }
-    public double? PhaseSpeedMin { get; set; }
-    public double? PhaseSpeedMax { get; set; }
-    public double? LoopAverageSpeedMin { get; set; }
-    public double? LoopAverageSpeedMax { get; set; }
-    public double? PhaseAverageSpeedMin { get; set; }
-    public double? PhaseAverageSpeedMax { get; set; }
+    public SpeedRestrictionsModel Restrictions { get; set; } = new();
 
     protected override Participation MapTo()
     {
         ValidateStartTimeInput();
         var newStart = OverrideStartTime();
-        return new(
-            IsNotRanked,
-            Combination,
-            Category,
-            newStart,
-            new SpeedRestrictions(
-                LoopSpeedMin,
-                LoopSpeedMax,
-                PhaseSpeedMin,
-                PhaseSpeedMax,
-                LoopAverageSpeedMin,
-                LoopAverageSpeedMax,
-                PhaseAverageSpeedMin,
-                PhaseAverageSpeedMax
-            ),
-            id: Id
-        );
+        return new(IsNotRanked, Combination, Category, newStart, Restrictions.ToDomain(), id: Id);
     }
 
     public override void MapFrom(Participation participation)
@@ -54,15 +32,7 @@ public record ParticipationFormModel : KrudFormModel<Participation>
         Category = participation.Category;
         IsStartTimeOverriden = participation.StartTimeOverride != null;
         StartTimeOverride = participation.StartTimeOverride?.LocalDateTime.TimeOfDay;
-        var restrictions = participation.Restrictions;
-        LoopSpeedMin = restrictions.LoopSpeedMin;
-        LoopSpeedMax = restrictions.LoopSpeedMax;
-        PhaseSpeedMin = restrictions.PhaseSpeedMin;
-        PhaseSpeedMax = restrictions.PhaseSpeedMax;
-        LoopAverageSpeedMin = restrictions.LoopAverageSpeedMin;
-        LoopAverageSpeedMax = restrictions.LoopAverageSpeedMax;
-        PhaseAverageSpeedMin = restrictions.PhaseAverageSpeedMin;
-        PhaseAverageSpeedMax = restrictions.PhaseAverageSpeedMax;
+        Restrictions = SpeedRestrictionsModel.From(participation);
     }
 
     void ValidateStartTimeInput()

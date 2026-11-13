@@ -7,7 +7,7 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class LoopModel : PersistedModel
+public class LoopModel
 {
     public static LoopModel MapFrom(Loop loop)
     {
@@ -18,6 +18,8 @@ public class LoopModel : PersistedModel
             Distance = loop.Distance,
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; init; }
     public double Distance { get; init; }

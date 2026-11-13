@@ -4,7 +4,7 @@ using NoTiming.Domain.Objects;
 
 namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase>
+public class Competition : Entity, ISpeedRestrictionAware, IKrudParent<Participation>, IKrudParent<Phase>
 {
     readonly List<Phase> _phases = [];
     readonly List<Participation> _participations = [];

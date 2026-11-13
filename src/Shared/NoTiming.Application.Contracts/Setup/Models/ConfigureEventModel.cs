@@ -7,7 +7,7 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class ConfigureEventModel : PersistedModel, IDocument, IKrudModel<ConfigureEvent>
+public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
 {
     public static ConfigureEventModel From(ConfigureEvent @event)
     {
@@ -15,6 +15,8 @@ public class ConfigureEventModel : PersistedModel, IDocument, IKrudModel<Configu
         model.MapFrom(@event);
         return model;
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; set; } = default!;
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;

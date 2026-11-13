@@ -4,6 +4,11 @@ namespace NoTiming.Application.Contracts.Shared.Models;
 
 public class SpeedRestrictionsModel
 {
+    public static SpeedRestrictionsModel From(ISpeedRestrictionAware source)
+    {
+        return From(source.Restrictions);
+    }
+
     public static SpeedRestrictionsModel From(SpeedRestrictions restrictions)
     {
         return new SpeedRestrictionsModel
@@ -19,14 +24,14 @@ public class SpeedRestrictionsModel
         };
     }
 
-    public double? LoopSpeedMin { get; init; }
-    public double? LoopSpeedMax { get; init; }
-    public double? PhaseSpeedMin { get; init; }
-    public double? PhaseSpeedMax { get; init; }
-    public double? LoopAverageSpeedMin { get; init; }
-    public double? LoopAverageSpeedMax { get; init; }
-    public double? PhaseAverageSpeedMin { get; init; }
-    public double? PhaseAverageSpeedMax { get; init; }
+    public double? LoopSpeedMin { get; set; }
+    public double? LoopSpeedMax { get; set; }
+    public double? PhaseSpeedMin { get; set; }
+    public double? PhaseSpeedMax { get; set; }
+    public double? LoopAverageSpeedMin { get; set; }
+    public double? LoopAverageSpeedMax { get; set; }
+    public double? PhaseAverageSpeedMin { get; set; }
+    public double? PhaseAverageSpeedMax { get; set; }
 
     public SpeedRestrictions ToDomain()
     {

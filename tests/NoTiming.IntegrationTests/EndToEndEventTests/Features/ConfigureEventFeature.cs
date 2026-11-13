@@ -1,6 +1,7 @@
 using NC.Krud.Abstractions;
 using Newtonsoft.Json;
 using NoTiming.Application.Contracts.Setup.Models;
+using NoTiming.Application.Contracts.Shared.Models;
 using NoTiming.Domain.Setup.Aggregates;
 using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 using NoTiming.IntegrationTests.Drivers;
@@ -468,14 +469,7 @@ internal class ConfigureEventFeature
                 competition.CompulsoryThresholdSpan == null
                     ? null
                     : (int)competition.CompulsoryThresholdSpan.Value.TotalMinutes,
-            LoopSpeedMin = competition.Restrictions.LoopSpeedMin,
-            LoopSpeedMax = competition.Restrictions.LoopSpeedMax,
-            PhaseSpeedMin = competition.Restrictions.PhaseSpeedMin,
-            PhaseSpeedMax = competition.Restrictions.PhaseSpeedMax,
-            LoopAverageSpeedMin = competition.Restrictions.LoopAverageSpeedMin,
-            LoopAverageSpeedMax = competition.Restrictions.LoopAverageSpeedMax,
-            PhaseAverageSpeedMin = competition.Restrictions.PhaseAverageSpeedMin,
-            PhaseAverageSpeedMax = competition.Restrictions.PhaseAverageSpeedMax,
+            Restrictions = SpeedRestrictionsModel.From(competition),
             FeiEventId = competition.FeiEventId,
             FeiEventCode = competition.FeiEventCode,
             FeiCompetitionId = competition.FeiCompetitionId,
@@ -497,14 +491,7 @@ internal class ConfigureEventFeature
             Combination = createdCombinations[participation.Combination.Id],
             IsStartTimeOverriden = participation.StartTimeOverride != null,
             StartTimeOverride = localStart?.TimeOfDay,
-            LoopSpeedMin = participation.Restrictions.LoopSpeedMin,
-            LoopSpeedMax = participation.Restrictions.LoopSpeedMax,
-            PhaseSpeedMin = participation.Restrictions.PhaseSpeedMin,
-            PhaseSpeedMax = participation.Restrictions.PhaseSpeedMax,
-            LoopAverageSpeedMin = participation.Restrictions.LoopAverageSpeedMin,
-            LoopAverageSpeedMax = participation.Restrictions.LoopAverageSpeedMax,
-            PhaseAverageSpeedMin = participation.Restrictions.PhaseAverageSpeedMin,
-            PhaseAverageSpeedMax = participation.Restrictions.PhaseAverageSpeedMax,
+            Restrictions = SpeedRestrictionsModel.From(participation),
         };
     }
 

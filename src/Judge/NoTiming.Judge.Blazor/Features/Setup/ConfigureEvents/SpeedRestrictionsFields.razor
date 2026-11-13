@@ -1,0 +1,79 @@
+@using NC.Blazor.Components.Input
+@using NoTiming.Application.Contracts.Shared.Models
+
+<NParagraph Content="@Strictest_restriction_wins_helper_string" Class="mt-4 mb-2" />
+
+<NOptionalInput Label="@Speed_limits_string"
+                HelperText="@Speed_limits_helper_string"
+                Value="_hasSpeedLimit"
+                ValueChanged="@((bool value) => SetSpeedLimit(value))">
+    <NNumberField @bind-Value="Restrictions.LoopSpeedMin" For="() => Restrictions.LoopSpeedMin" Label="@Loop_speed_min_string" HelperText="@Loop_speed_min_helper_string" />
+    <NNumberField @bind-Value="Restrictions.LoopSpeedMax" For="() => Restrictions.LoopSpeedMax" Label="@Loop_speed_max_string" HelperText="@Loop_speed_max_helper_string" />
+    <NNumberField @bind-Value="Restrictions.PhaseSpeedMin" For="() => Restrictions.PhaseSpeedMin" Label="@Phase_speed_min_string" HelperText="@Phase_speed_min_helper_string" />
+    <NNumberField @bind-Value="Restrictions.PhaseSpeedMax" For="() => Restrictions.PhaseSpeedMax" Label="@Phase_speed_max_string" HelperText="@Phase_speed_max_helper_string" />
+</NOptionalInput>
+
+<NOptionalInput Label="@Average_speed_limits_string"
+                HelperText="@Average_speed_limits_helper_string"
+                Value="_hasAverageSpeedLimit"
+                ValueChanged="@((bool value) => SetAverageSpeedLimit(value))"
+                Class="mt-4">
+    <NNumberField @bind-Value="Restrictions.LoopAverageSpeedMin" For="() => Restrictions.LoopAverageSpeedMin" Label="@Loop_average_speed_min_string" HelperText="@Loop_average_speed_min_helper_string" />
+    <NNumberField @bind-Value="Restrictions.LoopAverageSpeedMax" For="() => Restrictions.LoopAverageSpeedMax" Label="@Loop_average_speed_max_string" HelperText="@Loop_average_speed_max_helper_string" />
+    <NNumberField @bind-Value="Restrictions.PhaseAverageSpeedMin" For="() => Restrictions.PhaseAverageSpeedMin" Label="@Phase_average_speed_min_string" HelperText="@Phase_average_speed_min_helper_string" />
+    <NNumberField @bind-Value="Restrictions.PhaseAverageSpeedMax" For="() => Restrictions.PhaseAverageSpeedMax" Label="@Phase_average_speed_max_string" HelperText="@Phase_average_speed_max_helper_string" />
+</NOptionalInput>
+
+@code {
+    [Parameter, EditorRequired]
+    public SpeedRestrictionsModel Restrictions { get; set; } = null!;
+
+    // Each checkbox decides whether its group is shown. A group opens when it already has values.
+    bool _hasSpeedLimit;
+    bool _hasAverageSpeedLimit;
+    SpeedRestrictionsModel? _loaded;
+
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(_loaded, Restrictions))
+        {
+            return;
+        }
+        _loaded = Restrictions;
+        _hasSpeedLimit =
+            Restrictions.LoopSpeedMin != null
+            || Restrictions.LoopSpeedMax != null
+            || Restrictions.PhaseSpeedMin != null
+            || Restrictions.PhaseSpeedMax != null;
+        _hasAverageSpeedLimit =
+            Restrictions.LoopAverageSpeedMin != null
+            || Restrictions.LoopAverageSpeedMax != null
+            || Restrictions.PhaseAverageSpeedMin != null
+            || Restrictions.PhaseAverageSpeedMax != null;
+    }
+
+    // Unchecking clears the group, so a hidden field never keeps a value.
+    void SetSpeedLimit(bool value)
+    {
+        _hasSpeedLimit = value;
+        if (!value)
+        {
+            Restrictions.LoopSpeedMin = null;
+            Restrictions.LoopSpeedMax = null;
+            Restrictions.PhaseSpeedMin = null;
+            Restrictions.PhaseSpeedMax = null;
+        }
+    }
+
+    void SetAverageSpeedLimit(bool value)
+    {
+        _hasAverageSpeedLimit = value;
+        if (!value)
+        {
+            Restrictions.LoopAverageSpeedMin = null;
+            Restrictions.LoopAverageSpeedMax = null;
+            Restrictions.PhaseAverageSpeedMin = null;
+            Restrictions.PhaseAverageSpeedMax = null;
+        }
+    }
+}

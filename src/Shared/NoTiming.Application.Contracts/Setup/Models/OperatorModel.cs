@@ -5,7 +5,7 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class OperatorModel : PersistedModel
+public class OperatorModel
 {
     public static OperatorModel MapFrom(Operator @operator)
     {
@@ -17,6 +17,8 @@ public class OperatorModel : PersistedModel
             Role = @operator.Role,
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; init; }
     public UserModel User { get; init; } = default!;

@@ -8,7 +8,7 @@ using NoTiming.Domain.Core.Objects;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class EventInformationModel : PersistedModel, IIdentifiable, ISoftDeletableDocument, IKrudModel<EventInformation>
+public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKrudModel<EventInformation>
 {
     public static EventInformationModel From(EventInformation eventInformation)
     {
@@ -16,6 +16,8 @@ public class EventInformationModel : PersistedModel, IIdentifiable, ISoftDeletab
         model.MapFrom(eventInformation);
         return model;
     }
+
+    public int DomainVersion { get; set; }
 
     [BsonId]
     public int Id { get; set; }

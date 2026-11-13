@@ -7,7 +7,7 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class UserModel : PersistedModel, IDocument, IKrudModel<User>
+public class UserModel : IDocument, IKrudModel<User>
 {
     public static UserModel From(User user)
     {
@@ -17,6 +17,8 @@ public class UserModel : PersistedModel, IDocument, IKrudModel<User>
     }
 
     string? _name;
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;

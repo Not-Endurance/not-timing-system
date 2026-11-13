@@ -5,7 +5,7 @@ using NoTiming.Domain.Enums;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class OperatorModel : PersistedModel, IEventScoped, ISoftDeletableDocument, IKrudModel<Operator>
+public class OperatorModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Operator>
 {
     public static OperatorModel MapFrom(Operator @operator)
     {
@@ -14,6 +14,8 @@ public class OperatorModel : PersistedModel, IEventScoped, ISoftDeletableDocumen
         ((IKrudModel<Operator>)model).MapFrom(@operator);
         return model;
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;

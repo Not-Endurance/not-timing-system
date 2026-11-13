@@ -4,7 +4,7 @@ using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class CombinationModel : PersistedModel
+public class CombinationModel
 {
     public static CombinationModel MapFrom(Combination combination)
     {
@@ -19,6 +19,8 @@ public class CombinationModel : PersistedModel
             Horse = HorseModel.MapFrom(combination.Horse),
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; init; }
     public int Number { get; init; }

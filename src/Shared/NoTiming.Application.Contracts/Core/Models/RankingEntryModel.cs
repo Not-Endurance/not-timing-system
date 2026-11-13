@@ -3,7 +3,7 @@ using NoTiming.Domain.Core.Aggregates;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class RankingEntryModel : PersistedModel
+public class RankingEntryModel
 {
     public static RankingEntryModel MapFrom(RankingEntry rankingEntry)
     {
@@ -15,6 +15,8 @@ public class RankingEntryModel : PersistedModel
             IsNotRanked = rankingEntry.IsNotRanked,
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public ParticipationModel Participation { get; init; } = default!;
     public int? Rank { get; set; }

@@ -3,7 +3,7 @@ using NoTiming.Domain.Objects;
 
 namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-public class Participation : Entity, IKurdMirror<Combination>
+public class Participation : Entity, ISpeedRestrictionAware, IKurdMirror<Combination>
 {
     public Participation(
         bool? isNotRanked,

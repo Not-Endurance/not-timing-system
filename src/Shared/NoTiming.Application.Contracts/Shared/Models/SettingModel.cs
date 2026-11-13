@@ -5,7 +5,7 @@ using NoTiming.Domain.Enums;
 
 namespace NoTiming.Application.Contracts.Shared.Models;
 
-public class SettingModel : PersistedModel, IDocument, IKrudModel<Setting>
+public class SettingModel : IDocument, IKrudModel<Setting>
 {
     public static SettingModel From(Setting setting)
     {
@@ -13,6 +13,8 @@ public class SettingModel : PersistedModel, IDocument, IKrudModel<Setting>
         model.MapFrom(setting);
         return model;
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; set; } = default!;
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;

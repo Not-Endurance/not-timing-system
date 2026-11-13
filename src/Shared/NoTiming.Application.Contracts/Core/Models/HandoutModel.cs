@@ -4,7 +4,7 @@ using NoTiming.Domain.Core.Aggregates;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class HandoutModel : PersistedModel, IEventScoped, ISoftDeletableDocument, IKrudModel<Handout>
+public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Handout>
 {
     public static HandoutModel From(Handout handout)
     {
@@ -12,6 +12,8 @@ public class HandoutModel : PersistedModel, IEventScoped, ISoftDeletableDocument
         model.MapFrom(handout);
         return model;
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;

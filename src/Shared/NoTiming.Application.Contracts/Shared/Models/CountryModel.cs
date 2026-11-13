@@ -4,7 +4,7 @@ using NoTiming.Domain.Aggregates;
 
 namespace NoTiming.Application.Contracts.Shared.Models;
 
-public class CountryModel : PersistedModel, IDocument, IKrudModel<Country>
+public class CountryModel : IDocument, IKrudModel<Country>
 {
     public static CountryModel From(Country country)
     {
@@ -12,6 +12,8 @@ public class CountryModel : PersistedModel, IDocument, IKrudModel<Country>
         model.MapFrom(country);
         return model;
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; set; } = default!;
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;

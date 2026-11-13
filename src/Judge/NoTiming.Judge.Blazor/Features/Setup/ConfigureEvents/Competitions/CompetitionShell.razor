@@ -1,6 +1,7 @@
 @using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions
 @using NC.Blazor.Components.Input
 @using NC.Krud.Blazor.Components
+@using NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents
 
 @inherits CompetitionShellBehind
 
@@ -22,14 +23,7 @@
             <NNumberField @bind-Value="Model.CompulsoryThresholdMinutes" For="() => Model.CompulsoryThresholdMinutes" />
         }
 
-        <NNumberField @bind-Value="Model.LoopSpeedMin" For="() => Model.LoopSpeedMin" Label="@Loop_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
-        <NNumberField @bind-Value="Model.LoopSpeedMax" For="() => Model.LoopSpeedMax" Label="@Loop_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
-        <NNumberField @bind-Value="Model.PhaseSpeedMin" For="() => Model.PhaseSpeedMin" Label="@Phase_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
-        <NNumberField @bind-Value="Model.PhaseSpeedMax" For="() => Model.PhaseSpeedMax" Label="@Phase_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
-        <NNumberField @bind-Value="Model.LoopAverageSpeedMin" For="() => Model.LoopAverageSpeedMin" Label="@Loop_average_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
-        <NNumberField @bind-Value="Model.LoopAverageSpeedMax" For="() => Model.LoopAverageSpeedMax" Label="@Loop_average_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
-        <NNumberField @bind-Value="Model.PhaseAverageSpeedMin" For="() => Model.PhaseAverageSpeedMin" Label="@Phase_average_speed_min_string" HelperText="@Speed_limits_combine_helper_string" />
-        <NNumberField @bind-Value="Model.PhaseAverageSpeedMax" For="() => Model.PhaseAverageSpeedMax" Label="@Phase_average_speed_max_string" HelperText="@Speed_limits_combine_helper_string" />
+        <SpeedRestrictionsFields Restrictions="Model.Restrictions" />
 
         <NParagraph Content="@Locate_FEI_Show_data_instructions_string" Class="mt-8 mb-2" />
 

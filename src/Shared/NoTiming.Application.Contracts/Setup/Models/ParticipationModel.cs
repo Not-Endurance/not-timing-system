@@ -7,7 +7,7 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class ParticipationModel : PersistedModel
+public class ParticipationModel
 {
     public static ParticipationModel MapFrom(Participation participation)
     {
@@ -22,6 +22,8 @@ public class ParticipationModel : PersistedModel
             Restrictions = SpeedRestrictionsModel.From(participation.Restrictions),
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; init; }
     public ParticipationCategory Category { get; init; } = default!;

@@ -5,7 +5,7 @@ using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Application.Contracts.Setup.Models;
 
-public class OfficialModel : PersistedModel
+public class OfficialModel
 {
     public static OfficialModel MapFrom(Official official)
     {
@@ -19,6 +19,8 @@ public class OfficialModel : PersistedModel
             User = official.User == null ? null : UserModel.From(official.User),
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; init; }
     public string Name { get; init; } = default!;

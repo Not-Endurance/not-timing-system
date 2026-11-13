@@ -12,7 +12,7 @@
 // The migration stops if any event is live, because live events would be written against the new rules mid-event.
 // Set MIGRATION_DRY_RUN=1 to count what would change without writing anything.
 //
-// Keep DOMAIN_VERSION in step with PersistedModel.CURRENT_DOMAIN_VERSION and the entity default in NC.Domain.Entity.
+// Keep DOMAIN_VERSION in step with the entity default in NC.Domain.Entity and the DTOs' DomainVersion defaults.
 
 const DOMAIN_VERSION = 1;
 const DRY_RUN = process.env.MIGRATION_DRY_RUN === "1";
@@ -32,7 +32,7 @@ const STORED_COLLECTIONS = [
 ];
 
 // The documents that carry a DomainVersion, recognised by their stored fields. Athlete, horse and club are embedded
-// and are not versioned. Keep in step with the PersistedModel subclasses in NoTiming.Application.Contracts.
+// and are not versioned. Keep in step with the DTOs in NoTiming.Application.Contracts that declare DomainVersion.
 function persistedKind(o) {
   const has = (...keys) => keys.every((key) => Object.prototype.hasOwnProperty.call(o, key));
   const count = Object.keys(o).length;

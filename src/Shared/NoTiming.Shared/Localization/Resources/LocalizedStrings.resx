@@ -1077,8 +1077,44 @@
   <data name="Phase_average_speed_max_string" xml:space="preserve">
     <value>Phase average speed max</value>
   </data>
-  <data name="Speed_limits_combine_helper_string" xml:space="preserve">
-    <value>Combined with the competition limits. The stricter limit applies.</value>
+  <data name="Speed_limits_string" xml:space="preserve">
+    <value>Speed limits</value>
+  </data>
+  <data name="Speed_limits_helper_string" xml:space="preserve">
+    <value>Limits the speed of each loop and each phase. Leave a field empty for no limit. Unchecking clears these fields.</value>
+  </data>
+  <data name="Average_speed_limits_string" xml:space="preserve">
+    <value>Average speed limits</value>
+  </data>
+  <data name="Average_speed_limits_helper_string" xml:space="preserve">
+    <value>Limits the average speed over the loops and phases completed so far. Leave a field empty for no limit. Unchecking clears these fields.</value>
+  </data>
+  <data name="Loop_speed_min_helper_string" xml:space="preserve">
+    <value>Minimum speed applied on individual loops. Does not include recovery time.</value>
+  </data>
+  <data name="Loop_speed_max_helper_string" xml:space="preserve">
+    <value>Maximum speed applied on individual loops. Does not include recovery time.</value>
+  </data>
+  <data name="Phase_speed_min_helper_string" xml:space="preserve">
+    <value>Minimum speed applied on individual phases. Includes recovery time, except on the final phase.</value>
+  </data>
+  <data name="Phase_speed_max_helper_string" xml:space="preserve">
+    <value>Maximum speed applied on individual phases. Includes recovery time, except on the final phase.</value>
+  </data>
+  <data name="Loop_average_speed_min_helper_string" xml:space="preserve">
+    <value>Minimum average speed over the loops completed so far. Does not include recovery time.</value>
+  </data>
+  <data name="Loop_average_speed_max_helper_string" xml:space="preserve">
+    <value>Maximum average speed over the loops completed so far. Does not include recovery time.</value>
+  </data>
+  <data name="Phase_average_speed_min_helper_string" xml:space="preserve">
+    <value>Minimum average speed over the phases completed so far. Includes recovery time, except on the final phase.</value>
+  </data>
+  <data name="Phase_average_speed_max_helper_string" xml:space="preserve">
+    <value>Maximum average speed over the phases completed so far. Includes recovery time, except on the final phase.</value>
+  </data>
+  <data name="Strictest_restriction_wins_helper_string" xml:space="preserve">
+    <value>If several limits apply to the same speed, the strictest restriction wins.</value>
   </data>
   <data name="Loop_average_S_string" xml:space="preserve">
     <value>Loop avg. speed</value>
