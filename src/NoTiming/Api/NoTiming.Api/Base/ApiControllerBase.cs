@@ -1,12 +1,10 @@
 using System.Diagnostics;
-using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NC.Serialization.JSON;
 using NC.Structures;
 using NoTiming.Api.Application.Logging;
 using NoTiming.Api.Application.Telemetry;
-using NoTiming.Application.Contracts.Shared;
 
 namespace NoTiming.Api.Base;
 
@@ -55,9 +53,7 @@ public abstract class ApiControllerBase : ControllerBase
         where TPayload : class
     {
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var payload = requestBody.FromJson<TPayload>();
-        StampDomainVersion(payload);
-        return payload;
+        return requestBody.FromJson<TPayload>();
     }
 
     protected new IActionResult Ok()
@@ -78,33 +74,5 @@ public abstract class ApiControllerBase : ControllerBase
     protected IActionResult InvalidPayload(string message)
     {
         return new BadRequestObjectResult(message);
-    }
-
-    // A payload is written with the domain version this API was built with, whatever version the client sent.
-    // Nested documents are stamped too, because they are stored inside their parent.
-    static void StampDomainVersion(object? payload)
-    {
-        switch (payload)
-        {
-            case null
-            or string:
-                return;
-            case PersistedModel persisted:
-                persisted.DomainVersion = PersistedModel.CURRENT_DOMAIN_VERSION;
-                foreach (var property in persisted.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                {
-                    if (property.GetIndexParameters().Length == 0)
-                    {
-                        StampDomainVersion(property.GetValue(persisted));
-                    }
-                }
-                return;
-            case System.Collections.IEnumerable items:
-                foreach (var item in items)
-                {
-                    StampDomainVersion(item);
-                }
-                return;
-        }
     }
 }
