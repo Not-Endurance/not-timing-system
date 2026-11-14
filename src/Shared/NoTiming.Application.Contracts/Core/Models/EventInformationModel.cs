@@ -17,6 +17,8 @@ public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKru
         return model;
     }
 
+    public int DomainVersion { get; set; }
+
     [BsonId]
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
@@ -26,12 +28,15 @@ public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKru
     public string? FeiShowId { get; set; }
     public DateTimeOffset StartDay { get; set; }
     public DateTimeOffset EndDay { get; set; }
+    public string? TimeZoneId { get; set; }
     public bool IsActive { get; set; }
+    public bool IsFinalized { get; set; }
     public bool IsDeleted { get; set; }
     public int? DeletedVersion { get; set; }
 
     public void MapFrom(EventInformation eventInformation)
     {
+        DomainVersion = eventInformation.DomainVersion;
         Id = eventInformation.Id;
         Country = CountryModel.From(eventInformation.Country);
         Name = eventInformation.Name;
@@ -39,13 +44,25 @@ public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKru
         FeiShowId = eventInformation.FeiShowId;
         StartDay = eventInformation.EventSpan.StartDay;
         EndDay = eventInformation.EventSpan.EndDay;
+        TimeZoneId = eventInformation.EventSpan.TimeZoneId;
         IsActive = eventInformation.IsActive;
+        IsFinalized = eventInformation.IsFinalized;
     }
 
     public EventInformation MapToEntity()
     {
         var country = Country.MapToEntity();
-        var span = new EventSpan(StartDay, EndDay);
-        return new EventInformation(country, Name, Location, span, FeiShowId, Id, IsActive);
+        var span = new EventSpan(StartDay, EndDay, TimeZoneId ?? EventTimeZone.ForCountry(country));
+        return new EventInformation(
+            country,
+            Name,
+            Location,
+            span,
+            FeiShowId,
+            Id,
+            IsActive,
+            IsFinalized,
+            storedDomainVersion: DomainVersion
+        );
     }
 }

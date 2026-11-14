@@ -498,8 +498,8 @@
   <data name="Operator_string" xml:space="preserve">
     <value>Operator</value>
   </data>
-  <data name="Competition_Ruleset_string" xml:space="preserve">
-    <value>Ruleset</value>
+  <data name="English_names_string" xml:space="preserve">
+    <value>English names</value>
   </data>
   <data name="Automatic_CRI" xml:space="preserve">
     <value>Require compulsory inspection based on recovery</value>
@@ -1052,5 +1052,74 @@
   </data>
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Are you sure you want to delete '{0}'?</value>
+  </data>
+  <data name="Loop_speed_min_string" xml:space="preserve">
+    <value>Loop speed min</value>
+  </data>
+  <data name="Loop_speed_max_string" xml:space="preserve">
+    <value>Loop speed max</value>
+  </data>
+  <data name="Phase_speed_min_string" xml:space="preserve">
+    <value>Phase speed min</value>
+  </data>
+  <data name="Phase_speed_max_string" xml:space="preserve">
+    <value>Phase speed max</value>
+  </data>
+  <data name="Loop_average_speed_min_string" xml:space="preserve">
+    <value>Loop average speed min</value>
+  </data>
+  <data name="Loop_average_speed_max_string" xml:space="preserve">
+    <value>Loop average speed max</value>
+  </data>
+  <data name="Phase_average_speed_min_string" xml:space="preserve">
+    <value>Phase average speed min</value>
+  </data>
+  <data name="Phase_average_speed_max_string" xml:space="preserve">
+    <value>Phase average speed max</value>
+  </data>
+  <data name="Speed_limits_string" xml:space="preserve">
+    <value>Speed limits</value>
+  </data>
+  <data name="Speed_limits_helper_string" xml:space="preserve">
+    <value>Limits the speed of each loop and each phase. Leave a field empty for no limit. Unchecking clears these fields.</value>
+  </data>
+  <data name="Average_speed_limits_string" xml:space="preserve">
+    <value>Average speed limits</value>
+  </data>
+  <data name="Average_speed_limits_helper_string" xml:space="preserve">
+    <value>Limits the average speed over the loops and phases completed so far. Leave a field empty for no limit. Unchecking clears these fields.</value>
+  </data>
+  <data name="Loop_speed_min_helper_string" xml:space="preserve">
+    <value>Minimum speed applied on individual loops. Does not include recovery time.</value>
+  </data>
+  <data name="Loop_speed_max_helper_string" xml:space="preserve">
+    <value>Maximum speed applied on individual loops. Does not include recovery time.</value>
+  </data>
+  <data name="Phase_speed_min_helper_string" xml:space="preserve">
+    <value>Minimum speed applied on individual phases. Includes recovery time, except on the final phase.</value>
+  </data>
+  <data name="Phase_speed_max_helper_string" xml:space="preserve">
+    <value>Maximum speed applied on individual phases. Includes recovery time, except on the final phase.</value>
+  </data>
+  <data name="Loop_average_speed_min_helper_string" xml:space="preserve">
+    <value>Minimum average speed over the loops completed so far. Does not include recovery time.</value>
+  </data>
+  <data name="Loop_average_speed_max_helper_string" xml:space="preserve">
+    <value>Maximum average speed over the loops completed so far. Does not include recovery time.</value>
+  </data>
+  <data name="Phase_average_speed_min_helper_string" xml:space="preserve">
+    <value>Minimum average speed over the phases completed so far. Includes recovery time, except on the final phase.</value>
+  </data>
+  <data name="Phase_average_speed_max_helper_string" xml:space="preserve">
+    <value>Maximum average speed over the phases completed so far. Includes recovery time, except on the final phase.</value>
+  </data>
+  <data name="Strictest_restriction_wins_helper_string" xml:space="preserve">
+    <value>If several limits apply to the same speed, the strictest restriction wins.</value>
+  </data>
+  <data name="Loop_average_S_string" xml:space="preserve">
+    <value>Loop avg. speed</value>
+  </data>
+  <data name="Phase_average_S_string" xml:space="preserve">
+    <value>Phase avg. speed</value>
   </data>
 </root>

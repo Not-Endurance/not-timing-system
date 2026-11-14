@@ -6,6 +6,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: cd-production
+  cancel-in-progress: false
+
 env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 10.0.x
@@ -19,8 +23,68 @@ jobs:
   unit-tests:
     uses: ./.github/workflows/nts-unit-tests.yaml
 
-  deploy-message-bus:
+  migrate-mongo:
     needs: unit-tests
+    runs-on: ubuntu-latest
+    name: Production - Mongo migrations
+    environment: production
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+        cache-dependency-path: database/package-lock.json
+
+    - name: Install migration tooling
+      working-directory: database
+      run: npm ci
+
+    - name: Allow runner IP in Atlas
+      env:
+        ATLAS_PUBLIC_KEY: ${{ secrets.ATLAS_PUBLIC_KEY }}
+        ATLAS_PRIVATE_KEY: ${{ secrets.ATLAS_PRIVATE_KEY }}
+        ATLAS_PROJECT_ID: ${{ vars.ATLAS_PROJECT_ID }}
+      run: |
+        RUNNER_IP=$(curl -fsS https://api.ipify.org)
+        DELETE_AFTER=$(date -u -d '+2 hours' +%Y-%m-%dT%H:%M:%SZ)
+        curl -fsS --digest --user "$ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY" \
+          -X POST "https://cloud.mongodb.com/api/atlas/v2/groups/$ATLAS_PROJECT_ID/accessList" \
+          -H "Accept: application/vnd.atlas.2025-03-12+json" \
+          -H "Content-Type: application/json" \
+          -d "[{\"ipAddress\": \"$RUNNER_IP\", \"comment\": \"migrate-mongo run $GITHUB_RUN_ID\", \"deleteAfterDate\": \"$DELETE_AFTER\"}]"
+        echo "ATLAS_RUNNER_IP=$RUNNER_IP" >> "$GITHUB_ENV"
+
+    - name: Apply pending migrations
+      working-directory: database
+      env:
+        MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+      run: npm run migrate:up
+
+    - name: Remove runner IP from Atlas
+      if: always()
+      env:
+        ATLAS_PUBLIC_KEY: ${{ secrets.ATLAS_PUBLIC_KEY }}
+        ATLAS_PRIVATE_KEY: ${{ secrets.ATLAS_PRIVATE_KEY }}
+        ATLAS_PROJECT_ID: ${{ vars.ATLAS_PROJECT_ID }}
+      run: |
+        if [ -z "$ATLAS_RUNNER_IP" ]; then
+          echo "No runner IP was added, nothing to remove"
+          exit 0
+        fi
+        STATUS=$(curl -sS -o /dev/null -w '%{http_code}' --digest --user "$ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY" \
+          -X DELETE "https://cloud.mongodb.com/api/atlas/v2/groups/$ATLAS_PROJECT_ID/accessList/$ATLAS_RUNNER_IP" \
+          -H "Accept: application/vnd.atlas.2025-03-12+json")
+        if [ "$STATUS" != "204" ] && [ "$STATUS" != "404" ]; then
+          echo "Removing $ATLAS_RUNNER_IP from the Atlas access list failed with HTTP $STATUS"
+          exit 1
+        fi
+
+  deploy-message-bus:
+    needs: [unit-tests, migrate-mongo]
     runs-on: ubuntu-latest
     name: Production - MessageBus
     steps:

@@ -13,9 +13,10 @@ public class User : Aggregate
         string? countryRegion = null,
         string? club = null,
         string? feiId = null,
-        string? displayName = null
+        string? displayName = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Email = Required(nameof(Email), email).Trim();
         GivenName = Normalize(givenName);

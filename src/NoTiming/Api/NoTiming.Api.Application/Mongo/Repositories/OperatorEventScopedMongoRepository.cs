@@ -19,7 +19,8 @@ public class OperatorEventScopedMongoRepository : EventScopedMongoRepository<Ope
     protected override UpdateDefinition<OperatorModel> GetUpdateDefinition(OperatorModel document)
     {
         return Builders<OperatorModel>
-            .Update.Set(x => x.EventId, document.EventId)
+            .Update.Set(x => x.DomainVersion, document.DomainVersion)
+            .Set(x => x.EventId, document.EventId)
             .Set(x => x.UserId, document.UserId)
             .Set(x => x.Role, document.Role);
     }

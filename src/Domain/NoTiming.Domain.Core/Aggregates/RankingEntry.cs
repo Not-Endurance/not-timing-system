@@ -2,8 +2,14 @@
 
 public class RankingEntry : Aggregate // TODO: refacator in a proper aggregate
 {
-    public RankingEntry(Participation? participation, int? rank, bool isNotRanked, int? id = null)
-        : base(id)
+    public RankingEntry(
+        Participation? participation,
+        int? rank,
+        bool isNotRanked,
+        int? id = null,
+        int? storedDomainVersion = null
+    )
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Participation = Required(nameof(Participation), participation);
         Rank = rank;

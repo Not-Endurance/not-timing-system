@@ -33,12 +33,9 @@ public sealed class NameRenderingTests
     {
         Assert.Equal(
             "English Name",
-            NameRenderingHelper.Render("Local Name", "English Name", CompetitionRuleset.FEI, new CultureInfo("bg-BG"))
+            NameRenderingHelper.Render("Local Name", "English Name", true, new CultureInfo("bg-BG"))
         );
-        Assert.Equal(
-            "Local Name",
-            NameRenderingHelper.Render("Local Name", null, CompetitionRuleset.FEI, CultureInfo.InvariantCulture)
-        );
+        Assert.Equal("Local Name", NameRenderingHelper.Render("Local Name", null, true, CultureInfo.InvariantCulture));
     }
 
     [Fact]

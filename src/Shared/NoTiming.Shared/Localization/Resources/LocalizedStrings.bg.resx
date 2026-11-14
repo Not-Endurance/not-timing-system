@@ -498,8 +498,8 @@
   <data name="Operator_string" xml:space="preserve">
     <value>Оператор</value>
   </data>
-  <data name="Competition_Ruleset_string" xml:space="preserve">
-    <value>Правилник</value>
+  <data name="English_names_string" xml:space="preserve">
+    <value>Английски имена</value>
   </data>
   <data name="Automatic_CRI" xml:space="preserve">
     <value>Задължителна инспекция базирана на време на възстановяване</value>
@@ -1052,5 +1052,74 @@
   </data>
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Loop_speed_min_string" xml:space="preserve">
+    <value>Минимална скорост на обиколка</value>
+  </data>
+  <data name="Loop_speed_max_string" xml:space="preserve">
+    <value>Максимална скорост на обиколка</value>
+  </data>
+  <data name="Phase_speed_min_string" xml:space="preserve">
+    <value>Минимална скорост на етап</value>
+  </data>
+  <data name="Phase_speed_max_string" xml:space="preserve">
+    <value>Максимална скорост на етап</value>
+  </data>
+  <data name="Loop_average_speed_min_string" xml:space="preserve">
+    <value>Минимална средна скорост на обиколките</value>
+  </data>
+  <data name="Loop_average_speed_max_string" xml:space="preserve">
+    <value>Максимална средна скорост на обиколките</value>
+  </data>
+  <data name="Phase_average_speed_min_string" xml:space="preserve">
+    <value>Минимална средна скорост на етапите</value>
+  </data>
+  <data name="Phase_average_speed_max_string" xml:space="preserve">
+    <value>Максимална средна скорост на етапите</value>
+  </data>
+  <data name="Speed_limits_string" xml:space="preserve">
+    <value>Ограничения на скоростта</value>
+  </data>
+  <data name="Speed_limits_helper_string" xml:space="preserve">
+    <value>Ограничава скоростта на всеки кръг и на всяка фаза. Оставете поле празно, за да няма ограничение. Премахването на отметката изчиства тези полета.</value>
+  </data>
+  <data name="Average_speed_limits_string" xml:space="preserve">
+    <value>Ограничения на средната скорост</value>
+  </data>
+  <data name="Average_speed_limits_helper_string" xml:space="preserve">
+    <value>Ограничава средната скорост за досега завършените кръгове и фази. Оставете поле празно, за да няма ограничение. Премахването на отметката изчиства тези полета.</value>
+  </data>
+  <data name="Loop_speed_min_helper_string" xml:space="preserve">
+    <value>Минимална скорост, приложена към отделните кръгове. Не включва времето за възстановяване.</value>
+  </data>
+  <data name="Loop_speed_max_helper_string" xml:space="preserve">
+    <value>Максимална скорост, приложена към отделните кръгове. Не включва времето за възстановяване.</value>
+  </data>
+  <data name="Phase_speed_min_helper_string" xml:space="preserve">
+    <value>Минимална скорост, приложена към отделните фази. Включва времето за възстановяване, освен на последната фаза.</value>
+  </data>
+  <data name="Phase_speed_max_helper_string" xml:space="preserve">
+    <value>Максимална скорост, приложена към отделните фази. Включва времето за възстановяване, освен на последната фаза.</value>
+  </data>
+  <data name="Loop_average_speed_min_helper_string" xml:space="preserve">
+    <value>Минимална средна скорост за досега завършените кръгове. Не включва времето за възстановяване.</value>
+  </data>
+  <data name="Loop_average_speed_max_helper_string" xml:space="preserve">
+    <value>Максимална средна скорост за досега завършените кръгове. Не включва времето за възстановяване.</value>
+  </data>
+  <data name="Phase_average_speed_min_helper_string" xml:space="preserve">
+    <value>Минимална средна скорост за досега завършените фази. Включва времето за възстановяване, освен на последната фаза.</value>
+  </data>
+  <data name="Phase_average_speed_max_helper_string" xml:space="preserve">
+    <value>Максимална средна скорост за досега завършените фази. Включва времето за възстановяване, освен на последната фаза.</value>
+  </data>
+  <data name="Strictest_restriction_wins_helper_string" xml:space="preserve">
+    <value>Когато към една и съща скорост се прилагат няколко ограничения, важи най-строгото.</value>
+  </data>
+  <data name="Loop_average_S_string" xml:space="preserve">
+    <value>Ср. скорост (обиколки)</value>
+  </data>
+  <data name="Phase_average_S_string" xml:space="preserve">
+    <value>Ср. скорост (етапи)</value>
   </data>
 </root>

@@ -107,14 +107,14 @@ public sealed class CoreFeatureEndToEndTests
         await SeedOtherEvent(
             api,
             pastEventId,
-            new EventSpan(today.AddDays(-30), today.AddDays(-29)),
+            new EventSpan(today.AddDays(-30), today.AddDays(-29), "Europe/Sofia"),
             documentBase,
             "Past"
         );
         await SeedOtherEvent(
             api,
             activeEventId,
-            new EventSpan(today, today.AddDays(1)),
+            new EventSpan(today, today.AddDays(1), "Europe/Sofia"),
             documentBase + 10_000,
             "Active"
         );
@@ -341,8 +341,6 @@ public sealed class CoreFeatureEndToEndTests
         EventInformation eventInformation
     )
     {
-        eventInformation = CreateFeiExportEventInformation(eventInformation);
-        await api.Update(eventInformation);
         var finalRankings = await api.ReadRankings(eventInformation.Id);
         var exportableRanking = CreateFeiExportRanking(finalRankings.First());
         await api.Update(exportableRanking);
@@ -368,19 +366,6 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Contains(exportableRanking.FeiCompetitionId!, export.Content);
     }
 
-    static EventInformation CreateFeiExportEventInformation(EventInformation source)
-    {
-        return new EventInformation(
-            source.Country,
-            source.Name,
-            source.Location,
-            source.EventSpan,
-            $"FEI-SHOW-{source.Id}",
-            source.Id,
-            source.IsActive
-        );
-    }
-
     static Ranking CreateFeiExportRanking(Ranking source)
     {
         var entries = source
@@ -397,7 +382,7 @@ public sealed class CoreFeatureEndToEndTests
 
         return new Ranking(
             source.Name,
-            source.Ruleset,
+            source.EnglishNames,
             source.Category,
             $"FEI-EVENT-{source.Id}",
             "CEI1",
@@ -431,8 +416,7 @@ public sealed class CoreFeatureEndToEndTests
             exportHorse,
             source.Combination.Club,
             source.Combination.Distance,
-            source.Combination.MinAverageSpeed,
-            source.Combination.MaxAverageSpeed,
+            source.Combination.Restrictions,
             source.Combination.Id
         );
 

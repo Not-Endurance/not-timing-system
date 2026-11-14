@@ -1,6 +1,7 @@
 using NC.Krud.Abstractions;
 using Newtonsoft.Json;
 using NoTiming.Application.Contracts.Setup.Models;
+using NoTiming.Application.Contracts.Shared.Models;
 using NoTiming.Domain.Setup.Aggregates;
 using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 using NoTiming.IntegrationTests.Drivers;
@@ -305,7 +306,7 @@ internal class ConfigureEventFeature
             );
             Assert.Contains(
                 currentEvent.Competitions,
-                x => x.Id == competitionId && x.Name == competition.Name && x.Ruleset == competition.Ruleset
+                x => x.Id == competitionId && x.Name == competition.Name && x.EnglishNames == competition.EnglishNames
             );
 
             SelectCompetition(_judge, currentEvent, competitionId);
@@ -460,7 +461,7 @@ internal class ConfigureEventFeature
         return new CompetitionFormModel
         {
             Name = competition.Name,
-            Ruleset = competition.Ruleset,
+            EnglishNames = competition.EnglishNames,
             Date = localStart.Date,
             Time = localStart.TimeOfDay,
             UseCompulsoryThreshold = competition.CompulsoryThresholdSpan != null,
@@ -468,10 +469,7 @@ internal class ConfigureEventFeature
                 competition.CompulsoryThresholdSpan == null
                     ? null
                     : (int)competition.CompulsoryThresholdSpan.Value.TotalMinutes,
-            UseMinSpeedRestriction = competition.MinSpeedRestriction != null,
-            MinSpeedRestriction = competition.MinSpeedRestriction,
-            UseMaxSpeedRestriction = competition.MaxSpeedRestriction != null,
-            MaxSpeedRestriction = competition.MaxSpeedRestriction,
+            Restrictions = SpeedRestrictionsModel.From(competition),
             FeiEventId = competition.FeiEventId,
             FeiEventCode = competition.FeiEventCode,
             FeiCompetitionId = competition.FeiCompetitionId,
@@ -493,10 +491,7 @@ internal class ConfigureEventFeature
             Combination = createdCombinations[participation.Combination.Id],
             IsStartTimeOverriden = participation.StartTimeOverride != null,
             StartTimeOverride = localStart?.TimeOfDay,
-            IsMaxSpeedOverriden = participation.MaxSpeedOverride != null,
-            MaxSpeedOverride = participation.MaxSpeedOverride,
-            IsMinSpeedOverriden = participation.MinSpeedOverride != null,
-            MinSpeedOverride = participation.MinSpeedOverride,
+            Restrictions = SpeedRestrictionsModel.From(participation),
         };
     }
 

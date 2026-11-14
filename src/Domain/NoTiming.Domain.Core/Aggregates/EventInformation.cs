@@ -12,9 +12,11 @@ public class EventInformation : Aggregate
         EventSpan eventSpan,
         string? feiShowId,
         int id,
-        bool isActive = true
+        bool isActive = true,
+        bool isFinalized = false,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Country = Required(nameof(Country), country);
         Name = Required(nameof(Name), name);
@@ -22,6 +24,7 @@ public class EventInformation : Aggregate
         EventSpan = eventSpan;
         FeiShowId = feiShowId;
         IsActive = isActive;
+        IsFinalized = isFinalized;
     }
 
     public Country Country { get; }
@@ -30,6 +33,7 @@ public class EventInformation : Aggregate
     public EventSpan EventSpan { get; }
     public string? FeiShowId { get; }
     public bool IsActive { get; }
+    public bool IsFinalized { get; }
 
     public override string ToString()
     {

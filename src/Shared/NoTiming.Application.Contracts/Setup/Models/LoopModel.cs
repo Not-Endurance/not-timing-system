@@ -11,14 +11,21 @@ public class LoopModel
 {
     public static LoopModel MapFrom(Loop loop)
     {
-        return new() { Id = loop.Id, Distance = loop.Distance };
+        return new()
+        {
+            DomainVersion = loop.DomainVersion,
+            Id = loop.Id,
+            Distance = loop.Distance,
+        };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; init; }
     public double Distance { get; init; }
 
     public Loop MapToEntity()
     {
-        return new Loop(Distance, Id);
+        return new Loop(Distance, Id, storedDomainVersion: DomainVersion);
     }
 }

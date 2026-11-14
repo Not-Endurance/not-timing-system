@@ -1,0 +1,21 @@
+@using MudBlazor
+@using NC.Blazor.Components.Input
+
+@inherits NOptionalInputBehind
+
+<MudCheckBox T="bool"
+             Value="@Value"
+             ValueChanged="@ValueChanged"
+             For="@For"
+             Label="@Label"
+             Color="Color.Primary"
+             Class="@Class"
+             Style="@Style" />
+@if (!string.IsNullOrWhiteSpace(HelperText))
+{
+    <MudText Typo="Typo.caption" Class="mb-2">@HelperText</MudText>
+}
+@if (Value)
+{
+    @ChildContent
+}

@@ -8,7 +8,7 @@ public record Starter : ValueObject
     internal Starter(
         string athleteName,
         string? athleteNameEnglish,
-        CompetitionRuleset ruleset,
+        bool englishNames,
         int number,
         int phaseNumber,
         string gate,
@@ -18,7 +18,7 @@ public record Starter : ValueObject
     {
         AthleteName = athleteName;
         AthleteNameEnglish = athleteNameEnglish;
-        Ruleset = ruleset;
+        EnglishNames = englishNames;
         Number = number;
         PhaseNumber = phaseNumber;
         Gate = gate;
@@ -28,7 +28,7 @@ public record Starter : ValueObject
 
     public string AthleteName { get; }
     public string? AthleteNameEnglish { get; }
-    public CompetitionRuleset Ruleset { get; }
+    public bool EnglishNames { get; }
     public int Number { get; }
     public int PhaseNumber { get; }
     public string Gate { get; }
@@ -41,6 +41,11 @@ public record Starter : ValueObject
         var distance = Distance + km_string;
         var startTime = Start.ToTimeSpan();
         var start = FormattingHelper.Format(startTime);
-        return Combine(Number, NameRenderingHelper.Render(AthleteName, AthleteNameEnglish, Ruleset), distance, start);
+        return Combine(
+            Number,
+            NameRenderingHelper.Render(AthleteName, AthleteNameEnglish, EnglishNames),
+            distance,
+            start
+        );
     }
 }

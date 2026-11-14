@@ -24,7 +24,8 @@ public class CountryMongoRepository : MongoRepository<CountryModel>
         try
         {
             return Builders<CountryModel>
-                .Update.Set(x => x.IsoCode, document.IsoCode)
+                .Update.Set(x => x.DomainVersion, document.DomainVersion)
+                .Set(x => x.IsoCode, document.IsoCode)
                 .Set(x => x.NfCode, document.NfCode)
                 .Set(x => x.Name, document.Name);
         }

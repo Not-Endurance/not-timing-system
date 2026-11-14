@@ -1,18 +1,19 @@
 [{
+  "DomainVersion": 1,
   "_id": 1926599985,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 1000649529,
     "Number": 76,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": null,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": null },
     "Athlete": {
       "_id": 366937524,
       "Names": [
@@ -20,6 +21,7 @@
         "Зашева"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -42,12 +44,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 255712489,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -78,12 +80,12 @@
       "IsComplete": true
     },
     {
+      "DomainVersion": 1,
       "_id": 2130618769,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-28T07:43:00.000Z"
@@ -106,12 +108,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 248803262,
       "Gate": "GATE3/87",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -145,20 +147,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1781303650,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 868875140,
     "Number": 50,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1620154576,
       "Names": [
@@ -166,6 +169,7 @@
         "Костанян"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -188,12 +192,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1164139825,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -216,12 +220,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1513581063,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -242,12 +246,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 929193749,
       "Gate": "GATE3/87",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -274,20 +278,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1646546851,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 1912975737,
     "Number": 44,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 469022959,
       "Names": [
@@ -295,6 +300,7 @@
         "Бакалова"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -317,12 +323,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 2053418717,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -345,12 +351,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 163500130,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -371,12 +377,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 447125845,
       "Gate": "GATE3/87",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -403,20 +409,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1991309414,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 621581842,
     "Number": 80,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1513951826,
       "Names": [
@@ -424,6 +431,7 @@
         "Петрова"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -446,12 +454,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 741875938,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -474,12 +482,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1002202825,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -500,12 +508,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1659013488,
       "Gate": "GATE3/87",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -532,20 +540,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1717023518,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 621445191,
     "Number": 2,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 278618377,
       "Names": [
@@ -553,6 +562,7 @@
         "Георгиева"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -575,12 +585,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1524270646,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -605,12 +615,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1592011426,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -631,12 +641,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 2050734190,
       "Gate": "GATE3/87",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -663,20 +673,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1951822000,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 442221356,
     "Number": 72,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1424823491,
       "Names": [
@@ -684,6 +695,7 @@
         "Козарова"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -706,12 +718,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 233096899,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -734,12 +746,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 199167269,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -760,12 +772,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1154961095,
       "Gate": "GATE3/87",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -792,20 +804,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1202522178,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 195979988,
     "Number": 45,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1285793646,
       "Names": [
@@ -813,6 +826,7 @@
         "Халибрям"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -835,12 +849,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1623946715,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -865,12 +879,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 71092993,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -891,12 +905,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 343614742,
       "Gate": "GATE3/87",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -923,20 +937,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 262259298,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 433552815,
     "Number": 22,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1076449614,
       "Names": [
@@ -944,6 +959,7 @@
         "Кюмюрджийска"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -966,12 +982,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1807135389,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -994,12 +1010,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 197216190,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -1020,12 +1036,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 335773179,
       "Gate": "GATE3/87",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1052,20 +1068,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 2060043928,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 1682878006,
     "Number": 40,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 855380255,
       "Names": [
@@ -1073,6 +1090,7 @@
         "Добрева"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -1095,12 +1113,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1522956693,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -1125,12 +1143,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 563586447,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -1151,12 +1169,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1874383203,
       "Gate": "GATE3/87",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1183,20 +1201,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1614710756,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "JuniorOrYoungAdult",
   "Competition": {
     "Name": "ДП млади ездачи и юноши до 18 г",
-    "Ruleset": "FEI"
+    "EnglishNames": true
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 485219756,
     "Number": 54,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1644090398,
       "Names": [
@@ -1204,6 +1223,7 @@
         "Гайдарова"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -1226,12 +1246,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1213782309,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -1254,12 +1274,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 432135024,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "FEI",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -1280,12 +1300,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1332492071,
       "Gate": "GATE3/87",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "FEI",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1312,20 +1332,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1629460309,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Children",
   "Competition": {
     "Name": "ДП юноши до 14 години",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 1423537438,
     "Number": 64,
     "Distance": "62",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 476285420,
       "Names": [
@@ -1333,6 +1354,7 @@
         "Юруков"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -1355,12 +1377,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 760668280,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -1383,12 +1405,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 188317112,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1415,20 +1437,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1733824915,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Children",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 1158636416,
     "Number": 38,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1531980220,
       "Names": [
@@ -1436,6 +1459,7 @@
         "Панайотова"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -1458,12 +1482,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1150753797,
       "Gate": "GATE1/15",
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -1486,12 +1510,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 567761656,
       "Gate": "GATE2/30",
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1518,20 +1542,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 48188847,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Companion",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 227987334,
     "Number": 51,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1017005199,
       "Names": [
@@ -1539,6 +1564,7 @@
         "Кумчев"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -1561,12 +1587,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 627269168,
       "Gate": "GATE1/15",
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -1589,12 +1615,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1253034015,
       "Gate": "GATE2/30",
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1621,20 +1647,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 328295520,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Children",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 2124980372,
     "Number": 68,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 2061694513,
       "Names": [
@@ -1642,6 +1669,7 @@
         "Георгиева"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -1664,12 +1692,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1960712618,
       "Gate": "GATE1/15",
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -1692,12 +1720,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 943910534,
       "Gate": "GATE2/30",
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1724,20 +1752,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 772162610,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Children",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 1346286463,
     "Number": 36,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1805728072,
       "Names": [
@@ -1745,6 +1774,7 @@
         "Иванов"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -1767,12 +1797,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1185538437,
       "Gate": "GATE1/15",
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -1795,12 +1825,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1534837061,
       "Gate": "GATE2/30",
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1827,20 +1857,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1302554067,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Companion",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 449671187,
     "Number": 57,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1664792569,
       "Names": [
@@ -1848,6 +1879,7 @@
         "Колев"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -1870,12 +1902,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1006661862,
       "Gate": "GATE1/15",
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -1898,12 +1930,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1970160778,
       "Gate": "GATE2/30",
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -1930,20 +1962,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 497212692,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Companion",
   "Competition": {
     "Name": "ДП пони ездачи",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 1262474185,
     "Number": 59,
     "Distance": "30",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1663041866,
       "Names": [
@@ -1951,6 +1984,7 @@
         "Миткова"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -1973,12 +2007,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1373325761,
       "Gate": "GATE1/15",
       "Length": 15,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -2001,12 +2035,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1517900237,
       "Gate": "GATE2/30",
       "Length": 15,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2033,20 +2067,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 477507153,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 80 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 992737684,
     "Number": 67,
     "Distance": "87",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 115752921,
       "Names": [
@@ -2054,6 +2089,7 @@
         "Узунов"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -2076,12 +2112,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 229054495,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -2104,12 +2140,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1044738320,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": null,
       "ArriveTime": null,
@@ -2130,12 +2166,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 189597733,
       "Gate": "GATE3/87",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2162,20 +2198,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1465024039,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 542881568,
     "Number": 28,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 431979132,
       "Names": [
@@ -2183,6 +2220,7 @@
         "Йорданова"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -2205,12 +2243,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1534031705,
       "Gate": "GATE1/25",
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2233,12 +2271,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1584411534,
       "Gate": "GATE2/50",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2265,20 +2303,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1904494130,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 778290182,
     "Number": 78,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 523856865,
       "Names": [
@@ -2286,6 +2325,7 @@
         "Влайкова"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -2308,12 +2348,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 952192810,
       "Gate": "GATE1/25",
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2336,12 +2376,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1611277553,
       "Gate": "GATE2/50",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2368,20 +2408,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1600320700,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 1082398365,
     "Number": 19,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1526569693,
       "Names": [
@@ -2389,6 +2430,7 @@
         "Николов"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -2411,12 +2453,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1706676558,
       "Gate": "GATE1/25",
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2439,12 +2481,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1903668654,
       "Gate": "GATE2/50",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2471,20 +2513,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 281417031,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 261757742,
     "Number": 77,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 683635597,
       "Names": [
@@ -2492,6 +2535,7 @@
         "Фурлански"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -2514,12 +2558,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 774167900,
       "Gate": "GATE1/25",
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2542,12 +2586,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 216174550,
       "Gate": "GATE2/50",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2574,20 +2618,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 1010224448,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 301607551,
     "Number": 52,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 569018213,
       "Names": [
@@ -2595,6 +2640,7 @@
         "Несторова"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -2617,12 +2663,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1516358357,
       "Gate": "GATE1/25",
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2645,12 +2691,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1125227314,
       "Gate": "GATE2/50",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2677,20 +2723,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 2004881970,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 2022591792,
     "Number": 56,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 1133004815,
       "Names": [
@@ -2698,6 +2745,7 @@
         "Нардуци"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -2720,12 +2768,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 825621993,
       "Gate": "GATE1/25",
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2748,12 +2796,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 491747210,
       "Gate": "GATE2/50",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2780,20 +2828,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 894953536,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификационен турнир 40 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 2095370197,
     "Number": 23,
     "Distance": "50",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 2014371187,
       "Names": [
@@ -2801,6 +2850,7 @@
         "Михайлов"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -2823,12 +2873,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 1395581146,
       "Gate": "GATE1/25",
       "Length": 25,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -2851,12 +2901,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 528477663,
       "Gate": "GATE2/50",
       "Length": 25,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,
@@ -2883,20 +2933,21 @@
   "DeletedVersion": null
 },
 {
+  "DomainVersion": 1,
   "_id": 664499704,
   "TenantId": "nts",
   "EventId": 1324868821,
   "Category": "Senior",
   "Competition": {
     "Name": "Квалификация 60 км",
-    "Ruleset": "Regional"
+    "EnglishNames": false
   },
   "Combination": {
+    "DomainVersion": 1,
     "_id": 346556309,
     "Number": 39,
     "Distance": "62",
-    "MinAverageSpeed": 0,
-    "MaxAverageSpeed": 99999,
+    "Restrictions": { "LoopSpeedMin": null, "LoopSpeedMax": null, "PhaseSpeedMin": null, "PhaseSpeedMax": null, "LoopAverageSpeedMin": null, "LoopAverageSpeedMax": null, "PhaseAverageSpeedMin": 0, "PhaseAverageSpeedMax": 99999 },
     "Athlete": {
       "_id": 718815615,
       "Names": [
@@ -2904,6 +2955,7 @@
         "Ходжа"
       ],
       "Country": {
+        "DomainVersion": 1,
         "_id": 1395739409,
         "TenantId": "nts",
         "Name": "Bulgaria",
@@ -2926,12 +2978,12 @@
   },
   "Phases": [
     {
+      "DomainVersion": 1,
       "_id": 382798451,
       "Gate": "GATE1/31",
       "Length": 31,
       "MaxRecovery": 15,
       "Rest": 40,
-      "Ruleset": "Regional",
       "IsFinal": false,
       "StartTime": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -2954,12 +3006,12 @@
       "IsComplete": false
     },
     {
+      "DomainVersion": 1,
       "_id": 1124826584,
       "Gate": "GATE2/62",
       "Length": 31,
       "MaxRecovery": 20,
       "Rest": null,
-      "Ruleset": "Regional",
       "IsFinal": true,
       "StartTime": null,
       "ArriveTime": null,

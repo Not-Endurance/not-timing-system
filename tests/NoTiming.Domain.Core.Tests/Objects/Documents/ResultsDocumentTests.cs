@@ -18,7 +18,7 @@ public sealed class ResultsDocumentTests
         var second = CreateParticipation(2, DateTimeOffset.Now.AddHours(-1), DateTimeOffset.Now);
         var ranking = new Ranking(
             "CEI 1*",
-            CompetitionRuleset.Regional,
+            false,
             ParticipationCategory.Senior,
             null,
             null,
@@ -46,7 +46,7 @@ public sealed class ResultsDocumentTests
         var participation = CreateParticipation(12, DateTimeOffset.Now.AddHours(-2), DateTimeOffset.Now.AddHours(-1));
         var ranking = new Ranking(
             "CEI 1*",
-            CompetitionRuleset.Regional,
+            false,
             ParticipationCategory.Senior,
             null,
             null,
@@ -90,7 +90,7 @@ public sealed class ResultsDocumentTests
             CreateCountry(),
             "Event",
             "Location",
-            new EventSpan(DateTimeOffset.Now.Date, DateTimeOffset.Now.Date.AddDays(1)),
+            new EventSpan(DateTimeOffset.Now.Date, DateTimeOffset.Now.Date.AddDays(1), "Europe/Sofia"),
             null,
             id: 10
         );
@@ -101,11 +101,11 @@ public sealed class ResultsDocumentTests
         var country = CreateCountry();
         var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
         var horse = new Horse($"Horse {number}", null, null, number);
-        var combination = new Combination(number, athlete, horse, null, "20", null, null, number);
+        var combination = new Combination(number, athlete, horse, null, "20", null, number);
 
         return new Participation(
             ParticipationCategory.Senior,
-            new Competition("Competition", CompetitionRuleset.Regional),
+            new Competition("Competition", false),
             combination,
             new PhaseCollection([CreateCompletePhase(start, arrive)]),
             null,
@@ -121,7 +121,6 @@ public sealed class ResultsDocumentTests
             20,
             40,
             null,
-            CompetitionRuleset.Regional,
             true,
             null,
             Timestamp.Create(start),

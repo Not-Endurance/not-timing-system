@@ -16,6 +16,8 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
         return model;
     }
 
+    public int DomainVersion { get; set; }
+
     public int Id { get; set; } = default!;
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public string Location { get; set; } = default!;
@@ -46,12 +48,14 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
             loops,
             combinations,
             Id,
-            operators
+            operators,
+            storedDomainVersion: DomainVersion
         );
     }
 
     public void MapFrom(ConfigureEvent @event)
     {
+        DomainVersion = @event.DomainVersion;
         Id = @event.Id;
         Name = @event.Name;
         Location = @event.Location;

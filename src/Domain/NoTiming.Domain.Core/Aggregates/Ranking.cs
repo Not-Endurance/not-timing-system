@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using NC.Domain.Exceptions;
 
 namespace NoTiming.Domain.Core.Aggregates;
 
@@ -6,7 +7,7 @@ public class Ranking : Aggregate, IEventScoped
 {
     public Ranking(
         string? name,
-        CompetitionRuleset? ruleset,
+        bool englishNames,
         ParticipationCategory? category,
         string? feiEventId,
         string? feiEventCode,
@@ -15,15 +16,18 @@ public class Ranking : Aggregate, IEventScoped
         string? feiScheduleNumber,
         IEnumerable<RankingEntry> entries,
         int eventId,
-        int? id = null
+        int? id = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         EventId = eventId;
         Name = Required(nameof(Name), name);
-        Ruleset = Required(nameof(Ruleset), ruleset);
+        EnglishNames = englishNames;
         Category = Required(nameof(Category), category);
-        Entries = new(AreUnique(nameof(Entries), entries).ToList());
+        var rankingEntries = AreUnique(nameof(Entries), entries).ToList();
+        EnsurePlacingsAreAllOrNone(rankingEntries);
+        Entries = new(rankingEntries);
         FeiEventId = feiEventId;
         FeiEventCode = feiEventCode;
         FeiCompetitionId = feiCompetitionId;
@@ -33,7 +37,7 @@ public class Ranking : Aggregate, IEventScoped
 
     public int EventId { get; }
     public string Name { get; }
-    public CompetitionRuleset Ruleset { get; }
+    public bool EnglishNames { get; }
     public ParticipationCategory Category { get; }
     public string? FeiEventId { get; }
     public string? FeiEventCode { get; }
@@ -56,5 +60,18 @@ public class Ranking : Aggregate, IEventScoped
         }
         existing.Participation = participation;
         return true;
+    }
+
+    // Stored placings are final. A ranking that has some placings must have one for every entry, so a
+    // participation added without a placing can't silently re-rank the stored ones.
+    static void EnsurePlacingsAreAllOrNone(IReadOnlyCollection<RankingEntry> entries)
+    {
+        var rankedCount = entries.Count(x => x.Rank != null);
+        if (rankedCount != 0 && rankedCount != entries.Count)
+        {
+            throw new DomainException(
+                "Placings are stored for some entries but not all. Stored placings are final, so a participation without one can't be added."
+            );
+        }
     }
 }

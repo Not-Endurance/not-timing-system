@@ -107,7 +107,7 @@ public sealed class FeiExportTests
             country,
             "Integration FEI Show",
             "Sofia",
-            new EventSpan(start, start.AddDays(1)),
+            new EventSpan(start, start.AddDays(1), "Europe/Sofia"),
             "FEI-SHOW-1",
             1001
         );
@@ -128,7 +128,7 @@ public sealed class FeiExportTests
         var entries = new[] { new RankingEntry(participation, 1, false, 7000 + number) };
         return new Ranking(
             name,
-            CompetitionRuleset.FEI,
+            true,
             ParticipationCategory.Senior,
             feiEventId,
             feiEventCode,
@@ -154,15 +154,14 @@ public sealed class FeiExportTests
             100 + number
         );
         var horse = new Horse($"Локален Кон {number}", $"FEI Horse {number}", horseFeiId, 200 + number);
-        var combination = new Combination(number, athlete, horse, null, "40", null, null, 300 + number);
-        var competition = new CoreCompetition("CEI 1*", CompetitionRuleset.FEI);
+        var combination = new Combination(number, athlete, horse, null, "40", null, 300 + number);
+        var competition = new CoreCompetition("CEI 1*", true);
         var start = new Timestamp(new DateTimeOffset(2026, 5, 1, 8, 0, 0, TimeSpan.Zero));
         var phase = new Phase(
             "GATE1/40",
             40,
             40,
             rest: null,
-            CompetitionRuleset.FEI,
             isFinal: true,
             compulsoryThresholdSpan: null,
             startTime: start,

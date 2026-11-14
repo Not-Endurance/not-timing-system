@@ -18,6 +18,8 @@ public class UserModel : IDocument, IKrudModel<User>
 
     string? _name;
 
+    public int DomainVersion { get; set; }
+
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public string Email { get; set; } = default!;
@@ -38,6 +40,7 @@ public class UserModel : IDocument, IKrudModel<User>
 
     public void MapFrom(User user)
     {
+        DomainVersion = user.DomainVersion;
         Id = user.Id;
         Email = user.Email;
         Name = user.Name;
@@ -64,7 +67,8 @@ public class UserModel : IDocument, IKrudModel<User>
             CountryRegion,
             Club,
             FeiId,
-            DisplayName
+            DisplayName,
+            storedDomainVersion: DomainVersion
         );
     }
 

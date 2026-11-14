@@ -1,4 +1,5 @@
-﻿using NoTiming.Domain.Core.Aggregates;
+using NoTiming.Application.Contracts.Shared;
+using NoTiming.Domain.Core.Aggregates;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
@@ -8,19 +9,22 @@ public class RankingEntryModel
     {
         return new RankingEntryModel
         {
+            DomainVersion = rankingEntry.DomainVersion,
             Participation = ParticipationModel.MapFrom(rankingEntry.Participation),
             Rank = rankingEntry.Rank,
             IsNotRanked = rankingEntry.IsNotRanked,
         };
     }
 
+    public int DomainVersion { get; set; }
+
     public ParticipationModel Participation { get; init; } = default!;
-    public int? Rank { get; init; }
+    public int? Rank { get; set; }
     public bool IsNotRanked { get; init; }
 
     public RankingEntry MapToEntity()
     {
         var participation = Participation.MapToEntity();
-        return new RankingEntry(participation, Rank, IsNotRanked);
+        return new RankingEntry(participation, Rank, IsNotRanked, storedDomainVersion: DomainVersion);
     }
 }

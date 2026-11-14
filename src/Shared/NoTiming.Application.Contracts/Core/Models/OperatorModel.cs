@@ -10,9 +10,12 @@ public class OperatorModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Op
     public static OperatorModel MapFrom(Operator @operator)
     {
         var model = new OperatorModel();
+        model.DomainVersion = @operator.DomainVersion;
         ((IKrudModel<Operator>)model).MapFrom(@operator);
         return model;
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
@@ -24,7 +27,7 @@ public class OperatorModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Op
 
     public Operator MapToEntity()
     {
-        return new Operator(EventId, UserId, Role, Id);
+        return new Operator(EventId, UserId, Role, Id, storedDomainVersion: DomainVersion);
     }
 
     void IKrudModel<Operator>.MapFrom(Operator @operator)

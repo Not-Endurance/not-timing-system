@@ -27,7 +27,8 @@ public class ParticipationEventScopedMongoRepository : EventScopedMongoRepositor
         try
         {
             return Builders<ParticipationModel>
-                .Update.Set(x => x.Category, document.Category)
+                .Update.Set(x => x.DomainVersion, document.DomainVersion)
+                .Set(x => x.Category, document.Category)
                 .Set(x => x.Competition, document.Competition)
                 .Set(x => x.Combination, document.Combination)
                 .Set(x => x.Phases, document.Phases)

@@ -1,34 +1,33 @@
 using NoTiming.Domain.Core.Aggregates.Results;
 using NoTiming.Domain.Core.Objects.Rankers;
-using NoTiming.Domain.Core.StaticOptions;
 
 namespace NoTiming.Domain.Core.Aggregates;
 
 public class Result : Aggregate, IEventScoped
 {
     static readonly FeiRanker FEI_RANKER = new();
-    static readonly Ranker[] REGIONAL_RANKERS = [];
 
     protected Result(
         int? id,
         int? rankingId,
         string? name,
-        CompetitionRuleset? ruleset,
+        bool englishNames,
         ParticipationCategory? category,
         IEnumerable<ParticipationResult> entries,
-        int eventId
+        int eventId,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         EventId = eventId;
         RankingId = rankingId;
         Name = Required(nameof(Name), name);
-        Ruleset = Required(nameof(Ruleset), ruleset);
+        EnglishNames = englishNames;
         Category = Required(nameof(Category), category);
 
         var participationResults = Required(nameof(Entries), entries).ToList();
         AreUnique(nameof(Participations), participationResults.Select(x => x.Participation)).ToList();
-        Entries = RankIfRequired(participationResults, Ruleset).AsReadOnly();
+        Entries = RankIfRequired(participationResults).AsReadOnly();
     }
 
     public Result(Ranking ranking)
@@ -36,7 +35,7 @@ public class Result : Aggregate, IEventScoped
             ranking.Id,
             ranking.Id,
             ranking.Name,
-            ranking.Ruleset,
+            ranking.EnglishNames,
             ranking.Category,
             ranking.Entries.Select(ParticipationResult.From),
             ranking.EventId
@@ -45,7 +44,7 @@ public class Result : Aggregate, IEventScoped
     public int EventId { get; }
     public int? RankingId { get; }
     public string Name { get; }
-    public CompetitionRuleset Ruleset { get; }
+    public bool EnglishNames { get; }
     public ParticipationCategory Category { get; }
     public IReadOnlyList<ParticipationResult> Entries { get; }
     public bool IsRanked => Entries.Count > 1;
@@ -56,25 +55,28 @@ public class Result : Aggregate, IEventScoped
         return $"{Name} {Category}: {Entries.Count}";
     }
 
-    static List<ParticipationResult> RankIfRequired(List<ParticipationResult> entries, CompetitionRuleset ruleset)
+    static List<ParticipationResult> RankIfRequired(List<ParticipationResult> entries)
     {
-        return entries.Count > 1 ? Rank(entries, ruleset) : entries;
+        if (entries.Count <= 1)
+        {
+            return entries;
+        }
+        return IsFinal(entries) ? entries.OrderBy(x => x.Rank).ToList() : Rank(entries);
     }
 
-    static List<ParticipationResult> Rank(IReadOnlyCollection<ParticipationResult> entries, CompetitionRuleset ruleset)
+    static bool IsFinal(List<ParticipationResult> entries)
     {
-        var ranker = StaticOption.ShouldUseRegionalRanker(ruleset) ? GetRanker(StaticOption.Regional) : FEI_RANKER;
-        var ranked = ranker.Rank(entries);
+        return entries.All(x => x.Rank != null);
+    }
+
+    static List<ParticipationResult> Rank(IReadOnlyCollection<ParticipationResult> entries)
+    {
+        var ranked = FEI_RANKER.Rank(entries);
         var rank = 0;
         foreach (var entry in ranked)
         {
             entry.Rank = ++rank;
         }
         return ranked;
-    }
-
-    static Ranker GetRanker(IRegionOption? configuration)
-    {
-        return REGIONAL_RANKERS.FirstOrDefault(x => x.CountryIsoCode == configuration?.CountryIsoCode) ?? FEI_RANKER;
     }
 }

@@ -73,7 +73,7 @@ public class UiRpcClient : RpcClient, IUiClientProcedures, ISnapshotPublisher, I
             entry.AthleteName,
             entry.AthleteNameEnglish,
             Timestamp.Now(),
-            entry.Ruleset
+            entry.EnglishNames
         );
         await PublishSnapshotsAsync(new SnapshotGroup([snapshot], SnapshotType.Present));
     }

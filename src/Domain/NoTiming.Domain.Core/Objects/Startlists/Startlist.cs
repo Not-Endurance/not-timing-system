@@ -68,7 +68,7 @@ public record Startlist : ValueObject
         return new Starter(
             participation.Combination.Athlete.Name,
             participation.Combination.Athlete.NameEnglish,
-            participation.Competition.Ruleset,
+            participation.Competition.EnglishNames,
             participation.Combination.Number,
             phaseIndex + 1,
             phase.Gate,

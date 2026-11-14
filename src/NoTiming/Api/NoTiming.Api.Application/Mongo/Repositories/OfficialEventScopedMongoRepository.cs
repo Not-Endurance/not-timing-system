@@ -27,7 +27,8 @@ public class OfficialEventScopedMongoRepository : EventScopedMongoRepository<Off
         try
         {
             return Builders<OfficialModel>
-                .Update.Set(x => x.EventId, document.EventId)
+                .Update.Set(x => x.DomainVersion, document.DomainVersion)
+                .Set(x => x.EventId, document.EventId)
                 .Set(x => x.Name, document.Name)
                 .Set(x => x.NameEnglish, document.NameEnglish)
                 .Set(x => x.Role, document.Role);

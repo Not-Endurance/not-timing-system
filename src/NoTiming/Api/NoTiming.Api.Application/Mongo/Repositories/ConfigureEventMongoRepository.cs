@@ -28,7 +28,8 @@ public class ConfigureEventMongoRepository : MongoRepository<ConfigureEventModel
         try
         {
             return Builders<ConfigureEventModel> // TODO: use Reflection to build a full update definition by default
-                .Update.Set(x => x.Location, document.Location)
+                .Update.Set(x => x.DomainVersion, document.DomainVersion)
+                .Set(x => x.Location, document.Location)
                 .Set(x => x.Name, document.Name)
                 .Set(x => x.Country, document.Country)
                 .Set(x => x.FeiShowId, document.FeiShowId)

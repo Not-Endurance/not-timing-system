@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NC.Application.Authentication.User;
 using NC.Storage;
 using NoTiming.Api.Application.Features.Ui.Authorization;
@@ -20,6 +21,8 @@ public static class NoTimingApiApplicationServices
         services.AddSingleton<IReceiveSnapshotAccessPolicy, MongoUiReceiveAccessPolicy>();
         services.AddSingleton<IUiReceiveAuthorizer, UiReceiveAuthorizer>();
         services.AddTransient<IUserRepository, UserMongoRepository>();
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddHostedService<NoTiming.Api.Application.Event.EventFinalizationJob>();
 
         return services;
     }

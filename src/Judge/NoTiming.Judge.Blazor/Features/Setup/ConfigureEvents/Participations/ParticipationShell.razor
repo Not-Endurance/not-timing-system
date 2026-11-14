@@ -2,6 +2,7 @@
 @using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Participations
 @using NC.Blazor.Components.Input
 @using NC.Krud.Blazor.Components
+@using NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents
 
 @inherits ParticipationShellBehind
 
@@ -21,19 +22,7 @@
             <NTimePicker @bind-Time="Model.StartTimeOverride" For="() => Model.StartTimeOverride" ShowToolbar="false" Label="@Start_Time_string" Editable="true" Mask="TimeMask" />
         }
 
-        <NSwitch @bind-Value="Model.IsMaxSpeedOverriden" For="() => Model.IsMaxSpeedOverriden" Label="@Max_Speed_Override_string" />
-
-        @if (Model.IsMaxSpeedOverriden)
-        {
-            <NNumberField @bind-Value="Model.MaxSpeedOverride" For="() => Model.MaxSpeedOverride" Label="@Max_Speed_Override_string" Variant="Variant.Text" /> // TODO: is necessary?
-        }
-
-        <NSwitch @bind-Value="Model.IsMinSpeedOverriden" For="() => Model.IsMinSpeedOverriden" Label="@Min_Speed_Override_string" />
-
-        @if (Model.IsMinSpeedOverriden)
-        {
-            <NNumberField @bind-Value="Model.MinSpeedOverride" For="() => Model.MinSpeedOverride" Label="@Min_Speed_Override_string" />
-        }
+        <SpeedRestrictionsFields Restrictions="Model.Restrictions" />
     </FormFields>
 </KrudForm>
 

@@ -1,7 +1,6 @@
 ﻿using NC.Krud.Abstractions;
 using NoTiming.Application.Contracts.Shared;
 using NoTiming.Application.Contracts.Shared.Models;
-using NoTiming.Domain.Enums;
 using NoTiming.Domain.Setup.Aggregates;
 using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
@@ -13,13 +12,13 @@ public class CompetitionModel
     {
         return new CompetitionModel
         {
+            DomainVersion = competition.DomainVersion,
             Id = competition.Id,
             Name = competition.Name,
-            Ruleset = competition.Ruleset,
+            EnglishNames = competition.EnglishNames,
             Start = competition.Start,
             CompulsoryThreshold = competition.CompulsoryThresholdSpan,
-            MinSpeedRestriction = competition.MinSpeedRestriction,
-            MaxSpeedRestriction = competition.MaxSpeedRestriction,
+            Restrictions = SpeedRestrictionsModel.From(competition.Restrictions),
             FeiEventId = competition.FeiEventId,
             FeiEventCode = competition.FeiEventCode,
             FeiCompetitionId = competition.FeiCompetitionId,
@@ -30,13 +29,14 @@ public class CompetitionModel
         };
     }
 
+    public int DomainVersion { get; set; }
+
     public int Id { get; init; }
     public string Name { get; init; } = default!;
-    public CompetitionRuleset Ruleset { get; init; }
+    public bool EnglishNames { get; init; }
     public DateTimeOffset? Start { get; init; }
     public TimeSpan? CompulsoryThreshold { get; init; }
-    public double? MinSpeedRestriction { get; init; }
-    public double? MaxSpeedRestriction { get; init; }
+    public SpeedRestrictionsModel Restrictions { get; init; } = new();
     public string? FeiEventId { get; init; }
     public string? FeiEventCode { get; init; }
     public string? FeiCompetitionId { get; init; }
@@ -51,11 +51,10 @@ public class CompetitionModel
         var participations = Participations.Select(x => x.MapToEntity());
         return new Competition(
             Name,
-            Ruleset,
+            EnglishNames,
             Start,
             CompulsoryThreshold,
-            MinSpeedRestriction,
-            MaxSpeedRestriction,
+            Restrictions.ToDomain(),
             FeiEventId,
             FeiEventCode,
             FeiCompetitionId,
@@ -63,7 +62,8 @@ public class CompetitionModel
             FeiScheduleNumber,
             phases,
             participations,
-            Id
+            Id,
+            storedDomainVersion: DomainVersion
         );
     }
 }

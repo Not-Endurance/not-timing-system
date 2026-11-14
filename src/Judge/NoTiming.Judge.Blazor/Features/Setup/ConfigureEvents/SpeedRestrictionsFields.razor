@@ -1,0 +1,26 @@
+@using NC.Blazor.Components.Input
+
+@inherits SpeedRestrictionsFieldsBehind
+
+<NParagraph Content="@Strictest_restriction_wins_helper_string" Class="mt-4 mb-2" />
+
+<NOptionalInput Label="@Speed_limits_string"
+                HelperText="@Speed_limits_helper_string"
+                Value="HasSpeedLimit"
+                ValueChanged="@((bool value) => SetSpeedLimit(value))">
+    <NNumberField @bind-Value="Restrictions.LoopSpeedMin" For="() => Restrictions.LoopSpeedMin" Label="@Loop_speed_min_string" HelperText="@Loop_speed_min_helper_string" />
+    <NNumberField @bind-Value="Restrictions.LoopSpeedMax" For="() => Restrictions.LoopSpeedMax" Label="@Loop_speed_max_string" HelperText="@Loop_speed_max_helper_string" />
+    <NNumberField @bind-Value="Restrictions.PhaseSpeedMin" For="() => Restrictions.PhaseSpeedMin" Label="@Phase_speed_min_string" HelperText="@Phase_speed_min_helper_string" />
+    <NNumberField @bind-Value="Restrictions.PhaseSpeedMax" For="() => Restrictions.PhaseSpeedMax" Label="@Phase_speed_max_string" HelperText="@Phase_speed_max_helper_string" />
+</NOptionalInput>
+
+<NOptionalInput Label="@Average_speed_limits_string"
+                HelperText="@Average_speed_limits_helper_string"
+                Value="HasAverageSpeedLimit"
+                ValueChanged="@((bool value) => SetAverageSpeedLimit(value))"
+                Class="mt-4">
+    <NNumberField @bind-Value="Restrictions.LoopAverageSpeedMin" For="() => Restrictions.LoopAverageSpeedMin" Label="@Loop_average_speed_min_string" HelperText="@Loop_average_speed_min_helper_string" />
+    <NNumberField @bind-Value="Restrictions.LoopAverageSpeedMax" For="() => Restrictions.LoopAverageSpeedMax" Label="@Loop_average_speed_max_string" HelperText="@Loop_average_speed_max_helper_string" />
+    <NNumberField @bind-Value="Restrictions.PhaseAverageSpeedMin" For="() => Restrictions.PhaseAverageSpeedMin" Label="@Phase_average_speed_min_string" HelperText="@Phase_average_speed_min_helper_string" />
+    <NNumberField @bind-Value="Restrictions.PhaseAverageSpeedMax" For="() => Restrictions.PhaseAverageSpeedMax" Label="@Phase_average_speed_max_string" HelperText="@Phase_average_speed_max_helper_string" />
+</NOptionalInput>

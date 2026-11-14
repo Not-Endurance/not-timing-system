@@ -42,19 +42,6 @@ public class EventInformationController : ApiControllerBase
         return Ok();
     }
 
-    [HttpPatch("event")]
-    public async Task<IActionResult> Update()
-    {
-        var request = Request;
-        using var activity = StartFunctionActivity(nameof(Update));
-        TagRequest(request);
-        LogInformation(request, nameof(Update));
-
-        var payload = await ReadBody<EventInformationModel>(request);
-        await _events.Update(payload);
-        return Ok();
-    }
-
     [HttpGet("event/{id:int}")]
     public async Task<IActionResult> Read(int id)
     {
@@ -139,6 +126,18 @@ public class EventInformationController : ApiControllerBase
         LogInformation(request, nameof(Deactivate));
 
         await _businessService.Deactivate(id);
+        return Ok();
+    }
+
+    [HttpPost("event/{id:int}/reopen")]
+    public async Task<IActionResult> Reopen(int id)
+    {
+        var request = Request;
+        using var activity = StartFunctionActivity(nameof(Reopen));
+        TagRequest(request);
+        LogInformation(request, nameof(Reopen));
+
+        await _businessService.Reopen(id);
         return Ok();
     }
 

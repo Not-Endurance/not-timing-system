@@ -499,8 +499,8 @@
   <data name="Operator_string" xml:space="preserve">
     <value>Operatör</value>
   </data>
-  <data name="Competition_Ruleset_string" xml:space="preserve">
-    <value>Kural seti</value>
+  <data name="English_names_string" xml:space="preserve">
+    <value>İngilizce isimler</value>
   </data>
   <data name="Automatic_CRI" xml:space="preserve">
     <value>Toparlanma süresine göre zorunlu inceleme</value>
@@ -849,5 +849,74 @@
   </data>
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>'{0}' öğesini silmek istediğinizden emin misiniz?</value>
+  </data>
+  <data name="Loop_speed_min_string" xml:space="preserve">
+    <value>Tur hızı min</value>
+  </data>
+  <data name="Loop_speed_max_string" xml:space="preserve">
+    <value>Tur hızı maks</value>
+  </data>
+  <data name="Phase_speed_min_string" xml:space="preserve">
+    <value>Etap hızı min</value>
+  </data>
+  <data name="Phase_speed_max_string" xml:space="preserve">
+    <value>Etap hızı maks</value>
+  </data>
+  <data name="Loop_average_speed_min_string" xml:space="preserve">
+    <value>Tur ortalama hızı min</value>
+  </data>
+  <data name="Loop_average_speed_max_string" xml:space="preserve">
+    <value>Tur ortalama hızı maks</value>
+  </data>
+  <data name="Phase_average_speed_min_string" xml:space="preserve">
+    <value>Etap ortalama hızı min</value>
+  </data>
+  <data name="Phase_average_speed_max_string" xml:space="preserve">
+    <value>Etap ortalama hızı maks</value>
+  </data>
+  <data name="Speed_limits_string" xml:space="preserve">
+    <value>Hız sınırları</value>
+  </data>
+  <data name="Speed_limits_helper_string" xml:space="preserve">
+    <value>Her turun ve her fazın hızını sınırlar. Sınır olmaması için bir alanı boş bırakın. İşareti kaldırmak bu alanları temizler.</value>
+  </data>
+  <data name="Average_speed_limits_string" xml:space="preserve">
+    <value>Ortalama hız sınırları</value>
+  </data>
+  <data name="Average_speed_limits_helper_string" xml:space="preserve">
+    <value>Şimdiye kadar tamamlanan turlar ve fazlar üzerindeki ortalama hızı sınırlar. Sınır olmaması için bir alanı boş bırakın. İşareti kaldırmak bu alanları temizler.</value>
+  </data>
+  <data name="Loop_speed_min_helper_string" xml:space="preserve">
+    <value>Ayrı turlara uygulanan minimum hız. Dinlenme süresini içermez.</value>
+  </data>
+  <data name="Loop_speed_max_helper_string" xml:space="preserve">
+    <value>Ayrı turlara uygulanan maksimum hız. Dinlenme süresini içermez.</value>
+  </data>
+  <data name="Phase_speed_min_helper_string" xml:space="preserve">
+    <value>Ayrı fazlara uygulanan minimum hız. Dinlenme süresini içerir, son faz hariç.</value>
+  </data>
+  <data name="Phase_speed_max_helper_string" xml:space="preserve">
+    <value>Ayrı fazlara uygulanan maksimum hız. Dinlenme süresini içerir, son faz hariç.</value>
+  </data>
+  <data name="Loop_average_speed_min_helper_string" xml:space="preserve">
+    <value>Şimdiye kadar tamamlanan turlar üzerindeki minimum ortalama hız. Dinlenme süresini içermez.</value>
+  </data>
+  <data name="Loop_average_speed_max_helper_string" xml:space="preserve">
+    <value>Şimdiye kadar tamamlanan turlar üzerindeki maksimum ortalama hız. Dinlenme süresini içermez.</value>
+  </data>
+  <data name="Phase_average_speed_min_helper_string" xml:space="preserve">
+    <value>Şimdiye kadar tamamlanan fazlar üzerindeki minimum ortalama hız. Dinlenme süresini içerir, son faz hariç.</value>
+  </data>
+  <data name="Phase_average_speed_max_helper_string" xml:space="preserve">
+    <value>Şimdiye kadar tamamlanan fazlar üzerindeki maksimum ortalama hız. Dinlenme süresini içerir, son faz hariç.</value>
+  </data>
+  <data name="Strictest_restriction_wins_helper_string" xml:space="preserve">
+    <value>Aynı hız için birden fazla sınır geçerliyse en katı sınır uygulanır.</value>
+  </data>
+  <data name="Loop_average_S_string" xml:space="preserve">
+    <value>Tur ort. hızı</value>
+  </data>
+  <data name="Phase_average_S_string" xml:space="preserve">
+    <value>Etap ort. hızı</value>
   </data>
 </root>

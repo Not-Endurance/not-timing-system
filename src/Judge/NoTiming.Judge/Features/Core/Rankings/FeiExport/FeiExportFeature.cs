@@ -207,7 +207,7 @@ internal class FeiExportFeature : IFeiExportFeature
         {
             var athlete = entry.Participation.Combination.Athlete;
             var horse = entry.Participation.Combination.Horse;
-            var (First, Last) = SplitName(athlete.GetDisplayName(CompetitionRuleset.FEI));
+            var (First, Last) = SplitName(athlete.GetDisplayName(englishNames: true));
 
             var ctParticipation = new ctEnduranceIndivResult
             {
@@ -219,7 +219,7 @@ internal class FeiExportFeature : IFeiExportFeature
                     FamilyName = Last,
                     CompetingFor = athlete.Country.NfCode ?? athlete.Country.IsoCode,
                 },
-                Horse = new ctHorse { FEIID = horse.FeiId!, Name = horse.GetDisplayName(CompetitionRuleset.FEI) },
+                Horse = new ctHorse { FEIID = horse.FeiId!, Name = horse.GetDisplayName(englishNames: true) },
                 Complement = new ctEnduranceComplement { BestCondition = false },
                 Position = new ctPositionIndiv { Status = entry.Participation.Eliminated?.Code ?? "R" },
             };
