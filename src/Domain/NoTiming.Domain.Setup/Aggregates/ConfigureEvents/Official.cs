@@ -7,8 +7,15 @@ namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Official : Entity, INamed, INoTimingDisplayable
 {
-    public Official(string? name, string? nameEnglish, OfficialRole? role, int? id = null, User? user = null)
-        : base(id)
+    public Official(
+        string? name,
+        string? nameEnglish,
+        OfficialRole? role,
+        int? id = null,
+        User? user = null,
+        int? storedDomainVersion = null
+    )
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Role = Required(nameof(Role), role);
         Name = Required(nameof(Name), name);
@@ -21,15 +28,15 @@ public class Official : Entity, INamed, INoTimingDisplayable
     public OfficialRole Role { get; }
     public User? User { get; }
 
-    public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    public string GetDisplayName(bool englishNames = false, CultureInfo? culture = null)
     {
-        return NameRenderingHelper.Render(Name, NameEnglish, ruleset, culture);
+        return NameRenderingHelper.Render(Name, NameEnglish, englishNames, culture);
     }
 
-    public string GetDisplayLabel(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    public string GetDisplayLabel(bool englishNames = false, CultureInfo? culture = null)
     {
         var values = Role.GetDescription();
-        return Combine(values, GetDisplayName(ruleset, culture));
+        return Combine(values, GetDisplayName(englishNames, culture));
     }
 
     public override string ToString()

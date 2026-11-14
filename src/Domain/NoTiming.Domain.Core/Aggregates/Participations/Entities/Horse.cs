@@ -17,9 +17,9 @@ public class Horse : Entity, INamed, INoTimingDisplayable
     public string? NameEnglish { get; private set; }
     public string? FeiId { get; private set; }
 
-    public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    public string GetDisplayName(bool englishNames = false, CultureInfo? culture = null)
     {
-        return NameRenderingHelper.Render(Name, NameEnglish, ruleset, culture);
+        return NameRenderingHelper.Render(Name, NameEnglish, englishNames, culture);
     }
 
     public override string ToString()

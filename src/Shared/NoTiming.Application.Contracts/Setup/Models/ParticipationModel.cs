@@ -13,23 +13,24 @@ public class ParticipationModel
     {
         return new ParticipationModel
         {
+            DomainVersion = participation.DomainVersion,
             Id = participation.Id,
             IsNotRanked = participation.IsNotRanked,
             Category = participation.Category,
             Combination = CombinationModel.MapFrom(participation.Combination),
             StartTimeOverride = participation.StartTimeOverride,
-            MaxSpeedOverride = participation.MaxSpeedOverride,
-            MinSpeedOverride = participation.MinSpeedOverride,
+            Restrictions = SpeedRestrictionsModel.From(participation.Restrictions),
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; init; }
     public ParticipationCategory Category { get; init; } = default!;
     public CombinationModel Combination { get; init; } = default!;
     public bool IsNotRanked { get; init; }
     public DateTimeOffset? StartTimeOverride { get; init; }
-    public double? MaxSpeedOverride { get; init; }
-    public double? MinSpeedOverride { get; init; }
+    public SpeedRestrictionsModel Restrictions { get; init; } = new();
 
     public Participation MapToEntity()
     {
@@ -39,9 +40,9 @@ public class ParticipationModel
             combination,
             Category,
             StartTimeOverride,
-            MaxSpeedOverride,
-            MinSpeedOverride,
-            Id
+            Restrictions.ToDomain(),
+            Id,
+            storedDomainVersion: DomainVersion
         );
     }
 }

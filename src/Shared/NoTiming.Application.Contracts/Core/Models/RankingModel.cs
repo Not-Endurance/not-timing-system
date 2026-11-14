@@ -14,11 +14,13 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
         return model;
     }
 
+    public int DomainVersion { get; set; }
+
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public int EventId { get; set; }
     public string Name { get; set; } = default!;
-    public CompetitionRuleset Ruleset { get; set; }
+    public bool EnglishNames { get; set; }
     public ParticipationCategory Category { get; set; }
     public string? FeiEventId { get; set; }
     public string? FeiEventCode { get; set; }
@@ -31,10 +33,11 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
 
     public void MapFrom(Ranking ranking)
     {
+        DomainVersion = ranking.DomainVersion;
         Id = ranking.Id;
         EventId = ranking.EventId;
         Name = ranking.Name;
-        Ruleset = ranking.Ruleset;
+        EnglishNames = ranking.EnglishNames;
         Category = ranking.Category;
         FeiEventId = ranking.FeiEventId;
         FeiEventCode = ranking.FeiEventCode;
@@ -49,7 +52,7 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
         var entries = Entries.Select(x => x.MapToEntity()).ToList();
         return new Ranking(
             Name,
-            Ruleset,
+            EnglishNames,
             Category,
             FeiEventId,
             FeiEventCode,
@@ -58,7 +61,8 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
             FeiScheduleNumber,
             entries,
             EventId,
-            Id
+            Id,
+            storedDomainVersion: DomainVersion
         );
     }
 }

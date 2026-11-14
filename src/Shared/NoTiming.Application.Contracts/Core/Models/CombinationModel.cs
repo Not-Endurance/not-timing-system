@@ -1,4 +1,6 @@
-﻿using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+﻿using NoTiming.Application.Contracts.Shared;
+using NoTiming.Application.Contracts.Shared.Models;
+using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
@@ -8,21 +10,22 @@ public class CombinationModel
     {
         return new CombinationModel
         {
+            DomainVersion = combination.DomainVersion,
             Id = combination.Id,
             Number = combination.Number,
             Distance = combination.Distance,
-            MinAverageSpeed = combination.MinAverageSpeed,
-            MaxAverageSpeed = combination.MaxAverageSpeed,
+            Restrictions = SpeedRestrictionsModel.From(combination.Restrictions),
             Athlete = AthleteModel.MapFrom(combination.Athlete),
             Horse = HorseModel.MapFrom(combination.Horse),
         };
     }
 
+    public int DomainVersion { get; set; }
+
     public int Id { get; init; }
     public int Number { get; init; }
     public string? Distance { get; init; }
-    public double? MinAverageSpeed { get; init; }
-    public double? MaxAverageSpeed { get; init; }
+    public SpeedRestrictionsModel Restrictions { get; init; } = new();
     public AthleteModel Athlete { get; init; } = default!;
     public HorseModel Horse { get; init; } = default!;
 
@@ -30,6 +33,15 @@ public class CombinationModel
     {
         var athlete = Athlete.MapToEntity();
         var horse = Horse.MapToEntity();
-        return new Combination(Number, athlete, horse, athlete.Club, Distance!, MinAverageSpeed, MaxAverageSpeed, Id);
+        return new Combination(
+            Number,
+            athlete,
+            horse,
+            athlete.Club,
+            Distance!,
+            Restrictions.ToDomain(),
+            Id,
+            storedDomainVersion: DomainVersion
+        );
     }
 }

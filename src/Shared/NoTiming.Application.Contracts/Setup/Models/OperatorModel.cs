@@ -1,3 +1,4 @@
+using NoTiming.Application.Contracts.Shared;
 using NoTiming.Application.Contracts.Shared.Models;
 using NoTiming.Domain.Enums;
 using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
@@ -10,11 +11,14 @@ public class OperatorModel
     {
         return new OperatorModel
         {
+            DomainVersion = @operator.DomainVersion,
             Id = @operator.Id,
             User = UserModel.From(@operator.User),
             Role = @operator.Role,
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; init; }
     public UserModel User { get; init; } = default!;
@@ -22,6 +26,6 @@ public class OperatorModel
 
     public Operator MapToEntity()
     {
-        return new Operator(User.MapToEntity(), Id, Role);
+        return new Operator(User.MapToEntity(), Id, Role, storedDomainVersion: DomainVersion);
     }
 }

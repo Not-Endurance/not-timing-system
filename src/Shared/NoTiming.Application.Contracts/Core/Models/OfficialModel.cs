@@ -14,6 +14,8 @@ public class OfficialModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Of
         return model;
     }
 
+    public int DomainVersion { get; set; }
+
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public int EventId { get; set; }
@@ -26,11 +28,12 @@ public class OfficialModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Of
 
     public Official MapToEntity()
     {
-        return new Official(Name, NameEnglish, Role, EventId, Id, UserId);
+        return new Official(Name, NameEnglish, Role, EventId, Id, UserId, storedDomainVersion: DomainVersion);
     }
 
     void IKrudModel<Official>.MapFrom(Official official)
     {
+        DomainVersion = official.DomainVersion;
         Id = official.Id;
         EventId = official.EventId;
         Name = official.Name;

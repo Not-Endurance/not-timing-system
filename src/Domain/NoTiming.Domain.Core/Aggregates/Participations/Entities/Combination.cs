@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using NoTiming.Domain.Helpers;
+using NoTiming.Domain.Objects;
 
 namespace NoTiming.Domain.Core.Aggregates.Participations.Entities;
 
@@ -18,27 +19,25 @@ public class Combination : Entity, INoTimingDisplayable
         Horse horse,
         Club? club,
         string distance,
-        Speed? minAverageSpeed,
-        Speed? maxAverageSpeed,
-        int id
+        SpeedRestrictions? restrictions,
+        int id,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Number = number;
         Athlete = athlete;
         Horse = horse;
         Club = club;
         Distance = distance;
-        MinAverageSpeed = minAverageSpeed;
-        MaxAverageSpeed = maxAverageSpeed;
+        Restrictions = restrictions ?? SpeedRestrictions.None;
     }
 
     public int Number { get; }
     public Athlete Athlete { get; }
     public Horse Horse { get; }
     public Club? Club { get; }
-    public Speed? MinAverageSpeed { get; }
-    public Speed? MaxAverageSpeed { get; }
+    public SpeedRestrictions Restrictions { get; }
     public string Distance
     {
         get => FormatDistance(_distance);
@@ -49,10 +48,13 @@ public class Combination : Entity, INoTimingDisplayable
         }
     }
 
-    public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    public string GetDisplayName(bool englishNames = false, CultureInfo? culture = null)
     {
-        var speed = ToStringHelper.FormatSpeedRestrictions(MinAverageSpeed, MaxAverageSpeed);
-        return $"{hash_string}{Number}: {Athlete.GetDisplayName(ruleset, culture)}, {Horse.GetDisplayName(ruleset, culture)} {speed}";
+        var speed = ToStringHelper.FormatSpeedRestrictions(
+            (Speed?)Restrictions.PhaseAverageSpeedMin,
+            (Speed?)Restrictions.PhaseAverageSpeedMax
+        );
+        return $"{hash_string}{Number}: {Athlete.GetDisplayName(englishNames, culture)}, {Horse.GetDisplayName(englishNames, culture)} {speed}";
     }
 
     public override string ToString()

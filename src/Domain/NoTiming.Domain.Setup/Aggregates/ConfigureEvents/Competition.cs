@@ -1,20 +1,20 @@
 using NC.Domain.Krud;
 using NoTiming.Domain.Extensions;
+using NoTiming.Domain.Objects;
 
 namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
-public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase>
+public class Competition : Entity, ISpeedRestrictionAware, IKrudParent<Participation>, IKrudParent<Phase>
 {
     readonly List<Phase> _phases = [];
     readonly List<Participation> _participations = [];
 
     public Competition(
         string? name,
-        CompetitionRuleset? ruleset,
+        bool englishNames,
         DateTimeOffset? start,
         TimeSpan? compulsoryThresholdSpan,
-        double? minSpeedRestriction,
-        double? maxSpeedRestriction,
+        SpeedRestrictions? speedRestrictions,
         string? feiEventId,
         string? feiEventCode,
         string? feiCompetitionId,
@@ -22,18 +22,18 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
         string? feiScheduleNumber,
         IEnumerable<Phase> phases,
         IEnumerable<Participation> participations,
-        int? id = null
+        int? id = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         _phases = phases.ToList();
         _participations = participations.ToList();
         Name = Required(nameof(Name), name);
-        Ruleset = Required(nameof(Ruleset), ruleset);
+        EnglishNames = englishNames;
         Start = Required(nameof(Start), start);
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
-        MinSpeedRestriction = minSpeedRestriction;
-        MaxSpeedRestriction = maxSpeedRestriction;
+        Restrictions = speedRestrictions ?? SpeedRestrictions.None;
         FeiEventId = feiEventId;
         FeiEventCode = feiEventCode;
         FeiCompetitionId = feiCompetitionId;
@@ -45,11 +45,10 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
     IReadOnlyList<Phase> IKrudParent<Phase>.Children => Phases;
 
     public string Name { get; }
-    public CompetitionRuleset Ruleset { get; }
+    public bool EnglishNames { get; }
     public DateTimeOffset Start { get; }
     public TimeSpan? CompulsoryThresholdSpan { get; }
-    public double? MinSpeedRestriction { get; }
-    public double? MaxSpeedRestriction { get; }
+    public SpeedRestrictions Restrictions { get; }
     public string? FeiEventId { get; }
     public string? FeiEventCode { get; }
     public string? FeiCompetitionId { get; }

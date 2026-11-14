@@ -1,4 +1,3 @@
-using NoTiming.Domain.Enums;
 using NoTiming.Domain.Objects;
 using NoTiming.Domain.Watcher;
 
@@ -13,7 +12,7 @@ public class SnapshotModel
             Number = snapshot.Number,
             Name = snapshot.Name,
             NameEnglish = snapshot.NameEnglish,
-            Ruleset = snapshot.Ruleset,
+            EnglishNames = snapshot.EnglishNames,
             Timestamp = snapshot.Timestamp?.ToString(),
         };
     }
@@ -21,13 +20,13 @@ public class SnapshotModel
     public int Number { get; set; }
     public string Name { get; set; } = default!;
     public string? NameEnglish { get; set; }
-    public CompetitionRuleset? Ruleset { get; set; }
+    public bool EnglishNames { get; set; }
     public string? Timestamp { get; set; }
 
     public Snapshot MapToDomain()
     {
         var timestamp = string.IsNullOrWhiteSpace(Timestamp) ? null : new Timestamp(Timestamp);
-        return new Snapshot(Number, Name, NameEnglish, timestamp, Ruleset);
+        return new Snapshot(Number, Name, NameEnglish, timestamp, EnglishNames);
     }
 
     public SnapshotModel Copy()
@@ -37,7 +36,7 @@ public class SnapshotModel
             Number = Number,
             Name = Name,
             NameEnglish = NameEnglish,
-            Ruleset = Ruleset,
+            EnglishNames = EnglishNames,
             Timestamp = Timestamp,
         };
     }

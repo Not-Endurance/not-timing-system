@@ -17,7 +17,7 @@
                 var row = (ParticipationTableRow)item;
             }
 
-            <MudText Typo="Typo.caption">@row.Label</MudText>
+            <MudText Typo="Typo.caption" Color="@(row.HasBreach ? Color.Error : Color.Default)">@row.Label</MudText>
         </LeadingCell>
 
         <HeadingCell Context="index">

@@ -34,9 +34,9 @@ public class Athlete : Aggregate, IKurdMirror<Club>, INamed, INoTimingDisplayabl
     public Club? Club { get; private set; }
     public User? User { get; }
 
-    public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    public string GetDisplayName(bool englishNames = false, CultureInfo? culture = null)
     {
-        return NameRenderingHelper.Render(Name, NameEnglish, ruleset, culture);
+        return NameRenderingHelper.Render(Name, NameEnglish, englishNames, culture);
     }
 
     public override string ToString()

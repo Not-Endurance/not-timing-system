@@ -93,12 +93,12 @@ public sealed class ParticipationTests
         var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");
         var athlete = new Athlete("Athlete", null, country, null, null, number);
         var horse = new Horse("Horse", null, null, number);
-        var combination = new Combination(number, athlete, horse, null, "20", null, null, number);
+        var combination = new Combination(number, athlete, horse, null, "20", null, number);
         var phaseList = phases.Length == 0 ? [CreatePhase(start)] : phases;
 
         return new Participation(
             ParticipationCategory.Senior,
-            new Competition("Competition", CompetitionRuleset.Regional),
+            new Competition("Competition", false),
             combination,
             new PhaseCollection(phaseList),
             null,
@@ -119,7 +119,6 @@ public sealed class ParticipationTests
             20,
             40,
             40,
-            CompetitionRuleset.Regional,
             isFinal,
             null,
             new Timestamp(start),

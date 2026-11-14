@@ -2,17 +2,17 @@
 
 public record Competition
 {
-    public Competition(string name, CompetitionRuleset ruleset)
+    public Competition(string name, bool englishNames)
     {
         Name = name;
-        Ruleset = ruleset;
+        EnglishNames = englishNames;
     }
 
     public string Name { get; }
-    public CompetitionRuleset Ruleset { get; }
+    public bool EnglishNames { get; }
 
     public override string ToString()
     {
-        return $"{Name} ({Ruleset})";
+        return EnglishNames ? $"{Name} (English names)" : Name;
     }
 }

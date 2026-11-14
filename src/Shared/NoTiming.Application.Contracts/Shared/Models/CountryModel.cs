@@ -13,6 +13,8 @@ public class CountryModel : IDocument, IKrudModel<Country>
         return model;
     }
 
+    public int DomainVersion { get; set; }
+
     public int Id { get; set; } = default!;
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public string Name { get; set; } = default!;
@@ -22,6 +24,7 @@ public class CountryModel : IDocument, IKrudModel<Country>
 
     public void MapFrom(Country country)
     {
+        DomainVersion = country.DomainVersion;
         Id = country.Id;
         Name = country.Name;
         IsoCode = country.IsoCode;
@@ -31,6 +34,6 @@ public class CountryModel : IDocument, IKrudModel<Country>
 
     public Country MapToEntity()
     {
-        return new Country(Id, Name, IsoCode, NfCode, Locale);
+        return new Country(Id, Name, IsoCode, NfCode, Locale, storedDomainVersion: DomainVersion);
     }
 }

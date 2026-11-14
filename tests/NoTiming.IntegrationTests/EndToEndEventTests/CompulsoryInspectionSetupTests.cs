@@ -100,19 +100,17 @@ public sealed class CompulsoryInspectionSetupTests
                         combination: combination,
                         category: ParticipationCategory.Senior,
                         startTimeOverride: null,
-                        maxSpeedOverride: null,
-                        minSpeedOverride: null,
+                        restrictions: null,
                         id: eventId + 300 + index
                     )
             )
             .ToArray();
         var competition = new SetupCompetition(
             "Compulsory inspection setup test",
-            CompetitionRuleset.Regional,
+            false,
             DateTimeOffset.UtcNow.Date.AddDays(30).AddHours(8),
             compulsoryThresholdSpan: TimeSpan.FromMinutes(10),
-            minSpeedRestriction: null,
-            maxSpeedRestriction: null,
+            speedRestrictions: null,
             feiEventId: null,
             feiEventCode: null,
             feiCompetitionId: null,

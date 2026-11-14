@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Shared\NoTiming.Application\NoTiming.Application.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming\Api\NoTiming.Api.Application\NoTiming.Api.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

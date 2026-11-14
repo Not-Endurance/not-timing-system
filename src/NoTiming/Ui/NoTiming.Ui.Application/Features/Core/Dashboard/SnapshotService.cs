@@ -108,7 +108,7 @@ public class SnapshotService
                 participation.Combination.Number,
                 participation.Combination.Athlete.Name,
                 participation.Combination.Athlete.NameEnglish,
-                ruleset: participation.Competition.Ruleset
+                englishNames: participation.Competition.EnglishNames
             )
         );
         Participations.Remove(participation);
@@ -352,7 +352,7 @@ public class SnapshotService
             snapshot.Name,
             snapshot.NameEnglish,
             snapshot.Timestamp == null ? null : Timestamp.Copy(snapshot.Timestamp),
-            snapshot.Ruleset
+            snapshot.EnglishNames
         );
     }
 }

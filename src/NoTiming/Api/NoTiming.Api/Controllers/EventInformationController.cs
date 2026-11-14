@@ -129,6 +129,18 @@ public class EventInformationController : ApiControllerBase
         return Ok();
     }
 
+    [HttpPost("event/{id:int}/reopen")]
+    public async Task<IActionResult> Reopen(int id)
+    {
+        var request = Request;
+        using var activity = StartFunctionActivity(nameof(Reopen));
+        TagRequest(request);
+        LogInformation(request, nameof(Reopen));
+
+        await _businessService.Reopen(id);
+        return Ok();
+    }
+
     [HttpPost("event/{id:int}/start")]
     public async Task<IActionResult> Start(int id)
     {

@@ -13,13 +13,16 @@ public class EventInformationMongoRepository : MongoRepository<EventInformationM
     protected override UpdateDefinition<EventInformationModel> GetUpdateDefinition(EventInformationModel document)
     {
         return Builders<EventInformationModel>
-            .Update.Set(x => x.Country, document.Country)
+            .Update.Set(x => x.DomainVersion, document.DomainVersion)
+            .Set(x => x.Country, document.Country)
             .Set(x => x.Name, document.Name)
             .Set(x => x.Location, document.Location)
             .Set(x => x.FeiShowId, document.FeiShowId)
             .Set(x => x.StartDay, document.StartDay)
             .Set(x => x.EndDay, document.EndDay)
-            .Set(x => x.IsActive, document.IsActive);
+            .Set(x => x.IsActive, document.IsActive)
+            .Set(x => x.TimeZoneId, document.TimeZoneId)
+            .Set(x => x.IsFinalized, document.IsFinalized);
     }
 
     public override async Task Create(EventInformationModel item)

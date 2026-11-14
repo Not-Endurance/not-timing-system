@@ -14,6 +14,7 @@ public class PhaseModel
     {
         return new PhaseModel
         {
+            DomainVersion = phase.DomainVersion,
             Id = phase.Id,
             Loop = LoopModel.MapFrom(phase.Loop!),
             Recovery = phase.Recovery,
@@ -21,6 +22,8 @@ public class PhaseModel
             IsCompulsoryInspectionRequired = phase.IsCompulsoryInspectionRequired,
         };
     }
+
+    public int DomainVersion { get; set; }
 
     public int Id { get; set; }
     public int Recovery { get; init; }
@@ -33,6 +36,6 @@ public class PhaseModel
     public Phase MapToEntity()
     {
         var loop = Loop.MapToEntity();
-        return new Phase(loop, Recovery, Rest, Id, IsCompulsoryInspectionRequired);
+        return new Phase(loop, Recovery, Rest, Id, IsCompulsoryInspectionRequired, storedDomainVersion: DomainVersion);
     }
 }

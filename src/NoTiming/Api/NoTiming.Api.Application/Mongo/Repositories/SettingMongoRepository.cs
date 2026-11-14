@@ -24,7 +24,8 @@ public class SettingMongoRepository : MongoRepository<SettingModel>
         try
         {
             return Builders<SettingModel>
-                .Update.Set(x => x.DetectionMode, document.DetectionMode)
+                .Update.Set(x => x.DomainVersion, document.DomainVersion)
+                .Set(x => x.DetectionMode, document.DetectionMode)
                 .Set(x => x.Country, document.Country);
         }
         catch (Exception ex)

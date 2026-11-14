@@ -66,11 +66,11 @@ public sealed class UniqueParticipationsTests
         var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");
         var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
         var horse = new Horse($"Horse {number}", null, null, number);
-        var combination = new Combination(number, athlete, horse, null, "20", null, null, number);
+        var combination = new Combination(number, athlete, horse, null, "20", null, number);
 
         return new Participation(
             ParticipationCategory.Senior,
-            new Competition("Competition", CompetitionRuleset.Regional),
+            new Competition("Competition", false),
             combination,
             new PhaseCollection([CreatePhase()]),
             null,
@@ -86,7 +86,6 @@ public sealed class UniqueParticipationsTests
             20,
             40,
             null,
-            CompetitionRuleset.Regional,
             true,
             null,
             Timestamp.Create(DateTimeOffset.Now),

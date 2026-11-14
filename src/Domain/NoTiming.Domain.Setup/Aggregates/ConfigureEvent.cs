@@ -30,9 +30,10 @@ public class ConfigureEvent
         IEnumerable<Loop> loops,
         IEnumerable<Combination> combinations,
         int? id = null,
-        IEnumerable<Operator>? operators = null
+        IEnumerable<Operator>? operators = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Name = Required(nameof(Name), name);
         Location = Required(nameof(Location), location);

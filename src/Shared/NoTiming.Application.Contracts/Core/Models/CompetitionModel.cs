@@ -1,5 +1,4 @@
 ﻿using NoTiming.Domain.Core.Aggregates.Participations.Objects;
-using NoTiming.Domain.Enums;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
@@ -7,14 +6,14 @@ public class CompetitionModel
 {
     public static CompetitionModel MapFrom(Competition competition)
     {
-        return new CompetitionModel { Name = competition.Name, Ruleset = competition.Ruleset };
+        return new CompetitionModel { Name = competition.Name, EnglishNames = competition.EnglishNames };
     }
 
     public string Name { get; init; } = default!;
-    public CompetitionRuleset Ruleset { get; init; }
+    public bool EnglishNames { get; init; }
 
     public Competition MapToEntity()
     {
-        return new Competition(Name, Ruleset);
+        return new Competition(Name, EnglishNames);
     }
 }

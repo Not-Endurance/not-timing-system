@@ -13,6 +13,8 @@ public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Han
         return model;
     }
 
+    public int DomainVersion { get; set; }
+
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public int EventId { get; set; }
@@ -22,6 +24,7 @@ public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Han
 
     public void MapFrom(Handout handout)
     {
+        DomainVersion = handout.DomainVersion;
         Id = handout.Id;
         EventId = handout.EventId;
         Participation = ParticipationModel.MapFrom(handout.Entries.Single().Participation);
@@ -29,6 +32,6 @@ public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Han
 
     public Handout MapToEntity()
     {
-        return new Handout(Participation.MapToEntity(), Id);
+        return new Handout(Participation.MapToEntity(), Id, storedDomainVersion: DomainVersion);
     }
 }

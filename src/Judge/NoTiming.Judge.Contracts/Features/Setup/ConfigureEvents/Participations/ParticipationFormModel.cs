@@ -1,7 +1,9 @@
 ﻿using NC.DateAndTime;
 using NC.Domain.Exceptions;
 using NC.Krud.Models;
+using NoTiming.Application.Contracts.Shared.Models;
 using NoTiming.Domain.Enums;
+using NoTiming.Domain.Objects;
 using NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
@@ -13,18 +15,13 @@ public record ParticipationFormModel : KrudFormModel<Participation>
     public ParticipationCategory? Category { get; set; }
     public bool IsStartTimeOverriden { get; set; }
     public TimeSpan? StartTimeOverride { get; set; }
-    public bool IsMaxSpeedOverriden { get; set; }
-    public double? MaxSpeedOverride { get; set; }
-    public bool IsMinSpeedOverriden { get; set; }
-    public double? MinSpeedOverride { get; set; }
+    public SpeedRestrictionsModel Restrictions { get; set; } = new();
 
     protected override Participation MapTo()
     {
-        ValidateOverrideInput();
+        ValidateStartTimeInput();
         var newStart = OverrideStartTime();
-        var maxSpeedOverride = OverrideMaxSpeed();
-        var minSpeedOverride = OverrideMinSpeed();
-        return new(IsNotRanked, Combination, Category, newStart, maxSpeedOverride, minSpeedOverride, id: Id);
+        return new(IsNotRanked, Combination, Category, newStart, Restrictions.ToDomain(), id: Id);
     }
 
     public override void MapFrom(Participation participation)
@@ -35,33 +32,14 @@ public record ParticipationFormModel : KrudFormModel<Participation>
         Category = participation.Category;
         IsStartTimeOverriden = participation.StartTimeOverride != null;
         StartTimeOverride = participation.StartTimeOverride?.LocalDateTime.TimeOfDay;
-        IsMaxSpeedOverriden = participation.MaxSpeedOverride != null;
-        MaxSpeedOverride = participation.MaxSpeedOverride;
-        IsMinSpeedOverriden = participation.MinSpeedOverride != null;
-        MinSpeedOverride = participation.MinSpeedOverride;
+        Restrictions = SpeedRestrictionsModel.From(participation);
     }
 
-    void ValidateOverrideInput()
+    void ValidateStartTimeInput()
     {
         if (IsStartTimeOverriden && StartTimeOverride == null)
         {
             throw new DomainPropertyException(nameof(StartTimeOverride), Null_or_malformed_string, Start_Time_string);
-        }
-        if (IsMaxSpeedOverriden && MaxSpeedOverride == null)
-        {
-            throw new DomainPropertyException(
-                nameof(MaxSpeedOverride),
-                Null_or_malformed_string,
-                Max_Speed_Override_string
-            );
-        }
-        if (IsMinSpeedOverriden && MinSpeedOverride == null)
-        {
-            throw new DomainPropertyException(
-                nameof(MinSpeedOverride),
-                Null_or_malformed_string,
-                Min_Speed_Override_string
-            );
         }
     }
 
@@ -72,15 +50,5 @@ public record ParticipationFormModel : KrudFormModel<Participation>
             return null;
         }
         return DateTime.Today.ToLocalDateTime(StartTimeOverride.Value);
-    }
-
-    double? OverrideMaxSpeed()
-    {
-        return IsMaxSpeedOverriden ? MaxSpeedOverride : null;
-    }
-
-    double? OverrideMinSpeed()
-    {
-        return IsMinSpeedOverriden ? MinSpeedOverride : null;
     }
 }

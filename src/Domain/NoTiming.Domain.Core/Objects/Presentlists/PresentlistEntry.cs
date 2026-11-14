@@ -7,7 +7,7 @@ public record PresentlistEntry : ValueObject
         int phaseId,
         string athleteName,
         string? athleteNameEnglish,
-        CompetitionRuleset ruleset,
+        bool englishNames,
         Timestamp time,
         PresentlistEntryType type
     )
@@ -16,7 +16,7 @@ public record PresentlistEntry : ValueObject
         PhaseId = phaseId;
         AthleteName = athleteName;
         AthleteNameEnglish = athleteNameEnglish;
-        Ruleset = ruleset;
+        EnglishNames = englishNames;
         Time = time;
         Type = type;
     }
@@ -25,7 +25,7 @@ public record PresentlistEntry : ValueObject
     public int PhaseId { get; }
     public string AthleteName { get; }
     public string? AthleteNameEnglish { get; }
-    public CompetitionRuleset Ruleset { get; }
+    public bool EnglishNames { get; }
     public Timestamp Time { get; }
     public PresentlistEntryType Type { get; }
     public PresentlistEntryKey Key => new(Number, PhaseId, Type);

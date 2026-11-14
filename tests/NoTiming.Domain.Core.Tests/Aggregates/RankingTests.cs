@@ -50,7 +50,7 @@ public sealed class RankingTests
     {
         return new Ranking(
             "Competition",
-            CompetitionRuleset.FEI,
+            true,
             ParticipationCategory.Senior,
             null,
             null,
@@ -68,11 +68,11 @@ public sealed class RankingTests
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
         var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
         var horse = new Horse($"Horse {number}", null, null, number);
-        var combination = new Combination(number, athlete, horse, null, "20", null, null, number);
+        var combination = new Combination(number, athlete, horse, null, "20", null, number);
 
         return new Participation(
             ParticipationCategory.Senior,
-            new Competition("Competition", CompetitionRuleset.FEI),
+            new Competition("Competition", true),
             combination,
             new PhaseCollection([CreatePhase(START)]),
             null,
@@ -88,7 +88,6 @@ public sealed class RankingTests
             20,
             40,
             null,
-            CompetitionRuleset.FEI,
             true,
             null,
             Timestamp.Create(start),

@@ -20,7 +20,7 @@ public class StartlistTableBehind : NStatefulComponent
 
     protected string FormatAthlete(Starter entry)
     {
-        return NameRenderingHelper.Render(entry.AthleteName, entry.AthleteNameEnglish, entry.Ruleset);
+        return NameRenderingHelper.Render(entry.AthleteName, entry.AthleteNameEnglish, entry.EnglishNames);
     }
 
     protected string GetTimerKey(Starter entry)

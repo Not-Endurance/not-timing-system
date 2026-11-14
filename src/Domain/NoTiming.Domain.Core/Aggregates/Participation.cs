@@ -19,9 +19,10 @@ public class Participation : Aggregate, IEventScoped
         PhaseCollection phases,
         Eliminated? notQualified,
         int eventId,
-        int? id = null
+        int? id = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         EventId = eventId;
         Category = category;
@@ -59,7 +60,7 @@ public class Participation : Aggregate, IEventScoped
 
     public override string ToString()
     {
-        return Combine(Combination.GetDisplayName(Competition.Ruleset), Phases, Eliminated);
+        return Combine(Combination.GetDisplayName(Competition.EnglishNames), Phases, Eliminated);
     }
 
     //TODO rename to smthing better (including ISnapshotProcessor, IManualProcessor and other mentions..)

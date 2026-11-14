@@ -1,6 +1,7 @@
 @using NoTiming.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions
 @using NC.Blazor.Components.Input
 @using NC.Krud.Blazor.Components
+@using NoTiming.Judge.Blazor.Features.Setup.ConfigureEvents
 
 @inherits CompetitionShellBehind
 
@@ -9,7 +10,7 @@
     <FormFields>
         <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
 
-        <NSelect @bind-Value="Model.Ruleset" For="() => Model.Ruleset" Label="@Competition_Ruleset_string" />
+        <NSwitch @bind-Value="Model.EnglishNames" For="() => Model.EnglishNames" Label="@English_names_string" />
 
         <NDatePicker @bind-Date="Model.Date" For="() => Model.Date" Label="@Date_string" ImmediateText="true"/>
 
@@ -22,19 +23,7 @@
             <NNumberField @bind-Value="Model.CompulsoryThresholdMinutes" For="() => Model.CompulsoryThresholdMinutes" />
         }
 
-        <NSwitch @bind-Value="Model.UseMinSpeedRestriction" For="() => Model.UseMinSpeedRestriction" Label="@Min_Speed_Restriction_string" />
-
-        @if (Model.UseMinSpeedRestriction)
-        {
-            <NNumberField @bind-Value="Model.MinSpeedRestriction" For="() => Model.MinSpeedRestriction" Label="@Min_Speed_Restriction_string" HelperText="@Applies_to_all_Participations_added_to_the_competition_when_set_string" />
-        }
-
-        <NSwitch @bind-Value="Model.UseMaxSpeedRestriction" For="() => Model.UseMaxSpeedRestriction" Label="@Max_Speed_Restriction_string" />
-
-        @if (Model.UseMaxSpeedRestriction)
-        {
-            <NNumberField @bind-Value="Model.MaxSpeedRestriction" For="() => Model.MaxSpeedRestriction" Label="@Max_Speed_Restriction_string" HelperText="@Applies_to_all_Participations_added_to_the_competition_when_set_string" />
-        }
+        <SpeedRestrictionsFields Restrictions="Model.Restrictions" />
 
         <NParagraph Content="@Locate_FEI_Show_data_instructions_string" Class="mt-8 mb-2" />
 

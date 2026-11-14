@@ -13,6 +13,7 @@ const COLLECTION = "event_informations";
 const TIME_ZONES = {
   BG: "Europe/Sofia",
   BGR: "Europe/Sofia",
+  BUL: "Europe/Sofia",
   TR: "Europe/Istanbul",
   TUR: "Europe/Istanbul",
 };

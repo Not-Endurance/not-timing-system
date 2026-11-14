@@ -7,7 +7,7 @@ public class Ranking : Aggregate, IEventScoped
 {
     public Ranking(
         string? name,
-        CompetitionRuleset? ruleset,
+        bool englishNames,
         ParticipationCategory? category,
         string? feiEventId,
         string? feiEventCode,
@@ -16,13 +16,14 @@ public class Ranking : Aggregate, IEventScoped
         string? feiScheduleNumber,
         IEnumerable<RankingEntry> entries,
         int eventId,
-        int? id = null
+        int? id = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         EventId = eventId;
         Name = Required(nameof(Name), name);
-        Ruleset = Required(nameof(Ruleset), ruleset);
+        EnglishNames = englishNames;
         Category = Required(nameof(Category), category);
         var rankingEntries = AreUnique(nameof(Entries), entries).ToList();
         EnsurePlacingsAreAllOrNone(rankingEntries);
@@ -36,7 +37,7 @@ public class Ranking : Aggregate, IEventScoped
 
     public int EventId { get; }
     public string Name { get; }
-    public CompetitionRuleset Ruleset { get; }
+    public bool EnglishNames { get; }
     public ParticipationCategory Category { get; }
     public string? FeiEventId { get; }
     public string? FeiEventCode { get; }

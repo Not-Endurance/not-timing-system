@@ -11,9 +11,10 @@ public class Official : Aggregate, IEventScoped, INamed, INoTimingDisplayable
         OfficialRole? role,
         int eventId,
         int? id = null,
-        int? userId = null
+        int? userId = null,
+        int? storedDomainVersion = null
     )
-        : base(id)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         EventId = eventId;
         Name = Required(nameof(Name), name);
@@ -28,14 +29,14 @@ public class Official : Aggregate, IEventScoped, INamed, INoTimingDisplayable
     public OfficialRole Role { get; }
     public int? UserId { get; }
 
-    public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    public string GetDisplayName(bool englishNames = false, CultureInfo? culture = null)
     {
-        return NameRenderingHelper.Render(Name, NameEnglish, ruleset, culture);
+        return NameRenderingHelper.Render(Name, NameEnglish, englishNames, culture);
     }
 
-    public string GetDisplayLabel(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    public string GetDisplayLabel(bool englishNames = false, CultureInfo? culture = null)
     {
-        return $"{GetDisplayName(ruleset, culture)}, {Role.GetDescription()}";
+        return $"{GetDisplayName(englishNames, culture)}, {Role.GetDescription()}";
     }
 
     public override string ToString()

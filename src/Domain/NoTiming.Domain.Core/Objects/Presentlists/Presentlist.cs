@@ -117,7 +117,7 @@ public record Presentlist : ValueObject
             phase.Id,
             participation.Combination.Athlete.Name,
             participation.Combination.Athlete.NameEnglish,
-            participation.Competition.Ruleset,
+            participation.Competition.EnglishNames,
             time,
             type
         );

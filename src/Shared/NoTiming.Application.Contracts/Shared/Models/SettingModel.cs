@@ -14,6 +14,8 @@ public class SettingModel : IDocument, IKrudModel<Setting>
         return model;
     }
 
+    public int DomainVersion { get; set; }
+
     public int Id { get; set; } = default!;
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
     public string AccountId { get; set; } = default!;
@@ -22,11 +24,12 @@ public class SettingModel : IDocument, IKrudModel<Setting>
 
     public Setting MapToEntity()
     {
-        return new Setting(Country.MapToEntity(), DetectionMode, id: Id);
+        return new Setting(Country.MapToEntity(), DetectionMode, id: Id, storedDomainVersion: DomainVersion);
     }
 
     public void MapFrom(Setting setting)
     {
+        DomainVersion = setting.DomainVersion;
         Id = setting.Id;
         Country = CountryModel.From(setting.Country);
         DetectionMode = setting.DetectionMode;

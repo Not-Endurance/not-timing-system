@@ -39,8 +39,10 @@ public sealed class EventInformationModelTests
         return new EventInformationModel
         {
             Id = 1,
+            DomainVersion = 1,
             Country = new CountryModel
             {
+                DomainVersion = 1,
                 Id = 1,
                 Name = "Country",
                 IsoCode = isoCode,

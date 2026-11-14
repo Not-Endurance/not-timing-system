@@ -10,6 +10,9 @@ namespace NoTiming.Domain.Core.Tests.Objects.Arrivelists;
 
 public sealed class ArrivelistTests
 {
+    static readonly DateTimeOffset Yesterday = DateTimeOffset.Now.AddDays(-1);
+    static readonly DateTimeOffset Start = new DateTimeOffset(Yesterday.Date.AddHours(10), Yesterday.Offset);
+
     [Fact]
     public void Entries_WhenParticipationsAreInMixedStates_ShouldIncludeOnlyStartedUnarrivedActive()
     {
@@ -49,8 +52,7 @@ public sealed class ArrivelistTests
                 CreatePhase(20, completedStart, completedArrive, completedPresent),
                 CreatePhase(20, currentStart, isFinal: true),
             ],
-            minAverageSpeed: 10,
-            maxAverageSpeed: 20
+            PhaseAverage(min: 10, max: 20)
         );
 
         var entry = Assert.Single(new Arrivelist([participation]).Entries);
@@ -67,8 +69,7 @@ public sealed class ArrivelistTests
         var participation = CreateParticipation(
             20,
             [CreatePhase(20, start, isFinal: true)],
-            minAverageSpeed: 10,
-            maxAverageSpeed: 20
+            PhaseAverage(min: 10, max: 20)
         );
 
         var entry = Assert.Single(new Arrivelist([participation]).Entries);
@@ -83,7 +84,7 @@ public sealed class ArrivelistTests
     {
         var day = DateTimeOffset.Now.AddDays(-1).Date;
         var currentStart = new DateTimeOffset(day.AddHours(10), DateTimeOffset.Now.Offset);
-        var slowestOnly = CreateParticipation(1, [CreatePhase(10, currentStart, isFinal: true)], minAverageSpeed: 20);
+        var slowestOnly = CreateParticipation(1, [CreatePhase(10, currentStart, isFinal: true)], PhaseAverage(min: 20));
         var averageOnly = CreateParticipation(
             2,
             [
@@ -96,7 +97,7 @@ public sealed class ArrivelistTests
                 CreatePhase(10, currentStart, isFinal: true),
             ]
         );
-        var fastestOnly = CreateParticipation(3, [CreatePhase(10, currentStart, isFinal: true)], maxAverageSpeed: 15);
+        var fastestOnly = CreateParticipation(3, [CreatePhase(10, currentStart, isFinal: true)], PhaseAverage(max: 15));
 
         var arrivelist = new Arrivelist([fastestOnly, slowestOnly, averageOnly]);
 
@@ -116,7 +117,7 @@ public sealed class ArrivelistTests
                 CreatePhase(20, completedStart, completedArrive, completedArrive),
                 CreatePhase(20, currentStart, isFinal: true),
             ],
-            maxAverageSpeed: 20
+            PhaseAverage(max: 20)
         );
 
         var entry = Assert.Single(new Arrivelist([participation]).Entries);
@@ -125,11 +126,107 @@ public sealed class ArrivelistTests
         Assert.True(entry.Fast.ToDateTimeOffset() < currentStart);
     }
 
+    [Fact]
+    public void Entries_WhenLoopSpeedIsCapped_ShouldNotDependOnRecovery()
+    {
+        var participation = CreateParticipation(1, [CreatePhase(20, Start)], Loop(max: 20));
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        Assert.Equal(Start.AddMinutes(60), entry.Fast!.ToDateTimeOffset());
+    }
+
+    [Fact]
+    public void Entries_WhenPhaseSpeedIsCapped_ShouldAllowForMaximumRecoveryAtEarliest()
+    {
+        var participation = CreateParticipation(1, [CreatePhase(20, Start, maxRecovery: 40)], Phase(max: 20));
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        Assert.Equal(Start.AddMinutes(20), entry.Fast!.ToDateTimeOffset());
+    }
+
+    [Fact]
+    public void Entries_WhenPhaseSpeedIsMinimum_ShouldAllowNoRecoveryAtLatest()
+    {
+        var participation = CreateParticipation(1, [CreatePhase(20, Start, maxRecovery: 40)], Phase(min: 10));
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        Assert.Equal(Start.AddMinutes(120), entry.Slow!.ToDateTimeOffset());
+    }
+
+    [Fact]
+    public void Entries_WhenFinalPhaseHasPhaseSpeedCap_ShouldIgnoreRecovery()
+    {
+        var participation = CreateParticipation(1, [CreatePhase(20, Start, isFinal: true)], Phase(max: 20));
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        Assert.Equal(Start.AddMinutes(60), entry.Fast!.ToDateTimeOffset());
+    }
+
+    [Fact]
+    public void Entries_WhenSeveralCapsApply_ShouldUseLatestOfEarliestBoundsAndEarliestOfLatestBounds()
+    {
+        var participation = CreateParticipation(
+            1,
+            [CreatePhase(20, Start, maxRecovery: 40)],
+            new SpeedRestrictions(10, 20, 15, 20, null, null, null, null)
+        );
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        Assert.Equal(Start.AddMinutes(60), entry.Fast!.ToDateTimeOffset());
+        Assert.Equal(Start.AddMinutes(80), entry.Slow!.ToDateTimeOffset());
+    }
+
+    [Fact]
+    public void Entries_WhenLoopAverageIsCapped_ShouldUseTimeOfCompletedLoops()
+    {
+        var previousStart = Start.AddHours(-2);
+        var previousArrive = previousStart.AddMinutes(60);
+        var participation = CreateParticipation(
+            1,
+            [CreatePhase(20, previousStart, previousArrive, previousArrive), CreatePhase(20, Start, isFinal: true)],
+            new SpeedRestrictions(null, null, null, null, null, 15, null, null)
+        );
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        Assert.Equal(Start.AddMinutes(100), entry.Fast!.ToDateTimeOffset());
+    }
+
+    [Fact]
+    public void Entries_WhenLimitIsZero_ShouldIgnoreItInsteadOfNeverArriving()
+    {
+        var participation = CreateParticipation(1, [CreatePhase(20, Start, isFinal: true)], Loop(min: 0, max: 0));
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        Assert.Null(entry.Fast);
+        Assert.Null(entry.Slow);
+    }
+
+    static SpeedRestrictions PhaseAverage(double? min = null, double? max = null)
+    {
+        return new SpeedRestrictions(null, null, null, null, null, null, min, max);
+    }
+
+    static SpeedRestrictions Loop(double? min = null, double? max = null)
+    {
+        return new SpeedRestrictions(min, max, null, null, null, null, null, null);
+    }
+
+    static SpeedRestrictions Phase(double? min = null, double? max = null)
+    {
+        return new SpeedRestrictions(null, null, min, max, null, null, null, null);
+    }
+
     static Participation CreateParticipation(
         int number,
         IEnumerable<Phase> phases,
-        double? minAverageSpeed = null,
-        double? maxAverageSpeed = null,
+        SpeedRestrictions? restrictions = null,
         Eliminated? eliminated = null
     )
     {
@@ -138,20 +235,11 @@ public sealed class ArrivelistTests
         var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
         var horse = new Horse($"Horse {number}", null, null, number);
         var totalDistance = phaseList.Sum(x => x.Length);
-        var combination = new Combination(
-            number,
-            athlete,
-            horse,
-            null,
-            $"{totalDistance:0.##}",
-            minAverageSpeed,
-            maxAverageSpeed,
-            number
-        );
+        var combination = new Combination(number, athlete, horse, null, $"{totalDistance:0.##}", restrictions, number);
 
         return new Participation(
             ParticipationCategory.Senior,
-            new Competition("Competition", CompetitionRuleset.Regional),
+            new Competition("Competition", false),
             combination,
             new PhaseCollection(phaseList),
             eliminated,
@@ -164,15 +252,15 @@ public sealed class ArrivelistTests
         DateTimeOffset? start,
         DateTimeOffset? arrive = null,
         DateTimeOffset? present = null,
-        bool isFinal = false
+        bool isFinal = false,
+        int maxRecovery = 40
     )
     {
         return new Phase(
             "",
             length,
-            40,
+            maxRecovery,
             isFinal ? null : 40,
-            CompetitionRuleset.Regional,
             isFinal,
             null,
             Timestamp.Create(start),

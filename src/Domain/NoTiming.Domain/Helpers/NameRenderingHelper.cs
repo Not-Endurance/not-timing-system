@@ -1,5 +1,3 @@
-using NoTiming.Domain.Enums;
-
 namespace NoTiming.Domain.Helpers;
 
 public static class NameRenderingHelper
@@ -7,11 +5,11 @@ public static class NameRenderingHelper
     public static string Render(
         string name,
         string? nameEnglish,
-        CompetitionRuleset? ruleset = null,
+        bool englishNames = false,
         CultureInfo? culture = null
     )
     {
-        if (ruleset == CompetitionRuleset.FEI || ShouldUseEnglish(culture ?? CultureInfo.CurrentUICulture))
+        if (englishNames || ShouldUseEnglish(culture ?? CultureInfo.CurrentUICulture))
         {
             return FirstNonEmpty(nameEnglish, name);
         }

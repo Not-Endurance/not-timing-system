@@ -4,8 +4,8 @@ namespace NoTiming.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Loop : Entity
 {
-    public Loop(double? distance, int? id = null)
-        : base(id)
+    public Loop(double? distance, int? id = null, int? storedDomainVersion = null)
+        : base(id, storedDomainVersion: storedDomainVersion)
     {
         Distance = PositiveDistance(distance);
     }
