@@ -16,9 +16,9 @@ internal static class AccountEndpoints<TProfile>
     internal static void Map(RouteGroupBuilder api)
     {
         api.MapGet("/me", Me);
-        api.MapGet("/me/profile", Profile).RequireAuthorization(AuthenticationPolicies.SIGNED_IN);
+        api.MapGet("/me/profile", Profile).RequireAuthorization();
         api.MapPatch("/me", UpdateProfile)
-            .RequireAuthorization(AuthenticationPolicies.SIGNED_IN)
+            .RequireAuthorization()
             .AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/sign-in/code", RequestSignInCode).AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/register", Register).AddEndpointFilter<StateChangeGuard>();

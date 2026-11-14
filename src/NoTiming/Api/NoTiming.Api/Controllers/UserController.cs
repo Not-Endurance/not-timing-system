@@ -13,7 +13,7 @@ namespace NoTiming.Api.Controllers;
 /// The directory of users, which Judge searches. It answers only a signed-in person: an anonymous caller cannot query
 /// it. A person's own profile is read and changed through the session routes, not here.
 /// </summary>
-[Authorize(Policy = AuthenticationPolicies.SIGNED_IN)]
+[Authorize]
 public class UserController : ApiControllerBase
 {
     readonly IUserDirectory<NoTimingProfile> _users;

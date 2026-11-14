@@ -127,15 +127,16 @@ public static class AuthenticationServices
             );
 
         // The policy admits only a principal that carries a user id, so an endpoint it guards can read the id without checking it.
+        // It is also the default, so a bare [Authorize] or RequireAuthorization() gets the same guarantee.
+        var signedIn = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .RequireAssertion(context => context.User.GetSignedInUserId() is not null)
+            .Build();
         services.AddAuthorization(options =>
-            options.AddPolicy(
-                AuthenticationPolicies.SIGNED_IN,
-                policy =>
-                    policy
-                        .RequireAuthenticatedUser()
-                        .RequireAssertion(context => context.User.GetSignedInUserId() is not null)
-            )
-        );
+        {
+            options.AddPolicy(AuthenticationPolicies.SIGNED_IN, signedIn);
+            options.DefaultPolicy = signedIn;
+        });
         return services;
     }
 

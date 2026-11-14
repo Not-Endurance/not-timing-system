@@ -16,7 +16,7 @@ namespace NoTiming.Api.Controllers;
 /// A person's own event session. Every route needs a session, and a route that names or changes another person's
 /// session is refused, so the Ui reads and writes only what the person who is signed in owns.
 /// </summary>
-[Authorize(Policy = AuthenticationPolicies.SIGNED_IN)]
+[Authorize]
 public class UserSessionController : CrudControllerBase<NoTimingUserSessionModel>
 {
     readonly INoTimingUserSessionRepository _sessions;

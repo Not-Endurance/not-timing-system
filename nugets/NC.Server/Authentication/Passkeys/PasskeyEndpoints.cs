@@ -21,17 +21,17 @@ internal static class PasskeyEndpoints<TProfile>
         api.MapPost("/sign-in/passkey/options", SignInOptions).AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/sign-in/passkey/verify", SignInVerify).AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/me/passkey/options", EnrolOptions)
-            .RequireAuthorization(AuthenticationPolicies.SIGNED_IN)
+            .RequireAuthorization()
             .AddEndpointFilter<StateChangeGuard>();
-        api.MapGet("/me/passkeys", ListPasskeys).RequireAuthorization(AuthenticationPolicies.SIGNED_IN);
+        api.MapGet("/me/passkeys", ListPasskeys).RequireAuthorization();
         api.MapPost("/me/passkeys", Enrol)
-            .RequireAuthorization(AuthenticationPolicies.SIGNED_IN)
+            .RequireAuthorization()
             .AddEndpointFilter<StateChangeGuard>();
         api.MapPatch("/me/passkeys/{id}", Rename)
-            .RequireAuthorization(AuthenticationPolicies.SIGNED_IN)
+            .RequireAuthorization()
             .AddEndpointFilter<StateChangeGuard>();
         api.MapDelete("/me/passkeys/{id}", Remove)
-            .RequireAuthorization(AuthenticationPolicies.SIGNED_IN)
+            .RequireAuthorization()
             .AddEndpointFilter<StateChangeGuard>();
     }
 
