@@ -27,7 +27,7 @@ jobs:
     needs: unit-tests
     runs-on: ubuntu-latest
     name: Production - Mongo migrations
-    environment: production
+    environment: prod
     steps:
     - name: Checkout code
       uses: actions/checkout@v6

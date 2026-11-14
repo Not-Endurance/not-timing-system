@@ -27,7 +27,7 @@ jobs:
     needs: unit-tests
     runs-on: ubuntu-latest
     name: Staging - Mongo migrations
-    environment: staging
+    environment: sta
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
