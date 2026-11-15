@@ -20,19 +20,11 @@ internal static class PasskeyEndpoints<TProfile>
     {
         api.MapPost("/sign-in/passkey/options", SignInOptions).AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/sign-in/passkey/verify", SignInVerify).AddEndpointFilter<StateChangeGuard>();
-        api.MapPost("/me/passkey/options", EnrolOptions)
-            .RequireAuthorization()
-            .AddEndpointFilter<StateChangeGuard>();
+        api.MapPost("/me/passkey/options", EnrolOptions).RequireAuthorization().AddEndpointFilter<StateChangeGuard>();
         api.MapGet("/me/passkeys", ListPasskeys).RequireAuthorization();
-        api.MapPost("/me/passkeys", Enrol)
-            .RequireAuthorization()
-            .AddEndpointFilter<StateChangeGuard>();
-        api.MapPatch("/me/passkeys/{id}", Rename)
-            .RequireAuthorization()
-            .AddEndpointFilter<StateChangeGuard>();
-        api.MapDelete("/me/passkeys/{id}", Remove)
-            .RequireAuthorization()
-            .AddEndpointFilter<StateChangeGuard>();
+        api.MapPost("/me/passkeys", Enrol).RequireAuthorization().AddEndpointFilter<StateChangeGuard>();
+        api.MapPatch("/me/passkeys/{id}", Rename).RequireAuthorization().AddEndpointFilter<StateChangeGuard>();
+        api.MapDelete("/me/passkeys/{id}", Remove).RequireAuthorization().AddEndpointFilter<StateChangeGuard>();
     }
 
     static async Task<IResult> SignInOptions(

@@ -17,9 +17,7 @@ internal static class AccountEndpoints<TProfile>
     {
         api.MapGet("/me", Me);
         api.MapGet("/me/profile", Profile).RequireAuthorization();
-        api.MapPatch("/me", UpdateProfile)
-            .RequireAuthorization()
-            .AddEndpointFilter<StateChangeGuard>();
+        api.MapPatch("/me", UpdateProfile).RequireAuthorization().AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/sign-in/code", RequestSignInCode).AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/register", Register).AddEndpointFilter<StateChangeGuard>();
         api.MapPost("/sign-in/verify", VerifyCode).AddEndpointFilter<StateChangeGuard>();
