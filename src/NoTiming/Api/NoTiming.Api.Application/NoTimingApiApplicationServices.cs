@@ -6,7 +6,6 @@ using NC.Application.Authentication.User;
 using NC.Storage;
 using NoTiming.Api.Application.Features.Ui.Authorization;
 using NoTiming.Api.Application.Mongo.Repositories;
-using NoTiming.Application.Mongo;
 
 namespace NoTiming.Api.Application;
 
@@ -20,7 +19,6 @@ public static class NoTimingApiApplicationServices
         services.AddPendingSnapshotsMongoStorage(configuration);
         services.AddSingleton<IReceiveSnapshotAccessPolicy, MongoUiReceiveAccessPolicy>();
         services.AddSingleton<IUiReceiveAuthorizer, UiReceiveAuthorizer>();
-        services.AddTransient<IUserRepository, UserMongoRepository>();
         services.TryAddSingleton(TimeProvider.System);
         services.AddHostedService<NoTiming.Api.Application.Event.EventFinalizationJob>();
 
@@ -38,7 +36,6 @@ public static class NoTimingApiApplicationServices
         }
 
         var builder = new NStorageBuilder(services, configuration);
-        NoTimingMongoSerialization.Configure();
         builder.AddMongoStorage(connectionString, Assembly.GetExecutingAssembly());
     }
 }

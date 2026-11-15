@@ -1,0 +1,33 @@
+@using MudBlazor
+@using NC.Blazor.Components.Input
+@using NC.Blazor.Components.Layout
+
+@attribute [Route(NC.Blazor.Client.Authentication.AuthenticationContents.AUTHENTICATION)]
+@inherits SignInContentBehind
+
+<NContent Title="@Sign_in_string" Class="not-mid-width">
+    <Main>
+        <MudStack Spacing="3">
+            @if (!CodeSent)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SignInWithPasskeySafe">@Sign_in_with_passkey_string</MudButton>
+
+                <MudText Typo="Typo.body2">@Or_sign_in_with_code_string</MudText>
+                <NTextField @bind-Value="Email" For="() => Email" Label="@Email_string" Required />
+                <MudButton Variant="Variant.Outlined" OnClick="SendCodeSafe">@Send_me_a_code_string</MudButton>
+                <MudButton Href="/register" Variant="Variant.Text">@Create_an_account_string</MudButton>
+            }
+            else
+            {
+                <MudText>@Enter_six_digit_code_string</MudText>
+                <NTextField @bind-Value="Code" For="() => Code" Label="@Code_string" Required />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="VerifySafe">@Sign_in_string</MudButton>
+            }
+
+            @if (Message != null)
+            {
+                <MudText Color="Color.Error" role="alert">@Message</MudText>
+            }
+        </MudStack>
+    </Main>
+</NContent>

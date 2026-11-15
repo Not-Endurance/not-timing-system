@@ -1,15 +1,16 @@
 using NC.Application.Authentication.User;
+using NoTiming.Application.Contracts.Account;
 
 namespace NoTiming.Ui.Contracts.Features.Profile;
 
 public static class UiProfilePolicy
 {
-    public static bool IsComplete(NUserModel? user)
+    public static bool IsComplete(NUserModel? user, NoTimingProfile? profile)
     {
         return user != null
             && !string.IsNullOrWhiteSpace(user.GivenName)
             && !string.IsNullOrWhiteSpace(user.Surname)
-            && !string.IsNullOrWhiteSpace(user.CountryRegion);
+            && !string.IsNullOrWhiteSpace(profile?.CountryIsoCode);
     }
 
     public static bool IsComplete(UiProfileFormModel? model)

@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using NC.Application.HTTP;
 using NC.Application.RPC;
 using NC.Application.RPC.Clients;
-using NC.Application.RPC.SignalR;
+using NC.Blazor.Client.Authentication.Services;
 using NC.Startup;
 using NoTiming.Application.Contracts;
 using NoTiming.Application.Contracts.Core;
@@ -30,19 +31,14 @@ internal sealed class UiDriver : IAsyncDisposable
     readonly IUiAccessContext _accessContext;
     readonly string _clientName;
 
-    public UiDriver(Uri noTimingBaseUrl, IntegrationUser user, string clientName)
+    /// <param name="sessionCookie">
+    /// The signed-in person's session cookie, as <see cref="NoTimingIntegrationFixture.SignInAsync"/> returns it. Null
+    /// makes the driver an anonymous visitor.
+    /// </param>
+    public UiDriver(Uri noTimingBaseUrl, string? sessionCookie, string clientName)
     {
         _clientName = clientName;
-        var configuration = DriverConfiguration.Create(
-            noTimingBaseUrl,
-            ApplicationConstants.WITNESS_HUB,
-            clientName,
-            [
-                new("NClientAuthenticationSettings:ClientId", "integration-client"),
-                new("NClientAuthenticationSettings:Instance", "https://login.microsoftonline.com"),
-                new("NClientAuthenticationSettings:TenantId", "integration-tenant"),
-            ]
-        );
+        var configuration = DriverConfiguration.Create(noTimingBaseUrl, ApplicationConstants.WITNESS_HUB, clientName);
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
@@ -52,8 +48,19 @@ internal sealed class UiDriver : IAsyncDisposable
             noTimingBaseUrl.ToString().TrimEnd('/'),
             typeof(NoTimingUiApplicationServices).Assembly
         );
-        services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, IntegrationRpcAccessTokenProvider>());
-        services.AddScoped<AuthenticationStateProvider>(_ => new IntegrationAuthenticationStateProvider(user));
+        // The browser's signed-in state, read from the server's profile route with the same provider the Ui uses.
+        services.AddScoped<AuthenticationStateProvider, SessionAuthenticationStateProvider>();
+        if (sessionCookie != null)
+        {
+            services
+                .AddHttpClient(nameof(NHttpClient))
+                .AddHttpMessageHandler(() => new SessionCookieHandler(sessionCookie));
+            services.Replace(
+                ServiceDescriptor.Scoped<IRpcSocket>(provider =>
+                    ActivatorUtilities.CreateInstance<SessionCookieSocket>(provider, noTimingBaseUrl, sessionCookie)
+                )
+            );
+        }
 
         _provider = services.BuildServiceProvider();
         _socketService = _provider.GetRequiredService<INoTimingSocketService>();

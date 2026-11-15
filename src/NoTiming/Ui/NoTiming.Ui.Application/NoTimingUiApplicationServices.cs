@@ -1,13 +1,16 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http;
 using NC.Application.Authentication.Abstractions;
+using NC.Application.HTTP;
 using NC.Application.RPC;
 using NC.Application.RPC.SignalR;
 using NC.Blazor.Client;
 using NC.Krud.ServiceRegistration;
 using NoTiming.Application;
 using NoTiming.Shared;
+using NoTiming.Ui.Application.Features.Account;
 using NoTiming.Ui.Application.Features.Profile;
 using NoTiming.Ui.Application.Features.Socket;
 using NoTiming.Ui.Application.Storage.Repositories;
@@ -24,8 +27,7 @@ public static class NoTimingUiApplicationServices
     )
     {
         services.ConfigureKrud();
-        services.AddScoped<IRpcAccessTokenProvider, NoTimingClientRpcAccessTokenProvider>();
-        services.AddScoped<IUiAuthenticationRedirector, UiAuthenticationRedirector>();
+        services.AddScoped<IRpcAccessTokenProvider, CookieRpcAccessTokenProvider>();
         services.AddTransient<IUserRegister, UiUserApiRepository>();
         services.AddTransient<IUiUserProfileRepository, UiUserApiRepository>();
         services
@@ -36,6 +38,10 @@ public static class NoTimingUiApplicationServices
             .AddDomainEvents()
             .AddHttp(settings => settings.Host = baseUrl)
             .AddUserSessions();
+
+        // Every write the Ui makes carries the header the server's state-change guard requires.
+        services.AddTransient<UiRequestGuardHandler>();
+        services.AddHttpClient(nameof(NHttpClient)).AddHttpMessageHandler<UiRequestGuardHandler>();
 
         // Deployed builds leave RpcSettings.Host empty and call the origin the UI is served from.
         services.PostConfigure<RpcSettings>(settings =>

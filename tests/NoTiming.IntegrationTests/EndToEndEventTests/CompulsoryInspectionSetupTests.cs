@@ -31,7 +31,7 @@ public sealed class CompulsoryInspectionSetupTests
     {
         const int eventId = 260521001;
         var setupEvent = CreateSetupEvent(eventId);
-        using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
+        using var api = new NoTimingApiDriver(_fixture);
 
         await api.CreateSetupConfigureEvent(setupEvent);
 

@@ -1,0 +1,56 @@
+@using MudBlazor
+@using NC.Blazor.Components.Input
+@using NC.Blazor.Components.Layout
+
+@attribute [Route("passkeys")]
+@inherits PasskeysContentBehind
+
+<NContent Title="@Passkeys_string" Class="not-mid-width">
+    <Main>
+        <MudStack Spacing="3">
+            @if (NotSignedIn)
+            {
+                <MudText>@Sign_in_to_manage_passkeys_string</MudText>
+                <MudButton Href="/authentication" Variant="Variant.Filled" Color="Color.Primary">@Sign_in_string</MudButton>
+            }
+            else
+            {
+                <MudText Typo="Typo.body2">
+                    @Passkey_explanation_string
+                </MudText>
+
+                @foreach (var passkey in Passkeys)
+                {
+                    <MudPaper Class="pa-3">
+                        <MudStack Spacing="2">
+                            @if (Renaming == passkey.Id)
+                            {
+                                <NTextField @bind-Value="NewName" For="() => NewName" Label="@Name_string" Required />
+                                <MudStack Row Spacing="2">
+                                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => RenameSafe(passkey.Id)">@Save_string</MudButton>
+                                    <MudButton Variant="Variant.Text" OnClick="CancelRename">@Cancel_string</MudButton>
+                                </MudStack>
+                            }
+                            else
+                            {
+                                <MudText><strong>@passkey.Name</strong> — @string.Format(Added_on_string, passkey.CreatedAt.ToString("yyyy-MM-dd"))</MudText>
+                                <MudStack Row Spacing="2">
+                                    <MudButton Variant="Variant.Text" OnClick="() => StartRename(passkey)">@Rename_string</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="() => RemoveSafe(passkey.Id)">@Remove_string</MudButton>
+                                </MudStack>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                }
+
+                <NTextField @bind-Value="NewPasskeyName" For="() => NewPasskeyName" Label="@Name_for_new_passkey_string" />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddPasskeySafe">@Add_passkey_to_device_string</MudButton>
+            }
+
+            @if (Message != null)
+            {
+                <MudText Color="Color.Error" role="alert">@Message</MudText>
+            }
+        </MudStack>
+    </Main>
+</NContent>

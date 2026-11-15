@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NC.Localization;
@@ -11,4 +12,8 @@ public static class NoTimingCommonServices
     {
         return services.AddNLocalization<LocalizedStrings>(configuration);
     }
+
+    /// <summary>The languages the packaged resources have, read from the resource files themselves. English is the default.</summary>
+    public static IReadOnlyList<string> SupportedLanguages { get; } =
+        ResourceCultures.Discover(typeof(LocalizedStrings).Assembly, typeof(LocalizedStrings).FullName!, "en");
 }

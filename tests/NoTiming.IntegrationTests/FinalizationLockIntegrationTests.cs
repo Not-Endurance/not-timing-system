@@ -20,7 +20,7 @@ public sealed class FinalizationLockIntegrationTests : IClassFixture<NoTimingInt
     public async Task Create_WhenEventIsFinalized_ShouldRefuseNewOfficial()
     {
         const int eventId = 1801;
-        using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
+        using var api = new NoTimingApiDriver(_fixture);
         await api.Create(CreateEvent(eventId, isFinalized: true));
 
         var exception = await Assert.ThrowsAnyAsync<Exception>(
@@ -34,7 +34,7 @@ public sealed class FinalizationLockIntegrationTests : IClassFixture<NoTimingInt
     public async Task Create_WhenEventIsNotFinalized_ShouldAcceptNewOfficial()
     {
         const int eventId = 1802;
-        using var api = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
+        using var api = new NoTimingApiDriver(_fixture);
         await api.Create(CreateEvent(eventId, isFinalized: false));
 
         await api.Create(IntegrationPayloadFactory.Official(eventId, null));

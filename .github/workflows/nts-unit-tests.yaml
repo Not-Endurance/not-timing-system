@@ -23,6 +23,7 @@ jobs:
       - name: Run unit tests
         run: |
           dotnet test nugets/NC.Tests/NC.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
+          dotnet test tests/NC.Server.Tests/NC.Server.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
           dotnet test tests/NoTiming.Application.Tests/NoTiming.Application.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
           dotnet test tests/NoTiming.Domain.Core.Tests/NoTiming.Domain.Core.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m
           dotnet test tests/NoTiming.Domain.Setup.Tests/NoTiming.Domain.Setup.Tests.csproj --configuration ${{ env.CONFIGURATION }} -v:m

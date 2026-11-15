@@ -36,7 +36,7 @@ public sealed class CoreFeatureEndToEndTests
     {
         var snapshot = EndToEndEventSnapshot.Load(snapshotName);
         await using var judge = new JudgeDriver(_fixture.NoTimingBaseUrl);
-        using var noTimingApi = new NoTimingApiDriver(_fixture.NoTimingBaseUrl);
+        using var noTimingApi = new NoTimingApiDriver(_fixture);
         var configureEvent = new ConfigureEventFeature(judge, noTimingApi);
         var startEvent = new StartCoreEventFeature(judge, noTimingApi);
 
@@ -60,7 +60,7 @@ public sealed class CoreFeatureEndToEndTests
 
         await using var ui = new UiDriver(
             _fixture.NoTimingBaseUrl,
-            setup.UiOperator,
+            await _fixture.SignInAsync(setup.UiOperator),
             $"CoreEndToEndOperatorUi-{snapshot.Name}"
         );
         await ui.Start();

@@ -1,6 +1,6 @@
 ## Context
 - Primary sln file is src/not-timing-system.sln (production code only)
-- Test solution is tests/NoTiming.Tests.sln (unit test projects, Integration tests, NC.Tests)
+- Test solution is tests/NoTiming.Tests.sln (unit test projects, Integration tests, NC.Tests, NC.Server.Tests)
 
 ## Rules
 1. Don't execute commands that would create, delete or modify files outside of this working directory. Exceptions of this rule are commands which could cause side effects scoped to the utility that owns the command:
@@ -10,6 +10,11 @@
 3. Run dotnet `test` with minimal output `-v:m`.
 4. Domain logic is unit tested in the test project that mirrors its source project (for example NoTiming.Domain.Core.Tests and NoTiming.Domain.Setup.Tests). See Testing below.
 5. Don't concern yourself with code formatting. CSharpier formats code via CI, so don't run or check formatting locally.
+6. One top-level type per file, and the file is named after the type. A file may hold more than one type only when:
+   - the types share the same name, such as partial classes;
+   - a class and its I-prefixed interface share a name, and the interface is a simple abstraction that exists mainly for mocking; or
+   - the other classes are defined inside the main class as its subclasses.
+   Group related files in a directory named after the feature (for example `Codes/` or `Sessions/`) instead of putting several types in one large file.
 
 ## Verification
 - After individual atomic changes build and run the unit test project that mirrors the changed source project, for example `dotnet build tests/NoTiming.Tests.sln -v:q` followed by `dotnet test tests/NoTiming.Domain.Core.Tests/NoTiming.Domain.Core.Tests.csproj -v:m`.
@@ -47,4 +52,4 @@ GitHub Issues in `Not-Endurance/not-timing-system`, managed with the `gh` CLI. S
 
 ### Domain docs
 
-Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root, created lazily. See `docs/agents/domain.md`.
+Single-context: one `CONTEXT.md` (the glossary) and `docs/adr/` at the repo root, created lazily. Architecture is in `docs/architecture.md`. See `docs/agents/domain.md`.

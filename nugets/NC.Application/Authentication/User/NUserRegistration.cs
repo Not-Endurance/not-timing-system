@@ -7,20 +7,14 @@ public record NUserRegistration
         string? name = null,
         string? givenName = null,
         string? surname = null,
-        string? countryRegion = null,
         string? middleName = null,
-        string? club = null,
-        string? feiId = null,
         string? displayName = null
     )
     {
         Email = email;
         GivenName = Normalize(givenName);
         Surname = Normalize(surname);
-        CountryRegion = Normalize(countryRegion);
         MiddleName = Normalize(middleName);
-        Club = Normalize(club);
-        FeiId = Normalize(feiId);
         DisplayName = Normalize(displayName);
         Name = BuildName(GivenName, MiddleName, Surname) ?? Normalize(name);
     }
@@ -30,10 +24,7 @@ public record NUserRegistration
     public string? DisplayName { get; }
     public string? GivenName { get; }
     public string? Surname { get; }
-    public string? CountryRegion { get; }
     public string? MiddleName { get; }
-    public string? Club { get; }
-    public string? FeiId { get; }
 
     static string? BuildName(params string?[] parts)
     {

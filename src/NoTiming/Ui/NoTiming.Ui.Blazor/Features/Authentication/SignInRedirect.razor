@@ -1,0 +1,10 @@
+@using NC.Blazor.Client.Authentication
+@inject NavigationManager Navigator
+
+@code {
+    // A page that needs a session sends an anonymous visitor to the sign-in page, without showing the page first.
+    protected override void OnInitialized()
+    {
+        Navigator.NavigateTo(AuthenticationContents.AUTHENTICATION, replace: true);
+    }
+}

@@ -1,10 +1,12 @@
-using System.Security.Claims;
 using Microsoft.Extensions.Localization;
 using NC.Application.Configurations;
 using NC.Application.Environments;
 using NC.Localization;
+using NC.Server.Authentication;
+using NC.Server.Authentication.Interface;
 using NC.Startup;
 using NoTiming.Application.Contracts;
+using NoTiming.Application.Contracts.Account;
 using NoTiming.ConnectionDiagnostics;
 using NoTiming.EventBus;
 using NoTiming.EventBus.ConnectionDiagnostics;
@@ -51,6 +53,7 @@ public static class NoTimingHost
             string.Join(", ", app.Urls)
         );
 
+        app.UseForwardedHeaders();
         app.UseMiddleware<ConnectionDiagnosticsMiddleware>();
         app.Use(
             async (context, next) =>
@@ -93,24 +96,6 @@ public static class NoTimingHost
 
         app.UseCors(NoTimingServices.CORS_POLICY_NAME);
         app.UseAuthentication();
-        if (IsIntegrationAuthEnabled())
-        {
-            app.Use(
-                async (context, next) =>
-                {
-                    if (context.User?.Identity?.IsAuthenticated != true)
-                    {
-                        var principal = CreateIntegrationPrincipal(context);
-                        if (principal != null)
-                        {
-                            context.User = principal;
-                        }
-                    }
-
-                    await next();
-                }
-            );
-        }
         app.UseAuthorization();
 
         app.MapGet(
@@ -128,6 +113,7 @@ public static class NoTimingHost
                 )
         );
         app.MapNoTimingEventBus(NoTimingServices.CORS_POLICY_NAME);
+        app.MapNoTimingAuthentication<NoTimingProfile>();
         app.MapControllers();
 
         LocalizationHelper.Configure(app.Services.GetRequiredService<IStringLocalizer>());
@@ -138,48 +124,5 @@ public static class NoTimingHost
         }
 
         app.Run();
-    }
-
-    static bool IsIntegrationAuthEnabled()
-    {
-        return string.Equals(
-            Environment.GetEnvironmentVariable("NTS_INTEGRATION_AUTH"),
-            "true",
-            StringComparison.OrdinalIgnoreCase
-        );
-    }
-
-    static ClaimsPrincipal? CreateIntegrationPrincipal(HttpContext context)
-    {
-        var token = context.Request.Query["access_token"].ToString();
-        if (string.IsNullOrWhiteSpace(token))
-        {
-            var authorization = context.Request.Headers.Authorization.ToString();
-            const string bearer = "Bearer ";
-            if (authorization.StartsWith(bearer, StringComparison.OrdinalIgnoreCase))
-            {
-                token = authorization[bearer.Length..];
-            }
-        }
-
-        if (!token.StartsWith("integration|", StringComparison.Ordinal))
-        {
-            return null;
-        }
-
-        var parts = token.Split('|', 4);
-        if (parts.Length < 3 || string.IsNullOrWhiteSpace(parts[1]))
-        {
-            return null;
-        }
-
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.Email, parts[1]),
-            new("email", parts[1]),
-            new("name", string.IsNullOrWhiteSpace(parts[2]) ? parts[1] : parts[2]),
-            new("scp", parts.Length == 4 && !string.IsNullOrWhiteSpace(parts[3]) ? parts[3] : "nts-client-scope"),
-        };
-        return new ClaimsPrincipal(new ClaimsIdentity(claims, "IntegrationTest"));
     }
 }

@@ -57,7 +57,7 @@ internal class ConfigureEventFeature
                     user.GivenName,
                     user.MiddleName,
                     user.Surname,
-                    user.CountryRegion,
+                    user.CountryIsoCode,
                     user.Club,
                     user.FeiId,
                     user.DisplayName
@@ -71,9 +71,9 @@ internal class ConfigureEventFeature
                 registered.GivenName,
                 registered.MiddleName,
                 registered.Surname,
-                registered.CountryRegion,
-                registered.Club,
-                registered.FeiId,
+                registered.Profile.CountryIsoCode,
+                registered.Profile.Club,
+                registered.Profile.FeiId,
                 registered.DisplayName
             );
             Remember(idMap, user.Id, created.Id);
@@ -399,7 +399,7 @@ internal class ConfigureEventFeature
             user.GivenName,
             user.MiddleName,
             user.Surname,
-            user.CountryRegion,
+            user.CountryIsoCode,
             user.Club,
             user.FeiId,
             user.DisplayName
@@ -421,7 +421,7 @@ internal class ConfigureEventFeature
             user.GivenName,
             user.MiddleName,
             user.Surname,
-            user.CountryRegion,
+            user.CountryIsoCode,
             user.Club,
             user.FeiId,
             user.DisplayName

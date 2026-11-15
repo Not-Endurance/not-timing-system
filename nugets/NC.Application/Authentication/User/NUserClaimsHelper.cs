@@ -7,36 +7,19 @@ public static class NUserClaimsHelper
 {
     public static NUserRegistration? ResolveRegistration(ClaimsPrincipal? principal)
     {
-        return ResolveRegistration(principal, null);
-    }
-
-    public static NUserRegistration? ResolveRegistration(ClaimsPrincipal? principal, NUserRegistrationProfile? profile)
-    {
         var email = ResolveEmail(principal);
         if (string.IsNullOrWhiteSpace(email))
         {
             return null;
         }
 
-        var givenName = profile?.GivenName ?? ResolveGivenName(principal);
-        var middleName = profile?.MiddleName ?? ResolveMiddleName(principal);
-        var surname = profile?.Surname ?? ResolveSurname(principal);
-        var club = profile?.Club ?? ResolveClub(principal);
-        var feiId = profile?.FeiId ?? ResolveFeiId(principal);
-        var displayName = profile?.DisplayName ?? ResolveDisplayName(principal);
+        var givenName = ResolveGivenName(principal);
+        var middleName = ResolveMiddleName(principal);
+        var surname = ResolveSurname(principal);
+        var displayName = ResolveDisplayName(principal);
         var name = ResolveName(givenName, middleName, surname);
 
-        return new NUserRegistration(
-            email,
-            name,
-            givenName,
-            surname,
-            ResolveCountryRegion(principal),
-            middleName,
-            club,
-            feiId,
-            displayName
-        );
+        return new NUserRegistration(email, name, givenName, surname, middleName, displayName);
     }
 
     public static string? ResolveUserIdentifier(ClaimsPrincipal? principal)
@@ -108,23 +91,6 @@ public static class NUserClaimsHelper
     public static string? ResolveMiddleName(ClaimsPrincipal? principal)
     {
         return ResolveClaimValue(principal, "middle_name", "middleName", "middle");
-    }
-
-    public static string? ResolveCountryRegion(ClaimsPrincipal? principal)
-    {
-        return ResolveClaimValue(principal, ClaimTypes.Country, "country", "country_region", "country/region", "ctry");
-    }
-
-    public static string? ResolveClub(ClaimsPrincipal? principal)
-    {
-        return ResolveClaimValue(principal, "club", "club_name", "clubName")
-            ?? ResolveClaimValueBySuffix(principal, "club", "club_name", "clubName");
-    }
-
-    public static string? ResolveFeiId(ClaimsPrincipal? principal)
-    {
-        return ResolveClaimValue(principal, "feiId", "fei_id", "feiid", "FeiId")
-            ?? ResolveClaimValueBySuffix(principal, "feiId", "fei_id", "feiid");
     }
 
     static string? ResolveName(string? givenName, string? middleName, string? surname)
