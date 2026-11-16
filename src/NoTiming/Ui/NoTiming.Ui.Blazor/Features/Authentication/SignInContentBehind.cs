@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using NC.Blazor.Client.Authentication.Services;
 using MudBlazor;
+using NC.Blazor.Client.Authentication.Services;
 using NC.Blazor.Components.Abstractions;
 using NoTiming.Ui.Contracts.Features.Account;
 

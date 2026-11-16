@@ -371,7 +371,11 @@ internal sealed class IdentityUserRepository
     /// passkey finds nothing. The stamp moves, so a change based on the array from before the removal starts again
     /// instead of putting the passkey back.
     /// </summary>
-    public async Task<bool> RemovePasskey(int userId, byte[] credentialId, CancellationToken cancellationToken = default)
+    public async Task<bool> RemovePasskey(
+        int userId,
+        byte[] credentialId,
+        CancellationToken cancellationToken = default
+    )
     {
         var result = await _users.UpdateOneAsync(
             Builders<IdentityUserDocument>.Filter.And(

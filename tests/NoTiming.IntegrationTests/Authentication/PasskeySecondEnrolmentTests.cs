@@ -54,7 +54,11 @@ public sealed class PasskeySecondEnrolmentTests : IClassFixture<NoTimingIntegrat
         var options = await _client.PasskeyEnrolOptionsAsync(cookie);
         var credential = authenticator.Register(await options.Content.ReadAsStringAsync(), _origin, RelyingPartyId);
 
-        var enrolled = await _client.EnrolPasskeyAsync(Join(cookie, AccountClient.CookiesOf(options)), name, credential);
+        var enrolled = await _client.EnrolPasskeyAsync(
+            Join(cookie, AccountClient.CookiesOf(options)),
+            name,
+            credential
+        );
 
         Assert.Equal(HttpStatusCode.Created, enrolled.StatusCode);
     }
