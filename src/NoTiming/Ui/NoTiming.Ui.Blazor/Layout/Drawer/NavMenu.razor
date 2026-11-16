@@ -1,3 +1,4 @@
+@using NC.Blazor.Client.Authentication
 @using NC.Blazor.Components.Layout
 
 @inherits NavMenuBehind
@@ -37,6 +38,7 @@
         else
         {
             <NHeadline3 Content="@Welcome_string" />
+            <MudButton Href="@AuthenticationContents.AUTHENTICATION" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mt-2">@Sign_in_string</MudButton>
         }
     </MudDrawerHeader>
     

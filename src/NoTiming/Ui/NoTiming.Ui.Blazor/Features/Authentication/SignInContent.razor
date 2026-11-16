@@ -15,7 +15,7 @@
                 <MudText Typo="Typo.body2">@Or_sign_in_with_code_string</MudText>
                 <NTextField @bind-Value="Email" For="() => Email" Label="@Email_string" Required />
                 <MudButton Variant="Variant.Outlined" OnClick="SendCodeSafe">@Send_me_a_code_string</MudButton>
-                <MudButton Href="/register" Variant="Variant.Text">@Create_an_account_string</MudButton>
+                <MudButton Href="register" Variant="Variant.Text">@Create_an_account_string</MudButton>
             }
             else
             {
