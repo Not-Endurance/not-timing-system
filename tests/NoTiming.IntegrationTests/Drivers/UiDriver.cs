@@ -25,6 +25,13 @@ namespace NoTiming.IntegrationTests.Drivers;
 
 internal sealed class UiDriver : IAsyncDisposable
 {
+    // The hosts a deployed Ui leaves unset, so the Ui works out the origin it calls from its own address.
+    static readonly IEnumerable<KeyValuePair<string, string?>> UnpinnedHosts =
+    [
+        new($"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}", null),
+        new($"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}", null),
+    ];
+
     readonly ServiceProvider _provider;
     readonly INoTimingSocketService _socketService;
     readonly IParticipationContext _participationContext;
@@ -35,17 +42,27 @@ internal sealed class UiDriver : IAsyncDisposable
     /// The signed-in person's session cookie, as <see cref="NoTimingIntegrationFixture.SignInAsync"/> returns it. Null
     /// makes the driver an anonymous visitor.
     /// </param>
-    public UiDriver(Uri noTimingBaseUrl, string? sessionCookie, string clientName)
+    /// <param name="uiBaseAddress">
+    /// The address the Ui is served from when it is not the host, for example <c>https://host/ui/</c>. A deployed Ui sets no
+    /// host in its configuration, so the driver sets none either and the Ui calls the origin it is served from. Null makes
+    /// the host the Ui's address too.
+    /// </param>
+    public UiDriver(Uri noTimingBaseUrl, string? sessionCookie, string clientName, Uri? uiBaseAddress = null)
     {
         _clientName = clientName;
-        var configuration = DriverConfiguration.Create(noTimingBaseUrl, ApplicationConstants.WITNESS_HUB, clientName);
+        var configuration = DriverConfiguration.Create(
+            noTimingBaseUrl,
+            ApplicationConstants.WITNESS_HUB,
+            clientName,
+            uiBaseAddress == null ? null : UnpinnedHosts
+        );
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
         services.ConfigureNoTimingStorage(configuration).AddRestApiStorage();
         services.AddNoTimingUiApplication(
             configuration,
-            noTimingBaseUrl.ToString().TrimEnd('/'),
+            (uiBaseAddress ?? noTimingBaseUrl).ToString().TrimEnd('/'),
             typeof(NoTimingUiApplicationServices).Assembly
         );
         // The browser's signed-in state, read from the server's profile route with the same provider the Ui uses.
