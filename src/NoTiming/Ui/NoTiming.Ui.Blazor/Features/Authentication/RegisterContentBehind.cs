@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using MudBlazor;
 using NC.Blazor.Client.Authentication.Services;
 using NC.Blazor.Components.Abstractions;
 using NoTiming.Application.Contracts.Account;
@@ -16,6 +18,15 @@ public class RegisterContentBehind : NComponent
 
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
+
+    [Inject]
+    IUiPasskeyService Passkeys { get; set; } = default!;
+
+    [Inject]
+    IJSRuntime JavaScript { get; set; } = default!;
+
+    [Inject]
+    IDialogService DialogService { get; set; } = default!;
 
     protected string Email { get; set; } = string.Empty;
 
@@ -67,11 +78,24 @@ public class RegisterContentBehind : NComponent
         {
             await Account.VerifyCodeAsync(Email, Code);
             Session.Refresh();
+            await OfferPasskeyAsync();
             Navigator.NavigateTo("/");
         }
         catch (Exception ex) when (AccountMessages.For(ex) is { } message)
         {
             Message = message;
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    async Task OfferPasskeyAsync()
+    {
+        try
+        {
+            await PasskeyPrompt.OfferIfNoneAsync(Passkeys, JavaScript, DialogService);
         }
         catch (Exception ex)
         {

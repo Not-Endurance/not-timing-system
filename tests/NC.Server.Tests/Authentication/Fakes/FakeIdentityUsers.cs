@@ -113,38 +113,27 @@ internal sealed class FakeIdentityUsers : IIdentityUserRepository
         return Task.CompletedTask;
     }
 
-    public Task<IList<UserPasskeyInfo>> GetPasskeysAsync(IdentityUserDocument user, CancellationToken cancellationToken)
+    public Task SetPasskeyLastUsed(
+        IdentityUserDocument user,
+        byte[] credentialId,
+        DateTimeOffset usedAt,
+        CancellationToken cancellationToken
+    )
     {
-        IList<UserPasskeyInfo> passkeys = (user.Passkeys ?? [])
-            .Select(x => new UserPasskeyInfo(
-                x.CredentialId,
-                x.PublicKey,
-                new DateTimeOffset(x.CreatedAtUtc, TimeSpan.Zero),
-                0,
-                [],
-                true,
-                false,
-                false,
-                [],
-                []
-            )
-            {
-                Name = x.Name,
-            })
-            .ToList();
-        return Task.FromResult(passkeys);
+        var passkey = user.Passkeys?.Find(x => x.CredentialId.AsSpan().SequenceEqual(credentialId));
+        if (passkey is not null)
+        {
+            passkey.LastUsedAtUtc = usedAt.UtcDateTime;
+        }
+
+        return Task.CompletedTask;
     }
 
-    public Task<bool> RemovePasskeyKeepingAtLeast(
-        int userId,
-        byte[] credentialId,
-        int minimumRemaining,
-        CancellationToken cancellationToken = default
-    )
+    public Task<bool> RemovePasskey(int userId, byte[] credentialId, CancellationToken cancellationToken = default)
     {
         var passkeys = _stored[userId].Passkeys ?? [];
         var index = passkeys.FindIndex(x => x.CredentialId.AsSpan().SequenceEqual(credentialId));
-        if (index < 0 || passkeys.Count - 1 < minimumRemaining)
+        if (index < 0)
         {
             return Task.FromResult(false);
         }
@@ -194,6 +183,7 @@ internal sealed class FakeIdentityUsers : IIdentityUserRepository
                     PublicKey = x.PublicKey,
                     Name = x.Name,
                     CreatedAtUtc = x.CreatedAtUtc,
+                    LastUsedAtUtc = x.LastUsedAtUtc,
                 })
                 .ToList(),
         };

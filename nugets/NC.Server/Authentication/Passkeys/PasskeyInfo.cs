@@ -8,4 +8,7 @@ public sealed class PasskeyInfo
     public string? Name { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
+
+    /// <summary>When the passkey last signed the user in. Null while it has never been used to sign in.</summary>
+    public DateTimeOffset? LastUsedAt { get; init; }
 }

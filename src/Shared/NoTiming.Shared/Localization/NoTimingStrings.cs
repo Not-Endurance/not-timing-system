@@ -119,8 +119,8 @@ namespace NoTiming.Shared.Localization
             );
         public static string This_action_is_final_There_is_no_recovery_string =>
             LocalizeString(nameof(This_action_is_final_There_is_no_recovery_string));
-        public static string Type_1337_to_enable_confirmation_string =>
-            LocalizeString(nameof(Type_1337_to_enable_confirmation_string));
+        public static string Type_phrase_to_enable_string => LocalizeString(nameof(Type_phrase_to_enable_string));
+        public static string I_understand_string => LocalizeString(nameof(I_understand_string));
         public static string Confirmation_code_string => LocalizeString(nameof(Confirmation_code_string));
         public static string Setup_configuration_will_not_be_deleted_string =>
             LocalizeString(nameof(Setup_configuration_will_not_be_deleted_string));
@@ -387,12 +387,23 @@ namespace NoTiming.Shared.Localization
         public static string Rename_string => LocalizeString(nameof(Rename_string));
         public static string Remove_string => LocalizeString(nameof(Remove_string));
         public static string Added_on_string => LocalizeString(nameof(Added_on_string));
-        public static string Name_for_new_passkey_string => LocalizeString(nameof(Name_for_new_passkey_string));
+        public static string Description_string => LocalizeString(nameof(Description_string));
+        public static string Description_hint_string => LocalizeString(nameof(Description_hint_string));
+        public static string Description_required_string => LocalizeString(nameof(Description_required_string));
         public static string Add_passkey_to_device_string => LocalizeString(nameof(Add_passkey_to_device_string));
         public static string Browser_cannot_use_passkeys_string =>
             LocalizeString(nameof(Browser_cannot_use_passkeys_string));
         public static string Passkey_not_added_string => LocalizeString(nameof(Passkey_not_added_string));
-        public static string Last_passkey_string => LocalizeString(nameof(Last_passkey_string));
+        public static string Sign_in_faster_next_time_string => LocalizeString(nameof(Sign_in_faster_next_time_string));
+        public static string Passkey_prompt_string => LocalizeString(nameof(Passkey_prompt_string));
+        public static string Not_now_string => LocalizeString(nameof(Not_now_string));
+        public static string Passkey_device_question_string => LocalizeString(nameof(Passkey_device_question_string));
+        public static string Passkey_shared_device_warning_string =>
+            LocalizeString(nameof(Passkey_shared_device_warning_string));
+        public static string Last_used_string => LocalizeString(nameof(Last_used_string));
+        public static string Never_used_string => LocalizeString(nameof(Never_used_string));
+        public static string Remove_passkey_confirmation_string =>
+            LocalizeString(nameof(Remove_passkey_confirmation_string));
     }
 }
 #pragma warning restore NA0004

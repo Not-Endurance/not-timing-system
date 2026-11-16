@@ -1,7 +1,9 @@
-using System.Net;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using MudBlazor;
 using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Dialogs;
+using NC.Blazor.Helpers;
 using NoTiming.Ui.Contracts.Features.Account;
 
 namespace NoTiming.Ui.Blazor.Features.Authentication;
@@ -13,6 +15,9 @@ public class PasskeysContentBehind : NComponent
 
     [Inject]
     IJSRuntime JavaScript { get; set; } = default!;
+
+    [Inject]
+    IDialogService DialogService { get; set; } = default!;
 
     protected IReadOnlyList<UiPasskey> Passkeys { get; private set; } = [];
 
@@ -34,28 +39,32 @@ public class PasskeysContentBehind : NComponent
     protected async Task AddPasskeySafe()
     {
         Message = null;
+        var description = NewPasskeyName.Trim();
+        if (description.Length == 0)
+        {
+            Message = Description_required_string;
+            return;
+        }
+
         try
         {
-            if (!await PasskeyCeremony.IsSupportedAsync(JavaScript))
+            var outcome = await PasskeyCreation.CreateAsync(PasskeyService, JavaScript, DialogService, description);
+            switch (outcome)
             {
-                Message = Browser_cannot_use_passkeys_string;
-                return;
+                case PasskeyCreationOutcome.Created:
+                    NewPasskeyName = string.Empty;
+                    await LoadSafe();
+                    break;
+                case PasskeyCreationOutcome.Unsupported:
+                    Message = Browser_cannot_use_passkeys_string;
+                    break;
+                case PasskeyCreationOutcome.Cancelled:
+                    Message = Passkey_not_added_string;
+                    break;
+                case PasskeyCreationOutcome.NotSignedIn:
+                    NotSignedIn = true;
+                    break;
             }
-
-            var options = await PasskeyService.EnrolOptionsAsync();
-            var credential = await PasskeyCeremony.CreateAsync(JavaScript, options);
-            var name = string.IsNullOrWhiteSpace(NewPasskeyName) ? null : NewPasskeyName.Trim();
-            await PasskeyService.EnrolAsync(credential, name);
-            NewPasskeyName = string.Empty;
-            await LoadSafe();
-        }
-        catch (JSException)
-        {
-            Message = Passkey_not_added_string;
-        }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            NotSignedIn = true;
         }
         catch (Exception ex)
         {
@@ -77,9 +86,16 @@ public class PasskeysContentBehind : NComponent
     protected async Task RenameSafe(string id)
     {
         Message = null;
+        var description = NewName.Trim();
+        if (description.Length == 0)
+        {
+            Message = Description_required_string;
+            return;
+        }
+
         try
         {
-            await PasskeyService.RenameAsync(id, NewName.Trim());
+            await PasskeyService.RenameAsync(id, description);
             Renaming = null;
             await LoadSafe();
         }
@@ -94,12 +110,19 @@ public class PasskeysContentBehind : NComponent
         Message = null;
         try
         {
+            var parameters = new DialogParameters<NConfirmationDialog>
+            {
+                { x => x.Description, Remove_passkey_confirmation_string },
+                { x => x.ConfirmText, Remove_string },
+            };
+            var dialog = await DialogService.ShowAsync<NConfirmationDialog>(Remove_string, parameters);
+            if (await dialog.IsCanceled())
+            {
+                return;
+            }
+
             await PasskeyService.RemoveAsync(id);
             await LoadSafe();
-        }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Conflict)
-        {
-            Message = Last_passkey_string;
         }
         catch (Exception ex)
         {
@@ -114,7 +137,7 @@ public class PasskeysContentBehind : NComponent
             Passkeys = await PasskeyService.ListAsync();
             NotSignedIn = false;
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized)
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
         {
             NotSignedIn = true;
         }

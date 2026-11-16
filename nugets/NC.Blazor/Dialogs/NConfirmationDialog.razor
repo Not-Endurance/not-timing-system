@@ -1,13 +1,34 @@
 @using NC.Blazor.Components.Buttons
+@using NC.Blazor.Components.Input
 @inherits NConfirmationDialogBehind
 
-<MudDialog >
+<MudDialog>
     <DialogContent>
-        <MudText Typo="Typo.body1">@Description</MudText>
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.body1">@Description</MudText>
+
+            @if (!string.IsNullOrWhiteSpace(Warning))
+            {
+                <MudText Typo="Typo.body1" Color="Color.Error" role="alert">@Warning</MudText>
+            }
+
+            @if (ConfirmationPhrase is not null)
+            {
+                <MudText Typo="Typo.body2">@ConfirmationPrompt</MudText>
+                <NTextField T="string" @bind-Value="TypedPhrase" Label="@ConfirmationPhrase" Immediate="true" />
+            }
+        </MudStack>
     </DialogContent>
 
     <DialogActions>
-        <NButtonDanger Text="@Yes_string" OnClick="ConfirmDialog" />
+        @if (Danger)
+        {
+            <NButtonDanger Text="@(ConfirmText ?? Yes_string)" Disabled="@(!CanConfirm)" OnClick="ConfirmIfAllowed" />
+        }
+        else
+        {
+            <NButtonPrimary Text="@(ConfirmText ?? Yes_string)" Disabled="@(!CanConfirm)" OnClick="ConfirmIfAllowed" />
+        }
 
         <NButtonCancel OnClick="CancelDialog" />
     </DialogActions>

@@ -1,0 +1,23 @@
+@using NC.Blazor.Components.Buttons
+@using NC.Blazor.Components.Input
+@inherits PasskeyPromptDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.body1">@Passkey_prompt_string</MudText>
+
+            <NTextField @bind-Value="Description" For="() => Description" Label="@Description_string" HelperText="@Description_hint_string" Required />
+
+            @if (Message != null)
+            {
+                <MudText Color="Color.Error" role="alert">@Message</MudText>
+            }
+        </MudStack>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonSecondary Text="@Not_now_string" OnClick="CancelDialog" />
+        <NButtonPrimary Text="@Add_passkey_to_device_string" OnClick="CreateSafe" />
+    </DialogActions>
+</MudDialog>

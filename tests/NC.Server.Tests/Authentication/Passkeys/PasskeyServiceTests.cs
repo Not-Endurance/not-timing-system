@@ -68,15 +68,15 @@ public sealed class PasskeyServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task Remove_WhenItIsTheLastPasskey_ShouldRefuseAndKeepIt()
+    public async Task Remove_WhenItIsTheLastPasskey_ShouldRemoveIt()
     {
         var users = new FakeIdentityUsers(UserWithPasskeys(7, Credential));
         var service = CreateService(users);
 
         var outcome = await service.Remove(7, Credential, CancellationToken.None);
 
-        Assert.Equal(PasskeyOutcomeKind.LastPasskey, outcome.Kind);
-        Assert.Single(users.Stored(7).Passkeys!);
+        Assert.Equal(PasskeyOutcomeKind.Done, outcome.Kind);
+        Assert.Empty(users.Stored(7).Passkeys!);
     }
 
     [Fact]
@@ -130,9 +130,37 @@ public sealed class PasskeyServiceTests : IDisposable
         Assert.Equal("Phone", Assert.Single(users.Stored(7).Passkeys!).Name);
     }
 
-    static PasskeyService CreateService(FakeIdentityUsers users, UserPasskeyInfo? attestation = null)
+    [Fact]
+    public async Task VerifySignIn_WhenThePasskeyIsAccepted_ShouldRecordItsLastUse()
     {
-        var ceremony = new FakePasskeyCeremony { Attestation = attestation };
+        var users = new FakeIdentityUsers(UserWithPasskeys(7, Credential));
+        var assertion = new PasskeyAssertion { User = UserWithPasskeys(7, Credential), Passkey = Passkey(Credential) };
+        var service = CreateService(users, assertion: assertion);
+
+        await service.VerifySignIn("{}", CancellationToken.None);
+
+        var listed = await service.List(7, CancellationToken.None);
+        Assert.Equal(Now, Assert.Single(listed).LastUsedAt);
+    }
+
+    [Fact]
+    public async Task List_WhenThePasskeyWasNeverUsed_ShouldLeaveLastUseEmpty()
+    {
+        var users = new FakeIdentityUsers(UserWithPasskeys(7, Credential));
+        var service = CreateService(users);
+
+        var listed = await service.List(7, CancellationToken.None);
+
+        Assert.Null(Assert.Single(listed).LastUsedAt);
+    }
+
+    static PasskeyService CreateService(
+        FakeIdentityUsers users,
+        UserPasskeyInfo? attestation = null,
+        PasskeyAssertion? assertion = null
+    )
+    {
+        var ceremony = new FakePasskeyCeremony { Attestation = attestation, Assertion = assertion };
         return new PasskeyService(
             ceremony,
             users,

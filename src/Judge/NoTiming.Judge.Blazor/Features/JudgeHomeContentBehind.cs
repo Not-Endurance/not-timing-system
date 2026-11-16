@@ -1,5 +1,6 @@
 using MudBlazor;
 using NC.Blazor.Components.Abstractions;
+using NC.Blazor.Dialogs;
 using NC.Blazor.Helpers;
 using NC.Domain.Exceptions;
 using NoTiming.Application.Contracts.Core;
@@ -94,7 +95,10 @@ public class JudgeHomeContentBehind : NStatefulComponent
 
         try
         {
-            var dialog = await DialogService.ShowAsync<ResetEventDialog>();
+            var dialog = await DialogService.ShowAsync<NConfirmationDialog>(
+                Hard_reset_string,
+                HardResetConfirmation.Parameters()
+            );
             if (await dialog.IsCanceled())
             {
                 return;

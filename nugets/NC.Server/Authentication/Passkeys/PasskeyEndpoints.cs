@@ -83,6 +83,7 @@ internal static class PasskeyEndpoints<TProfile>
                 Id = Base64Url.EncodeToString(x.CredentialId),
                 Name = x.Name,
                 CreatedAt = x.CreatedAt,
+                LastUsedAt = x.LastUsedAt,
             })
         );
     }
@@ -162,7 +163,6 @@ internal static class PasskeyEndpoints<TProfile>
         {
             PasskeyOutcomeKind.Done => Results.NoContent(),
             PasskeyOutcomeKind.NotFound => Results.NotFound(),
-            PasskeyOutcomeKind.LastPasskey => Results.Conflict(new { error = "last-passkey" }),
             _ => Results.BadRequest(new { error = "passkey-not-removed" }),
         };
     }
@@ -210,5 +210,7 @@ internal static class PasskeyEndpoints<TProfile>
         public string? Name { get; init; }
 
         public DateTimeOffset CreatedAt { get; init; }
+
+        public DateTimeOffset? LastUsedAt { get; init; }
     }
 }
