@@ -22,10 +22,14 @@ public static class NoTimingUiApplicationServices
     public static IServiceCollection AddNoTimingUiApplication(
         this IServiceCollection services,
         IConfiguration configuration,
-        string baseUrl,
+        string uiBaseAddress,
         Assembly rootAssembly
     )
     {
+        // The Ui is served under its own path (/ui/), but the API and the hubs sit at the origin. A call relative to the
+        // Ui's path would reach /ui/api/..., which the Ui answers with its index.html, so every call goes to the origin.
+        var serverOrigin = new Uri(uiBaseAddress).GetLeftPart(UriPartial.Authority);
+
         services.ConfigureKrud();
         services.AddScoped<IRpcAccessTokenProvider, CookieRpcAccessTokenProvider>();
         services.AddTransient<IUserRegister, UiUserApiRepository>();
@@ -36,7 +40,7 @@ public static class NoTimingUiApplicationServices
             .ConfigureN()
             .AddRpcClient()
             .AddDomainEvents()
-            .AddHttp(settings => settings.Host = baseUrl)
+            .AddHttp(settings => settings.Host = serverOrigin)
             .AddUserSessions();
 
         // Every write the Ui makes carries the header the server's state-change guard requires.
@@ -48,7 +52,7 @@ public static class NoTimingUiApplicationServices
         {
             if (string.IsNullOrWhiteSpace(settings.Host))
             {
-                settings.Host = baseUrl.TrimEnd('/');
+                settings.Host = serverOrigin;
             }
         });
 
