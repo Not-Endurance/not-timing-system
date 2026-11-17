@@ -48,7 +48,7 @@ public sealed class PasskeyRemovalConcurrencyTests : IClassFixture<NoTimingInteg
     }
 
     [Fact]
-    public async Task RemovePasskey_WhenTwoPasskeysAreRemovedAtOnce_ShouldKeepOneAndRefuseTheOther()
+    public async Task RemovePasskey_WhenTwoPasskeysAreRemovedAtOnce_ShouldRemoveBoth()
     {
         var email = Address("race-two");
         var cookie = await RegisterAndSignInAsync(_client, _mongo, email);
@@ -63,8 +63,8 @@ public sealed class PasskeyRemovalConcurrencyTests : IClassFixture<NoTimingInteg
         );
 
         var statuses = answers.Select(x => x.StatusCode).OrderBy(x => x).ToArray();
-        Assert.Equal(new[] { HttpStatusCode.NoContent, HttpStatusCode.Conflict }, statuses);
-        Assert.Equal(1, await CountPasskeysAsync(cookie));
+        Assert.Equal(new[] { HttpStatusCode.NoContent, HttpStatusCode.NoContent }, statuses);
+        Assert.Equal(0, await CountPasskeysAsync(cookie));
     }
 
     async Task<int> CountPasskeysAsync(string cookie)

@@ -28,4 +28,6 @@ public sealed class UiPasskey
     public string? Name { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset? LastUsedAt { get; set; }
 }

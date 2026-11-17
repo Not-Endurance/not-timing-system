@@ -125,7 +125,7 @@ public sealed class PasskeyTests : IClassFixture<NoTimingIntegrationFixture>, ID
     }
 
     [Fact]
-    public async Task RemovePasskey_WhenItIsTheLastOne_ShouldRefuseWithConflict()
+    public async Task RemovePasskey_WhenItIsTheLastOne_ShouldRemoveIt()
     {
         var email = Address("last");
         var cookie = await RegisterAndSignInAsync(_client, _mongo, email);
@@ -133,10 +133,36 @@ public sealed class PasskeyTests : IClassFixture<NoTimingIntegrationFixture>, ID
         var only = NewCredential();
         await _mongo.SeedPasskeysAsync(userId, (only, "Phone"));
 
-        var refused = await _client.RemovePasskeyAsync(cookie, Base64Url.EncodeToString(only));
+        var removed = await _client.RemovePasskeyAsync(cookie, Base64Url.EncodeToString(only));
 
-        Assert.Equal(HttpStatusCode.Conflict, refused.StatusCode);
-        Assert.Equal(1, await CountPasskeysAsync(cookie));
+        Assert.Equal(HttpStatusCode.NoContent, removed.StatusCode);
+        Assert.Equal(0, await CountPasskeysAsync(cookie));
+    }
+
+    [Fact]
+    public async Task ListPasskeys_WhenThePasskeyHasSignedIn_ShouldReportWhenItWasLastUsed()
+    {
+        var cookie = await RegisterAndSignInAsync(_client, _mongo, Address("last-used"));
+        using var authenticator = new SoftwareAuthenticator();
+        var enrolOptions = await _client.PasskeyEnrolOptionsAsync(cookie);
+        var credential = authenticator.Register(
+            await enrolOptions.Content.ReadAsStringAsync(),
+            _origin,
+            RelyingPartyId
+        );
+        await _client.EnrolPasskeyAsync(Join(cookie, AccountClient.CookiesOf(enrolOptions)), "Phone", credential);
+        var signInOptions = await _client.PasskeySignInOptionsAsync();
+        var answer = authenticator.Answer(await signInOptions.Content.ReadAsStringAsync(), _origin, RelyingPartyId);
+        var verified = await _client.PasskeySignInVerifyAsync(
+            JsonDocument.Parse(answer).RootElement.Clone(),
+            AccountClient.CookiesOf(signInOptions)
+        );
+
+        var list = await _client.ListPasskeysAsync(AccountClient.SessionCookieOf(verified));
+
+        using var json = JsonDocument.Parse(await list.Content.ReadAsStringAsync());
+        var item = Assert.Single(json.RootElement.EnumerateArray());
+        Assert.Equal(JsonValueKind.String, item.GetProperty("lastUsedAt").ValueKind);
     }
 
     [Fact]

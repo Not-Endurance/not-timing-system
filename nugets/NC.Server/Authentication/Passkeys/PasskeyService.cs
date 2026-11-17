@@ -13,9 +13,6 @@ namespace NC.Server.Authentication.Passkeys;
 /// </summary>
 internal sealed class PasskeyService : IPasskeyManager
 {
-    /// <summary>A user keeps at least one passkey, so the last one is never removed.</summary>
-    const int MinimumPasskeys = 1;
-
     readonly IPasskeyCeremony _ceremony;
     readonly IIdentityUserRepository _users;
     readonly EmailDispatchQueue _mail;
@@ -144,11 +141,13 @@ internal sealed class PasskeyService : IPasskeyManager
 
         var userId = assertion.User.Id;
         var passkey = assertion.Passkey;
+        var usedAt = _time.GetUtcNow();
         await _users.Change(
             userId,
             async changed =>
             {
                 await _users.AddOrUpdatePasskeyAsync(changed, passkey, cancellationToken);
+                await _users.SetPasskeyLastUsed(changed, passkey.CredentialId, usedAt, cancellationToken);
                 return await _users.UpdateAsync(changed, cancellationToken);
             },
             cancellationToken
@@ -167,20 +166,21 @@ internal sealed class PasskeyService : IPasskeyManager
     public async Task<IReadOnlyList<PasskeyInfo>> List(int userId, CancellationToken cancellationToken)
     {
         var user = await _users.FindByUserId(userId, cancellationToken);
-        if (user is null)
+        if (user?.Passkeys is null)
         {
             return [];
         }
 
         return
         [
-            .. (await _users.GetPasskeysAsync(user, cancellationToken))
-                .OrderBy(x => x.CreatedAt)
+            .. user
+                .Passkeys.OrderBy(x => x.CreatedAtUtc)
                 .Select(x => new PasskeyInfo
                 {
                     CredentialId = x.CredentialId,
                     Name = x.Name,
-                    CreatedAt = x.CreatedAt,
+                    CreatedAt = new DateTimeOffset(x.CreatedAtUtc, TimeSpan.Zero),
+                    LastUsedAt = x.LastUsedAtUtc is { } usedAt ? new DateTimeOffset(usedAt, TimeSpan.Zero) : null,
                 }),
         ];
     }
@@ -200,18 +200,13 @@ internal sealed class PasskeyService : IPasskeyManager
             : new PasskeyOutcome { Kind = PasskeyOutcomeKind.NotFound };
     }
 
-    /// <summary>Removes a passkey, but never the user's last one. The repository keeps that minimum in the same update.</summary>
+    /// <summary>
+    /// Removes one of the user's passkeys, the last one included. The user still has the email code to sign in with.
+    /// </summary>
     public async Task<PasskeyOutcome> Remove(int userId, byte[] credentialId, CancellationToken cancellationToken)
     {
-        if (await _users.RemovePasskeyKeepingAtLeast(userId, credentialId, MinimumPasskeys, cancellationToken))
-        {
-            return new PasskeyOutcome { Kind = PasskeyOutcomeKind.Done };
-        }
-
-        // Refused either because the passkey is not the user's or because it is their last. Reading again tells them apart.
-        var user = await _users.FindByUserId(userId, cancellationToken);
-        var stillHeld = user?.Passkeys?.Any(x => x.CredentialId.AsSpan().SequenceEqual(credentialId)) ?? false;
-        return new PasskeyOutcome { Kind = stillHeld ? PasskeyOutcomeKind.LastPasskey : PasskeyOutcomeKind.NotFound };
+        var removed = await _users.RemovePasskey(userId, credentialId, cancellationToken);
+        return new PasskeyOutcome { Kind = removed ? PasskeyOutcomeKind.Done : PasskeyOutcomeKind.NotFound };
     }
 
     /// <summary>An answer that cannot be checked is refused the same way whatever the reason. Cancellation is not.</summary>

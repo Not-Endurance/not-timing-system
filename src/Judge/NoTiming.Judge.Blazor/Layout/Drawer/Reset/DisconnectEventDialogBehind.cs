@@ -1,4 +1,5 @@
 using MudBlazor;
+using NC.Blazor.Dialogs;
 using NC.Blazor.Dialogs.Abstractions;
 using NC.Blazor.Helpers;
 using NoTiming.Application.Contracts.Socket;
@@ -34,7 +35,10 @@ public class DisconnectEventDialogBehind : NDialog
     {
         try
         {
-            var hardResetDialog = await DialogService.ShowAsync<ResetEventDialog>();
+            var hardResetDialog = await DialogService.ShowAsync<NConfirmationDialog>(
+                Hard_reset_string,
+                HardResetConfirmation.Parameters()
+            );
             if (await hardResetDialog.IsCanceled())
             {
                 await CancelDialog();

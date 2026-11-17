@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using MudBlazor;
 using NC.Blazor.Client.Authentication.Services;
 using NC.Blazor.Components.Abstractions;
 using NoTiming.Ui.Contracts.Features.Account;
@@ -22,6 +23,9 @@ public class SignInContentBehind : NComponent
 
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
+
+    [Inject]
+    IDialogService DialogService { get; set; } = default!;
 
     protected string Email { get; set; } = string.Empty;
 
@@ -56,6 +60,7 @@ public class SignInContentBehind : NComponent
         {
             await Account.VerifyCodeAsync(Email, Code);
             Session.Refresh();
+            await OfferPasskeyAsync();
             Navigator.NavigateTo("/");
         }
         catch (Exception ex) when (AccountMessages.For(ex) is { } message)
@@ -92,6 +97,18 @@ public class SignInContentBehind : NComponent
         catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
         {
             Message = Passkey_not_accepted_string;
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    async Task OfferPasskeyAsync()
+    {
+        try
+        {
+            await PasskeyPrompt.OfferIfNoneAsync(Passkeys, JavaScript, DialogService);
         }
         catch (Exception ex)
         {

@@ -9,6 +9,7 @@ public static class Routes
     public const string PRESENTLIST_PAGE = "presentlist";
     public const string PERFORMANCE_PAGE = "performance";
     public const string PROFILE_PAGE = "profile";
+    public const string PASSKEYS_PAGE = "passkeys";
     public const string PAST_EVENTS_PAGE = "past-events";
     public const string PAST_EVENT_DETAILS_PAGE = "past-events/{eventId:int}";
 }

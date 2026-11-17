@@ -367,32 +367,60 @@ internal sealed class IdentityUserRepository
     }
 
     /// <summary>
-    /// Removes one passkey as a single update, and only while at least <paramref name="minimumRemaining"/> would remain.
-    /// The condition is part of the update, so two removals at once cannot take a user below the minimum. The stamp
-    /// moves, so a change based on the array from before the removal starts again instead of putting the passkey back.
+    /// Removes one passkey as a single update. The element match is part of the update, so a second removal of the same
+    /// passkey finds nothing. The stamp moves, so a change based on the array from before the removal starts again
+    /// instead of putting the passkey back.
     /// </summary>
-    public async Task<bool> RemovePasskeyKeepingAtLeast(
+    public async Task<bool> RemovePasskey(
         int userId,
         byte[] credentialId,
-        int minimumRemaining,
         CancellationToken cancellationToken = default
     )
     {
-        // "Passkeys.n" exists only when there are more than n passkeys, so it holds exactly when removing one would
-        // leave at least n.
         var result = await _users.UpdateOneAsync(
             Builders<IdentityUserDocument>.Filter.And(
                 Builders<IdentityUserDocument>.Filter.Eq(x => x.Id, userId),
-                Builders<IdentityUserDocument>.Filter.ElemMatch(x => x.Passkeys, x => x.CredentialId == credentialId),
-                Builders<IdentityUserDocument>.Filter.Exists($"Passkeys.{minimumRemaining}")
+                Builders<IdentityUserDocument>.Filter.ElemMatch(x => x.Passkeys, x => x.CredentialId == credentialId)
             ),
             Builders<IdentityUserDocument>
                 .Update.PullFilter(x => x.Passkeys, x => x.CredentialId == credentialId)
                 .Set(x => x.ConcurrencyStamp, NewStamp()),
             cancellationToken: cancellationToken
         );
+        if (result.MatchedCount != 1)
+        {
+            return false;
+        }
 
-        return result.MatchedCount == 1;
+        // The field exists only while there is a passkey, as UpdateAsync keeps it, so a user left with none loses it.
+        await _users.UpdateOneAsync(
+            Builders<IdentityUserDocument>.Filter.And(
+                Builders<IdentityUserDocument>.Filter.Eq(x => x.Id, userId),
+                Builders<IdentityUserDocument>.Filter.Size(x => x.Passkeys, 0)
+            ),
+            Builders<IdentityUserDocument>.Update.Unset(x => x.Passkeys),
+            cancellationToken: cancellationToken
+        );
+
+        return true;
+    }
+
+    public Task SetPasskeyLastUsed(
+        IdentityUserDocument user,
+        byte[] credentialId,
+        DateTimeOffset usedAt,
+        CancellationToken cancellationToken
+    )
+    {
+        var passkeys = Passkeys(user);
+        var passkey = passkeys.Find(x => x.CredentialId.AsSpan().SequenceEqual(credentialId));
+        if (passkey is not null)
+        {
+            passkey.LastUsedAtUtc = usedAt.UtcDateTime;
+            user.Passkeys = passkeys;
+        }
+
+        return Task.CompletedTask;
     }
 
     /// <summary>

@@ -922,9 +922,6 @@
   <data name="Added_on_string" xml:space="preserve">
     <value>{0} tarihinde eklendi</value>
   </data>
-  <data name="Name_for_new_passkey_string" xml:space="preserve">
-    <value>Yeni geçiş anahtarı için ad</value>
-  </data>
   <data name="Add_passkey_to_device_string" xml:space="preserve">
     <value>Bu cihaza geçiş anahtarı ekle</value>
   </data>
@@ -933,9 +930,6 @@
   </data>
   <data name="Passkey_not_added_string" xml:space="preserve">
     <value>Geçiş anahtarı eklenemedi. Tekrar deneyin.</value>
-  </data>
-  <data name="Last_passkey_string" xml:space="preserve">
-    <value>Bu son geçiş anahtarınız. Kaldırmadan önce bir tane daha ekleyin.</value>
   </data>
   <data name="Your_sign_in_code_string" xml:space="preserve">
     <value>Giriş kodunuz</value>
@@ -1023,5 +1017,44 @@
   </data>
   <data name="Phase_average_S_string" xml:space="preserve">
     <value>Etap ort. hızı</value>
+  </data>
+  <data name="Type_phrase_to_enable_string" xml:space="preserve">
+    <value>Butonu etkinleştirmek için aşağıya "{0}" yazın.</value>
+  </data>
+  <data name="I_understand_string" xml:space="preserve">
+    <value>Anlıyorum</value>
+  </data>
+  <data name="Description_string" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="Description_hint_string" xml:space="preserve">
+    <value>Cihazınızı açıklayın, örneğin 'telefon' veya 'laptop'.</value>
+  </data>
+  <data name="Description_required_string" xml:space="preserve">
+    <value>Bu cihaz için bir açıklama girin.</value>
+  </data>
+  <data name="Sign_in_faster_next_time_string" xml:space="preserve">
+    <value>Bir dahaki sefere daha hızlı giriş yapın</value>
+  </data>
+  <data name="Passkey_prompt_string" xml:space="preserve">
+    <value>Bu cihazda parmak izi, yüz veya ekran PIN'i ile giriş yapmak için bir geçiş anahtarı ekleyin. Kod ya da şifre gerekmez, giriş anında yapılır. Her cihazın kendi geçiş anahtarı vardır; kullandığınız her cihaz için bir tane ekleyin.</value>
+  </data>
+  <data name="Not_now_string" xml:space="preserve">
+    <value>Şimdi değil</value>
+  </data>
+  <data name="Passkey_device_question_string" xml:space="preserve">
+    <value>Bu cihaz için bir geçiş anahtarı oluşturuyorsunuz.</value>
+  </data>
+  <data name="Passkey_shared_device_warning_string" xml:space="preserve">
+    <value>Geçiş anahtarları mevcut cihazı yetkilendirir. Geçiş anahtarlarını herkese açık veya paylaşılan cihazlarda saklamayın.</value>
+  </data>
+  <data name="Last_used_string" xml:space="preserve">
+    <value>Son kullanım: {0}</value>
+  </data>
+  <data name="Never_used_string" xml:space="preserve">
+    <value>Henüz kullanılmadı</value>
+  </data>
+  <data name="Remove_passkey_confirmation_string" xml:space="preserve">
+    <value>Bu geçiş anahtarı kaldırılsın mı? Bu cihazda onunla giriş yapamayacaksınız.</value>
   </data>
 </root>
