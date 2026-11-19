@@ -1,14 +1,8 @@
-using NoTiming.Domain.Core.Objects.Payloads;
+using NoTiming.Application.Contracts.Notices;
 
 namespace NoTiming.EventBus.Contracts.Features.Ui.Procedures;
 
 public interface IUiClientProcedures
 {
-    Task OnParticipationArrived(ParticipationArrived payload);
-    Task OnInspectionRequired(InspectionRequired payload);
-    Task OnRepresentationRequired(RepresentationRequired payload);
-    Task OnPhaseCompleted(PhaseCompleted payload);
-    Task OnParticipationEliminated(ParticipationEliminated payload);
-    Task OnParticipationRestored(ParticipationRestored payload);
-    Task OnPresentationAcknoledged(VetInAcknoledged payload);
+    Task ParticipationChanged(ParticipationChangedNotice notice);
 }

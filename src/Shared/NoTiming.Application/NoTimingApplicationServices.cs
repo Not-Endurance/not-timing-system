@@ -30,8 +30,7 @@ public static class NoTimingApplicationServices
         Assembly rootAssembly
     )
     {
-        services.AddHttpClient();
-        services.AddTransient<NHttpClient>();
+        services.AddNHttpClient();
         services.AddNConventionalServices(rootAssembly);
         return new(services, configuration);
     }
@@ -57,10 +56,7 @@ public static class NoTimingApplicationServices
             );
             _services.Add<
                 IArrivelistService,
-                INotificationHandler<ParticipationArrived>,
-                INotificationHandler<PhaseCompleted>,
-                INotificationHandler<ParticipationRestored>,
-                INotificationHandler<ParticipationEliminated>,
+                INotificationHandler<ParticipationChanged>,
                 INotificationHandler<EventConnected>,
                 ArrivelistService
             >(ServiceLifetime.Scoped);
@@ -69,13 +65,7 @@ public static class NoTimingApplicationServices
             );
             _services.Add<
                 IPresentlistService,
-                INotificationHandler<ParticipationArrived>,
-                INotificationHandler<PhaseCompleted>,
-                INotificationHandler<InspectionRequired>,
-                INotificationHandler<RepresentationRequired>,
-                INotificationHandler<ParticipationRestored>,
-                INotificationHandler<ParticipationEliminated>,
-                INotificationHandler<VetInAcknoledged>,
+                INotificationHandler<ParticipationChanged>,
                 INotificationHandler<EventConnected>,
                 INotificationHandler<EventDisconnected>,
                 PresentlistService
@@ -83,9 +73,7 @@ public static class NoTimingApplicationServices
             _services.Add<
                 IStartUpcoming,
                 IStartHistory,
-                INotificationHandler<PhaseCompleted>,
-                INotificationHandler<ParticipationRestored>,
-                INotificationHandler<ParticipationEliminated>,
+                INotificationHandler<ParticipationChanged>,
                 INotificationHandler<EventConnected>,
                 StartlistService
             >(ServiceLifetime.Scoped);

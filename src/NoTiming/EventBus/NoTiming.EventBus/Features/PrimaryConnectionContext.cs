@@ -29,14 +29,6 @@ public class JudgeConnectionsContext : IJudgeConnectionsContext
         var match = _connections.FirstOrDefault(x => x.Value == connectionId);
         _connections.TryRemove(match);
     }
-
-    public string? GetConnectionId(string eventId)
-    {
-        return _connections.GetValueOrDefault(eventId);
-    }
 }
 
-public interface IJudgeConnectionsContext : ISingleton
-{
-    string? GetConnectionId(string eventId);
-}
+public interface IJudgeConnectionsContext : ISingleton { }

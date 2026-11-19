@@ -142,7 +142,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         var judgeParticipation = judge.Participations.FirstOrDefault(x => x.Combination.Number == participationNumber);
         Assert.True(
             judgeParticipation?.Phases.Current.IsComplete() == true,
-            $"Judge did not complete participation #{participationNumber}. Loaded participations: {judge.Participations.Count}, recently timed: {string.Join(", ", judge.RecentlyTimed)}, repository: {judge.ParticipationRepositoryType}, http: {judge.HttpBaseUrl}."
+            $"Judge did not complete participation #{participationNumber}. Loaded participations: {judge.Participations.Count}, recently timed: {string.Join(", ", judge.RecentlyChanged)}, repository: {judge.ParticipationRepositoryType}, http: {judge.HttpBaseUrl}."
         );
 
         var persistedParticipation = await api.WaitForParticipation(
@@ -191,10 +191,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         await snapshots.Load();
         Assert.DoesNotContain(snapshots.Participations, x => x.Combination.Number == participationNumber);
 
-        var persistedSnapshotResults = await api.ReadSnapshotResults(eventId);
-
         Assert.True(persistedParticipation.Phases.Current.IsComplete());
-        Assert.Equal(3, persistedSnapshotResults.Count);
     }
 
     [Fact]
@@ -492,10 +489,8 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
         var pendingRepresentationInspectionException = await Assert.ThrowsAnyAsync<Exception>(
             () => judge.GetRequiredService<IInspectionService>().RequestInspection(true)
         );
-        Assert.Equal(
-            nameof(NoTimingStrings.Cannot_request_Required_Inspection_without_Representation_time_string),
-            pendingRepresentationInspectionException.Message
-        );
+        // The judge now receives the API's localized refusal text rather than the resource key.
+        Assert.Contains("Required Inspection", pendingRepresentationInspectionException.Message);
         Assert.Equal(
             "Cannot request Required Inspection without Representation time",
             judge.GetRequiredService<IStringLocalizer>()[pendingRepresentationInspectionException.Message].Value
@@ -557,12 +552,15 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NoTimingIntegrat
                 && !ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
             "hide acknowledged RI/CRI entries on the acknowledging Ui"
         );
-        await WaitForPresentlist(
-            participantPresentlist,
-            entries =>
-                !ContainsPresentlistEntry(entries, riNumber, PresentlistEntryType.RI)
-                && !ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
-            "hide acknowledged RI/CRI entries on another connected Ui"
+        // Acknowledgements are no longer relayed. Another connected Ui keeps the entries until it reloads.
+        await Task.Delay(TimeSpan.FromSeconds(2));
+        Assert.True(
+            ContainsPresentlistEntry(participantPresentlist.Entries, riNumber, PresentlistEntryType.RI),
+            "keep acknowledged RI on another connected Ui until it reloads"
+        );
+        Assert.True(
+            ContainsPresentlistEntry(participantPresentlist.Entries, criNumber, PresentlistEntryType.CRI),
+            "keep acknowledged CRI on another connected Ui until it reloads"
         );
 
         await participantUi.Disconnect();

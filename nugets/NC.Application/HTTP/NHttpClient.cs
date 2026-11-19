@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NC.Application.Identity;
 using NC.Serialization.JSON;
 using NC.Structures;
 
@@ -12,16 +13,19 @@ public class NHttpClient
 {
     readonly string _baseUrl;
     readonly HttpClient _httpClient;
+    readonly IClientIdentity _identity;
     readonly ILogger<NHttpClient> _logger;
 
     public NHttpClient(
         IHttpClientFactory httpClientFactory,
+        IClientIdentity identity,
         ILogger<NHttpClient> logger,
         IOptions<NHttpSettings> options
     )
     {
         _baseUrl = options.Value.Url!;
         _httpClient = httpClientFactory.CreateClient(nameof(NHttpClient));
+        _identity = identity;
         _logger = logger;
     }
 
@@ -122,6 +126,7 @@ public class NHttpClient
         try
         {
             using var request = new HttpRequestMessage(method, url);
+            request.Headers.Add(ClientIdentityHeaders.CLIENT_ID, _identity.Id);
             if (json != null)
             {
                 request.Content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -225,9 +230,10 @@ public class NHttpClient
         }
     }
 
-    static HttpRequestMessage CreateRequest(HttpMethod method, Uri url, object? payload = null)
+    HttpRequestMessage CreateRequest(HttpMethod method, Uri url, object? payload = null)
     {
         var request = new HttpRequestMessage(method, url);
+        request.Headers.Add(ClientIdentityHeaders.CLIENT_ID, _identity.Id);
         if (payload != null)
         {
             request.Content = new StringContent(payload.ToJson(), Encoding.UTF8, "application/json");

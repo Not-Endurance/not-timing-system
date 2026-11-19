@@ -8,8 +8,8 @@ using NoTiming.Application.Contracts.Core;
 using NoTiming.Application.Contracts.Socket;
 using NoTiming.Domain.Core.Aggregates;
 using NoTiming.Domain.Core.Aggregates.Participations.Entities;
+using NoTiming.Domain.Core.Events;
 using NoTiming.Domain.Core.Objects.Documents;
-using NoTiming.Domain.Core.Objects.Payloads;
 using NoTiming.Judge.Features.Core.State;
 
 namespace NoTiming.Judge.Features.Core.Handouts;
@@ -19,7 +19,7 @@ public class HandoutsService
         IHandoutsService,
         ICreateHandout,
         ICoreDependentObservables,
-        INotificationHandler<PhaseCompleted>
+        INotificationHandler<ParticipationChanged>
 {
     readonly SemaphoreSlim _semaphore = new(1);
     readonly INoTimingSocketContext _socketContext;
@@ -89,15 +89,20 @@ public class HandoutsService
         return await SafeHelper.RunWithError(SafeGetCombinations);
     }
 
-    public async Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    /// <summary>
+    /// A handout is made when a phase completes and the next phase is not the final one. A change counts as a completed
+    /// phase when the number of completed phases went up compared with the state before it.
+    /// </summary>
+    public async Task Handle(ParticipationChanged notification, CancellationToken cancellationToken)
     {
-        if (notification.Participation.Phases.Current.IsFinal)
+        if (!ParticipationChangeRules.PhaseCompleted(notification) || notification.Participation.Phases.Current.IsFinal)
         {
             return;
         }
 
         await CreateDocument(notification.Participation);
     }
+
 
     async Task<IEnumerable<Combination>> SafeGetCombinations()
     {

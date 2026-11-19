@@ -8,17 +8,13 @@ using NoTiming.Domain.Core.Aggregates;
 using NoTiming.Domain.Core.Aggregates.Participations.Objects;
 using NoTiming.Domain.Core.Events;
 using NoTiming.Domain.Core.Objects.Arrivelists;
-using NoTiming.Domain.Core.Objects.Payloads;
 
 namespace NoTiming.Application.Arrivelists;
 
 public class ArrivelistService
     : NStatefulService,
         IArrivelistService,
-        INotificationHandler<ParticipationArrived>,
-        INotificationHandler<PhaseCompleted>,
-        INotificationHandler<ParticipationRestored>,
-        INotificationHandler<ParticipationEliminated>,
+        INotificationHandler<ParticipationChanged>,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>
 {
@@ -56,27 +52,9 @@ public class ArrivelistService
         return Entries.Any();
     }
 
-    public Task Handle(ParticipationArrived notification, CancellationToken cancellationToken)
+    public Task Handle(ParticipationChanged notification, CancellationToken cancellationToken)
     {
         Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.Remove);
         return Task.CompletedTask;
     }
 

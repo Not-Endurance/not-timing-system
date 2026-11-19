@@ -1,11 +1,16 @@
 ﻿using NC.Krud.Abstractions;
+using NoTiming.Application.Contracts.Notices;
 using NoTiming.Application.Contracts.Shared;
 using NoTiming.Domain.Core.Aggregates;
 using NoTiming.Domain.Enums;
 
 namespace NoTiming.Application.Contracts.Core.Models;
 
-public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Participation>
+public class ParticipationModel
+    : IEventScoped,
+        ISoftDeletableDocument,
+        IKrudModel<Participation>,
+        IOutbox<ParticipationChangedNotice>
 {
     public static ParticipationModel MapFrom(Participation participation)
     {
@@ -38,6 +43,19 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
     public EliminatedModel? Eliminated { get; set; }
     public bool IsDeleted { get; set; }
     public int? DeletedVersion { get; set; }
+
+    // Outbox marker. A write that changes the participation for clients sets Emitted to false and its writer; the event bus clears it.
+    // Not part of the API's JSON: clients never read these.
+    [Newtonsoft.Json.JsonIgnore]
+    public bool Emitted { get; set; }
+
+    [Newtonsoft.Json.JsonIgnore]
+    public string? WriterId { get; set; }
+
+    public ParticipationChangedNotice ToEvent()
+    {
+        return new ParticipationChangedNotice { ParticipationId = Id, WriterId = WriterId ?? string.Empty };
+    }
 
     public Participation MapToEntity()
     {

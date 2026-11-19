@@ -22,9 +22,7 @@ public class RankingService
         IRankingMenuService,
         IResultsDocumentService,
         ICoreDependentObservables,
-        INotificationHandler<PhaseCompleted>,
-        INotificationHandler<ParticipationEliminated>,
-        INotificationHandler<ParticipationRestored>,
+        INotificationHandler<ParticipationChanged>,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>,
         IScoped
@@ -119,18 +117,18 @@ public class RankingService
         EmitChanged();
     }
 
-    public async Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    public async Task Handle(ParticipationChanged notification, CancellationToken cancellationToken)
     {
-        await _coalesced.Invoke(() => UpdateRanklist(notification));
-    }
+        // A stored ranking keeps the participation as it was when the ranking last changed. Only the changes that have
+        // always updated rankings are applied, so the stored rankings do not move with every other change.
+        if (
+            !ParticipationChangeRules.PhaseCompleted(notification)
+            && !ParticipationChangeRules.EliminationChanged(notification)
+        )
+        {
+            return;
+        }
 
-    public async Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
-    {
-        await _coalesced.Invoke(() => UpdateRanklist(notification));
-    }
-
-    public async Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
-    {
         await _coalesced.Invoke(() => UpdateRanklist(notification));
     }
 

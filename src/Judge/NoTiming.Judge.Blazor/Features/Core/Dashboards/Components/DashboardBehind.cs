@@ -12,7 +12,7 @@ public class DashboardBehind : NStatefulComponent
     IParticipationContext Service { get; set; } = default!;
 
     protected IReadOnlyList<Participation> Participations => Service.Participations;
-    protected IReadOnlyList<int> RecentlyTimed => Service.RecentlyTimed;
+    protected IReadOnlyList<int> RecentlyChanged => Service.RecentlyChanged;
 
     protected Participation? Selected
     {

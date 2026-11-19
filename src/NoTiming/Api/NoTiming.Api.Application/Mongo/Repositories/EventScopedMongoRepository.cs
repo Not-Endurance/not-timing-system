@@ -27,6 +27,20 @@ public abstract class EventScopedMongoRepository<T> : MongoRepository<T>, IEvent
     }
 
     // Once an event is finalized its participations, phases, handouts and rankings are locked. An admin reopens it.
+    protected async Task EnsureEventNotFinalized(int eventId)
+    {
+        var events = _context
+            .Client.GetDatabase(_db)
+            .GetCollection<EventInformationModel>(MongoConstants.EVENT_INFORMATION_COLLECTION);
+        var isFinalized = await events.Find(x => x.Id == eventId && x.IsFinalized).AnyAsync();
+        if (isFinalized)
+        {
+            throw new DomainException(
+                $"Cannot change event '{eventId}' because it is finalized. An admin can reopen the event."
+            );
+        }
+    }
+
     public override async Task Create(T item)
     {
         await EnsureEventNotFinalized(item.EventId);
@@ -49,19 +63,5 @@ public abstract class EventScopedMongoRepository<T> : MongoRepository<T>, IEvent
     {
         await EnsureEventNotFinalized(eventId);
         await DeleteMany(x => x.EventId == eventId);
-    }
-
-    async Task EnsureEventNotFinalized(int eventId)
-    {
-        var events = _context
-            .Client.GetDatabase(_db)
-            .GetCollection<EventInformationModel>(MongoConstants.EVENT_INFORMATION_COLLECTION);
-        var isFinalized = await events.Find(x => x.Id == eventId && x.IsFinalized).AnyAsync();
-        if (isFinalized)
-        {
-            throw new DomainException(
-                $"Cannot change event '{eventId}' because it is finalized. An admin can reopen the event."
-            );
-        }
     }
 }

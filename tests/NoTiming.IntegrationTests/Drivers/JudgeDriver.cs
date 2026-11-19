@@ -53,7 +53,7 @@ internal sealed class JudgeDriver : IAsyncDisposable
     }
 
     public IReadOnlyList<Participation> Participations => _participationContext.Participations;
-    public IReadOnlyList<int> RecentlyTimed => _participationContext.RecentlyTimed;
+    public IReadOnlyList<int> RecentlyChanged => _participationContext.RecentlyChanged;
     public bool IsConnected => _socketService.IsConnected;
     public string ParticipationRepositoryType => _participationRepository.GetType().FullName ?? "unknown";
     public string HttpBaseUrl => _httpSettings.Value.Url ?? "";

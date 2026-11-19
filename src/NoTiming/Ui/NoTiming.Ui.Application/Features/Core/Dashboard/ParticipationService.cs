@@ -15,11 +15,7 @@ namespace NoTiming.Ui.Application.Features.Core.Dashboard;
 public class ParticipationService
     : NStatefulService<ObservableList<Participation>>,
         IParticipationContext,
-        INotificationHandler<PhaseCompleted>,
-        INotificationHandler<InspectionRequired>,
-        INotificationHandler<RepresentationRequired>,
-        INotificationHandler<ParticipationEliminated>,
-        INotificationHandler<ParticipationRestored>,
+        INotificationHandler<ParticipationChanged>,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>,
         IScoped
@@ -51,7 +47,7 @@ public class ParticipationService
     }
 
     public IReadOnlyList<Participation> Participations => State;
-    public IReadOnlyList<int> RecentlyTimed { get; } = [];
+    public IReadOnlyList<int> RecentlyChanged { get; } = [];
 
     protected override async Task<bool> InitializeState()
     {
@@ -66,33 +62,10 @@ public class ParticipationService
         return State.Any();
     }
 
-    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    public Task Handle(ParticipationChanged notification, CancellationToken cancellationToken)
     {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(InspectionRequired notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(RepresentationRequired notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.Remove);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
+        var action = notification.Participation.IsEliminated() ? NCollectionAction.Remove : NCollectionAction.AddOrUpdate;
+        Update(notification.Participation, action);
         return Task.CompletedTask;
     }
 

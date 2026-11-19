@@ -220,15 +220,6 @@ internal sealed class NoTimingApiDriver : IDisposable
         );
     }
 
-    public async Task<IReadOnlyList<SnapshotResultModel>> ReadSnapshotResults(int eventId)
-    {
-        var models = await Send<IEnumerable<SnapshotResultModel>>(
-            HttpMethod.Get,
-            EventFilter("api/snapshot-results", eventId)
-        );
-        return models.ToArray();
-    }
-
     public async Task<NoTimingUserSessionModel?> ReadUserSession(string userIdentifier, int eventId, string cookie)
     {
         var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);

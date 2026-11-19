@@ -18,7 +18,7 @@ public class PerformanceContentBehind : NStatefulComponent
     [Inject]
     BlazorSocketService BlazorSocketService { get; set; } = default!;
 
-    protected IReadOnlyList<int> Recent => Context.RecentlyTimed;
+    protected IReadOnlyList<int> Recent => Context.RecentlyChanged;
 
     protected Participation? Selected
     {

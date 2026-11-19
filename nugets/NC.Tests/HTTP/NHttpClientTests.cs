@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NC.Application.HTTP;
+using NC.Application.Identity;
 using Xunit;
 
 namespace NC.Tests.HTTP;
@@ -87,14 +88,47 @@ public sealed class NHttpClientTests
         Assert.True(result.IsSuccess);
     }
 
-    static NHttpClient CreateClient(HttpMessageHandler handler)
+    [Fact]
+    public async Task GetJson_WhenRequestIsSent_ShouldAttachTheClientIdentityHeader()
+    {
+        var stub = new StubHandler(HttpStatusCode.OK, "{}");
+        var client = CreateClient(stub, new FixedClientIdentity("client-1"));
+
+        await client.GetJson("me");
+
+        Assert.Equal("client-1", stub.Request!.Headers.GetValues(ClientIdentityHeaders.CLIENT_ID).Single());
+    }
+
+    [Fact]
+    public async Task Delete_WhenRequestIsSent_ShouldAttachTheClientIdentityHeader()
+    {
+        var stub = new StubHandler(HttpStatusCode.NoContent, string.Empty);
+        var client = CreateClient(stub, new FixedClientIdentity("client-2"));
+
+        await client.Delete("me/passkeys/1");
+
+        Assert.Equal("client-2", stub.Request!.Headers.GetValues(ClientIdentityHeaders.CLIENT_ID).Single());
+    }
+
+    static NHttpClient CreateClient(HttpMessageHandler handler, IClientIdentity? identity = null)
     {
         var factory = new StubFactory(new HttpClient(handler));
         return new NHttpClient(
             factory,
+            identity ?? new FixedClientIdentity("test-client"),
             NullLogger<NHttpClient>.Instance,
             Options.Create(new NHttpSettings { Url = BASE_URL })
         );
+    }
+
+    sealed class FixedClientIdentity : IClientIdentity
+    {
+        public FixedClientIdentity(string id)
+        {
+            Id = id;
+        }
+
+        public string Id { get; }
     }
 
     sealed class StubFactory : IHttpClientFactory
