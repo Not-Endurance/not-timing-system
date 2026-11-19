@@ -1,0 +1,36 @@
+@using MudBlazor
+@using NC.Blazor.Components.Buttons
+@using NC.Blazor.Components.Input
+@using NC.Blazor.Components.Layout
+
+@attribute [Route(Routes.LOGIN_WITH_EMAIL_PAGE)]
+@inherits LoginWithEmailContentBehind
+
+<div class="narrow-page">
+    <NContent Title="@Sign_in_with_code_string">
+        <Main>
+            <MudStack Spacing="3">
+                <div>
+                    <NButtonBack OnClick="GoBack" />
+                </div>
+
+                @if (!CodeSent)
+                {
+                    <NTextField @bind-Value="Email" For="() => Email" Label="@Email_string" Required />
+                    <NButtonPrimary Text="@Send_me_a_code_string" Size="Size.Large" Style="width:100%" OnClick="SendCodeSafe" />
+                }
+                else
+                {
+                    <MudText>@Enter_six_digit_code_string</MudText>
+                    <NTextField @bind-Value="Code" For="() => Code" Label="@Code_string" Required />
+                    <NButtonPrimary Text="@Sign_in_string" Size="Size.Large" Style="width:100%" OnClick="VerifySafe" />
+                }
+
+                @if (Message != null)
+                {
+                    <MudText Color="Color.Error" role="alert">@Message</MudText>
+                }
+            </MudStack>
+        </Main>
+    </NContent>
+</div>

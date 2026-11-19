@@ -15,6 +15,7 @@ public static class AccountMessages
 
         return status switch
         {
+            HttpStatusCode.BadRequest => Check_details_string,
             HttpStatusCode.Unauthorized => Code_not_right_or_expired_string,
             HttpStatusCode.TooManyRequests => Too_many_codes_requested_string,
             HttpStatusCode.Forbidden => Request_could_not_be_checked_string,

@@ -1056,14 +1056,17 @@
   <data name="Request_could_not_be_checked_string" xml:space="preserve">
     <value>Заявката не можа да бъде проверена. Презаредете страницата и опитайте отново.</value>
   </data>
+  <data name="Check_details_string" xml:space="preserve">
+    <value>Проверете въведените данни и опитайте отново.</value>
+  </data>
   <data name="Sign_in_string" xml:space="preserve">
     <value>Вход</value>
   </data>
   <data name="Sign_in_with_passkey_string" xml:space="preserve">
     <value>Вход с ключ за достъп</value>
   </data>
-  <data name="Or_sign_in_with_code_string" xml:space="preserve">
-    <value>Или влезте с код, изпратен на имейла ви.</value>
+  <data name="Sign_in_with_code_string" xml:space="preserve">
+    <value>Вход с имейл</value>
   </data>
   <data name="Email_string" xml:space="preserve">
     <value>Имейл</value>
@@ -1072,7 +1075,7 @@
     <value>Изпратете ми код</value>
   </data>
   <data name="Create_an_account_string" xml:space="preserve">
-    <value>Създаване на акаунт</value>
+    <value>Регистрация</value>
   </data>
   <data name="Enter_six_digit_code_string" xml:space="preserve">
     <value>Въведете шестцифрения код, който изпратихме на имейла ви.</value>
@@ -1081,19 +1084,16 @@
     <value>Код</value>
   </data>
   <data name="Browser_cannot_use_passkeys_sign_in_with_code_string" xml:space="preserve">
-    <value>Този браузър не може да използва ключове за достъп. Влезте с код.</value>
+    <value>Този браузър не може да използва ключове за достъп. Влезте с имейл.</value>
   </data>
   <data name="Passkey_not_used_string" xml:space="preserve">
-    <value>Ключът за достъп не беше използван. Опитайте отново или влезте с код.</value>
+    <value>Ключът за достъп не беше използван. Опитайте отново или влезте с имейл.</value>
   </data>
   <data name="Passkey_not_accepted_string" xml:space="preserve">
-    <value>Този ключ за достъп не беше приет. Влезте с код.</value>
+    <value>Този ключ за достъп не беше приет. Влезте с имейл.</value>
   </data>
   <data name="Create_account_string" xml:space="preserve">
-    <value>Създай акаунт</value>
-  </data>
-  <data name="Country_code_string" xml:space="preserve">
-    <value>Код на държава</value>
+    <value>Регистрация</value>
   </data>
   <data name="Privacy_email_use_string" xml:space="preserve">
     <value>Имейла ви използваме само за вход в профила и за изпращане на известия за събития.</value>

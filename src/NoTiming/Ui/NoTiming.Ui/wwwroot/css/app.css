@@ -65,9 +65,9 @@ h1:focus {
         content: "An error has occurred."
     }
 
-.not-narrow-width {
-    max-width: 400px;
-    margin: auto;
+.narrow-page {
+    max-width: 420px;
+    margin: 0 auto;
 }
 
 .status-bar-safe-area {

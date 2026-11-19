@@ -363,9 +363,10 @@ namespace NoTiming.Shared.Localization
         public static string Too_many_codes_requested_string => LocalizeString(nameof(Too_many_codes_requested_string));
         public static string Request_could_not_be_checked_string =>
             LocalizeString(nameof(Request_could_not_be_checked_string));
+        public static string Check_details_string => LocalizeString(nameof(Check_details_string));
         public static string Sign_in_string => LocalizeString(nameof(Sign_in_string));
         public static string Sign_in_with_passkey_string => LocalizeString(nameof(Sign_in_with_passkey_string));
-        public static string Or_sign_in_with_code_string => LocalizeString(nameof(Or_sign_in_with_code_string));
+        public static string Sign_in_with_code_string => LocalizeString(nameof(Sign_in_with_code_string));
         public static string Email_string => LocalizeString(nameof(Email_string));
         public static string Send_me_a_code_string => LocalizeString(nameof(Send_me_a_code_string));
         public static string Create_an_account_string => LocalizeString(nameof(Create_an_account_string));
@@ -376,7 +377,6 @@ namespace NoTiming.Shared.Localization
         public static string Passkey_not_used_string => LocalizeString(nameof(Passkey_not_used_string));
         public static string Passkey_not_accepted_string => LocalizeString(nameof(Passkey_not_accepted_string));
         public static string Create_account_string => LocalizeString(nameof(Create_account_string));
-        public static string Country_code_string => LocalizeString(nameof(Country_code_string));
         public static string Privacy_email_use_string => LocalizeString(nameof(Privacy_email_use_string));
         public static string I_already_have_an_account_string =>
             LocalizeString(nameof(I_already_have_an_account_string));

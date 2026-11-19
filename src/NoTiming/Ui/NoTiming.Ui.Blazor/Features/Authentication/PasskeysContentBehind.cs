@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+using NC.Blazor.Client.Authentication;
 using NC.Blazor.Components.Abstractions;
 using NC.Blazor.Dialogs;
 using NC.Blazor.Helpers;
@@ -18,6 +19,9 @@ public class PasskeysContentBehind : NComponent
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    NavigationManager Navigator { get; set; } = default!;
 
     protected IReadOnlyList<UiPasskey> Passkeys { get; private set; } = [];
 
@@ -81,6 +85,11 @@ public class PasskeysContentBehind : NComponent
     protected void CancelRename()
     {
         Renaming = null;
+    }
+
+    protected void GoToLogin()
+    {
+        Navigator.NavigateTo(AuthenticationContents.AUTHENTICATION);
     }
 
     protected async Task RenameSafe(string id)
