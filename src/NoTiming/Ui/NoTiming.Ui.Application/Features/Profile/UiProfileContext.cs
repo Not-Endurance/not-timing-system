@@ -35,18 +35,19 @@ public class UiProfileContext : NStatefulService, IUiProfileContext, IScoped
 
     protected override async Task<bool> InitializeState()
     {
+        // Registration searches the countries too, so the list loads for a visitor who is not signed in.
+        _countryList = (await _countries.ReadMany()).OrderBy(country => country.Name).ToArray();
+
         var session = await _userSession.GetCurrent<NoTimingUserSessionStateModel>();
         User = session?.User;
         Profile = null;
         if (User == null)
         {
-            _countryList = [];
             return true;
         }
 
         var signedIn = await _profiles.Read(User.Email);
         Profile = signedIn.Data?.Profile;
-        _countryList = (await _countries.ReadMany()).OrderBy(country => country.Name).ToArray();
         return true;
     }
 

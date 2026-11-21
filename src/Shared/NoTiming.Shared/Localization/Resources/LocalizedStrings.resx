@@ -1056,14 +1056,17 @@
   <data name="Request_could_not_be_checked_string" xml:space="preserve">
     <value>This request could not be checked. Reload the page and try again.</value>
   </data>
+  <data name="Check_details_string" xml:space="preserve">
+    <value>Check the details you entered and try again.</value>
+  </data>
   <data name="Sign_in_string" xml:space="preserve">
-    <value>Sign in</value>
+    <value>Login</value>
   </data>
   <data name="Sign_in_with_passkey_string" xml:space="preserve">
-    <value>Sign in with a passkey</value>
+    <value>Login with passkey</value>
   </data>
-  <data name="Or_sign_in_with_code_string" xml:space="preserve">
-    <value>Or, sign in with a code sent to your email.</value>
+  <data name="Sign_in_with_code_string" xml:space="preserve">
+    <value>Login with email</value>
   </data>
   <data name="Email_string" xml:space="preserve">
     <value>Email</value>
@@ -1072,7 +1075,7 @@
     <value>Send me a code</value>
   </data>
   <data name="Create_an_account_string" xml:space="preserve">
-    <value>Create an account</value>
+    <value>Register</value>
   </data>
   <data name="Enter_six_digit_code_string" xml:space="preserve">
     <value>Enter the six-digit code we sent to your email.</value>
@@ -1081,19 +1084,16 @@
     <value>Code</value>
   </data>
   <data name="Browser_cannot_use_passkeys_sign_in_with_code_string" xml:space="preserve">
-    <value>This browser cannot use passkeys. Sign in with a code instead.</value>
+    <value>This browser cannot use passkeys. Login with email instead.</value>
   </data>
   <data name="Passkey_not_used_string" xml:space="preserve">
-    <value>The passkey was not used. Try again, or sign in with a code.</value>
+    <value>The passkey was not used. Try again, or login with email.</value>
   </data>
   <data name="Passkey_not_accepted_string" xml:space="preserve">
-    <value>That passkey was not accepted. Sign in with a code instead.</value>
+    <value>That passkey was not accepted. Login with email instead.</value>
   </data>
   <data name="Create_account_string" xml:space="preserve">
-    <value>Create account</value>
-  </data>
-  <data name="Country_code_string" xml:space="preserve">
-    <value>Country code</value>
+    <value>Register</value>
   </data>
   <data name="Privacy_email_use_string" xml:space="preserve">
     <value>We use your email only to sign you in and to send event notices.</value>
@@ -1105,10 +1105,10 @@
     <value>Passkeys</value>
   </data>
   <data name="Sign_in_to_manage_passkeys_string" xml:space="preserve">
-    <value>Sign in to manage your passkeys.</value>
+    <value>Login to manage your passkeys.</value>
   </data>
   <data name="Passkey_explanation_string" xml:space="preserve">
-    <value>A passkey lets you sign in with this device's biometric check. Add one for each device you use.</value>
+    <value>A passkey lets you login with this device's biometric check. Add one for each device you use.</value>
   </data>
   <data name="Rename_string" xml:space="preserve">
     <value>Rename</value>
@@ -1129,10 +1129,10 @@
     <value>The passkey was not added. Try again.</value>
   </data>
   <data name="Your_sign_in_code_string" xml:space="preserve">
-    <value>Your sign-in code</value>
+    <value>Your login code</value>
   </data>
   <data name="Your_sign_in_code_is_0_string" xml:space="preserve">
-    <value>Your sign-in code is '{0}'. It expires in 10 minutes and works once. If you did not ask for it, ignore this email.</value>
+    <value>Your login code is '{0}'. It expires in 10 minutes and works once. If you did not ask for it, ignore this email.</value>
   </data>
   <data name="Your_registration_code_string" xml:space="preserve">
     <value>Your registration code</value>
@@ -1144,7 +1144,7 @@
     <value>A passkey was added to your account</value>
   </data>
   <data name="A_passkey_named_1_was_added_to_your_account_on_0_string" xml:space="preserve">
-    <value>A passkey named '{1}' was added to your account on '{0}'. If you did not add it, sign in and remove it.</value>
+    <value>A passkey named '{1}' was added to your account on '{0}'. If you did not add it, login and remove it.</value>
   </data>
   <data name="Loop_speed_min_string" xml:space="preserve">
     <value>Loop speed min</value>
@@ -1231,10 +1231,10 @@
     <value>Enter a description for this device.</value>
   </data>
   <data name="Sign_in_faster_next_time_string" xml:space="preserve">
-    <value>Sign in faster next time</value>
+    <value>Login faster next time</value>
   </data>
   <data name="Passkey_prompt_string" xml:space="preserve">
-    <value>Add a passkey to sign in on this device with your fingerprint, face or screen PIN. No code, no password, instant sign-in. Each device has its own passkey, so add one on each device you use.</value>
+    <value>Add a passkey to login on this device with your fingerprint, face or screen PIN. No code, no password, instant login. Each device has its own passkey, so add one on each device you use.</value>
   </data>
   <data name="Not_now_string" xml:space="preserve">
     <value>Not now</value>
@@ -1252,7 +1252,7 @@
     <value>Not used yet</value>
   </data>
   <data name="Remove_passkey_confirmation_string" xml:space="preserve">
-    <value>Remove this passkey? You will not be able to sign in with it on that device.</value>
+    <value>Remove this passkey? You will not be able to login with it on that device.</value>
   </data>
   <data name="Confirmation_code_string" xml:space="preserve">
     <value>Confirmation code</value>

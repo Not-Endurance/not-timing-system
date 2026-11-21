@@ -1,17 +1,23 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+using NC.Blazor.Client.Authentication;
 using NC.Blazor.Client.Authentication.Services;
 using NC.Blazor.Components.Abstractions;
 using NoTiming.Application.Contracts.Account;
+using NoTiming.Domain.Aggregates;
 using NoTiming.Ui.Contracts.Features.Account;
+using NoTiming.Ui.Contracts.Features.Profile;
 
 namespace NoTiming.Ui.Blazor.Features.Authentication;
 
-public class RegisterContentBehind : NComponent
+public class RegisterContentBehind : NStatefulComponent
 {
     [Inject]
     IUiAccountService Account { get; set; } = default!;
+
+    [Inject]
+    IUiProfileContext ProfileContext { get; set; } = default!;
 
     [Inject]
     SessionAuthenticationStateProvider Session { get; set; } = default!;
@@ -34,7 +40,7 @@ public class RegisterContentBehind : NComponent
 
     protected string Surname { get; set; } = string.Empty;
 
-    protected string CountryIsoCode { get; set; } = string.Empty;
+    protected Country? SelectedCountry { get; set; }
 
     protected string Website { get; set; } = string.Empty;
 
@@ -43,6 +49,21 @@ public class RegisterContentBehind : NComponent
     protected bool CodeSent { get; private set; }
 
     protected string? Message { get; private set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(ProfileContext);
+    }
+
+    protected async Task<IEnumerable<Country?>> SearchCountriesSafe(string term, CancellationToken ct)
+    {
+        return (await ProfileContext.SearchCountries(term, ct)).Cast<Country?>();
+    }
+
+    protected void OpenLogin()
+    {
+        Navigator.NavigateTo(AuthenticationContents.AUTHENTICATION);
+    }
 
     protected async Task RegisterSafe()
     {
@@ -55,7 +76,7 @@ public class RegisterContentBehind : NComponent
                     Email = Email,
                     GivenName = GivenName,
                     Surname = Surname,
-                    Profile = new NoTimingProfile { CountryIsoCode = CountryIsoCode },
+                    Profile = new NoTimingProfile { CountryIsoCode = SelectedCountry?.IsoCode ?? string.Empty },
                     Website = Website,
                 }
             );

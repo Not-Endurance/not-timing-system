@@ -859,14 +859,17 @@
   <data name="Request_could_not_be_checked_string" xml:space="preserve">
     <value>Bu istek doğrulanamadı. Sayfayı yenileyip tekrar deneyin.</value>
   </data>
+  <data name="Check_details_string" xml:space="preserve">
+    <value>Girdiğiniz bilgileri kontrol edip yeniden deneyin.</value>
+  </data>
   <data name="Sign_in_string" xml:space="preserve">
-    <value>Oturum aç</value>
+    <value>Giriş</value>
   </data>
   <data name="Sign_in_with_passkey_string" xml:space="preserve">
-    <value>Geçiş anahtarıyla oturum aç</value>
+    <value>Geçiş anahtarıyla giriş yap</value>
   </data>
-  <data name="Or_sign_in_with_code_string" xml:space="preserve">
-    <value>Ya da e-postanıza gönderilen kodla oturum açın.</value>
+  <data name="Sign_in_with_code_string" xml:space="preserve">
+    <value>E-posta ile giriş yap</value>
   </data>
   <data name="Email_string" xml:space="preserve">
     <value>E-posta</value>
@@ -875,7 +878,7 @@
     <value>Bana kod gönder</value>
   </data>
   <data name="Create_an_account_string" xml:space="preserve">
-    <value>Hesap oluştur</value>
+    <value>Kayıt ol</value>
   </data>
   <data name="Enter_six_digit_code_string" xml:space="preserve">
     <value>E-postanıza gönderdiğimiz altı haneli kodu girin.</value>
@@ -884,19 +887,16 @@
     <value>Kod</value>
   </data>
   <data name="Browser_cannot_use_passkeys_sign_in_with_code_string" xml:space="preserve">
-    <value>Bu tarayıcı geçiş anahtarlarını kullanamıyor. Bunun yerine kodla oturum açın.</value>
+    <value>Bu tarayıcı geçiş anahtarlarını kullanamıyor. Bunun yerine e-posta ile giriş yapın.</value>
   </data>
   <data name="Passkey_not_used_string" xml:space="preserve">
-    <value>Geçiş anahtarı kullanılmadı. Tekrar deneyin ya da kodla oturum açın.</value>
+    <value>Geçiş anahtarı kullanılmadı. Tekrar deneyin ya da e-posta ile giriş yapın.</value>
   </data>
   <data name="Passkey_not_accepted_string" xml:space="preserve">
-    <value>Bu geçiş anahtarı kabul edilmedi. Bunun yerine kodla oturum açın.</value>
+    <value>Bu geçiş anahtarı kabul edilmedi. Bunun yerine e-posta ile giriş yapın.</value>
   </data>
   <data name="Create_account_string" xml:space="preserve">
-    <value>Hesap oluştur</value>
-  </data>
-  <data name="Country_code_string" xml:space="preserve">
-    <value>Ülke kodu</value>
+    <value>Kayıt ol</value>
   </data>
   <data name="Privacy_email_use_string" xml:space="preserve">
     <value>E-postanızı yalnızca oturumunuzu açmak ve etkinlik bildirimleri göndermek için kullanırız.</value>
@@ -908,10 +908,10 @@
     <value>Geçiş anahtarları</value>
   </data>
   <data name="Sign_in_to_manage_passkeys_string" xml:space="preserve">
-    <value>Geçiş anahtarlarınızı yönetmek için oturum açın.</value>
+    <value>Geçiş anahtarlarınızı yönetmek için giriş yapın.</value>
   </data>
   <data name="Passkey_explanation_string" xml:space="preserve">
-    <value>Geçiş anahtarı, bu cihazın biyometrik doğrulamasıyla oturum açmanızı sağlar. Kullandığınız her cihaz için bir tane ekleyin.</value>
+    <value>Geçiş anahtarı, bu cihazın biyometrik doğrulamasıyla giriş yapmanızı sağlar. Kullandığınız her cihaz için bir tane ekleyin.</value>
   </data>
   <data name="Rename_string" xml:space="preserve">
     <value>Yeniden adlandır</value>
@@ -947,7 +947,7 @@
     <value>Hesabınıza yeni bir geçiş anahtarı eklendi</value>
   </data>
   <data name="A_passkey_named_1_was_added_to_your_account_on_0_string" xml:space="preserve">
-    <value>'{0}' tarihinde hesabınıza '{1}' adlı bir geçiş anahtarı eklendi. Bunu siz eklemediyseniz oturum açıp anahtarı kaldırın.</value>
+    <value>'{0}' tarihinde hesabınıza '{1}' adlı bir geçiş anahtarı eklendi. Bunu siz eklemediyseniz giriş yapıp anahtarı kaldırın.</value>
   </data>
   <data name="Loop_speed_min_string" xml:space="preserve">
     <value>Tur hızı min</value>
