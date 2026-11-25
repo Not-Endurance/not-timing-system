@@ -170,7 +170,9 @@ public class SnapshotService
 
     public Task Handle(ParticipationChanged notification, CancellationToken cancellationToken)
     {
-        var action = notification.Participation.IsEliminated() ? NCollectionAction.Remove : NCollectionAction.AddOrUpdate;
+        var action = notification.Participation.IsEliminated()
+            ? NCollectionAction.Remove
+            : NCollectionAction.AddOrUpdate;
         Update(notification.Participation, action);
         return Task.CompletedTask;
     }

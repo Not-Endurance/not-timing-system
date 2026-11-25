@@ -63,7 +63,9 @@ public class ParticipationEventScopedMongoRepository
 
         var update = Builders<ParticipationModel>.Update.Combine(
             GetUpdateDefinition(document),
-            Builders<ParticipationModel>.Update.Set(x => x.Emitted, false).Set(x => x.WriterId, _clientIdentity.ClientId)
+            Builders<ParticipationModel>
+                .Update.Set(x => x.Emitted, false)
+                .Set(x => x.WriterId, _clientIdentity.ClientId)
         );
         await GetCollection().UpdateOneAsync(GetItemFilter(document), update);
     }

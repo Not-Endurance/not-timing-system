@@ -104,7 +104,12 @@ public class JudgeParticipationService
     /// <summary>A snapshot this judge recorded. The API applies it and returns the participations it changed.</summary>
     public async Task Record(Snapshot snapshot)
     {
-        var entry = new SnapshotModel { Number = snapshot.Number, Name = string.Empty, Timestamp = snapshot.Timestamp.ToString() };
+        var entry = new SnapshotModel
+        {
+            Number = snapshot.Number,
+            Name = string.Empty,
+            Timestamp = snapshot.Timestamp.ToString(),
+        };
         var group = new SnapshotGroupModel { Entries = [entry], Type = snapshot.Type };
         var changed = await _commands.RecordSnapshots(group);
         foreach (var participation in changed)

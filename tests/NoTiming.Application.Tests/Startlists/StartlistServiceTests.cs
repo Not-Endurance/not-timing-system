@@ -36,7 +36,10 @@ public sealed class StartlistServiceTests
         await service.Handle(new ParticipationChanged(eliminatedParticipation, null, false), CancellationToken.None);
 
         await repository.Update(restoredParticipation);
-        await service.Handle(new ParticipationChanged(restoredParticipation, eliminatedParticipation, false), CancellationToken.None);
+        await service.Handle(
+            new ParticipationChanged(restoredParticipation, eliminatedParticipation, false),
+            CancellationToken.None
+        );
 
         Assert.Contains(service.Upcoming, x => x.Number == 301);
     }

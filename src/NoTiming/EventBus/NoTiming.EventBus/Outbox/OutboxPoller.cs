@@ -49,7 +49,11 @@ internal sealed class OutboxPoller<TDocument, TEvent> : BackgroundService
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                _logger.LogError(ex, "Outbox poll of '{Collection}' failed. It will retry on the next tick.", _collection);
+                _logger.LogError(
+                    ex,
+                    "Outbox poll of '{Collection}' failed. It will retry on the next tick.",
+                    _collection
+                );
             }
         }
     }

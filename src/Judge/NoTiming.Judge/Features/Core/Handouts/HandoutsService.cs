@@ -103,7 +103,6 @@ public class HandoutsService
         await CreateDocument(notification.Participation);
     }
 
-
     async Task<IEnumerable<Combination>> SafeGetCombinations()
     {
         return await _participations.ReadMany().Select(x => x.Combination);

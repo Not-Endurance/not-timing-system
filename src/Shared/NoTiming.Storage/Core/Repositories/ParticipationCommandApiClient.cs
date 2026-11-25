@@ -31,12 +31,18 @@ public class ParticipationCommandApiClient : IParticipationCommands
 
     public Task<Participation?> SetRepresentation(int participationId, bool isRequested)
     {
-        return Send(x => $"participations/{x}/{participationId}/representation", new ToggleModel { IsRequested = isRequested });
+        return Send(
+            x => $"participations/{x}/{participationId}/representation",
+            new ToggleModel { IsRequested = isRequested }
+        );
     }
 
     public Task<Participation?> SetInspection(int participationId, bool isRequested)
     {
-        return Send(x => $"participations/{x}/{participationId}/inspection", new ToggleModel { IsRequested = isRequested });
+        return Send(
+            x => $"participations/{x}/{participationId}/inspection",
+            new ToggleModel { IsRequested = isRequested }
+        );
     }
 
     public Task<Participation?> Withdraw(int participationId)
@@ -51,7 +57,10 @@ public class ParticipationCommandApiClient : IParticipationCommands
 
     public Task<Participation?> FinishNotRanked(int participationId, string reason)
     {
-        return Send(x => $"participations/{x}/{participationId}/finish-not-ranked", new FinishNotRankedModel { Reason = reason });
+        return Send(
+            x => $"participations/{x}/{participationId}/finish-not-ranked",
+            new FinishNotRankedModel { Reason = reason }
+        );
     }
 
     public Task<Participation?> Disqualify(int participationId, DisqualifyCode[] codes, string? reason)
