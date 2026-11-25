@@ -6,7 +6,6 @@ using NoTiming.Application.Contracts.Startlists;
 using NoTiming.Domain.Core.Aggregates;
 using NoTiming.Domain.Core.Aggregates.Participations.Objects;
 using NoTiming.Domain.Core.Events;
-using NoTiming.Domain.Core.Objects.Payloads;
 using NoTiming.Domain.Core.Objects.Startlists;
 
 namespace NoTiming.Application.Startlists;
@@ -15,9 +14,7 @@ public class StartlistService
     : NStatefulService,
         IStartUpcoming,
         IStartHistory,
-        INotificationHandler<PhaseCompleted>,
-        INotificationHandler<ParticipationRestored>,
-        INotificationHandler<ParticipationEliminated>,
+        INotificationHandler<ParticipationChanged>,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>
 {
@@ -56,20 +53,10 @@ public class StartlistService
         return Startlist.History.Any() || Startlist.Upcoming.Any();
     }
 
-    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    public Task Handle(ParticipationChanged notification, CancellationToken cancellationToken)
     {
         Update(notification.Participation);
         return Task.CompletedTask;
-    }
-
-    public async Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
-    {
-        await Refresh(notification.Participation);
-    }
-
-    public async Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
-    {
-        await Refresh(notification.Participation);
     }
 
     public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
@@ -96,11 +83,5 @@ public class StartlistService
         _state.Upsert(participation);
         Startlist = new Startlist(_state);
         EmitChanged();
-    }
-
-    async Task Refresh(Participation participation)
-    {
-        var persisted = await _participations.Read(participation.Id);
-        Update(persisted ?? participation);
     }
 }

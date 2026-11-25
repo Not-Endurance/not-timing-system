@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.SignalR.Client;
+using NC.Application.Identity;
+using NC.Application.RPC.Changes;
 using NC.Application.RPC.SignalR;
 using NC.Reflection;
 using NC.Startup;
@@ -7,21 +9,46 @@ namespace NC.Application.RPC.Clients;
 
 public abstract class RpcClient : IRpcClient
 {
+    readonly IClientIdentity _identity;
     readonly SignalRSocket _socket;
     bool _isInitialized;
 
-    protected RpcClient(IRpcSocket socket)
+    protected RpcClient(IRpcSocket socket, IClientIdentity identity)
     {
         if (socket is not SignalRSocket signalRSocket)
         {
             throw new ApplicationException($"Unsupported socket '{socket?.GetTypeName()}'");
         }
         _socket = signalRSocket;
+        _identity = identity;
     }
 
     protected abstract void RegisterProcedures();
 
     protected SignalRSocket Socket => _socket;
+
+    /// <summary>
+    /// Registers a change notice. The action receives whether the change came from another client.
+    /// A client's own writes are still delivered, so its state refreshes, but they are not marked as remote.
+    /// </summary>
+    protected void RegisterChangeProcedure<T>(string name, Func<T, bool, Task> action)
+        where T : ChangeNotice
+    {
+        RegisterInputProcedure<T>(
+            name,
+            async notice =>
+            {
+                try
+                {
+                    await action(notice, !notice.IsFrom(_identity.Id));
+                }
+                catch (Exception exception)
+                {
+                    _socket.RaiseError(exception, name, notice);
+                }
+            }
+        );
+    }
 
     internal void EnsureInitialized()
     {

@@ -5,7 +5,7 @@ using NoTiming.Domain.Aggregates;
 using NoTiming.Domain.Core.Aggregates;
 using NoTiming.Domain.Core.Aggregates.Participations.Entities;
 using NoTiming.Domain.Core.Aggregates.Participations.Objects;
-using NoTiming.Domain.Core.Objects.Payloads;
+using NoTiming.Domain.Core.Events;
 using NoTiming.Domain.Enums;
 using NoTiming.Domain.Objects;
 
@@ -14,14 +14,13 @@ namespace NoTiming.Application.Tests.Startlists;
 public sealed class StartlistServiceTests
 {
     [Fact]
-    public async Task Handle_WhenParticipationEliminated_ShouldRefreshFromRepositoryAndExcludeFromUpcoming()
+    public async Task Handle_WhenParticipationEliminated_ShouldExcludeFromUpcoming()
     {
-        var payloadParticipation = CreateParticipationWithHistoryAndFutureStart(301);
         var eliminatedParticipation = CreateParticipationWithHistoryAndFutureStart(301, new Withdrawn());
         var repository = new FakeParticipationRepository(eliminatedParticipation);
         var service = new StartlistService(repository);
 
-        await service.Handle(new ParticipationEliminated(payloadParticipation), CancellationToken.None);
+        await service.Handle(new ParticipationChanged(eliminatedParticipation, null, false), CancellationToken.None);
 
         Assert.DoesNotContain(service.Upcoming, x => x.Number == 301);
         Assert.Contains(service.History, x => x.Number == 301);
@@ -30,15 +29,17 @@ public sealed class StartlistServiceTests
     [Fact]
     public async Task Handle_WhenParticipationRestored_ShouldReturnParticipationToUpcoming()
     {
-        var payloadParticipation = CreateParticipationWithHistoryAndFutureStart(301);
         var eliminatedParticipation = CreateParticipationWithHistoryAndFutureStart(301, new Withdrawn());
         var restoredParticipation = CreateParticipationWithHistoryAndFutureStart(301);
         var repository = new FakeParticipationRepository(eliminatedParticipation);
         var service = new StartlistService(repository);
-        await service.Handle(new ParticipationEliminated(payloadParticipation), CancellationToken.None);
+        await service.Handle(new ParticipationChanged(eliminatedParticipation, null, false), CancellationToken.None);
 
         await repository.Update(restoredParticipation);
-        await service.Handle(new ParticipationRestored(eliminatedParticipation), CancellationToken.None);
+        await service.Handle(
+            new ParticipationChanged(restoredParticipation, eliminatedParticipation, false),
+            CancellationToken.None
+        );
 
         Assert.Contains(service.Upcoming, x => x.Number == 301);
     }

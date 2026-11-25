@@ -24,8 +24,7 @@ public class NApplicationBuilder
 
     public NApplicationBuilder AddHttp(Action<NHttpSettings>? configure = null)
     {
-        _services.AddHttpClient();
-        _services.AddTransient<NHttpClient>();
+        _services.AddNHttpClient();
         _services.AddSettings(_configuration, x => !string.IsNullOrWhiteSpace(x.Url), configure);
         return this;
     }

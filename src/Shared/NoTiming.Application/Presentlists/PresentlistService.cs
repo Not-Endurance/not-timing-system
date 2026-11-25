@@ -7,7 +7,6 @@ using NoTiming.Application.Contracts.Socket;
 using NoTiming.Domain.Core.Aggregates;
 using NoTiming.Domain.Core.Aggregates.Participations.Objects;
 using NoTiming.Domain.Core.Events;
-using NoTiming.Domain.Core.Objects.Payloads;
 using NoTiming.Domain.Core.Objects.Presentlists;
 
 namespace NoTiming.Application.Presentlists;
@@ -15,13 +14,7 @@ namespace NoTiming.Application.Presentlists;
 public class PresentlistService
     : NStatefulService,
         IPresentlistService,
-        INotificationHandler<ParticipationArrived>,
-        INotificationHandler<PhaseCompleted>,
-        INotificationHandler<InspectionRequired>,
-        INotificationHandler<RepresentationRequired>,
-        INotificationHandler<ParticipationRestored>,
-        INotificationHandler<ParticipationEliminated>,
-        INotificationHandler<VetInAcknoledged>,
+        INotificationHandler<ParticipationChanged>,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>
 {
@@ -83,52 +76,16 @@ public class PresentlistService
                 break;
             case PresentlistEntryType.RI:
             case PresentlistEntryType.CRI:
-                var acknoledgement = new VetInAcknoledged(entry.Number, entry.PhaseId, entry.Type, entry.Time);
-                await _actionPublisher.PublishPresentationAcknoledged(acknoledgement);
+                // Only this client's list changes. Other clients keep the entry until they reload.
+                Presentlist = Presentlist.Without(new PresentlistEntryKey(entry.Number, entry.PhaseId, entry.Type));
+                EmitChanged();
                 break;
         }
     }
 
-    public Task Handle(ParticipationArrived notification, CancellationToken cancellationToken)
+    public Task Handle(ParticipationChanged notification, CancellationToken cancellationToken)
     {
         Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(InspectionRequired notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(RepresentationRequired notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.Remove);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(VetInAcknoledged notification, CancellationToken cancellationToken)
-    {
-        Presentlist = Presentlist.Without(notification.Key);
-        EmitChanged();
         return Task.CompletedTask;
     }
 

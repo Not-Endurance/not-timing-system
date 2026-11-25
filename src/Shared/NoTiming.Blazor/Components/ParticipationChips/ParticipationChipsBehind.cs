@@ -11,7 +11,7 @@ public abstract class ParticipationChipsBehind : NStatefulComponent
     public bool Compact { get; set; }
 
     [Parameter]
-    public IReadOnlyList<int> RecentlyTimed { get; set; } = [];
+    public IReadOnlyList<int> RecentlyChanged { get; set; } = [];
 
     [Parameter]
     [EditorRequired]
@@ -45,7 +45,7 @@ public abstract class ParticipationChipsBehind : NStatefulComponent
     {
         try
         {
-            if (RecentlyTimed.Contains(participation.Combination.Number))
+            if (RecentlyChanged.Contains(participation.Combination.Number))
             {
                 return Color.Warning;
             }

@@ -7,5 +7,5 @@ public interface IParticipationContext : IStatefulService
 {
     Participation? Selected { get; set; }
     IReadOnlyList<Participation> Participations { get; }
-    IReadOnlyList<int> RecentlyTimed { get; }
+    IReadOnlyList<int> RecentlyChanged { get; }
 }

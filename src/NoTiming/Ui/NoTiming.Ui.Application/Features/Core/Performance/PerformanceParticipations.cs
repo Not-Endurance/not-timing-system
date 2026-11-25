@@ -16,11 +16,7 @@ namespace NoTiming.Ui.Application.Features.Core.Performance;
 public class PerformanceParticipations
     : NStatefulService<ObservableList<Participation>>,
         IPerformanceParticipations,
-        INotificationHandler<PhaseCompleted>,
-        INotificationHandler<InspectionRequired>,
-        INotificationHandler<RepresentationRequired>,
-        INotificationHandler<ParticipationEliminated>,
-        INotificationHandler<ParticipationRestored>,
+        INotificationHandler<ParticipationChanged>,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>,
         IScoped
@@ -52,31 +48,7 @@ public class PerformanceParticipations
         return State.Any();
     }
 
-    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(InspectionRequired notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(RepresentationRequired notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
+    public Task Handle(ParticipationChanged notification, CancellationToken cancellationToken)
     {
         Update(notification.Participation);
         return Task.CompletedTask;

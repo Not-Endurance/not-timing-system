@@ -1,9 +1,8 @@
-using NoTiming.Application.Contracts.Watcher;
-using NoTiming.Application.Contracts.Watcher.Models;
+using NoTiming.Application.Contracts.Notices;
 
 namespace NoTiming.EventBus.Contracts.Features.Judge.Procedures;
 
 public interface IJudgeClientProcedures
 {
-    Task Receive(SnapshotGroupModel snapshotGroup);
+    Task ParticipationChanged(ParticipationChangedNotice notice);
 }

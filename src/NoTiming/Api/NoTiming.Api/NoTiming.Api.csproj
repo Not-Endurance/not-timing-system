@@ -15,7 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\NoTiming.Api.Application\NoTiming.Api.Application.csproj" />
     <ProjectReference Include="..\..\..\Shared\NoTiming.Application.Contracts\NoTiming.Application.Contracts.csproj" />
-    <ProjectReference Include="..\..\Ui\NoTiming.Ui.Contracts\NoTiming.Ui.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

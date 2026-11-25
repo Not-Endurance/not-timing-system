@@ -57,12 +57,12 @@ public static class NoTimingStorageServices
             _services.AddTransient<IRepository<ConfigureEvent>, ConfigureEventApiRepository>();
             _services.AddTransient<IUserLookup, UserApiRepository>();
 
+            _services.AddTransient<IParticipationCommands, ParticipationCommandApiClient>();
             AddEventScopedRepository<Participation, ParticipationEventScopedApiRepository>();
             AddEventScopedRepository<Ranking, RankingEventScopedApiRepository>();
             AddEventScopedRepository<Official, OfficialEventScopedApiRepository>();
             AddEventScopedRepository<Operator, OperatorEventScopedApiRepository>();
             AddEventScopedRepository<Handout, HandoutEventScopedApiRepository>();
-            AddEventScopedRepository<SnapshotResult, SnapshotResultEventScopedApiRepository>();
             return this;
         }
 

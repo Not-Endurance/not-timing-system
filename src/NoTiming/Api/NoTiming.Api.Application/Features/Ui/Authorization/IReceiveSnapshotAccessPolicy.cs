@@ -1,6 +1,6 @@
 namespace NoTiming.Api.Application.Features.Ui.Authorization;
 
-internal interface IReceiveSnapshotAccessPolicy
+public interface IReceiveSnapshotAccessPolicy
 {
     Task<bool> CanReceiveSnapshots(string email, int eventId);
 }
